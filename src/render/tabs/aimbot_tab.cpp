@@ -3,7 +3,7 @@
 #include "../../settings.h"
 #include "../../helpers/notifies.h"
 
-extern void bind_button(const char* eng, const char* rus, int& key);
+extern void bind_button(const char* eng, int& key);
 extern bool hotkey(const char* label, int* k, const ImVec2& size_arg = ImVec2(0.f, 0.f));
 
 namespace render
@@ -35,16 +35,16 @@ namespace render
 			static int definition_index = 7;
 			auto settings = &settings::aimbot::m_items[definition_index];
 
-			child(___("Main", u8"Основные настройки"), [&settings]()
+			child(strings::aimbot_main.c_str(), [&settings]()
 			{
 				auto k_item_names = get_weapons(false);
 
 				const char* setting_types[] =
 				{
-					___("Separately", u8"Раздельно"),
-					___("Subgroups", u8"Подразделы"),
-					___("For all", u8"Все оружие"),
-					___("Groups", u8"Разделы")
+					strings::aimbot_main_setting_types_seperately.c_str(),
+					strings::aimbot_main_setting_types_subgroups.c_str(),
+					strings::aimbot_main_setting_types_for_all.c_str(),
+					strings::aimbot_main_setting_types_groups.c_str()
 				};
 
 				static bool is_settings_visible = false;
@@ -102,35 +102,35 @@ namespace render
 
 						if (is_settings_visible)
 						{
-							if (ImGui::Button(___("Edit", u8"Изменить"), ImVec2(ImGui::GetContentRegionAvailWidth(), 0.f)))
+							if (ImGui::Button(strings::edit.c_str(), ImVec2(ImGui::GetContentRegionAvailWidth(), 0.f)))
 								is_settings_visible = false;
 						}
 						else
 						{
-							if (ImGui::Button(___("Hide", u8"Скрыть"), ImVec2(ImGui::GetContentRegionAvailWidth(), 0.f)))
+							if (ImGui::Button(strings::hide.c_str(), ImVec2(ImGui::GetContentRegionAvailWidth(), 0.f)))
 								is_settings_visible = true;
 						}
 					}
 
 					if (!is_settings_visible)
 					{
-						separator(___("New group", u8"Новая группа"));
+						separator(strings::aimbot_main_newgroup.c_str());
 
-						ImGui::Text(___("Name", u8"Имя"));
+						ImGui::Text(strings::name.c_str());
 
 						static char group_name[32];
 						ImGui::InputText("##aimbot.group_name", group_name, sizeof(group_name));
 
-						if (ImGui::Button(___("Create", u8"Добавить")))
+						if (ImGui::Button(strings::create.c_str()))
 						{
 							if (strlen(group_name) == 0)
-								notifies::push(___("Enter the group name", u8"Укажите имя группы"), notify_state_s::danger_state);
+								notifies::push(strings::aimbot_main_entername.c_str(), notify_state_s::danger_state);
 							else
 							{
 								settings::aimbot::m_groups.emplace_back(aimbot_group{ std::string(group_name), { } });
 
 								memset(group_name, 0, sizeof(group_name));
-								notifies::push(___("Group created", u8"Группа создана"));
+								notifies::push(strings::aimbot_main_groupcreated.c_str());
 
 								definition_index = settings::aimbot::m_groups.size() - 1;
 							}
@@ -139,12 +139,12 @@ namespace render
 						if (settings::aimbot::m_groups.empty())
 							return;
 
-						separator(___("Current group", u8"Текущая группа"));
+						separator(strings::aimbot_main_currgroup.c_str());
 
 						auto& current_group = settings::aimbot::m_groups[definition_index];
 
 						static auto weapon_to_select = -1;
-						std::string placeholder = ___("Select weapon", u8"Выберите предметы");
+						std::string placeholder = strings::aimbot_main_selweap.c_str();
 
 						const auto groups = get_groups(false, false);
 
@@ -156,7 +156,7 @@ namespace render
 							weapon_to_select = -1;
 						}
 
-						//ImGui::Text(___("Press for remove weapon", u8"Нажмите для удаления"));
+						//ImGui::Text(___("Press for remove weapon", u8"РќР°Р¶РјРёС‚Рµ РґР»СЏ СѓРґР°Р»РµРЅРёСЏ"));
 
 						static int weapon_to_remove = -1;
 						//ImVec2(ImGui::GetContentRegionAvailWidth(), 150.f)
@@ -167,9 +167,9 @@ namespace render
 							weapon_to_remove = -1;
 						}
 
-						if (ImGui::Button(___("Delete", u8"Удалить")))
+						if (ImGui::Button(strings::delete_st.c_str()))
 						{
-							notifies::push(___("Group removed", u8"Группа удалена"));
+							notifies::push(strings::aimbot_main_delgroup.c_str());
 
 							settings::aimbot::m_groups.erase(settings::aimbot::m_groups.begin() + definition_index);
 
@@ -180,9 +180,9 @@ namespace render
 					}
 				}
 
-				checkbox("Enabled", u8"Включено", &settings->enabled);
-				checkbox("Randomise RCS", u8"Смягчать", &settings->recoil.humanize);
-				tooltip("Enabling this will randomise RCS between 0.1 - 0.5 at X and 0.1 - 0.6 on Y");
+				checkbox(strings::enabled.c_str(), &settings->enabled);
+				checkbox(strings::aimbot_main_randomise_rcs.c_str(), &settings->recoil.humanize);
+				tooltip(strings::aimbot_main_randomise_rcs_tooltip.c_str());
 
 				if (settings::aimbot::setting_type == settings_type_t::separately)
 				{
@@ -197,65 +197,65 @@ namespace render
 					case WEAPON_ELITE:
 					case WEAPON_HKP2000:
 					case 201:
-						checkbox("Auto Pistol", u8"Автом. пистолеты", &settings->autopistol);
+						checkbox(strings::aimbot_main_autopistol.c_str(), &settings->autopistol);
 					default:
 						break;
 					}
 				}
 				else if (settings::aimbot::setting_type == settings_type_t::subgroups && (definition_index == WEAPONTYPE_PISTOL || definition_index == 201))
-					checkbox("Auto Pistol", u8"Автом. пистолеты", &settings->autopistol);
+					checkbox(strings::aimbot_main_autopistol.c_str(), &settings->autopistol);
 				else
-					checkbox("Auto Pistol", u8"Автом. пистолеты", &settings->autopistol);
+					checkbox(strings::aimbot_main_autopistol.c_str(), &settings->autopistol);
 
-				checkbox("Air Check", u8"Не наводиться в прыжке", &settings->check_air);
-				checkbox("Flash Check", u8"Не наводиться ослепленным", &settings->check_flash);
-				checkbox("Smoke Check", u8"Не наводиться в дымовые", &settings->check_smoke);
+				checkbox(strings::aimbot_main_aircheck.c_str(), &settings->check_air);
+				checkbox(strings::aimbot_main_flashcheck.c_str(), &settings->check_flash);
+				checkbox(strings::aimbot_main_smokecheck.c_str(), &settings->check_smoke);
 
 				if (settings::aimbot::setting_type == settings_type_t::separately)
 				{
 					if (utils::is_sniper(definition_index))
-						checkbox("Zoom Check", u8"Наводиться только в зуме", &settings->check_zoom);
+						checkbox(strings::aimbot_main_zoomcheck.c_str(), &settings->check_zoom);
 				}
 				else if (settings::aimbot::setting_type == settings_type_t::subgroups)
 				{
 					if (definition_index == 240 || definition_index == 209 || definition_index == WEAPONTYPE_SNIPER_RIFLE)
-						checkbox("Zoom Check", u8"Наводиться только в зуме", &settings->check_zoom);
+						checkbox(strings::aimbot_main_zoomcheck.c_str(), &settings->check_zoom);
 				}
 				else if (settings::aimbot::setting_type == settings_type_t::groups)
-					checkbox("Zoom Check", u8"Наводиться только в зуме", &settings->check_zoom);
+					checkbox(strings::aimbot_main_zoomcheck.c_str(), &settings->check_zoom);
 
 				columns(2);
 				{
-					checkbox("By Damage", u8"По дамагу", &settings->by_damage);
+					checkbox(strings::aimbot_main_bydamage.c_str(), &settings->by_damage);
 
 					ImGui::NextColumn();
 
 					ImGui::PushItemWidth(-1);
-					ImGui::SliderIntLeftAligned(___("Min:##min_damage", u8"От:##min_damage"), &settings->min_damage, 1, 100, "%.0f HP");
+					ImGui::SliderIntLeftAligned((strings::min + "##min_damage").c_str(), &settings->min_damage, 1, 100, "%.0f HP");
 					ImGui::PopItemWidth();
 				}
 				columns(1);
 
 				columns(2);
 				{
-					checkbox("Auto Wall", u8"Игнор стен", &settings->autowall.enabled);
+					checkbox(strings::aimbot_main_autowall.c_str(), &settings->autowall.enabled);
 
 					ImGui::NextColumn();
 
 					ImGui::PushItemWidth(-1);
-					ImGui::SliderIntLeftAligned(___("Min:##autowall", u8"От:##autowall"), &settings->autowall.min_damage, 1, 100, "%.0f HP");
+					ImGui::SliderIntLeftAligned((strings::min + "##min_damage").c_str(), &settings->autowall.min_damage, 1, 100, "%.0f HP");
 					ImGui::PopItemWidth();
 				}
 				columns(1);
 
-				separator(___("Delays", u8"Задержки"));
+				separator(strings::aimbot_main_delays.c_str());
 
 				if (!settings->silent.enabled)
 				{
-					checkbox("Auto Delay", u8"Автоматическая задержка", &settings->autodelay);
-					ImGui::SliderIntLeftAligned(___("Shot Delay:", u8"Перед выстрелом:"), &settings->shot_delay, 0, 250, "%.0f ms");
+					checkbox(strings::aimbot_main_autodelay.c_str(), &settings->autodelay);
+					ImGui::SliderIntLeftAligned(strings::aimbot_main_shotdelay.c_str(), &settings->shot_delay, 0, 250, "%.0f ms");
 				}
-				ImGui::SliderIntLeftAligned(___("Target Switch Delay:", u8"После убийства:"), &settings->kill_delay, 0, 1000, "%.0f ms");
+				ImGui::SliderIntLeftAligned(strings::aimbot_main_targetswitchdelay.c_str(), &settings->kill_delay, 0, 1000, "%.0f ms");
 
 				if (settings::aimbot::setting_type != 0)
 					return;
@@ -273,7 +273,7 @@ namespace render
 
 				ImGui::Separator();
 
-				if (ImGui::Button(___("Current", u8"Текущее")))
+				if (ImGui::Button(strings::aimbot_main_current.c_str()))
 					definition_index = item_definition_index;
 
 				if (weapon)
@@ -282,72 +282,72 @@ namespace render
 
 			ImGui::NextColumn();
 
-			child(___("Silent", u8"Невидимая доводка"), [&settings]()
+			child(strings::aimbot_silent.c_str(), [&settings]()
 			{
-				checkbox("Enabled##silent", u8"Включено##silent", &settings->silent.enabled);
-				checkbox("Always (?)", u8"Всегда (?)", &settings->silent.always);
-				tooltip("Silent will work on every shot.", u8"Будет работать на каждом выстреле.");
-				checkbox("Use With Smooth", u8"Совмещать с доводкой", &settings->silent.with_smooth);
+				checkbox((strings::enabled + "##silent").c_str(), &settings->silent.enabled);
+				checkbox(strings::aimbot_silent_always.c_str(), &settings->silent.always);
+				tooltip(strings::aimbot_silent_always_tt.c_str());
+				checkbox(strings::aimbot_silent_withsmooth.c_str(), &settings->silent.with_smooth);
 
 				if (settings->silent.with_smooth && settings->fov < settings->silent.fov)
 					settings->silent.fov = settings->fov;
 
-				ImGui::SliderFloatLeftAligned(___("FOV:", u8"Радиус:"), &settings->silent.fov, 0, settings->silent.with_smooth ? settings->fov : 20.f, "%.1f %"); //20f
-				//ImGui::SliderInt("##silent.chanse", &settings->silent.chanse, 1, 10, ___("Chanse: %.0f", u8"Шанс срабатывания: %.0f"));
+				ImGui::SliderFloatLeftAligned(strings::aimbot_fov.c_str(), &settings->silent.fov, 0, settings->silent.with_smooth ? settings->fov : 20.f, "%.1f %"); //20f
+				//ImGui::SliderInt("##silent.chanse", &settings->silent.chanse, 1, 10, ___("Chanse: %.0f", u8"РЁР°РЅСЃ СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ: %.0f"));
 
-				separator(___("Other", u8"Прочее"));
+				separator(strings::aimbot_misc.c_str());
 
 				ImGui::PushID("aimbot.other");
 				{
-					checkbox("Dynamic FOV", u8"Динамический радиус", &settings->dynamic_fov);
-					checkbox("Legit Backtrack (?)", &settings->backtrack.legit);
-					tooltip("Will backtrack depending on stuff as fov,angle,hitbox ID, sim_time, etc...");
+					checkbox(strings::aimbot_misc_dynfov.c_str(), &settings->dynamic_fov);
+					checkbox(strings::aimbot_misc_legitbacktrack.c_str(), &settings->backtrack.legit);
+					tooltip(strings::aimbot_misc_legitbacktrack_tt.c_str());
 
-					ImGui::SliderFloatLeftAligned(___("FOV:", u8"Радиус:"), &settings->fov, 0, 15.f, "%.1f %");
+					ImGui::SliderFloatLeftAligned(strings::aimbot_fov.c_str(), &settings->fov, 0, 15.f, "%.1f %");
 
-					ImGui::SliderFloatLeftAligned(___("Smooth:", u8"Плавность:"), &settings->smooth, 1, 15.f, "%.1f %");
+					ImGui::SliderFloatLeftAligned(strings::aimbot_misc_smooth.c_str(), &settings->smooth, 1, 15.f, "%.1f %");
 
-					//ImGui::SliderFloatLeftAligned(___("BT time:", u8"Лаг компенсация:"), &settings->backtrack.time, 0.f, 0.2f, ___("%.2f ms", u8"%.0f тиков"));
-					ImGui::SliderIntLeftAligned(___("Lag Compensation:", u8"Лаг компенсация:"), &settings->backtrack.ticks, 0, 12, ___("%.0f ms", u8"%.0f тиков"));
+					//ImGui::SliderFloatLeftAligned(___("BT time:", u8"Р›Р°Рі РєРѕРјРїРµРЅСЃР°С†РёСЏ:"), &settings->backtrack.time, 0.f, 0.2f, ___("%.2f ms", u8"%.0f С‚РёРєРѕРІ"));
+					ImGui::SliderIntLeftAligned(strings::aimbot_misc_lagcomp.c_str(), &settings->backtrack.ticks, 0, 12, "%.0f ms");
 
-					ImGui::SliderIntLeftAligned(___("Hit Chance:", u8"Мин шанс попадания:"), &settings->min_hitchanse, 0, 100, "%.0f%%");
+					ImGui::SliderIntLeftAligned(strings::aimbot_misc_hitchance.c_str(), &settings->min_hitchanse, 0, 100, "%.0f%%");
 				}
 				ImGui::PopID();
 
 				columns(3);
 				{
-					checkbox("Head", u8"Голова", &settings->hitboxes.head);
-					checkbox("Hands", u8"Руки", &settings->hitboxes.hands);
+					checkbox(strings::aimbot_misc_head.c_str(), &settings->hitboxes.head);
+					checkbox(strings::aimbot_misc_hands.c_str(), &settings->hitboxes.hands);
 
 					ImGui::NextColumn();
 
-					checkbox("Neck", u8"Шея", &settings->hitboxes.neck);
-					checkbox("Legs", u8"Ноги", &settings->hitboxes.legs);
+					checkbox(strings::aimbot_misc_neck.c_str(), &settings->hitboxes.neck);
+					checkbox(strings::aimbot_misc_legs.c_str(), &settings->hitboxes.legs);
 
 					ImGui::NextColumn();
 
-					checkbox("Body", u8"Живот", &settings->hitboxes.body);
+					checkbox(strings::aimbot_misc_body.c_str(), &settings->hitboxes.body);
 				}
 				columns(1);
 			});
 
 			ImGui::NextColumn();
 
-			child(___("Recoil Control System", u8"Спрей"), [&settings]()
+			child(strings::aimbot_rcs.c_str(), [&settings]()
 			{
-				checkbox("Enabled", u8"Включено", &settings->recoil.enabled);
-				checkbox("First Bullet", u8"С первой пули", &settings->recoil.first_bullet);
-				checkbox("RCS Hitbox Override (?)", &settings->rcs_override_hitbox);
-				tooltip("If shotsFired >= 3 - disable all hitboxes, except body, if shotsFired < 3 - enable hitboxes you had.");
+				checkbox(strings::enabled.c_str(), &settings->recoil.enabled);
+				checkbox(strings::aimbot_rcs_firstbullet.c_str(), &settings->recoil.first_bullet);
+				checkbox(strings::aimbot_rcs_hitboxoverride.c_str(), &settings->rcs_override_hitbox);
+				tooltip(strings::aimbot_rcs_hitboxoverride_tt.c_str());
 
-				ImGui::SliderFloatLeftAligned("Pitch:", &settings->recoil.pitch, 0, 2, "%.1f %");
-				ImGui::SliderFloatLeftAligned("Yaw:", &settings->recoil.yaw, 0, 2, "%.1f %");
+				ImGui::SliderFloatLeftAligned(strings::aimbot_rcs_pitch.c_str(), &settings->recoil.pitch, 0, 2, "%.1f %");
+				ImGui::SliderFloatLeftAligned(strings::aimbot_rcs_yaw.c_str(), &settings->recoil.yaw, 0, 2, "%.1f %");
 
-				separator(___("Trigger", u8"Авто выстрел"));
+				separator(strings::aimbot_trigger.c_str());
 
 				columns(2);
 				{
-					checkbox("Enabled##trigger", u8"Включено##trigger", &settings->trigger.enabled);
+					checkbox((strings::enabled + "##trigger").c_str(), &settings->trigger.enabled);
 
 					ImGui::NextColumn();
 
@@ -357,11 +357,11 @@ namespace render
 				}
 				columns(1);
 
-				bind_button("Back Shot", "Back Shot", globals::binds::back_shot);
+				bind_button(strings::aimbot_trigger_backshot.c_str(), globals::binds::back_shot);
 
-				ImGui::SliderIntLeftAligned(___("Reaction time:", u8"Перед выстрелом:"), &settings->trigger.delay, 0, 250, "%.0f ms");
-				ImGui::SliderIntLeftAligned(___("Delay Between Shots:", u8"Между выстрелами:"), &settings->trigger.delay_btw_shots, 0, 250, "%.0f ms");
-				ImGui::SliderIntLeftAligned(___("Hit Chance:", u8"Мин шанс попадания:"), &settings->trigger.hitchance, 1, 100, "%.0f%%");
+				ImGui::SliderIntLeftAligned(strings::aimbot_trigger_reactiontime.c_str(), &settings->trigger.delay, 0, 250, "%.0f ms");
+				ImGui::SliderIntLeftAligned(strings::aimbot_trigger_dbs.c_str(), &settings->trigger.delay_btw_shots, 0, 250, "%.0f ms");
+				ImGui::SliderIntLeftAligned(strings::aimbot_misc_hitchance.c_str(), &settings->trigger.hitchance, 1, 100, "%.0f%%");
 			});
 		}
 	}

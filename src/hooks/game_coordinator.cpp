@@ -128,7 +128,7 @@ namespace hooks
 			{
 				interfaces::engine_client->ClientCmd_Unrestricted("callvote swapteams");
 
-				notifies::push(render::___("Anti-Kicking...", u8"Анти-кик..."), notify_state_s::warning_state);
+				notifies::push(strings::antikick.c_str(), notify_state_s::warning_state);
 			}
 		});
 

@@ -4,7 +4,7 @@
 #include "../../features/features.h"
 #include "../../helpers/console.h"
 
-extern void bind_button(const char* eng, const char* rus, int& key);
+extern void bind_button(const char* eng, int& key);
 extern bool hotkey(const char* label, int* k, const ImVec2& size_arg = ImVec2(0.f, 0.f));
 
 namespace render
@@ -17,22 +17,22 @@ namespace render
 
 		void misc_tab()
 		{
-			child(___("Name", u8"Имя"), []()
+			child(strings::misc_name.c_str(), []()
 			{
 				ImGui::InputText("##misc_name", name, sizeof(name));
 				columns(2);
 				{
-					if (ImGui::Button(___("Apply##name", u8"Применить##name"), ImVec2(ImGui::GetContentRegionAvailWidth() - 2.f, 0.f)))
+					if (ImGui::Button((strings::misc_apply + "##name").c_str(), ImVec2(ImGui::GetContentRegionAvailWidth() - 2.f, 0.f)))
 						utils::set_player_name(name);
 
 					ImGui::NextColumn();
 
-					if (ImGui::Button(___("Hide", u8"Скрыть"), ImVec2(ImGui::GetContentRegionAvailWidth() - 2.f, 0.f)))
+					if (ImGui::Button(strings::misc_hide.c_str(), ImVec2(ImGui::GetContentRegionAvailWidth() - 2.f, 0.f)))
 						utils::set_player_name("\n\xAD\xAD\xAD");
 				}
 				columns(1);
 
-				separator(___("Clan Tag", u8"Клантег"));
+				separator(strings::misc_clantag.c_str());
 
 				if (!is_clantag_copied && std::string(localtag) != globals::clantag::value)
 				{
@@ -47,7 +47,7 @@ namespace render
 				auto player_resource = *interfaces::player_resource;
 				if (player_resource)
 				{
-					if (ImGui::BeginCombo("##clantags.list", ___("Player tags", u8"Теги игроков")))
+					if (ImGui::BeginCombo("##clantags.list", strings::misc_playertags.c_str()))
 					{
 						std::vector<std::string> tags;
 
@@ -81,7 +81,7 @@ namespace render
 
 				columns(2);
 				{
-					if (ImGui::Button(___("Apply##clan", u8"Применить##clan"), ImVec2(ImGui::GetContentRegionAvailWidth() - 2.f, 0.f)))
+					if (ImGui::Button((strings::misc_apply + "##clan").c_str(), ImVec2(ImGui::GetContentRegionAvailWidth() - 2.f, 0.f)))
 					{
 						globals::clantag::value = localtag;
 						clantag::set(localtag);
@@ -91,16 +91,18 @@ namespace render
 
 					ImGui::NextColumn();
 
-					if (ImGui::Button(!globals::clantag::animation ? ___("Animation", u8"Аним.") : ___("Dont Animate", u8"Не аним."), ImVec2(ImGui::GetContentRegionAvailWidth() - 2.f, 0.f)))
+					if (ImGui::Button(!globals::clantag::animation ? strings::misc_anim.c_str() : strings::misc_dontanim.c_str(), ImVec2(ImGui::GetContentRegionAvailWidth() - 2.f, 0.f)))
 						globals::clantag::animation = !globals::clantag::animation;
 				}
 				columns(1);
+
+				separator(strings::misc_fakelags.c_str());
 
 				ImGui::PushID("fakelags");
 				{
 					columns(2);
 					{
-						checkbox("Enabled", u8"Включено", &settings::fake_lags::enabled);
+						checkbox(strings::enabled.c_str(), &settings::fake_lags::enabled);
 
 						ImGui::NextColumn();
 
@@ -112,55 +114,55 @@ namespace render
 
 					const char* lag_types[] =
 					{
-						___("Always", u8"Всегда"),
-						___("Only in air", u8"Только в прыжке"),
-						___("When picking", u8"Во время пика"),
-						___("By button", u8"По кнопке"),
-						___("Adaptive", u8"По кнопке")
+						strings::misc_fakelags_always.c_str(),
+						strings::misc_fakelags_inair.c_str(),
+						strings::misc_fakelags_picking.c_str(),
+						strings::misc_fakelags_button.c_str(),
+						strings::misc_fakelags_adaptive.c_str()
 					};
 
 					ImGui::Combo("##lag_type", &settings::fake_lags::type, lag_types, IM_ARRAYSIZE(lag_types));
-					ImGui::SliderIntLeftAligned(___("Factor:", u8"Фактор:"), &settings::fake_lags::factor, 1, 6, settings::fake_lags::factor == 1 ? "%.0f tick" : "%.0f ticks");
+					ImGui::SliderIntLeftAligned(strings::misc_fakelags_factor.c_str(), &settings::fake_lags::factor, 1, 6, settings::fake_lags::factor == 1 ? "%.0f tick" : "%.0f ticks");
 				}
 				ImGui::PopID();
 
-				static const char* desyncModes[] = {
-					"Off",
-					"Static",
-					"Balance"
+				const char* desyncModes[] = {
+					strings::misc_desync_off.c_str(),
+					strings::misc_desync_static.c_str(),
+					strings::misc_desync_balance.c_str()
 				};
 
-				separator("Desync", u8"Десинхронизация");
+				separator(strings::misc_desync.c_str());
 				ImGui::PushID("desync");
 				{
 					columns(2);
 					{
-						checkbox("Enabled", u8"Включено", &settings::desync::enabled2);
+						checkbox(strings::enabled.c_str(), &settings::desync::enabled2);
 
 						ImGui::NextColumn();
-						ImGui::Combo("Mode", &settings::desync::desync_mode, desyncModes, IM_ARRAYSIZE(desyncModes));
+						ImGui::Combo(strings::misc_desync_mode.c_str(), &settings::desync::desync_mode, desyncModes, IM_ARRAYSIZE(desyncModes));
 					}
 					columns(1);
 
-					bind_button("Left/Right", u8"Left/Right", globals::binds::desync);
+					bind_button(strings::misc_leftright.c_str(), globals::binds::desync);
 				}
 				ImGui::PopID();
 
-				separator("FOV");
+				separator(strings::misc_fov.c_str());
 
-				ImGui::SliderFloatLeftAligned(___("View Model:", u8"Руки:"), &settings::misc::viewmodel_fov, 54, 120, "%.0f *");
-				ImGui::SliderIntLeftAligned(___("Debug:", u8"Обзор:"), &settings::misc::debug_fov, 80, 120, "%.0f *");
+				ImGui::SliderFloatLeftAligned(strings::misc_viewmodel.c_str(), &settings::misc::viewmodel_fov, 54, 120, "%.0f *");
+				ImGui::SliderIntLeftAligned(strings::misc_debug.c_str(), &settings::misc::debug_fov, 80, 120, "%.0f *");
 
 				static const char* skyList[] = { "Baggage", "Tibet", "Embassy", "Italy", "Daylight 1", "Daylight 2", "Daylight 3", "Daylight 4", "Cloudy", "Night 1", "Night 2", "Night Flat", "Day HD", "Day", "Rural", "Vertigo HD", "Vertigo", "Dusty Sky", "Jungle", "Nuke", "Office" };
 
-				separator("Skybox Changer");
+				separator(strings::misc_skybox.c_str());
 
 				columns(2);
 				{
-					checkbox("Enabled", &settings::visuals::skychanger);
+					checkbox(strings::enabled.c_str(), &settings::visuals::skychanger);
 
 					ImGui::NextColumn();
-					ImGui::Combo("List", &settings::visuals::skychanger_mode, skyList, IM_ARRAYSIZE(skyList));
+					ImGui::Combo(strings::misc_list.c_str(), &settings::visuals::skychanger_mode, skyList, IM_ARRAYSIZE(skyList));
 				}
 				columns(1);
 
@@ -175,27 +177,27 @@ namespace render
 					"Z"
 				};
 
-				separator("Viewmodel Override");
+				separator(strings::misc_viewmodel_ov.c_str());
 
 				columns(2);
 				{
-					checkbox("Enabled##viewmodel_changer", &settings::misc::override_viewmodel);
+					checkbox((strings::enabled + "##viewmodel_changer").c_str(), &settings::misc::override_viewmodel);
 
 					ImGui::NextColumn();
-					ImGui::Combo("List##viewmodel_changer", &settings::visuals::viewmodel_mode, viewList, IM_ARRAYSIZE(viewList));
+					ImGui::Combo((strings::misc_list + "##viewmodel_changer").c_str(), &settings::visuals::viewmodel_mode, viewList, IM_ARRAYSIZE(viewList));
 				}
 				columns(1);
 
 				switch (settings::visuals::viewmodel_mode)
 				{
 				case 0:
-					ImGui::SliderFloatLeftAligned("Offset X:", &settings::misc::viewmodel_offset_x, -21.f, 21.f, "%.0f");
+					ImGui::SliderFloatLeftAligned(strings::misc_viewmodel_x.c_str(), &settings::misc::viewmodel_offset_x, -21.f, 21.f, "%.0f");
 					break;
 				case 1:
-					ImGui::SliderFloatLeftAligned("Offset Y:", &settings::misc::viewmodel_offset_y, 0.f, 50.f, "%.0f");
+					ImGui::SliderFloatLeftAligned(strings::misc_viewmodel_y.c_str(), &settings::misc::viewmodel_offset_y, 0.f, 50.f, "%.0f");
 					break;
 				case 2:
-					ImGui::SliderFloatLeftAligned("Offset Z:", &settings::misc::viewmodel_offset_z, -30.f, 30.f, "%.0f");
+					ImGui::SliderFloatLeftAligned(strings::misc_viewmodel_z.c_str(), &settings::misc::viewmodel_offset_z, -30.f, 30.f, "%.0f");
 					break;
 				}
 
@@ -207,60 +209,59 @@ namespace render
 
 			ImGui::NextColumn();
 
-			child(___("Extra", u8"Прочее"), []()
+			child(strings::misc_extra.c_str(), []()
 			{
-				//checkbox("Russian", u8"Русский язык", &globals::russian_language);
 				//checkbox("Disable Animations (?)", u8"Отключить анимации (?)", &globals::no_animations);
 				//tooltip("Disables the cheat menu animations.", u8"Отключает анимации меню чита.");
 
 				const char* fastStopModes[] = {
-					"Off",
-					"Left & Right",
-					"Forward & Backward",
-					"Both"
+					strings::misc_extra_faststop_off.c_str(),
+					strings::misc_extra_faststop_leftright.c_str(),
+					strings::misc_extra_faststop_forwardback.c_str(),
+					strings::misc_extra_faststop_both.c_str()
 				};
 
-				checkbox("Engine Prediction", &settings::movement::engine_prediction);
-				checkbox("Radar", u8"Радар", &settings::misc::radar);
-				checkbox("No Flash", u8"Убрать световые", &settings::misc::no_flash);
-				checkbox("No Smoke", u8"Убрать дымовые", &settings::misc::no_smoke);
-				checkbox("Bunny Hop", u8"Распрыжка", &settings::misc::bhop);
-				checkbox("Auto Strafe", u8"Стрейфы", &settings::misc::auto_strafe);
-				checkbox("Knife Bot", u8"Ножевой бот", &settings::misc::knife_bot);
-				checkbox("Moon Walk", u8"Лунная походка", &settings::misc::moon_walk);
-				checkbox("Deathmatch", u8"Бой насмерть", &settings::misc::deathmatch);
-				checkbox("Post Processing", u8"Постообработка", &globals::post_processing);
-				checkbox("Resolver", u8"Постообработка", &settings::desync::resolver);
-				checkbox("Humanised Bhop", u8"Постообработка", &settings::misc::human_bhop);
-				checkbox("Noscope Overlay", u8"Постообработка", &settings::misc::noscope);
-				checkbox("No 3rd Person on Equiped Weapons.", &settings::misc::disable_on_weapon);
-				checkbox("Anti OBS", &settings::misc::anti_obs);
-				checkbox("Left Hand Knife", &settings::misc::lefthandknife);
-				checkbox("-98 Nade (?)", &settings::misc::selfnade);
-				tooltip("Look up, Hold mouse 2,When you're fully primed to throw with mouse 2 start holding mouse 1, crouch when released.");
+				checkbox(strings::misc_extra_engpred.c_str(), &settings::movement::engine_prediction);
+				checkbox(strings::misc_extra_radar.c_str(), &settings::misc::radar);
+				checkbox(strings::misc_extra_noflash.c_str(), &settings::misc::no_flash);
+				checkbox(strings::misc_extra_nosmoke.c_str(), &settings::misc::no_smoke);
+				checkbox(strings::misc_extra_bhop.c_str(), &settings::misc::bhop);
+				checkbox(strings::misc_extra_autostrafe.c_str(), &settings::misc::auto_strafe);
+				checkbox(strings::misc_extra_knifebot.c_str(), &settings::misc::knife_bot);
+				checkbox(strings::misc_extra_moonwalk.c_str(), &settings::misc::moon_walk);
+				checkbox(strings::misc_extra_dm.c_str(), &settings::misc::deathmatch);
+				checkbox(strings::misc_extra_postpr.c_str(), &globals::post_processing);
+				checkbox(strings::misc_extra_resolver.c_str(), &settings::desync::resolver);
+				checkbox(strings::misc_extra_hbhop.c_str(), &settings::misc::human_bhop);
+				checkbox(strings::misc_extra_noscope.c_str(), &settings::misc::noscope);
+				checkbox(strings::misc_extra_no3person.c_str(), &settings::misc::disable_on_weapon);
+				checkbox(strings::misc_extra_antiobs.c_str(), &settings::misc::anti_obs);
+				checkbox(strings::misc_extra_leftknife.c_str(), &settings::misc::lefthandknife);
+				checkbox(strings::misc_extra_98nade.c_str(), &settings::misc::selfnade);
+				tooltip(strings::misc_extra_98nade_tt.c_str());
 				columns(2);
 				{
-					checkbox("Fast Stop", &settings::misc::fast_stop);
+					checkbox(strings::misc_extra_faststop.c_str(), &settings::misc::fast_stop);
 
 					ImGui::NextColumn();
 
 					ImGui::PushItemWidth(-1);
-					ImGui::Combo("Mode", &settings::misc::fast_stop_mode, fastStopModes, IM_ARRAYSIZE(fastStopModes));
+					ImGui::Combo(strings::misc_desync_mode.c_str(), &settings::misc::fast_stop_mode, fastStopModes, IM_ARRAYSIZE(fastStopModes));
 					ImGui::PopItemWidth();
 				}
 				columns(1);
 
-				checkbox("Force Inventory Open", &settings::misc::force_inventory_open);
+				checkbox(strings::misc_extra_forceinv.c_str(), &settings::misc::force_inventory_open);
 
 				columns(2);
 				{
-					checkbox("Edge Jump", &settings::misc::edge_jump);
+					checkbox(strings::misc_edgejump.c_str(),&settings::misc::edge_jump);
 
 					ImGui::NextColumn();
 
 					ImGui::PushItemWidth(-1);
 					if (settings::misc::edge_jump) {
-						ImGui::Checkbox("Duck in Air", &settings::misc::edge_jump_duck_in_air);
+						ImGui::Checkbox(strings::misc_extra_edgejump_duck.c_str(), &settings::misc::edge_jump_duck_in_air);
 					}
 					ImGui::PopItemWidth();
 				}
@@ -270,26 +271,38 @@ namespace render
 
 			ImGui::NextColumn();
 
-			child(___("Binds", u8"Кнопки"), []()
+			child(strings::misc_binds.c_str(), []()
 			{
-				bind_button("Zeus Bot", u8"Zeus Bot", globals::binds::zeus_bot);
-				bind_button("Slow Walk", "Slow Walk", globals::binds::slow_walk);
-				bind_button("Fake Crouch", "Fake Crouch", globals::binds::fake_duck);
-				bind_button("Third Person", "Third Person", globals::binds::thirdperson::key);
-				bind_button("Lightning Shot", "Lightning Shot", globals::binds::lightning_shot);
-				bind_button("Edge Jump", "Edge Jump", globals::binds::edge_jump);
-				//bind_button("Block Bot", "Block Bot", globals::binds::block_bot);
+				bind_button(strings::misc_zeusbot.c_str(), globals::binds::zeus_bot);
+				bind_button(strings::misc_slowwalk.c_str(), globals::binds::slow_walk);
+				bind_button(strings::misc_fakecrouch.c_str(), globals::binds::fake_duck);
+				bind_button(strings::misc_thirdperson.c_str(), globals::binds::thirdperson::key);
+				bind_button(strings::misc_lightningshot.c_str(), globals::binds::lightning_shot);
+				bind_button(strings::misc_edgejump.c_str(), globals::binds::edge_jump);
+
+				separator(strings::misc_unfinished.c_str());
+
+				bind_button(strings::misc_blockbot.c_str(), globals::binds::block_bot);
+
+				separator(strings::language.c_str());
+
+				static const char* languages[] = {
+					"English",
+					"Russian"
+				};
+				ImGui::Combo("Language", &globals::language, languages, IM_ARRAYSIZE(languages));
+				strings::updatelang();
 
 				if (settings::misc::human_bhop)
 				{
-					separator(___("Humanised Bhop Settings", u8"Фейк лаги"));
+					separator(strings::misc_hbhop_settings.c_str());
 
-					ImGui::SliderIntLeftAligned("Bhop Hit Chance", &settings::misc::bhop_hit_chance, 0, 100, "%.0f %%");
-					tooltip("The chance of second hop, first hop is always at 100%");
-					ImGui::SliderIntLeftAligned("Hops Limit", &settings::misc::hops_restricted_limit, 0, 12);
-					tooltip("Will fuckup the bhop after certain amount of hops to look legit.");
-					ImGui::SliderIntLeftAligned("Max Hops Limit", &settings::misc::max_hops_hit, 0, 12);
-					tooltip("Will fuckup the bhop after certain amount of hops to look legit.");
+					ImGui::SliderIntLeftAligned(strings::misc_hbhop_settings_hitch.c_str(), &settings::misc::bhop_hit_chance, 0, 100, "%.0f %%");
+					tooltip(strings::misc_hbhop_settings_hitch_tt.c_str());
+					ImGui::SliderIntLeftAligned(strings::misc_hbhop_settings_limit.c_str(), &settings::misc::hops_restricted_limit, 0, 12);
+					tooltip(strings::misc_hbhop_settings_limit_tt.c_str());
+					ImGui::SliderIntLeftAligned(strings::misc_hbhop_settings_maxlimit.c_str(), &settings::misc::max_hops_hit, 0, 12);
+					tooltip(strings::misc_hbhop_settings_limit_tt.c_str());
 				}
 
 				/*if (!interfaces::local_player)

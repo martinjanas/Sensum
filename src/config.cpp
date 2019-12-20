@@ -2,10 +2,11 @@
 #include "helpers/console.h"
 
 #include <fstream>
-#include <experimental/filesystem>
-
 
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+
+#include <experimental/filesystem>
+
 
 namespace fs = std::experimental::filesystem;
 

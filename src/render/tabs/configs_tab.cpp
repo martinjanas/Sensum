@@ -40,15 +40,15 @@ namespace render
 				is_loaded = true;
 			}
 
-			child(___("New Config", u8"Новая конфигурация"), []()
+			child(strings::config_newconfig.c_str(), []()
 			{
 				ImGui::InputText("##filename", filename, 32);
 
-				if (ImGui::Button(___("Create", u8"Создать"), button_size))
+				if (ImGui::Button(strings::create.c_str(), button_size))
 				{
 					if (strlen(filename) == 0)
 					{
-						notifies::push(___("Enter config name", u8"Укажите имя конфига"), notify_state_s::warning_state);
+						notifies::push(strings::config_configname.c_str(), notify_state_s::warning_state);
 					}
 					else
 					{
@@ -56,24 +56,24 @@ namespace render
 						memset(filename, 0, 32);
 						is_loaded = false;
 
-						notifies::push(___("Config created", u8"Конфиг создан"));
+						notifies::push(strings::config_created.c_str());
 
 						globals::settings = currentName;
 						globals::save();
 					}
 				}
 
-				separator(___("Some Actions", u8"Управление"));
+				separator(strings::config_actions.c_str());
 
 				if (!currentName.empty())
 				{
 					ImGui::InputText("##currentname", current_loaded_config, 32);
 
-					if (ImGui::Button(___("Rename", u8"Переименовать"), button_size))
+					if (ImGui::Button(strings::config_rename.c_str(), button_size))
 					{
 						if (strlen(current_loaded_config) == 0)
 						{
-							notifies::push(___("Enter new config name", u8"Укажите новое имя конфига"), notify_state_s::warning_state);
+							notifies::push(strings::config_newname.c_str(), notify_state_s::warning_state);
 						}
 						else
 						{
@@ -84,45 +84,45 @@ namespace render
 							settings::save(currentName);
 							is_loaded = false;
 
-							notifies::push(___("Config renamed", u8"Конфиг переименован"));
+							notifies::push(strings::config_renamed.c_str());
 
 							globals::settings = currentName;
 							globals::save();
 						}
 					}
 
-					if (ImGui::Button(___("Load", u8"Загрузить"), button_size))
+					if (ImGui::Button(strings::config_load.c_str(), button_size))
 					{
 						settings::load(currentName);
 
 						globals::settings = currentName;
 						globals::save();
 
-						notifies::push(___("Config loaded", u8"Конфиг загружен"));
+						notifies::push(strings::config_loaded.c_str());
 					}
 
-					if (ImGui::Button(___("Save", u8"Сохранить"), button_size))
+					if (ImGui::Button(strings::config_save.c_str(), button_size))
 					{
 						settings::save(currentName);
 
 						globals::settings = currentName;
 						globals::save();
 
-						notifies::push(___("Config saved", u8"Конфиг сохранен"), notify_state_s::success_state);
+						notifies::push(strings::config_saved.c_str(), notify_state_s::success_state);
 					}
 
-					if (ImGui::Button(___("Remove", u8"Удалить"), button_size))
+					if (ImGui::Button(strings::delete_st.c_str(), button_size))
 					{
 						if (config::remove(currentName, "settings"))
 						{
 							currentName.clear();
 							is_loaded = false;
 
-							notifies::push(___("Config removed", u8"Конфиг удален"), notify_state_s::success_state);
+							notifies::push(strings::config_removed.c_str(), notify_state_s::success_state);
 						}
 						else
 						{
-							notifies::push(___("Something went wrong", u8"Не удалось удалить конфиг"), notify_state_s::warning_state);
+							notifies::push(strings::config_cantremove.c_str(), notify_state_s::warning_state);
 						}
 					}
 				}
@@ -130,7 +130,7 @@ namespace render
 
 			ImGui::NextColumn();
 
-			child(___("Configs", u8"Конфигурации"), []()
+			child(strings::config_list.c_str(), []()
 			{
 				if (!render::fonts::configs_list)
 					return;
@@ -152,15 +152,15 @@ namespace render
 				}
 				ImGui::PopFont();
 
-				if (ImGui::Button(___("Refresh", u8"Обновить список"), button_size))
+				if (ImGui::Button(strings::config_refresh.c_str(), button_size))
 					is_loaded = false;
 			});
 
 			ImGui::NextColumn();
 
-			child(___("Binds", u8"Загрузка по кнопке"), []()
+			child(strings::config_binds.c_str(), []()
 			{
-				checkbox("Show notify when loaded", u8"Уведомлять при загрузке", &globals::binds::notify_when_loaded);
+				checkbox(strings::config_notify.c_str(), &globals::binds::notify_when_loaded);
 
 				for (auto& config : config::cached["settings"])
 					bind_button(config.first.c_str(), globals::binds::configs[config.first]);

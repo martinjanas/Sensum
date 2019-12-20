@@ -91,7 +91,7 @@ void WeaponCheck(std::string weapon, c_base_player* player)
 		text.str().c_str = "";*/ // WIP
 
 
-	text << allcolors[yellow] << "[Buy]" << " " << allcolors[green] << "Player " << allcolors[white] << player->GetPlayerInfo().szName << allcolors[green] << "bought" << allcolors[white] << wepName;
+	text << allcolors[yellow] << strings::buylog_buy.c_str() << " " << allcolors[green] << strings::buylog_player.c_str() << allcolors[white] << player->GetPlayerInfo().szName << allcolors[green] << strings::buylog_bought.c_str() << allcolors[white] << wepName;
 
 	g::hud_chat->ChatPrintf(0, filter, text.str().c_str());
 }

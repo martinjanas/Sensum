@@ -96,7 +96,7 @@ DWORD __stdcall on_attach(LPVOID base)
 	//if (strcmp(version, "1.36.8.3") != 0)
 		//std::abort();
 
-	notifies::push(globals::russian_language ? u8"Инициализация завершена" : "Successfully initialized", notify_state_s::debug_state);
+	notifies::push(strings::init.c_str(), notify_state_s::debug_state);
 
 	setup_hotkeys(base);
 

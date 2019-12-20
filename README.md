@@ -3,8 +3,4 @@
 
 
 
-# Be sure to put game-items.json file into memesense folder in csgo folder.
-
-
-
-
+# Be sure to put `game-items.json` file into `memesense` folder in `csgo` folder.

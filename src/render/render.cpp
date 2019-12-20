@@ -123,21 +123,12 @@ namespace render
 		return s_ready;
 	}
 
-	const char* ___(const char* english, const char* russian)
-	{
-		return globals::russian_language ? russian : english;
-	}
-
 	void tooltip(const char* text)
 	{
 		if (ImGui::IsItemHovered())
 			ImGui::SetTooltip(text);
 	}
 
-	void tooltip(const char* english, const char* russian)
-	{
-		tooltip(___(english, russian));
-	}
 
 	ImVec2 get_listbox_size(float x, float y_offset)
 	{
@@ -198,11 +189,6 @@ namespace render
 		ImGui::Columns(count, nullptr, false);
 	}
 
-	void separator(const char* en, const char* ru)
-	{
-		separator(___(en, ru));
-	}
-
 	void separator(const char* label)
 	{
 		auto size = ImGui::CalcTextSize(label);
@@ -239,11 +225,6 @@ namespace render
 	void checkbox(const char* label, bool* value)
 	{
 		ImGui::Checkbox(label, value);
-	}
-
-	void checkbox(const char* english, const char* russian, bool* value)
-	{
-		checkbox(___(english, russian), value);
 	}
 
 	void combo(const char* label, const std::function<void(std::string&)>& body)

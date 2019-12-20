@@ -6,6 +6,7 @@
 #include "helpers/console.h"
 #include "helpers/notifies.h"
 #include "features/features.h"
+#include "render/strings.h"
 
 #include <thread>
 
@@ -21,7 +22,7 @@ namespace globals
 	bool configs_initialized = false;
 
 	bool no_animations = false;
-	bool russian_language = false;
+	int language = 0;
 
 	int yaw_offset = 90; //90
 	float last_yaw_offset = 90.f; //90
@@ -109,7 +110,7 @@ namespace globals
 					if (notify_when_loaded)
 					{
 						char buf[256];
-						sprintf_s(buf, "\"%s\" %s", bind.first.c_str(), render::___("loaded", u8"загружен"));
+						sprintf_s(buf, "\"%s\" %s", bind.first.c_str(), strings::loaded.c_str());
 
 						notifies::push(buf);
 					}
@@ -132,7 +133,7 @@ namespace globals
 			clantag_features::restore();
 
 			Option::Load(root["no_animations"], no_animations);
-			Option::Load(root["russian_language"], russian_language);
+			Option::Load(root["language"], language);
 			Option::Load(root["post_processing"], post_processing, true);
 
 			Option::Load(root["binds.back_shot"], binds::back_shot, 0);
@@ -160,6 +161,7 @@ namespace globals
 				}
 			}
 		});
+		strings::updatelang();
 	}
 
 	void save()
@@ -169,7 +171,7 @@ namespace globals
 			Json::Value root;
 
 			root["no_animations"] = no_animations;
-			root["russian_language"] = russian_language;
+			root["language"] = language;
 			root["post_processing"] = post_processing;
 
 			root["settings"] = settings;

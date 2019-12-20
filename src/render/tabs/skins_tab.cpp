@@ -30,7 +30,7 @@ namespace render
 			auto& sel_entry2 = entry2[index];
 			sel_entry2.definition_index = index;
 
-			child(___("Items", u8"Предметы"), [&selected_entry]()
+			child(strings::skins_items.c_str(), [&selected_entry]()
 			{
 				auto weapon_index = 0;
 				const auto weapons = get_weapons(true);
@@ -53,13 +53,13 @@ namespace render
 				if (!state)
 					return;
 
-				if (ImGui::Button(___("Current Weapon", u8"Текущее оружие"), ImVec2(ImGui::GetContentRegionAvailWidth(), 22.f)))
+				if (ImGui::Button(strings::skins_currweapon.c_str(), ImVec2(ImGui::GetContentRegionAvailWidth(), 22.f)))
 					definition_index = weapon_index;
 			});
 
 			ImGui::NextColumn();
 
-			child(___("Paint Kits", u8"Раскраски"), [&selected_entry]()
+			child(strings::skins_paints.c_str(), [&selected_entry]()
 			{
 				static auto show_all_kits = false;
 				//checkbox("All skins", u8"Полный список", &show_all_kits);
@@ -139,13 +139,13 @@ namespace render
 
 			ImGui::NextColumn();
 
-			child(___("Customizing", u8"Настройки"), [&selected_entry, &sel_entry2]()
+			child(strings::skins_customizing.c_str(), [&selected_entry, &sel_entry2]()
 			{
 				//checkbox("Enabled", u8"Включено", &selected_entry.enabled);
 
 				if (selected_entry.definition_index == WEAPON_KNIFE || selected_entry.definition_index == WEAPON_KNIFE_T)
 				{
-					ImGui::Text(___("Model", u8"Модель"));
+					ImGui::Text(strings::skins_model.c_str());
 
 					std::string knife_name;
 					for (const auto& item : skins::knife_names)
@@ -167,7 +167,7 @@ namespace render
 				}
 				else if (selected_entry.definition_index == GLOVE_CT_SIDE || selected_entry.definition_index == GLOVE_T_SIDE)
 				{
-					ImGui::Text(___("Model", u8"Модель"));
+					ImGui::Text(strings::skins_model.c_str());
 
 					std::string glove_name;
 					for (const auto& item : skins::glove_names)
@@ -191,7 +191,7 @@ namespace render
 					selected_entry.definition_override_index = 0;
 
 				if (selected_entry.definition_index != GLOVE_CT_SIDE && selected_entry.definition_index != GLOVE_T_SIDE)
-					checkbox("Enabled", u8"Включено", &selected_entry.enabled);
+					checkbox(strings::enabled.c_str(), &selected_entry.enabled);
 
 				/*	int index;
 
@@ -226,21 +226,21 @@ namespace render
 				*/
 
 				//ImGui::SliderFloatLeftAligned(___("Wear:", u8"Износ:"), &selected_entry.wear, FLT_MIN, 1.f, "%.10f");
-				ImGui::Text("Wear:");
+				ImGui::Text(strings::skins_wear.c_str());
 				ImGui::InputFloat("##skins.wear", &selected_entry.wear);
 				tooltip("FN: 0 - 0.07, MW: 0.08 - 0.14, FT: 0.15 - 0.38, WW: 0.39 - 0.45, BS: 0.46");
 
-				ImGui::Text("Seed");
+				ImGui::Text(strings::skins_seed.c_str());
 				ImGui::InputInt("##skins.seed", &selected_entry.seed);
 
 				if (selected_entry.definition_index != GLOVE_CT_SIDE && selected_entry.definition_index != GLOVE_T_SIDE)
 				{
-					ImGui::Text(___("Name Tag", u8"Именной ярлык"));
+					ImGui::Text(strings::skins_nametag.c_str());
 					ImGui::InputText("##skins.nametag", selected_entry.custom_name, 32);
 
 					columns(2);
 					{
-						checkbox(___("StatTrack", u8"Счетчик убийств"), &selected_entry.stat_track.enabled);
+						checkbox(strings::skins_stattrack.c_str(), &selected_entry.stat_track.enabled);
 
 						ImGui::NextColumn();
 
@@ -251,7 +251,7 @@ namespace render
 					columns(1);
 				}
 
-				if (ImGui::Button(___("Save & Apply", u8"Сохранить и применить"), ImVec2(ImGui::GetContentRegionAvailWidth(), 18.f)))
+				if (ImGui::Button(strings::skins_save.c_str(), ImVec2(ImGui::GetContentRegionAvailWidth(), 18.f)))
 				{
 					utils::force_full_update();
 					skins::save();

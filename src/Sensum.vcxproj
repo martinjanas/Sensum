@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -170,12 +170,14 @@
     <ClCompile Include="MaterialManager.cpp" />
     <ClCompile Include="nade_helper.cpp" />
     <ClCompile Include="render\fonts\droidsans.hpp" />
+    <ClCompile Include="render\strings.cpp" />
     <ClCompile Include="render\tabs\aimbot_tab.cpp" />
     <ClCompile Include="render\tabs\configs_tab.cpp" />
     <ClCompile Include="render\tabs\misc_tab.cpp" />
     <ClCompile Include="render\tabs\players_tab.cpp" />
     <ClCompile Include="render\tabs\skins_tab.cpp" />
     <ClCompile Include="render\tabs\visuals_tab.cpp" />
+    <ClCompile Include="render\strings_ru.cpp" />
     <ClCompile Include="render\timers.cpp" />
     <ClCompile Include="render\menu.cpp" />
     <ClCompile Include="render\render.cpp" />
@@ -245,6 +247,8 @@
     <ClInclude Include="nade_helper.h" />
     <ClInclude Include="render\fonts\undefeated.hpp" />
     <ClInclude Include="render\render.h" />
+    <ClInclude Include="render\strings.h" />
+    <ClInclude Include="render\strings_ru.h" />
     <ClInclude Include="runtime_saver.h" />
     <ClInclude Include="security\importer.h" />
     <ClInclude Include="settings.h" />

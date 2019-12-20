@@ -23,5 +23,4 @@ namespace notifies
 {
 	void handle(ImDrawList* draw_list);
 	void push(const std::string& message, notify_state_s state = notify_state_s::info_state);
-	void push(const std::string& english, const std::string& russian, notify_state_s state = notify_state_s::info_state);
 }

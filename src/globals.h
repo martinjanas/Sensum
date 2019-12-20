@@ -11,7 +11,7 @@ namespace globals
 	extern bool post_processing;
 	extern bool configs_initialized;
 	extern bool no_animations;
-	extern bool russian_language;
+	extern int language;
 
 	extern int yaw_offset;
 	extern float last_yaw_offset;

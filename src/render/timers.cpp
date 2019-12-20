@@ -217,37 +217,37 @@ namespace render
 				ImGui::SetNextWindowSize(ImVec2(215.f, 130.f)); //175
 				ImGui::SetNextWindowBgAlpha(settings::visuals::player_info_box_alpha);
 
-				if (ImGui::Begin("Player Info Box", &settings::visuals::player_info_box, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar))
+				if (ImGui::Begin(strings::visuals_esp_playerinfo.c_str(), &settings::visuals::player_info_box, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar))
 				{
 					columns(6);
 					{
 						ImGui::SetColumnWidth(-1, 40.f);
-						ImGui::Text(___("Name", u8"Имя"));
+						ImGui::Text(strings::visuals_esp_playerinfo_name.c_str());
 
 						ImGui::NextColumn();
 
 						ImGui::SetColumnWidth(-1, 40.f);
-						ImGui::Text(___("Money", u8"Деньги"));
+						ImGui::Text(strings::visuals_esp_playerinfo_money.c_str());
 
 						ImGui::NextColumn();
 
 						ImGui::SetColumnWidth(-1, 25.f); //48
-						ImGui::Text(___(" HP", u8"Дамаг"));
+						ImGui::Text(strings::visuals_esp_playerinfo_hp.c_str());
 
 						ImGui::NextColumn();
 
 						ImGui::SetColumnWidth(-1, 30.f); //45
-						ImGui::Text(___("Level", u8"Дамаг"));
+						ImGui::Text(strings::visuals_esp_playerinfo_level.c_str());
 
 						ImGui::NextColumn();
 
 						ImGui::SetColumnWidth(-1, 30.f);
-						ImGui::Text(___("Wins", u8"Дамаг"));
+						ImGui::Text(strings::visuals_esp_playerinfo_wins.c_str());
 
 						ImGui::NextColumn();
 
 						ImGui::SetColumnWidth(-1, 30.f);
-						ImGui::Text(___("Dist", u8"Дамаг"));
+						ImGui::Text(strings::visuals_esp_playerinfo_dist.c_str());
 					}
 					columns(1);
 
@@ -323,22 +323,22 @@ namespace render
 				ImGui::SetNextWindowSize(ImVec2(145.f, 130.f)); //145.f
 				ImGui::SetNextWindowBgAlpha(settings::visuals::grief_box_alpha);
 
-				if (ImGui::Begin("Grief Box", &settings::visuals::grief_box, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar))
+				if (ImGui::Begin(strings::visuals_esp_grief.c_str(), &settings::visuals::grief_box, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar))
 				{
 					columns(3);
 					{
 						ImGui::SetColumnWidth(-1, 40.f);
-						ImGui::Text(___("Name", u8"Имя"));
+						ImGui::Text(strings::visuals_esp_playerinfo_name.c_str());
 
 						ImGui::NextColumn();
 
 						ImGui::SetColumnWidth(-1, 48.f);
-						ImGui::Text(___("Damage", u8"Дамаг"));
+						ImGui::Text(strings::visuals_esp_grief_damage.c_str());
 
 						ImGui::NextColumn();
 
 						ImGui::SetColumnWidth(-1, 45.f);
-						ImGui::Text(___("Kills", u8"Дамаг"));
+						ImGui::Text(strings::visuals_esp_kills.c_str());
 					}
 					columns(1);
 

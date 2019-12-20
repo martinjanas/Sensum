@@ -8,7 +8,7 @@
 #include "../helpers/notifies.h"
 #include "../features/features.h"
 
-#define VERSION "1.5.2"
+#define VERSION "1.5.3"
 
 const char* const KeyNames[] =
 {
@@ -210,9 +210,9 @@ bool hotkey(const char* label, int* k, const ImVec2& size_arg = ImVec2(0.f, 0.f)
 	if (*k != 0 && g.ActiveId != id)
 		strcpy_s(buf_display, KeyNames[*k]);
 	else if (g.ActiveId == id)
-		strcpy_s(buf_display, "<Press a key>");
+		strcpy_s(buf_display, strings::binds_press_a_key.c_str());
 	else
-		strcpy_s(buf_display, render::___("None", u8"Не выбрана"));
+		strcpy_s(buf_display, strings::binds_no_key.c_str());
 
 	const ImRect clip_rect(frame_bb.Min.x, frame_bb.Min.y, frame_bb.Min.x + size.x, frame_bb.Min.y + size.y);
 	ImVec2 render_pos = frame_bb.Min + style.FramePadding;
@@ -227,11 +227,11 @@ bool hotkey(const char* label, int* k, const ImVec2& size_arg = ImVec2(0.f, 0.f)
 	return value_changed;
 }
 
-void bind_button(const char* eng, const char* rus, int& key)
+void bind_button(const char* eng, int& key)
 {
 	render::columns(2);
 	{
-		ImGui::Text(render::___(eng, rus));
+		ImGui::Text(eng);
 
 		ImGui::NextColumn();
 
@@ -245,11 +245,6 @@ void bind_button(const char* eng, const char* rus, int& key)
 		ImGui::PopItemWidth();
 	}
 	render::columns(1);
-}
-
-void bind_button(const char* label, int& key)
-{
-	bind_button(label, label, key);
 }
 
 namespace render
@@ -332,25 +327,25 @@ namespace render
 		{
 			std::map<int, const char*> groups =
 			{
-				{ WEAPONTYPE_PISTOL, ___("Pistols", u8"Пистолеты") },
-				{ WEAPONTYPE_SHOTGUN, ___("Shotguns", u8"Дробовики") },
-				{ WEAPONTYPE_SUBMACHINEGUN, ___("Submachineguns", u8"Пистолеты-пулеметы") },
-				{ WEAPONTYPE_MACHINEGUN, ___("Machineguns", u8"Пулеметы") },
-				{ WEAPONTYPE_RIFLE, ___("Rifles", u8"Винтовки") },
-				{ WEAPONTYPE_SNIPER_RIFLE, ___("Snipers", u8"Снайперские винтовки") },
+				{ WEAPONTYPE_PISTOL, strings::WEAPONTYPE_PISTOL.c_str() },
+				{ WEAPONTYPE_SHOTGUN, strings::WEAPONTYPE_SHOTGUN.c_str() },
+				{ WEAPONTYPE_SUBMACHINEGUN, strings::WEAPONTYPE_SUBMACHINEGUN.c_str() },
+				{ WEAPONTYPE_MACHINEGUN, strings::WEAPONTYPE_MACHINEGUN.c_str() },
+				{ WEAPONTYPE_RIFLE, strings::WEAPONTYPE_RIFLE.c_str() },
+				{ WEAPONTYPE_SNIPER_RIFLE, strings::WEAPONTYPE_SNIPER_RIFLE.c_str() },
 			};
 
 			if (need_knife)
 			{
-				groups[-1] = { ___("Knives", u8"Ножи") };
-				groups[-2] = { ___("Gloves", u8"Перчатки") };
+				groups[-1] = { strings::WEAPONTYPE_KNIVE.c_str() };
+				groups[-2] = { strings::WEAPONTYPE_GLOVE.c_str() };
 			}
 
 			if (need_groups)
 			{
-				groups[201] = "Desert Eagle";
-				groups[240] = "SSG08";
-				groups[209] = "AWP";
+				groups[201] = strings::WEAPON_DEAGLE.c_str();
+				groups[240] = strings::WEAPON_SSG08.c_str();
+				groups[209] = strings::WEAPON_AWP.c_str();
 			}
 
 			return groups;
@@ -540,13 +535,13 @@ namespace render
 			{
 				const auto menu_items = std::vector<std::string>
 				{
-					___(xorstr_("Visuals"), xorstr_(u8"Визуалы")),
-					___(xorstr_("Aimbot"), xorstr_(u8"Аимбот")),
-					___(xorstr_("Misc"), xorstr_(u8"Прочее")),
-					___(xorstr_("Skins"), xorstr_(u8"Скины")),
-					___(xorstr_("Players"), xorstr_(u8"Игроки")),
-					___(xorstr_("Colors"), xorstr_(u8"Визуалы")),
-					___(xorstr_("Configs"), xorstr_(u8"Конфиги"))
+					strings::menu_visuals.c_str(),
+					strings::menu_aimbot.c_str(),
+					strings::menu_misc.c_str(),
+					strings::menu_skins.c_str(),
+					strings::menu_players.c_str(),
+					strings::menu_colors.c_str(),
+					strings::menu_configs.c_str()
 				};
 
 				const auto menu_items_count = menu_items.size();

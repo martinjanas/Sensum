@@ -26,25 +26,25 @@ namespace render
 			auto is_first = true;
 			const std::vector<const char*> ranks =
 			{
-				___("Unknown", u8"Неизвестно"),
-				___("Silver I", u8"Серебро - I"),
-				___("Silver II", u8"Серебро - II"),
-				___("Silver III", u8"Серебро - III"),
-				___("Silver IV", u8"Серебро - IV"),
-				___("Silver Elite", u8"Серебро - Элита"),
-				___("Silver Elite Master", u8"Серебро - Великий Магистр"),
-				___("Gold Nova I", u8"Золотая Звезда - I"),
-				___("Gold Nova II", u8"Золотая Звезда - II"),
-				___("Gold Nova III", u8"Золотая Звезда - III"),
-				___("Gold Nova Master", u8"Золотая Звезда - Магистр"),
-				___("Master Guardian I", u8"Магистр-хранитель - I"),
-				___("Master Guardian II", u8"Магистр-хранитель - II"),
-				___("Master Guardian Elite", u8"Магистр-хранитель - Элита"),
-				___("Distinguished Master Guardian", u8"Заслуженный Магистр-хранитель"),
-				___("Legendary Eagle", u8"Легендарный Беркут"),
-				___("Legendary Eagle Master", u8"Легендарный Беркут-магистр"),
-				___("Supreme Master First Class", u8"Великий Магистр Высшего Ранга"),
-				___("The Global Elite", u8"Всемирная Элита"),
+				strings::players_rank0.c_str(),
+				strings::players_rank1.c_str(),
+				strings::players_rank2.c_str(),
+				strings::players_rank3.c_str(),
+				strings::players_rank4.c_str(),
+				strings::players_rank5.c_str(),
+				strings::players_rank6.c_str(),
+				strings::players_rank7.c_str(),
+				strings::players_rank8.c_str(),
+				strings::players_rank9.c_str(),
+				strings::players_rank10.c_str(),
+				strings::players_rank11.c_str(),
+				strings::players_rank12.c_str(),
+				strings::players_rank13.c_str(),
+				strings::players_rank14.c_str(),
+				strings::players_rank15.c_str(),
+				strings::players_rank16.c_str(),
+				strings::players_rank17.c_str(),
+				strings::players_rank18.c_str(),
 			};
 
 			for (const auto& item : list)
@@ -98,26 +98,26 @@ namespace render
 			columns(5);
 			{
 				ImGui::SetColumnWidth(-1, 200.f);
-				ImGui::Text(___("Name", u8"Имя"));
+				ImGui::Text(strings::players_name.c_str());
 
 				ImGui::NextColumn();
 
 				ImGui::SetColumnWidth(-1, 60.f);
-				ImGui::Text(___("Money", u8"Деньги"));
+				ImGui::Text(strings::players_money.c_str());
 
 				ImGui::NextColumn();
 
 				ImGui::SetColumnWidth(-1, 60.f);
-				ImGui::Text(___("Wins", u8"Победы"));
+				ImGui::Text(strings::players_wins.c_str());
 
 				ImGui::NextColumn();
 
 				ImGui::SetColumnWidth(-1, 60.f);
-				ImGui::Text(___("Damage", u8"Дамаг"));
+				ImGui::Text(strings::players_damage.c_str());
 
 				ImGui::NextColumn();
 
-				ImGui::Text(___("Rank", u8"Звание"));
+				ImGui::Text(strings::players_rank.c_str());
 			}
 			columns(1);
 
