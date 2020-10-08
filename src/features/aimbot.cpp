@@ -276,7 +276,7 @@ namespace aimbot
 
 		if (target)
 			punch = { punches::current.pitch * x ,  punches::current.yaw * y, 0 };
-		else if (a_settings.recoil.standalone)
+		else if (!a_settings.recoil.standalone)
 			punch = { (punches::current.pitch - punches::last.pitch) * x, (punches::current.yaw - punches::last.yaw) * y, 0 };
 
 		if ((punch.pitch != 0.f || punch.yaw != 0.f) && g::local_player->m_aimPunchAngle().roll == 0.f)

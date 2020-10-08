@@ -161,9 +161,6 @@ namespace hooks
 		static int definition_index = 7;
 		auto a_settings = &settings::aimbot::m_items[definition_index];
 
-		if (a_settings->recoil.enabled)
-			aimbot::OnMove(cmd);
-
 		if (settings::misc::smoke_helper)
 			visuals::SmokeHelperAimbot(cmd);
 
