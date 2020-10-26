@@ -90,7 +90,7 @@ struct weapon_setting
 		bool enabled = false;
 		bool first_bullet = false;
 		bool humanize = false;
-		bool standalone = false;
+		bool standalone = true;
 		bool rcs2 = false;
 
 		float pitch = 2.0f;

@@ -1,4 +1,4 @@
-﻿#include "../render.h"
+#include "../render.h"
 #include "../../settings/globals.h"
 #include "../../settings/settings.h"
 #include "../../helpers/notifies.h"
@@ -331,8 +331,6 @@ namespace render
 			child("Recoil Control System", [&settings]()
 				{
 					checkbox("Enabled", &settings->recoil.enabled);
-					checkbox("Legit RCS Mode", &settings->recoil.standalone);
-					tooltip("Pull Down to Spray, No Need to Spray The Y Direction");
 					checkbox("First Bullet", &settings->recoil.first_bullet);
 					checkbox("Random Yaw & Pitch Amount (?)", &settings->recoil.humanize);
 					tooltip("Will randomize yaw and pitch.");
