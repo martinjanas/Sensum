@@ -182,8 +182,8 @@ namespace render
 
 					switch (settings::chams::chams_list_mode)
 					{
-					case 0://Enemies
-						columns(2); 
+					case 0:
+						columns(2);
 						{
 							checkbox("Enabled", &settings::chams::enemy::enabled);
 
@@ -199,7 +199,7 @@ namespace render
 						}
 						columns(1);
 						break;
-					case 1: //Teammate
+					case 1:
 						columns(2);
 						{
 							checkbox("Enabled", &settings::chams::teammates::enabled);
@@ -216,7 +216,7 @@ namespace render
 						}
 						columns(1);
 						break;
-					case 2: //LocalPlayer
+					case 2:
 						columns(2);
 						{
 							checkbox("Enabled", &settings::chams::localplayer::enabled);
@@ -233,7 +233,7 @@ namespace render
 						}
 						columns(1);
 						break;
-					case 3: //Misc
+					case 3:
 						columns(2);
 						{
 							checkbox("Guns", &settings::chams::misc::weapon_chams);
