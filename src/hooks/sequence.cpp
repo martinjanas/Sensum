@@ -30,7 +30,7 @@ namespace hooks
 			case SEQUENCE_DEFAULT_DRAW:
 				return utils::random(SEQUENCE_BUTTERFLY_DRAW, SEQUENCE_BUTTERFLY_DRAW2);
 			case SEQUENCE_DEFAULT_LOOKAT01:
-				return utils::random(SEQUENCE_BUTTERFLY_LOOKAT01, SEQUENCE_BUTTERFLY_LOOKAT03);
+				return utils::random(SEQUENCE_BUTTERFLY_LOOKAT01, SEQUENCE_BUTTERFLY_LOOKAT02);
 			default:
 				return sequence + 1;
 			}
