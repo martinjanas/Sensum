@@ -269,7 +269,18 @@ namespace render
 							ImGui::PopItemWidth();
 						}
 						columns(1);
-						checkbox("Arms", &settings::chams::misc::arms_chams);
+
+						columns(2);
+						{
+							checkbox("Arms", &settings::chams::misc::arms_chams);
+
+							ImGui::NextColumn();
+
+							ImGui::PushItemWidth(-1);
+							checkbox("Dropped Kits", &settings::chams::misc::dropped_defusekit_chams);
+							ImGui::PopItemWidth();
+						}
+						columns(1);
 						break;
 					case 4:
 						checkbox("TODO: Work In Progress!", &b_wip);
@@ -328,6 +339,12 @@ namespace render
 								columns(2);
 								{
 									checkbox("Dropped Guns", &settings::glow::glowDroppedWeaponsEnabled);
+
+									ImGui::NextColumn();
+
+									ImGui::PushItemWidth(-1);
+									checkbox("Dropped Kits", &settings::glow::glowDroppedKitsEnabled);
+									ImGui::PopItemWidth();
 								}
 								columns(1);
 								break;

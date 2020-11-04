@@ -63,6 +63,7 @@ namespace settings
 		bool glowTeamEnabled = false;
 		bool glowC4PlantedEnabled = false;
 		bool glowDroppedWeaponsEnabled = false;
+		bool glowDroppedKitsEnabled = false;
 		bool glowNadesEnabled = false;
 		bool glowOverride = false;
 
@@ -74,6 +75,7 @@ namespace settings
 		Color glowTeamColor(0, 255, 0, 255);
 		Color glowC4PlantedColor = Color(255, 255, 255, 255);
 		Color glowDroppedWeaponsColor = Color(255, 255, 255, 255);
+		Color glowDroppedKitsColor = Color(255, 255, 255, 255);
 		Color glowNadesColor = Color(255, 255, 255, 255);
 		Color glowHE = Color(255, 0, 0, 255);
 		Color glowMolotovIncendiary = Color(255, 128, 0, 255);
@@ -136,6 +138,7 @@ namespace settings
 			bool nade_chams = false;
 			bool dropped_bomb_chams = false;
 			bool planted_bomb_chams = false;
+			bool dropped_defusekit_chams = false;
 			bool accesories_chams = false;
 			bool arms_chams = false;
 
@@ -144,6 +147,7 @@ namespace settings
 			Color color_nade_chams = Color(0, 255, 125, 255);
 			Color color_dropped_bomb_chams = Color(0, 255, 125, 255);
 			Color color_planted_bomb_chams = Color(0, 255, 125, 255);
+			Color color_dropped_defusekit_chams = Color(0, 255, 125, 255);
 
 			Color color_he_chams = Color(255, 0, 0, 255);
 			Color color_inc_molotov_chams = Color(255, 128, 0, 255);
@@ -320,6 +324,7 @@ namespace settings
 				Option::Load(root["chams.decoy_color"], settings::chams::misc::color_decoy_chams);
 				Option::Load(root["chams.smoke_color"], settings::chams::misc::color_smoke_chams);
 				Option::Load(root["chams.C4dropped_color"], settings::chams::misc::color_dropped_bomb_chams);
+				Option::Load(root["chams.defusekit_dropped_color"], settings::chams::misc::color_dropped_defusekit_chams);
 				
 				Option::Load(root["misc.bhop"], misc::bhop);
 				Option::Load(root["misc.auto_strafe"], misc::auto_strafe);
@@ -373,6 +378,7 @@ namespace settings
 				Option::Load(root["glow.plantedc4"], glow::glowC4PlantedEnabled);
 				Option::Load(root["glow.nades"], glow::glowNadesEnabled);
 				Option::Load(root["glow.dropped_weapons"], glow::glowDroppedWeaponsEnabled);
+				Option::Load(root["glow.dropped_kits"], glow::glowDroppedKitsEnabled);
 				Option::Load(root["glow.override"], glow::glowOverride);
 				Option::Load(root["glow.list_mode"], glow::glow_list_mode);
 
@@ -381,6 +387,7 @@ namespace settings
 				Option::Load(root["glow.plantedc4_color"], glow::glowC4PlantedColor);
 				Option::Load(root["glow.nades_color"], glow::glowNadesColor);
 				Option::Load(root["glow.dropped_weapons_color"], glow::glowDroppedWeaponsColor);
+				Option::Load(root["glow.dropped_kits_color"], glow::glowDroppedKitsColor);
 
 				Option::Load(root["desync.enabled"], desync::enabled);
 				Option::Load(root["desync.yaw_flip"], desync::yaw_flip);
@@ -567,6 +574,7 @@ namespace settings
 				Option::Save(config["chams.decoy_color"], settings::chams::misc::color_decoy_chams);
 				Option::Save(config["chams.smoke_color"], settings::chams::misc::color_smoke_chams);
 				Option::Save(config["chams.C4dropped_color"], settings::chams::misc::color_dropped_bomb_chams);
+				Option::Save(config["chams.defusekit_dropped_color"], settings::chams::misc::color_dropped_defusekit_chams);
 				Option::Save(config["chams.legitaa_color"], settings::chams::localplayer::desync_color);
 
 				config["misc.bhop"] = misc::bhop;
@@ -620,6 +628,7 @@ namespace settings
 				config["glow.enemy"] = glow::glowEnemyEnabled;
 				config["glow.team"] = glow::glowTeamEnabled;
 				config["glow.dropped_weapons"] = glow::glowDroppedWeaponsEnabled;
+				config["glow.dropped_kits"] = glow::glowDroppedKitsEnabled;
 				config["glow.plantedc4"] = glow::glowC4PlantedEnabled;
 				config["glow.nades"] = glow::glowNadesEnabled;
 				config["glow.override"] = glow::glowOverride;
@@ -630,6 +639,7 @@ namespace settings
 				Option::Save(config["glow.plantedc4_color"], glow::glowC4PlantedColor);
 				Option::Save(config["glow.nades_color"], glow::glowNadesColor);
 				Option::Save(config["glow.dropped_weapons_color"], glow::glowDroppedWeaponsColor);
+				Option::Save(config["glow.dropped_kits_color"], glow::glowDroppedKitsColor);
 
 				config["desync.enabled"] = desync::enabled;
 				config["desync.yaw_flip"] = desync::yaw_flip;
