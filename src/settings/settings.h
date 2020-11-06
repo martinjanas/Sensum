@@ -192,6 +192,7 @@ namespace settings
 		extern bool glowTeamEnabled;
 		extern bool glowC4PlantedEnabled;
 		extern bool glowDroppedWeaponsEnabled;
+		extern bool glowDroppedKitsEnabled;
 		extern bool glowNadesEnabled;
 		extern bool glowOverride;
 
@@ -203,6 +204,7 @@ namespace settings
 		extern Color glowTeamColor;
 		extern Color glowC4PlantedColor;
 		extern Color glowDroppedWeaponsColor;
+		extern Color glowDroppedKitsColor;
 		extern Color glowNadesColor;
 		extern Color glowHE;
 		extern Color glowMolotovIncendiary;
@@ -265,6 +267,7 @@ namespace settings
 			extern bool nade_chams;
 			extern bool dropped_bomb_chams;
 			extern bool planted_bomb_chams;
+			extern bool dropped_defusekit_chams;
 			extern bool accesories_chams;
 			extern bool arms_chams;
 
@@ -273,6 +276,7 @@ namespace settings
 			extern Color color_nade_chams;
 			extern Color color_dropped_bomb_chams;
 			extern Color color_planted_bomb_chams;
+			extern Color color_dropped_defusekit_chams;
 
 			extern Color color_he_chams;
 			extern Color color_inc_molotov_chams;

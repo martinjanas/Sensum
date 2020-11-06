@@ -479,6 +479,15 @@ namespace visuals
 				}
 				g::mdl_render->ForcedMaterialOverride(nullptr);
 				mat->IncrementReferenceCount();
+
+				if (client_class->m_ClassID == CEconEntity) {
+					if (settings::chams::misc::dropped_defusekit_chams) {
+						g::render_view->SetColorModulation(settings::chams::misc::color_dropped_defusekit_chams.r() / 255.f, settings::chams::misc::color_dropped_defusekit_chams.g() / 255.f, settings::chams::misc::color_dropped_defusekit_chams.b() / 255.f);
+						mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, true);
+						g::mdl_render->ForcedMaterialOverride(mat);
+						entity->DrawModel(1, 255);
+					}
+				}
 			}
 		}
 	}
@@ -757,6 +766,12 @@ namespace visuals
 				client_class->m_ClassID >= CWeaponAug && client_class->m_ClassID <= CWeaponXM1014) {
 				if (settings::glow::glowDroppedWeaponsEnabled) {
 					glow.set(settings::glow::glowDroppedWeaponsColor.r() / 255.f, settings::glow::glowDroppedWeaponsColor.g() / 255.f, settings::glow::glowDroppedWeaponsColor.b() / 255.f, settings::glow::glowDroppedWeaponsColor.a() / 255.f);
+				}
+			}
+
+			if (client_class->m_ClassID == CEconEntity) {
+				if (settings::glow::glowDroppedKitsEnabled) {
+					glow.set(settings::glow::glowDroppedKitsColor.r() / 255.f, settings::glow::glowDroppedKitsColor.g() / 255.f, settings::glow::glowDroppedKitsColor.b() / 255.f, settings::glow::glowDroppedKitsColor.a() / 255.f);
 				}
 			}
 		}

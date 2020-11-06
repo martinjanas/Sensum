@@ -22,15 +22,17 @@ namespace render
 			ImGui::SameLine();
 			ColorEdit4("Team XQZ", &settings::chams::teammates::color_not_visible, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
 
-			ColorEdit4("Local  ", &settings::chams::localplayer::color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
-			ImGui::SameLine();
-			ColorEdit4("Planted C4     ##chams", &settings::chams::misc::color_planted_bomb_chams, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
-			ImGui::SameLine();
-			ColorEdit4("Weapons (?)##chams", &settings::chams::misc::color_dropped_weapons_chams, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
-			tooltip("Dropped Weapons");
-			ColorEdit4("Grenades      ##chams", &settings::chams::misc::color_nade_chams, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
+			ColorEdit4("Local                 ", &settings::chams::localplayer::color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
 			ImGui::SameLine();
 			ColorEdit4("Real Angle##chams", &settings::chams::localplayer::desync_color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
+
+			ColorEdit4("Planted C4      ##chams", &settings::chams::misc::color_planted_bomb_chams, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
+			ImGui::SameLine();
+			ColorEdit4("Grenades##chams", &settings::chams::misc::color_nade_chams, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
+
+			ColorEdit4("Dropped Weapons##chams", &settings::chams::misc::color_dropped_weapons_chams, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
+
+			ColorEdit4("Dropped Defuse Kits     ##chams", &settings::chams::misc::color_dropped_defusekit_chams, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
 
 			separator("ESP");
 			ColorEdit4("ESP Visible ", &settings::esp::visibleColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
@@ -59,7 +61,9 @@ namespace render
 			tooltip("Dropped Weapons");
 			ColorEdit4("Team  ", &settings::glow::glowTeamColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
 			ImGui::SameLine();
-			ColorEdit4("Grenades##glow", &settings::glow::glowNadesColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
+			ColorEdit4("Grenades  ##glow", &settings::glow::glowNadesColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
+			ImGui::SameLine();
+			ColorEdit4("Kits##glow", &settings::glow::glowDroppedKitsColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
 		}
 	}
 }
