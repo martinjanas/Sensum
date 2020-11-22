@@ -10,7 +10,7 @@ namespace silent_walk
 		if (!g::local_player || !g::local_player->IsAlive())
 			return false;
 
-		if (settings::misc::silent_walk)
+		if (!settings::misc::silent_walk)
 			return false;
 
 		auto weapon_handle = g::local_player->m_hActiveWeapon();

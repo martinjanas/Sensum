@@ -164,3 +164,8 @@ namespace no_smoke
 	void event();
 	void handle();
 }
+
+namespace silent_walk
+{
+	void handle(CUserCmd* cmd);
+}

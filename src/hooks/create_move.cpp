@@ -56,6 +56,8 @@ namespace hooks
 
 		slow_walk::handle(cmd);
 
+		silent_walk::handle(cmd);
+
 		entities::on_create_move(cmd);
 		features::edge_jump_pre(cmd);
 		engine_prediction::start(cmd);
