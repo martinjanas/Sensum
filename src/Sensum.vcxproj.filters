@@ -304,6 +304,9 @@
     <ClCompile Include="features\offscreen.cpp">
       <Filter>features\visuals</Filter>
     </ClCompile>
+    <ClCompile Include="features\silent_walk.cpp">
+      <Filter>features\misc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\directx9\imgui_impl_dx9.h">

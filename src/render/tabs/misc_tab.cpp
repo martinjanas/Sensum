@@ -209,6 +209,8 @@ namespace render
 						ImGui::PopItemWidth();
 					}
 					columns(1);
+					checkbox("Silent Walk", &settings::misc::silent_walk);
+					columns(1);
 				});
 
 			ImGui::NextColumn();

@@ -365,6 +365,7 @@ namespace settings
 		extern bool block_bot;
 		extern bool smoke_helper;
 		extern bool flash_helper;
+		extern bool silent_walk;
 
 		extern float viewmodel_offset_x;
 		extern float viewmodel_offset_y;

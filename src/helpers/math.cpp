@@ -620,3 +620,23 @@ QAngle math::AngleNormalize(QAngle angle)
 
 	return angle;
 }
+
+float math::Magnitude(Vector a)
+{
+	return sqrt((a.x * a.x) + (a.y * a.y));
+}
+
+Vector math::Normalize(Vector value)
+{
+	float num = Magnitude(value);
+	if (num != 0.f)
+		return value / num;
+	return Vector(0.f, 0.f, 0.f);
+}
+
+Vector math::ClampMagnitude(Vector vector, float maxLength)
+{
+	if (Magnitude(vector) > maxLength)
+		return Vector(Normalize(vector).x * maxLength, Normalize(vector).y * maxLength, 0);
+	return vector;
+}

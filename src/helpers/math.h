@@ -50,4 +50,7 @@ namespace math
 	void smooth(const float& amount, const QAngle& current_angles, const QAngle& aim_angles, QAngle& angle, const bool& humanize = false);
 	float AngleNormalize(float angle);
 	QAngle AngleNormalize(QAngle angle);
+	float Magnitude(Vector a);
+	Vector Normalize(Vector value);
+	Vector ClampMagnitude(Vector vector, float maxLength);
 }

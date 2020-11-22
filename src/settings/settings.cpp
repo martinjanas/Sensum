@@ -231,6 +231,7 @@ namespace settings
 		bool override_viewmodel = false;
 		bool smoke_helper = false;
 		bool flash_helper = false;
+		bool silent_walk = false;
 
 		float viewmodel_offset_x = 0.f;
 		float viewmodel_offset_y = 0.f;
@@ -372,6 +373,7 @@ namespace settings
 				Option::Load(root["misc.anti_obs"], misc::anti_obs);
 				Option::Load(root["misc.smoke_helper"], misc::smoke_helper);
 				Option::Load(root["misc.flash_helper"], misc::flash_helper);
+				Option::Load(root["misc.silent_walk"], misc::flash_helper);
 
 				Option::Load(root["glow.enemy"], glow::glowEnemyEnabled);
 				Option::Load(root["glow.team"], glow::glowTeamEnabled);
@@ -620,6 +622,7 @@ namespace settings
 				config["misc.anti_obs"] = misc::anti_obs;
 				config["misc.smoke_helper"] = misc::smoke_helper;
 				config["misc.flash_helper"] = misc::flash_helper;
+				config["misc.silent_walk"] = misc::flash_helper;
 
 				Option::Save(config["misc_spread_crosshair_color"], settings::visuals::spread_cross_color);
 				Option::Save(config["mics.rcs_cross_color"], visuals::recoilcolor);
