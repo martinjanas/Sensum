@@ -4,7 +4,7 @@
 #include "../../helpers/notifies.h"
 
 extern void bind_button(const char* label, int& key);
-extern bool hotkey(const char* label, int* k, const ImVec2& size_arg = ImVec2(0.f, 0.f));
+extern bool Hotkey(const char* label, int* k, const ImVec2& size_arg = ImVec2(0.f, 0.f));
 
 namespace render
 {
@@ -337,8 +337,16 @@ namespace render
 					//checkbox("RCS Hitbox Override (?)", &settings->rcs_override_hitbox); //Doesnt work very well, need to recode the whole aimbot.
 					//tooltip("If shotsFired >= 3 - disable all hitboxes, except body, if shotsFired < 3 - enable hitboxes you had.");
 
-					ImGui::SliderFloatLeftAligned("Pitch:", &settings->recoil.pitch, 0, 2, "%.1f %");
-					ImGui::SliderFloatLeftAligned("Yaw:", &settings->recoil.yaw, 0, 2, "%.1f %");
+					//ImGui::SliderFloatLeftAligned("Pitch:", &settings->recoil.pitch, 0, 2, "%.1f %");
+					//ImGui::SliderFloatLeftAligned("Yaw:", &settings->recoil.yaw, 0, 2, "%.1f %");
+
+					float pitch_max = 2.0f, yaw_max = 2.0f;
+
+					float pitch_perc = (settings->recoil.pitch / pitch_max) * 100.0f;
+					float yaw_perc = (settings->recoil.yaw / yaw_max) * 100.0f;
+
+					ImGui::SliderFloatLeftAlignedCustom("Pitch:", &settings->recoil.pitch, 0.0f, 2.0f, "%.1f%%", &pitch_perc);
+					ImGui::SliderFloatLeftAlignedCustom("Yaw:", &settings->recoil.yaw, 0.0f, 2.0f, "%.1f%%", &yaw_perc);
 
 					separator("Trigger");
 
@@ -349,7 +357,7 @@ namespace render
 						ImGui::NextColumn();
 
 						ImGui::PushItemWidth(-1);
-						hotkey("##binds.trigger", &globals::binds::trigger);
+						Hotkey("##binds.trigger", &globals::binds::trigger);
 						ImGui::PopItemWidth();
 					}
 					columns(1);

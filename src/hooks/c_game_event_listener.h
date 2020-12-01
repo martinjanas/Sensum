@@ -98,8 +98,7 @@ void WeaponCheck(std::string weapon, c_base_player* player)
 
 class c_game_event_listener final : public IGameEventListener2
 {
-	const char* hitgroups[10] =
-	{
+	const char* hitgroups[10] = {
 		"generic", "head", "chest", "stomach", "arm", "arm", "leg", "leg", "gear"
 	};
 
@@ -194,11 +193,9 @@ class c_game_event_listener final : public IGameEventListener2
 					switch (settings::visuals::hitsound)
 					{
 					case 0:
-						//PlaySoundA((g_Config.AppdataFolder + "hitsound0.wav").data(), NULL, SND_ASYNC | SND_NODEFAULT | SND_NOSTOP);
 						PlaySoundA(cod, NULL, SND_ASYNC | SND_MEMORY); //cod sound
 						break;
 					case 1:
-						//PlaySoundA((g_Config.AppdataFolder + "hitsound1.wav").data(), NULL, SND_ASYNC | SND_NODEFAULT | SND_NOSTOP);
 						PlaySoundA(skeet, NULL, SND_ASYNC | SND_MEMORY); //skeet sound
 						break;
 					case 2:
@@ -232,13 +229,11 @@ class c_game_event_listener final : public IGameEventListener2
 			if (!enemy || !g::local_player || enemy->m_iTeamNum() == g::local_player->m_iTeamNum())
 				return;
 
-			if (!utils::IsMMGamemodes())
+			if (!utils::IsPlayingMM())
 				return;
 
-			std::string buf2 = context->GetString("weapon");
-
 			if(settings::esp::buylog)
-				WeaponCheck(buf2, enemy);
+			   WeaponCheck(context->GetString("weapon"), enemy);
 		}
 		else if (name == FNV("round_start"))
 		{

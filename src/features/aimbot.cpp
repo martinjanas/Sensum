@@ -244,6 +244,30 @@ namespace aimbot
 		return true;
 	}
 	//--------------------------------------------------------------------------------
+	bool able_to_rcs()
+	{
+		auto nci = g::engine_client->GetNetChannelInfo();
+
+		if (nci)
+		{
+			float ping = 1.f / nci->GetLatency(FLOW_INCOMING);
+
+			//if (nci->GetAvgLoss(1) > 0.f || nci->GetAvgLoss(0) > 0.f)
+				//return false;
+
+			if (ping >= 120.f)
+				return false;
+		}
+
+		float fps = 1.f / g::global_vars->absoluteframetime;
+
+		if (fps <= 30.f)
+			return false;
+
+		return true;
+	}
+
+	//--------------------------------------------------------------------------------
 	bool RCS(QAngle& angle, c_base_player* target)
 	{
 		if (!has_rcs() || (a_settings.recoil.pitch == 0 && a_settings.recoil.yaw == 0))

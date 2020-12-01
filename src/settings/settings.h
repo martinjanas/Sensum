@@ -195,7 +195,7 @@ namespace settings
 		extern bool glowDroppedKitsEnabled;
 		extern bool glowNadesEnabled;
 		extern bool glowOverride;
-
+		
 		extern int style_enemy;
 		extern int style_teammate;
 		extern int glow_list_mode;
@@ -326,8 +326,6 @@ namespace settings
 		extern bool enabled;
 		extern bool yaw_flip;
 		extern bool resolver;
-		extern int desync_mode;
-		extern bool enabled2;
 	}
 
 	namespace aimbot
@@ -365,6 +363,7 @@ namespace settings
 		extern bool block_bot;
 		extern bool smoke_helper;
 		extern bool flash_helper;
+		extern bool ow_reveal;
 
 		extern float viewmodel_offset_x;
 		extern float viewmodel_offset_y;

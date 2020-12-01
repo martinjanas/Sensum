@@ -210,6 +210,36 @@ namespace hooks
 		inline static void* setup;
 	};
 
+	struct read_packet
+	{
+		static const int index = 17;
+		using fn = netpacket_t * (__thiscall*)(IDemoPlayer*);
+		static netpacket_t* __fastcall hooked(IDemoPlayer* player);
+
+		inline static fn original;
+		inline static void* setup;
+	};
+
+	struct hud_update
+	{
+		static const int index = 11;
+		using fn = void(__thiscall*)(IBaseClientDLL*, bool);
+		static void __fastcall hooked(IBaseClientDLL* _this, void* edx, bool active);
+
+		inline static fn original;
+		inline static void* setup;
+	};
+
+	struct is_playing_demo
+	{
+		static const int index = 82;
+		using fn = bool(__thiscall*)();
+		static bool __stdcall hooked();
+
+		inline static fn original;
+		inline static void* setup;
+	};
+
 	/*struct dispatch_user_message
 	{
 		static const int index = 38;

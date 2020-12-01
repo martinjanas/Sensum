@@ -37,6 +37,12 @@ static auto funcname() ->  RecvProp* \
 	return prop_ptr; \
 }
 
+#define OFFSET(type, name, offset)\
+type &name##() const\
+{\
+        return *(type*)(uintptr_t(this) + offset);\
+}
+
 class CAnimationLayer
 {
 public:
@@ -184,6 +190,34 @@ public:
 	NETVAR(float, m_flDefuseCountDown, "CPlantedC4", "m_flDefuseCountDown");
 	NETVAR(CHandle<c_base_player>, m_hBombDefuser, "CPlantedC4", "m_hBombDefuser");
 	NETVAR(int, m_nBombSite, "CPlantedC4", "m_nBombSite");
+};
+
+class c_inferno_t : public c_base_entity
+{
+public:
+	OFFSET(float, SpawnTime, 0x20);
+	NETVAR(int, m_fireXDelta, "CInferno", "m_fireXDelta");
+	NETVAR(int, m_fireYDelta, "CInferno", "m_fireYDelta");
+	NETVAR(int, m_fireZDelta, "CInferno", "m_fireZDelta");
+	NETVAR(bool, m_bFireIsBurning, "CInferno", "m_bFireIsBurning");
+	NETVAR(int, m_fireCount, "CInferno", "m_fireCount");
+
+	static float ExpireTime()
+	{
+		return 7.03125f;
+	}
+};
+
+class c_smoke_t : public c_base_entity
+{
+public:
+	NETVAR(int, m_nSmokeEffectTickBegin, "CSmokeGrenadeProjectile", "m_nSmokeEffectTickBegin");
+	NETVAR(bool, m_bDidSmokeEffect, "CSmokeGrenadeProjectile", "m_bDidSmokeEffect");
+
+	static float ExpireTime()
+	{
+		return 19.0f;
+	}
 };
 
 class c_base_grenade : public c_base_entity

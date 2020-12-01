@@ -26,9 +26,8 @@ namespace utils
 	bool is_connected();
 	bool is_sniper(int iItemDefinitionIndex);
 	bool IsPlayingMM();
+	bool IsPlayingMM_AND_IsValveServer();
 	bool Insecure();
-	bool IsMMGamemodes();
-	bool IsValveDS();
 
 	std::string get_weapon_name(void* weapon);
 

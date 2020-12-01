@@ -18,7 +18,7 @@ namespace render
 		ConVar* cl_hud_playercount_pos = nullptr;
 
 		decltype(entities::m_local) m_local;
-
+	
 		void render_panel()
 		{
 			if (!cl_hud_playercount_pos)

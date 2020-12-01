@@ -5,7 +5,7 @@
 #include "../../helpers/console.h"
 
 extern void bind_button(const char* label, int& key);
-extern bool hotkey(const char* label, int* k, const ImVec2& size_arg = ImVec2(0.f, 0.f));
+extern bool Hotkey(const char* label, int* k, const ImVec2& size_arg = ImVec2(0.f, 0.f));
 
 namespace render
 {

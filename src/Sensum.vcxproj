@@ -100,7 +100,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>
       </MinimalRebuild>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <ExceptionHandling>Async</ExceptionHandling>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
@@ -118,6 +118,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="features\aimbot.cpp" />
+    <ClCompile Include="features\aimlines.cpp" />
     <ClCompile Include="features\auto_strafe.cpp" />
     <ClCompile Include="features\bhop.cpp" />
     <ClCompile Include="features\Chams.cpp" />
@@ -255,6 +256,7 @@
     <ClInclude Include="valve_sdk\interfaces\IAppSystem.h" />
     <ClInclude Include="valve_sdk\interfaces\IBaseClientDLL.h" />
     <ClInclude Include="valve_sdk\interfaces\ICvar.h" />
+    <ClInclude Include="valve_sdk\interfaces\IDemoPlayer.h" />
     <ClInclude Include="valve_sdk\interfaces\IEngineSound.hpp" />
     <ClInclude Include="valve_sdk\interfaces\IFileSystem.h" />
     <ClInclude Include="valve_sdk\interfaces\ILocalize.h" />

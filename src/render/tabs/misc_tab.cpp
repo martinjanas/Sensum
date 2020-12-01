@@ -6,7 +6,7 @@
 #include <string.h>
 
 extern void bind_button(const char* label, int& key);
-extern bool hotkey(const char* label, int* k, const ImVec2& size_arg = ImVec2(0.f, 0.f));
+extern bool Hotkey(const char* label, int* k, const ImVec2& size_arg = ImVec2(0.f, 0.f));
 
 namespace render
 {
@@ -78,12 +78,6 @@ namespace render
 					}
 					columns(1);
 
-					static const char* desyncModes[] = {
-						"Off",
-						"Static",
-						"Balance"
-					};
-
 					static const char* skyList[] = {
 						"Off", "Baggage", "Tibet", "Embassy", "Italy",
 						"Daylight 1", "Daylight 2", "Daylight 3", "Daylight 4",
@@ -93,20 +87,7 @@ namespace render
 					};
 
 					separator("Desync");
-					ImGui::PushID("desync");
-					{
-						columns(2);
-						{
-							checkbox("Enabled", &settings::desync::enabled2);
-
-							ImGui::NextColumn();
-							ImGui::Combo("Mode", &settings::desync::desync_mode, desyncModes, IM_ARRAYSIZE(desyncModes));
-						}
-						columns(1);
-
-						bind_button("Left/Right", globals::binds::desync);
-					}
-					ImGui::PopID();
+					checkbox("Enabled", &settings::desync::enabled);
 
 					separator("FOV");
 

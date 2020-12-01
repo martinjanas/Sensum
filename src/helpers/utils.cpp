@@ -107,16 +107,16 @@ namespace utils
 		if (!type)
 			type = g::cvar->find("game_type");
 
-		if (type->GetInt() == 0 && mode->GetInt() == 0) //casual
+		if ((type->GetInt() == 0 && mode->GetInt() == 0)) //casual
 			return false;
 
-		if (type->GetInt() == 1 && mode->GetInt() == 1) //demolition
+		if ((type->GetInt() == 1 && mode->GetInt() == 1)) //demolition
 			return false;
 
-		if (type->GetInt() == 1 && mode->GetInt() == 0) //arms race
+		if ((type->GetInt() == 1 && mode->GetInt() == 0)) //arms race
 			return false;
 
-		if (type->GetInt() == 1 && mode->GetInt() == 2) //deathmatch
+		if ((type->GetInt() == 1 && mode->GetInt() == 2)) //deathmatch
 			return false;
 
 		if (type->GetInt() == 0 && mode->GetInt() == 1) //competitive
@@ -134,10 +134,27 @@ namespace utils
 		return false;
 	}
 
-	bool IsMMGamemodes()
+	bool IsPlayingMM_AND_IsValveServer() //returns true if server has mm gamemodes set (5v5, 2v2, scrimmage, dangerzone) and true if server is Valve official server.
 	{
 		ConVar* type = nullptr;
 		ConVar* mode = nullptr;
+
+		const char* server = "";
+
+		if (g::engine_client->IsInGame())
+		{
+			auto nci = g::engine_client->GetNetChannelInfo();
+
+			if (nci)
+			{
+				server = nci->GetAddress();
+
+				if (!strcmp(server, "loopback"))
+					server = "Local server";
+				else if (g::game_rules_proxy->m_bIsValveDS())
+					server = "Valve server";
+			}
+		}
 
 		if (!mode)
 			mode = g::cvar->find("game_mode");
@@ -145,17 +162,31 @@ namespace utils
 		if (!type)
 			type = g::cvar->find("game_type");
 
-		if (type->GetInt() == 0 && mode->GetInt() == 0) //casual
+		if ((type->GetInt() == 0 && mode->GetInt() == 0) && server == "Valve server") //casual
+			return false;
+
+		if ((type->GetInt() == 1 && mode->GetInt() == 1) && server == "Valve server") //demolition
+			return false;
+
+		if ((type->GetInt() == 1 && mode->GetInt() == 0) && server == "Valve server") //arms race
+			return false;
+
+		if ((type->GetInt() == 1 && mode->GetInt() == 2) && server == "Valve server") //deathmatch
+			return false;
+
+		/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+		if ((type->GetInt() == 0 && mode->GetInt() == 0) && server != "Valve server") //casual
 			return true;
 
-		if (type->GetInt() == 1 && mode->GetInt() == 1) //demolition
-			return false;
+		if ((type->GetInt() == 1 && mode->GetInt() == 1) && server != "Valve server") //demolition
+			return true;
 
-		if (type->GetInt() == 1 && mode->GetInt() == 0) //arms race
-			return false;
+		if ((type->GetInt() == 1 && mode->GetInt() == 0) && server != "Valve server") //arms race
+			return true;
 
-		if (type->GetInt() == 1 && mode->GetInt() == 2) //deathmatch
-			return false;
+		if ((type->GetInt() == 1 && mode->GetInt() == 2) && server != "Valve server") //deathmatch
+			return true;
 
 		if (type->GetInt() == 0 && mode->GetInt() == 1) //competitive
 			return true;
@@ -164,21 +195,10 @@ namespace utils
 			return true;
 
 		if (type->GetInt() == 6 && mode->GetInt() == 0) //dangerzone
-			return false;
+			return true;
 
 		if (type->GetInt() == 6 && mode->GetInt() == 0) //scrimmage
 			return true;
-
-		return false;
-	}
-
-	bool IsValveDS()
-	{
-		if (g::game_rules_proxy->m_bIsValveDS())
-			return true;
-
-		if (!g::game_rules_proxy->m_bIsValveDS())
-			return false;
 
 		return false;
 	}

@@ -480,6 +480,7 @@ namespace visuals
 				g::mdl_render->ForcedMaterialOverride(nullptr);
 				mat->IncrementReferenceCount();
 
+
 				if (client_class->m_ClassID == CEconEntity) {
 					if (settings::chams::misc::dropped_defusekit_chams) {
 						g::render_view->SetColorModulation(settings::chams::misc::color_dropped_defusekit_chams.r() / 255.f, settings::chams::misc::color_dropped_defusekit_chams.g() / 255.f, settings::chams::misc::color_dropped_defusekit_chams.b() / 255.f);
@@ -488,6 +489,8 @@ namespace visuals
 						entity->DrawModel(1, 255);
 					}
 				}
+				//g::mdl_render->ForcedMaterialOverride(nullptr);
+				//mat->IncrementReferenceCount();
 			}
 		}
 	}
@@ -501,7 +504,7 @@ namespace visuals
 		if (!g::local_player || !g::local_player->IsAlive())
 			return;
 
-		if (!utils::IsPlayingMM() && utils::IsValveDS())
+		if (!utils::IsPlayingMM_AND_IsValveServer())
 			return;
 
 		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
@@ -541,14 +544,14 @@ namespace visuals
 		if (g::local_player->m_bGunGameImmunity() || g::local_player->m_fFlags() & FL_FROZEN)
 			return;
 
-		if (!utils::IsPlayingMM() && utils::IsValveDS())
+		if (!utils::IsPlayingMM_AND_IsValveServer())
 			return;
 
 		QAngle OrigAng;
 
 		static IMaterial* material = nullptr;
 
-		static IMaterial* Normal = g::mat_system->FindMaterial("simple_regular", TEXTURE_GROUP_MODEL);
+		static IMaterial* Normal = g::mat_system->FindMaterial("sensum_regular", TEXTURE_GROUP_MODEL);
 		static IMaterial* Dogtags = g::mat_system->FindMaterial("models/inventory_items/dogtags/dogtags_outline", TEXTURE_GROUP_MODEL);
 		static IMaterial* Flat = g::mat_system->FindMaterial("debug/debugdrawflat", TEXTURE_GROUP_MODEL);
 		static IMaterial* Metallic = g::mat_system->FindMaterial("sensum_reflective", TEXTURE_GROUP_MODEL);
@@ -624,63 +627,6 @@ namespace visuals
 			damage = armor_new;
 		}
 		return damage;
-	}
-
-	void bomb_esp(c_planted_c4* entity) noexcept {
-		if (!settings::esp::bomb_esp)
-			return;
-
-		auto local_player = reinterpret_cast<c_base_player*>(g::entity_list->GetClientEntity(g::engine_client->GetLocalPlayer()));
-		if (!local_player)
-			return;
-
-		auto explode_time = entity->m_flC4Blow();
-		auto remaining_time = explode_time - (g::global_vars->interval_per_tick * local_player->m_nTickBase());
-		if (remaining_time < 0)
-			return;
-
-		int width, height;
-		g::engine_client->GetScreenSize(width, height);
-
-		Vector bomb_origin, bomb_position;
-		bomb_origin = entity->m_vecOrigin();
-
-		explode_time -= g::global_vars->interval_per_tick * local_player->m_nTickBase();
-		if (explode_time <= 0)
-			explode_time = 0;
-
-		char buffer[64];
-		sprintf_s(buffer, "%.2f", explode_time);
-
-		auto c4_timer = g::cvar->find("mp_c4timer")->GetInt();
-		auto value = (explode_time * height) / c4_timer;
-
-		float damage;
-		float hp_remaining = g::local_player->m_iHealth();
-		auto distance = local_player->GetEyePos().DistTo(entity->m_vecOrigin());
-		auto a = 450.7f;
-		auto b = 75.68f;
-		auto c = 789.2f;
-		auto d = ((distance - b) / c);
-		auto fl_damage = a * exp(-d * d);
-		damage = damage_for_armor(fl_damage, g::local_player->m_ArmorValue());
-		hp_remaining -= damage;
-
-		char text[256];
-		sprintf_s(text, "HP LEFT: %1.f", hp_remaining);
-
-		//render bomb damage && fatal check
-		if (g::local_player->IsAlive() && damage <= g::local_player->m_iHealth() && hp_remaining > 0) {
-			VGSHelper::Get().DrawTextW(text, width / 2 - 95, height / 2 + 255, Color::White, 50);
-		}
-		else if (g::local_player->IsAlive() && damage >= g::local_player->m_iHealth()) {
-			VGSHelper::Get().DrawTextW("HP LEFT: 0", width / 2 - 95, height / 2 + 255, Color::Red, 50);
-		}
-
-		if (!math::world2screen(bomb_origin, bomb_position))
-			return;
-
-		VGSHelper::Get().DrawText(buffer, bomb_position.x - 15, bomb_position.y + 10, Color::White, 15);
 	}
 
 	void SpreadCircle()
@@ -852,7 +798,7 @@ namespace visuals
 		if (settings::visuals::spread_cross)
 			SpreadCircle();
 
-		if (settings::desync::enabled2)
+		if (settings::desync::enabled)
 			AAIndicator();
 
 		if (settings::misc::damage_indicator)

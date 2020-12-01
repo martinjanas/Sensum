@@ -160,6 +160,13 @@ namespace esp
 			entities::local_mutex.unlock();
 		}
 
+		int x, y;
+
+		g::engine_client->GetScreenSize(x, y);
+
+		int xx = x / 2;
+		int yy = y / 2;
+
 		QAngle angles;
 		g::engine_client->GetViewAngles(angles);
 

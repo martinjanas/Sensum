@@ -16,6 +16,7 @@ namespace entities
 
 	local_data_t m_local;
 	std::list<tick_data_t> m_items(24);
+	player_data_t entity_data[MAX_PLAYERS];
 
 	CUtlVector<SndInfo_t> sounds;
 
@@ -104,9 +105,6 @@ namespace entities
 				{
 					if (player->m_iTeamNum() == team_ct || player->m_iTeamNum() == team_t)
 						m_sounds[k] = sound_t{ player->GetIndex(), player->m_vecOrigin() };
-
-					//if (m_sounds[k].index != 0)
-						//globals::sound = true;
 				}
 			}
 		}
@@ -222,7 +220,7 @@ namespace entities
 		damage = damage_for_armor(fl_damage, local->m_ArmorValue());
 		hp_remaining -= damage;
 
-		return hp_remaining < 0 ? 0 : hp_remaining;
+		return hp_remaining < 0 ? 0 : (hp_remaining + 1);
 	}
 
 	float get_bomb_time(c_planted_c4* bomb, const int& tick_base)
@@ -416,7 +414,6 @@ namespace entities
 			player_data.name = std::string(player->GetPlayerInfo().szName).substr(0, 12);
 
 			player_data.weapon = utils::get_weapon_name(player->m_hActiveWeapon());
-			//player_data.weapon = player->m_hActiveWeapon().Get()->GetWeaponName();
 			player_data.icon = player->m_hActiveWeapon()->GetGunIcon();
 			player_data.kevlar_icon = player->GetArmorIcon();
 			player_data.wep_str_size = player->m_hActiveWeapon()->GetGunStringSize();
@@ -431,7 +428,6 @@ namespace entities
 			player_data.has_defkit = player->m_bHasDefuser();
 			player_data.is_desyncing = IsDesyncing(player);
 			player_data.draw_entity = player->DrawSpecificEntity();
-			//player_data.sound = globals::sound;
 
 			auto weapData = player->m_hActiveWeapon();
 

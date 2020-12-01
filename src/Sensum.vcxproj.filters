@@ -304,6 +304,9 @@
     <ClCompile Include="features\offscreen.cpp">
       <Filter>features\visuals</Filter>
     </ClCompile>
+    <ClCompile Include="features\aimlines.cpp">
+      <Filter>features\visuals</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\directx9\imgui_impl_dx9.h">
@@ -641,6 +644,9 @@
     </ClInclude>
     <ClInclude Include="features\popflash_helper.h">
       <Filter>features\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="valve_sdk\interfaces\IDemoPlayer.h">
+      <Filter>valve_sdk\interfaces</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

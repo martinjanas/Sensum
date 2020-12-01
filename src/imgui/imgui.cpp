@@ -8883,6 +8883,64 @@ bool ImGui::SliderFloat(const char* label, float* v, float v_min, float v_max, c
 	return value_changed;
 }
 
+bool ImGui::SliderFloatLeftAlignedCustom(const char* label, float* v, float v_min, float v_max, const char* display_format, float* v2)
+{
+	ImGuiWindow* window = GetCurrentWindow();
+	if (window->SkipItems)
+		return false;
+
+	ImGuiContext& g = *GImGui;
+	const ImGuiStyle& style = g.Style;
+	const ImGuiID id = window->GetID(label);
+	const float w = CalcItemWidth();
+
+	const ImVec2 label_size = CalcTextSize("label", NULL, true);
+	const ImRect frame_bb(window->DC.CursorPos, window->DC.CursorPos + ImVec2(w, label_size.y + style.FramePadding.y * 2.0f));
+	const ImRect total_bb(frame_bb.Min, frame_bb.Max + ImVec2(label_size.x > 0.0f ? style.ItemInnerSpacing.x + label_size.x : 0.0f, 0.0f));
+
+	// NB- we don't call ItemSize() yet because we may turn into a text edit box below
+	if (!ItemAdd(total_bb, id, &frame_bb))
+	{
+		ItemSize(total_bb, style.FramePadding.y);
+		return false;
+	}
+	const bool hovered = ItemHoverable(frame_bb, id);
+
+	if (!display_format)
+		display_format = "%.3f";
+	int decimal_precision = ParseFormatPrecision(display_format, 3);
+
+	// Tabbing or CTRL-clicking on Slider turns it into an input box
+	bool start_text_input = false;
+	const bool tab_focus_requested = FocusableItemRegister(window, id);
+	if (tab_focus_requested || (hovered && g.IO.MouseClicked[0]) || g.NavActivateId == id || (g.NavInputId == id && g.ScalarAsInputTextId != id))
+	{
+		SetActiveID(id, window);
+		SetFocusID(id, window);
+		FocusWindow(window);
+		g.ActiveIdAllowNavDirFlags = (1 << ImGuiDir_Up) | (1 << ImGuiDir_Down);
+		if (tab_focus_requested || g.IO.KeyCtrl || g.NavInputId == id)
+		{
+			start_text_input = true;
+			g.ScalarAsInputTextId = 0;
+		}
+	}
+	if (start_text_input || (g.ActiveId == id && g.ScalarAsInputTextId == id))
+		return InputScalarAsWidgetReplacement(frame_bb, label, ImGuiDataType_Float, v, id, decimal_precision);
+
+	// Actual slider behavior + render grab
+	ItemSize(total_bb, style.FramePadding.y);
+	const bool value_changed = SliderBehavior(frame_bb, id, v, v_min, v_max, 1.f, decimal_precision);
+
+	// Display value using user-provided display format so user can add prefix/suffix/decorations to the value.
+	char value_buf[64];
+	const char* value_buf_end = value_buf + ImFormatString(value_buf, IM_ARRAYSIZE(value_buf), display_format, *v2);
+	RenderTextClipped(frame_bb.Min, frame_bb.Max, label, NULL, NULL, ImVec2(0.05f, 0.5f));
+	RenderTextClipped(frame_bb.Min, frame_bb.Max, value_buf, value_buf_end, NULL, ImVec2(0.95f, 0.5f));
+
+	return value_changed;
+}
+
 bool ImGui::SliderFloatLeftAligned(const char* label, float* v, float v_min, float v_max, const char* display_format)
 {
 	ImGuiWindow* window = GetCurrentWindow();

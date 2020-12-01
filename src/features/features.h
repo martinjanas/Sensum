@@ -13,14 +13,7 @@ namespace features
 	void fast_stop(CUserCmd* cmd);
 	void edge_jump_pre(CUserCmd* cmd);
 	void edge_jump_post(CUserCmd* cmd);
-}
-
-namespace spy_camera
-{
-	void on_render_view(CViewSetup& view);
-	void on_end_scene();
-	void on_fire_event();
-	void on_frame_render_start();
+	void aimlines(ImDrawList* draw_list);
 }
 
 namespace color_modulation
@@ -41,8 +34,7 @@ namespace visuals
 	void RenderHitmarker();
 	void RenderNoScopeOverlay();
 	void SpreadCircle();
-	void bomb_esp(c_planted_c4* entity) noexcept;
-	void DrawFov(); //todo
+	void DrawFov();
 	void DesyncChams();
 	void AAIndicator();
 	void KnifeLeft();
@@ -55,7 +47,6 @@ namespace visuals
 	void RenderCirclePopflash(ImDrawList* draw_list);
 	void SmokeHelperAimbot(CUserCmd* cmd);
 	void PopflashHelperAimbot(CUserCmd* cmd);
-	void BoneESP();
 }
 
 namespace esp

@@ -41,7 +41,10 @@ namespace hooks
 		draw_model_execute::setup = reinterpret_cast<void*>(utils::GetVirtual(g::mdl_render, hooks::draw_model_execute::index));
 		check_file_crc_server::setup = reinterpret_cast<void*>(utils::pattern_scan(GetModuleHandleA(xorstr_("engine.dll")), xorstr_("55 8B EC 81 EC ? ? ? ? 53 8B D9 89 5D F8 80")));
 		loose_file_allowed::setup = reinterpret_cast<void*>(utils::GetVirtual(g::file_system, hooks::loose_file_allowed::index));
-		
+		read_packet::setup = reinterpret_cast<void*>(utils::GetVirtual(g::demo_player, hooks::read_packet::index));
+		hud_update::setup = reinterpret_cast<void*>(utils::GetVirtual(g::base_client, hooks::hud_update::index));
+		is_playing_demo::setup = reinterpret_cast<void*>(utils::GetVirtual(g::engine_client, hooks::is_playing_demo::index));
+
 		if (MH_Initialize() != MH_OK) {
 			MessageBoxA(NULL, "Failed to initialize Minhook.", MB_OK, MB_ICONERROR);
 		}
@@ -102,6 +105,18 @@ namespace hooks
 			MessageBoxA(NULL, "Outdated index - Loose File Allowed", MB_OK, MB_ICONERROR);
 		}
 
+		if (MH_CreateHook(read_packet::setup, &hooks::read_packet::hooked, reinterpret_cast<void**>(&read_packet::original)) != MH_OK) {
+			MessageBoxA(NULL, "Outdated index - Read Packet", MB_OK, MB_ICONERROR);
+		}
+
+		if (MH_CreateHook(hud_update::setup, &hooks::hud_update::hooked, reinterpret_cast<void**>(&hud_update::original)) != MH_OK) {
+			MessageBoxA(NULL, "Outdated index - Hud Update", MB_OK, MB_ICONERROR);
+		}
+
+		if (MH_CreateHook(is_playing_demo::setup, &hooks::is_playing_demo::hooked, reinterpret_cast<void**>(&is_playing_demo::original)) != MH_OK) {
+			MessageBoxA(NULL, "Outdated index - Is Playing Demo", MB_OK, MB_ICONERROR);
+		}
+
 		if (MH_EnableHook(MH_ALL_HOOKS) != MH_OK) {
 			MessageBoxA(NULL, "Failed to enable hooks.", MB_OK, MB_ICONERROR);
 		}
@@ -144,6 +159,46 @@ namespace hooks
 
 		//delete convars::sensum_mute_russians;
 		//delete convars::sensum_i_dont_speak_nn_lang;
+	}
+
+	bool __stdcall is_playing_demo::hooked()
+	{
+		if (*static_cast<uintptr_t*>(_ReturnAddress()) == 0x0975C084 // client.dll : 84 C0 75 09 38 05
+			&& **reinterpret_cast<uintptr_t**>(uintptr_t(_AddressOfReturnAddress()) + 4) == 0x0C75C084) { // client.dll : 84 C0 75 0C 5B
+			return true;
+		}
+		return original();
+	}
+
+	netpacket_t* __fastcall read_packet::hooked(IDemoPlayer* player)
+	{
+		if (settings::misc::ow_reveal)
+		{
+			player->SetOverwatchState(true);
+
+			auto ret = original(g::demo_player);
+
+			player->SetOverwatchState(false);
+
+			player->IsPlayingDemo() ? settings::chams::misc::dropped_weapons = false : true;
+
+
+			return ret;
+		}
+	}
+
+	void __fastcall hud_update::hooked(IBaseClientDLL* _this, void* edx, bool active)
+	{
+		if (settings::misc::ow_reveal && g::demo_player->IsPlayingDemo()) {
+			g::demo_player->SetOverwatchState(true);
+
+			original(g::base_client, active);
+
+			g::demo_player->SetOverwatchState(false);
+		}
+		else {
+			original(g::base_client, active);
+		}
 	}
 
 	void __fastcall check_file_crc_server::hooked(void* ecx, void* edx)
@@ -207,19 +262,6 @@ namespace hooks
 			visuals::DrawRing3DPopflash();
 		}
 
-		for (int i = 1; i < g::entity_list->GetHighestEntityIndex(); i++) {
-			auto entity = reinterpret_cast<c_planted_c4*>(g::entity_list->GetClientEntity(i));
-
-			if (entity) {
-				auto client_class = entity->GetClientClass();
-				auto model_name = g::mdl_info->GetModelName(entity->GetModel());
-
-				if (client_class->m_ClassID == EClassId::CPlantedC4 && entity->m_bBombTicking() && !entity->m_bBombDefused()) {
-					visuals::bomb_esp(entity);
-				}
-			}
-		}
-
 		original(g::vgui_panel, panel, forceRepaint, allowForce);
 
 		if (!panelId)
@@ -247,7 +289,7 @@ namespace hooks
 		if (!strcmp(pSoundEntry, "UIPanorama.popup_accept_match_beep")) {
 			static auto fnAccept = reinterpret_cast<bool(__stdcall*)(const char*)>(utils::pattern_scan(GetModuleHandleA("client.dll"), "55 8B EC 83 E4 F8 8B 4D 08 BA ? ? ? ? E8 ? ? ? ? 85 C0 75 12"));
 
-			HWND window = FindWindow(NULL, L"Counter-Strike: Global Offensive");
+			static HWND window = FindWindow(NULL, L"Counter-Strike: Global Offensive");
 
 			if (fnAccept) {
 				fnAccept("");
@@ -269,7 +311,7 @@ namespace hooks
 	{
 		visuals::more_chams();
 
-		if (settings::chams::localplayer::desync_chams && settings::desync::enabled2)
+		if (settings::chams::localplayer::desync_chams && settings::desync::enabled)
 			visuals::DesyncChams();
 
 		original(view);

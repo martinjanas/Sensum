@@ -16,7 +16,7 @@ float real_angle = 0.0f;
 float view_angle = 0.0f;
 
 static CCSGOPlayerAnimState g_AnimState;
-static int max_choke_ticks = 6;
+static int max_choke_ticks = 8; //was 6
 
 float AngleDiff(float destAngle, float srcAngle) {
 	float delta;
@@ -54,6 +54,12 @@ namespace hooks
 		if (settings::misc::auto_strafe)
 			features::auto_strafe(cmd);
 
+		if (settings::misc::smoke_helper)
+			visuals::SmokeHelperAimbot(cmd);
+
+		if (settings::misc::flash_helper)
+			visuals::PopflashHelperAimbot(cmd);
+
 		slow_walk::handle(cmd);
 
 		entities::on_create_move(cmd);
@@ -80,7 +86,7 @@ namespace hooks
 				max_choke_ticks = 11;
 		}
 		else {
-			max_choke_ticks = 5 - latency_ticks;
+			max_choke_ticks = 13 - latency_ticks; //was 5
 		}
 
 		static float SpawnTime = 0.0f;
@@ -102,7 +108,7 @@ namespace hooks
 			if (g::local_player->m_bGunGameImmunity() || g::local_player->m_fFlags() & FL_FROZEN)
 				return;
 
-			if (!utils::IsPlayingMM() && utils::IsValveDS())
+			if (!utils::IsPlayingMM_AND_IsValveServer())
 				return;
 
 			auto weapon = g::local_player->m_hActiveWeapon().Get();
@@ -129,21 +135,19 @@ namespace hooks
 			}
 
 			static bool broke_lby = false;
-			if (settings::desync::desync_mode == 2)
-			{
-				if (next_lby >= g::global_vars->curtime) {
-					if (!broke_lby && *send_packet && g::client_state->chokedcommands > 0)
-						return;
 
-					broke_lby = false;
-					*send_packet = false;
-					cmd->viewangles.yaw += 120.0f * side; //was 120.f and side
-				}
-				else {
-					broke_lby = true;
-					*send_packet = false;
-					cmd->viewangles.yaw += 120.0f * -side; //was 120.f and -side
-				}
+			if (next_lby >= g::global_vars->curtime) {
+				if (!broke_lby && *send_packet && g::client_state->chokedcommands > 0)
+					return;
+
+				broke_lby = false;
+				*send_packet = false;
+				cmd->viewangles.yaw += 120.0f * side; //was 120.f and side
+			}
+			else {
+				broke_lby = true;
+				*send_packet = false;
+				cmd->viewangles.yaw += 120.0f * -side; //was 120.f and -side
 			}
 			math::FixAngles(cmd->viewangles);
 			math::MovementFix(cmd, OldAngles, cmd->viewangles);
@@ -181,13 +185,13 @@ namespace hooks
 		if (settings::misc::lefthandknife)
 			visuals::KnifeLeft();
 
-		if (settings::desync::enabled2 && std::fabsf(g::local_player->m_flSpawnTime() - g::global_vars->curtime) > 1.0f)
+		if (settings::desync::enabled && std::fabsf(g::local_player->m_flSpawnTime() - g::global_vars->curtime) > 1.0f)
 			Desync(cmd, sendpacket2);
 
 		math::FixAngles(cmd->viewangles);
 		cmd->viewangles.yaw = std::remainderf(cmd->viewangles.yaw, 360.0f);
 
-		if (settings::desync::enabled2 && g::client_state->chokedcommands >= max_choke_ticks) {
+		if (settings::desync::enabled && g::client_state->chokedcommands >= max_choke_ticks) {
 			*sendpacket2 = true;
 			cmd->viewangles = g::client_state->viewangles;
 		}

@@ -71,6 +71,7 @@ namespace settings
 		int style_teammate = 0;
 		int glow_list_mode = 0;
 
+		
 		Color glowEnemyColor = Color(255, 0, 0, 255);
 		Color glowTeamColor(0, 255, 0, 255);
 		Color glowC4PlantedColor = Color(255, 255, 255, 255);
@@ -195,8 +196,6 @@ namespace settings
 		bool enabled = false;
 		bool yaw_flip = false;
 		bool resolver = false;
-		int desync_mode = 0;
-		bool enabled2 = false;
 	}
 
 	namespace aimbot
@@ -231,6 +230,7 @@ namespace settings
 		bool override_viewmodel = false;
 		bool smoke_helper = false;
 		bool flash_helper = false;
+		bool ow_reveal = false;
 
 		float viewmodel_offset_x = 0.f;
 		float viewmodel_offset_y = 0.f;
@@ -392,9 +392,6 @@ namespace settings
 				Option::Load(root["desync.enabled"], desync::enabled);
 				Option::Load(root["desync.yaw_flip"], desync::yaw_flip);
 				Option::Load(root["desync.resolver"], desync::resolver);
-				Option::Load(root["desync.enabled2"], desync::enabled2);
-				Option::Load(root["desync_mode"], desync::desync_mode);
-				Option::Load(root["desync.chams_mode"], desync::desync_mode);
 
 				Option::Load(root["legitbot.setting_type"], aimbot::setting_type);
 
@@ -644,9 +641,6 @@ namespace settings
 				config["desync.enabled"] = desync::enabled;
 				config["desync.yaw_flip"] = desync::yaw_flip;
 				config["desync.resolver"] = desync::resolver;
-				config["desync.enabled2"] = desync::enabled2;
-				config["desync_mode"] = desync::desync_mode;
-				config["desync.chams_mode"] = desync::desync_mode;
 
 				config["legitbot.setting_type"] = aimbot::setting_type;
 

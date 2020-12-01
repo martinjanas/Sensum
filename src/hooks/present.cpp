@@ -31,6 +31,7 @@ namespace hooks
 		esp::render_helpers(globals::draw_list);
 		esp::render(globals::draw_list);
 		visuals::render(globals::draw_list);
+		//features::aimlines(globals::draw_list); //Work in progress - I need to figure out how to make the lines not render through walls.
 
 		ImGui::Render();
 

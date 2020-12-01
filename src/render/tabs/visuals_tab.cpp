@@ -6,7 +6,8 @@
 #include "../..//features/features.h"
 
 extern void bind_button(const char* label, int& key);
-extern bool hotkey(const char* label, int* k, const ImVec2& size_arg = ImVec2(0.f, 0.f));
+extern bool Hotkey(const char* label, int* k, const ImVec2& size_arg = ImVec2(0.f, 0.f));
+
 
 namespace render
 {
@@ -23,7 +24,7 @@ namespace render
 						ImGui::NextColumn();
 
 						ImGui::PushItemWidth(-1);
-						hotkey("##binds.esp", &globals::binds::esp);
+						Hotkey("##binds.esp", &globals::binds::esp);
 						ImGui::PopItemWidth();
 					}
 					columns(1);
@@ -145,8 +146,8 @@ namespace render
 					checkbox("Money ESP", &settings::esp::money);
 					checkbox("Sound ESP", &settings::esp::soundesp);
 
-					checkbox("Beams", &settings::esp::beams);
-					checkbox("Sound Direction (?)", &settings::esp::sound);
+					//checkbox("Beams", &settings::esp::beams);
+					//checkbox("Sound Direction (?)", &settings::esp::sound);
 				
 					checkbox("Bomb Damage ESP", &settings::esp::bomb_esp);
 					checkbox("Offscreen ESP", &settings::esp::offscreen);
