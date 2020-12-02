@@ -1,4 +1,4 @@
-# Sensum - Internal legit cheat | https://discord.gg/FnAJfra
+# Sensum - Internal legit cheat
 
 # Since I quit playing cs, because its developers are retarded and the whole community is retarded and the game has server problems with 1 000 000 players, I permanently stop working on Sensum.
 
