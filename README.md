@@ -2,7 +2,7 @@
 
 # Since I quit playing cs, because its developers are retarded and the whole community is retarded and the game has server problems with 1 000 000 players, I permanently stop working on Sensum.
 
-# You are welcome to take it as Yours project, but, if the project will be public I wanna You to follow these rules:
+You are welcome to take it as Yours project, but, if the project will be public I wanna You to follow these rules:
 
 #1 - Dont rename Sensum.
 
