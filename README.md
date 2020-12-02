@@ -4,8 +4,8 @@
 
 # You are welcome to take it as Yours project, but, if the project will be public I wanna You to follow these rules:
 
-# #1 - Dont rename Sensum.
-# #2 - Dont remove or edit the authors text "Xardch & MartiNJ409" in bottom left in menu.
+#1 - Dont rename Sensum.
+#2 - Dont remove or edit the authors text "Xardch & MartiNJ409" in bottom left in menu.
 
 
 Remember to compile in Release x86 to minimalize fps drops and other problems, config location since now is in "C:\\Sensum".
