@@ -1,14 +1,5 @@
-# Sensum - Internal legit cheat
-
-# Since I quit playing cs, because its developers are retarded and the whole community is retarded and the game has server problems with 1 000 000 players, I permanently stop working on Sensum.
-
-You are welcome to take it as Yours project, but, if the project will be public I wanna You to follow these rules:
-
-#1 - Dont rename Sensum.
-
-#2 - Dont remove or edit the authors text "Xardch & MartiNJ409" in bottom left in menu.
-
-
+# Sensum - Internal legit cheat | Detected as of 2nd December 2020
+Not in development anymore, since I quit playing cs.
 Remember to compile in Release x86 to minimalize fps drops and other problems, config location since now is in "C:\\Sensum".
 
 Remember to put skin_kits.json file into "Sensum" folder in C drive. (Ex: C:\\Sensum)
