@@ -160,7 +160,7 @@ namespace render
 					checkbox("No 3rd Person on Equiped Weapons.", &settings::misc::disable_on_weapon);
 					checkbox("Anti OBS", &settings::misc::anti_obs);
 					checkbox("Left Hand Knife", &settings::misc::lefthandknife);
-					checkbox("Ow revealer", &settings::misc::ow_revealer);
+					checkbox("Ow revealer", &settings::misc::ow_reveal);
 					checkbox("Smoke Helper (?)", &settings::misc::smoke_helper);
 					tooltip("Jump = jump throw, LClick/RClick = left/right mouse buttons.");
 					checkbox("Flash Helper - WIP", &settings::misc::flash_helper);
