@@ -1,4 +1,4 @@
-# Sensum - Internal legit cheat | Detected as of 2nd December 2020 | https://discord.gg/DbsYjH6EMC
+# Sensum - Internal legit cheat | Detected as of 2nd December 2020 | https://discord.gg/dDwHyydXw7
 Not in development anymore, since I quit playing cs, because the game is slowly dying and the community is cancerrous af. 
 
 Remember to compile in Release x86 to minimalize fps drops and other problems, config location since now is in "C:\\Sensum".
