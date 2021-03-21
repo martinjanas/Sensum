@@ -97,7 +97,9 @@ namespace settings
 			bool flat = false;
 			bool wireframe = false;
 			bool health_chams = false;
+			bool backtrack_chams = false;
 
+			int backtrack_chams_mode = 1;
 			int selected_material = 1;
 
 			Color color_visible = Color(0, 128, 0, 255);
@@ -111,7 +113,9 @@ namespace settings
 			bool flat = false;
 			bool wireframe = false;
 			bool health_chams = false;
+			bool backtrack_chams = false;
 
+			int backtrack_chams_mode = 1;
 			int selected_material = 1;
 
 			Color color_visible = Color(0, 128, 0, 255);
@@ -124,9 +128,11 @@ namespace settings
 			bool wireframe = false;
 			bool flat = false;
 			bool desync_chams = false;
-
+			bool backtrack_chams = false;
+		
 			int desync_chams_mode = 0;
 			int selected_material = 1;
+			int backtrack_chams_mode = 0;
 
 			Color color = Color(0, 0, 255, 255);
 			Color desync_color = Color(255, 255, 255, 255);
@@ -217,6 +223,8 @@ namespace settings
 		float viewmodel_fov = 68.f;
 		bool deathmatch = false;
 		int debug_fov = 90;
+		bool music_kit_apply;
+		int music_kit = 1;
 		bool lknife;
 		bool noscope;
 		bool lefthandknife;
@@ -289,9 +297,13 @@ namespace settings
 				Option::Load(root["chams.list_mode"], chams::chams_list_mode, 0);
 				Option::Load(root["chams.enemy_enabled"], chams::enemy::enabled, false);
 				Option::Load(root["chams.enemy_visible_only"], chams::enemy::visible_only, true);
+				Option::Load(root["chams.enemy_backtrack_enable"], chams::enemy::backtrack_chams, false);
+				Option::Load(root["chams.enemy_backtrack_chams_mode"], chams::enemy::backtrack_chams_mode, 0);
 
 				Option::Load(root["chams.teammates_enabled"], chams::teammates::enabled, false);
 				Option::Load(root["chams.teammates_visible_only"], chams::teammates::visible_only, true);
+				Option::Load(root["chams.teammates_backtrack_enable"], chams::teammates::backtrack_chams, false);
+				Option::Load(root["chams.teammates_backtrack_chams_mode"], chams::teammates::backtrack_chams_mode, 0);
 
 				Option::Load(root["chams.localplayer_enabled"], chams::localplayer::enabled, false);
 
@@ -534,9 +546,14 @@ namespace settings
 				config["chams.list_mode"] = chams::chams_list_mode;
 				config["chams.enemy_enabled"] = chams::enemy::enabled;
 				config["chams.enemy_visible_only"] = chams::enemy::visible_only;
+				config["chams.enemy_backtrack_enable"] = chams::enemy::backtrack_chams;
+				config["chams.enemy_backtrack_chams_mode"] = chams::enemy::backtrack_chams_mode;
 
 				config["chams.teammates_enabled"] = chams::teammates::enabled;
 				config["chams.teammates_visible_only"] = chams::teammates::visible_only;
+				config["chams.teammates_backtrack_enable"] = chams::teammates::backtrack_chams;
+				config["chams.teammates_backtrack_chams_mode"] = chams::teammates::backtrack_chams_mode;
+
 
 				config["chams.localplayer_enabled"] = chams::localplayer::enabled;
 

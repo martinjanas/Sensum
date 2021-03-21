@@ -28,7 +28,7 @@ namespace hooks
 			sequence::hook = new recv_prop_hook(c_base_view_model::m_nSequence(), sequence::hooked);
 		}
 		end_scene::setup = reinterpret_cast<void*>(utils::GetVirtual(g::d3_device, hooks::end_scene::index));
-		create_move::setup = reinterpret_cast<void*>(utils::GetVirtual(g::client_mode, hooks::create_move::index));
+		create_move::setup = reinterpret_cast<void*>(utils::GetVirtual(g::base_client, hooks::create_move::index));
 		reset::setup = reinterpret_cast<void*>(utils::GetVirtual(g::d3_device, hooks::reset::index));
 		paint_traverse::setup = reinterpret_cast<void*>(utils::GetVirtual(g::vgui_panel, hooks::paint_traverse::index));
 		override_view::setup = reinterpret_cast<void*>(utils::GetVirtual(g::client_mode, hooks::override_view::index));
@@ -325,6 +325,7 @@ namespace hooks
 		if (g::mdl_render->IsForcedMaterialOverride() && !strstr(info.pModel->szName, "arms") && !strstr(info.pModel->szName, "weapons/v_"))
 			return original(g::mdl_render, context, &state, &info, bone);
 		
+		aimbot::backtrack_chams(context, state, info, bone);
 		Chams::Get().OnDrawModelExecute(context, state, info, bone);
 		
 		original(g::mdl_render, context, &state, &info, bone);

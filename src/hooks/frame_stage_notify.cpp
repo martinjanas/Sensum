@@ -27,6 +27,14 @@ namespace hooks
 	}
 
 	void __stdcall hooks::frame_stage_notify::hooked(EClientFrameStage stage) {
+		
+		static int definition_index = 7;
+		auto a_settings = &settings::aimbot::m_items[definition_index];
+
+		if (g::local_player)
+		{
+			aimbot::punches::current = g::local_player->m_aimPunchAngle();
+		}
 
 		if (stage == FRAME_RENDER_START) {
 
@@ -44,6 +52,13 @@ namespace hooks
 		else if (stage == FRAME_NET_UPDATE_END && g::engine_client->IsInGame()) {
 
 		}
+
 		original(g::base_client, stage);
+
+		if (a_settings->recoil.enabled)
+		{
+			if (g::local_player)
+				g::local_player->m_aimPunchAngle() = aimbot::punches::current;
+		}
 	}
 }

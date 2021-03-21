@@ -7,22 +7,19 @@
 #include "..\\hooks\hooks.h"
 #include "..//helpers/notifies.h"
 
-static QAngle CurrentPunch = { 0,0,0 };
-static QAngle RCSLastPunch = { 0,0,0 };
-
 namespace aimbot
 {
 	bool silent_enabled = false;
 	bool _is_trigger = false;
 	bool _is_backshot = false;
 	bool last_hit_state = false;
-
+	
 	float out_delay = 0.f;
 	float network_delay = 0.f;
 	float latency_delay = 0.f;
 	float correct_nexttime = 0.f;
 	float interpolation_time = 0.f;
-
+	
 	bool shot_delay = false;
 	bool is_delayed = false;
 	ULONGLONG shot_delay_time = 0;
@@ -35,6 +32,8 @@ namespace aimbot
 	CCSWeaponInfo* weapon_data;
 	c_base_combat_weapon* weapon = nullptr;
 
+	matrix3x4_t bt_matrix[MAXSTUDIOBONES];
+
 	struct entity_pos_t
 	{
 		int id;
@@ -43,6 +42,14 @@ namespace aimbot
 		Vector origin;
 		Vector eye_pos;
 	};
+
+	struct backtrack_data_t
+	{
+		matrix3x4_t matrix[128];
+		bool is_moving;
+	};
+
+	std::map<int, std::deque<backtrack_data_t>> data;
 
 	std::vector<entity_pos_t> duplicates;
 
@@ -69,6 +76,7 @@ namespace aimbot
 
 		QAngle abs_angles; //target angles
 		QAngle aim_angles;
+		QAngle silent_angles;
 
 		int hitbox_id;
 		std::array<Vector, 4> hitboxes;
@@ -79,6 +87,9 @@ namespace aimbot
 
 		bool is_visible = false;
 		Vector hitbox;
+
+		bool can_lock_on = false;
+		bool can_lock_on_silent = false;
 
 		bool operator<(const target_t& other) const
 		{
@@ -252,9 +263,6 @@ namespace aimbot
 		{
 			float ping = 1.f / nci->GetLatency(FLOW_INCOMING);
 
-			//if (nci->GetAvgLoss(1) > 0.f || nci->GetAvgLoss(0) > 0.f)
-				//return false;
-
 			if (ping >= 120.f)
 				return false;
 		}
@@ -266,12 +274,14 @@ namespace aimbot
 
 		return true;
 	}
-
 	//--------------------------------------------------------------------------------
-	bool RCS(QAngle& angle, c_base_player* target)
+	bool RCS(QAngle& angle, c_base_player* target, CUserCmd* cmd)
 	{
-		if (!has_rcs() || (a_settings.recoil.pitch == 0 && a_settings.recoil.yaw == 0))
+		if (!has_rcs() || !able_to_rcs() || (a_settings.recoil.pitch == 0 && a_settings.recoil.yaw == 0))
 			return false;
+
+		if (is_trigger())
+			cmd->buttons |= IN_ATTACK;
 
 		auto x = a_settings.recoil.pitch;
 		auto y = a_settings.recoil.yaw;
@@ -284,19 +294,20 @@ namespace aimbot
 
 		static auto weapon_recoil_scale = g::cvar->find("weapon_recoil_scale");
 		float scale = weapon_recoil_scale->GetFloat();
+
 		if (scale != 2.f)
 		{
 			x = scale * x / 2.f;
 			y = scale * y / 2.f;
 		}
 
+		x = scale *= 1.26f;
+		y = scale;
+
 		if (x <= 0 && y <= 0)
 			return false;
 
 		QAngle punch = { };
-
-		//if (punches::current.pitch > 0.06f)
-			///punches::current.pitch = 0.06f;
 
 		if (target)
 			punch = { punches::current.pitch * x ,  punches::current.yaw * y, 0 };
@@ -312,73 +323,6 @@ namespace aimbot
 		punches::last_corrected = punch;
 
 		return true;
-	}
-
-	void RCS2(QAngle& angle, c_base_player* target)
-	{
-		a_settings.rcs_type = 0;
-
-		if (!a_settings.recoil.enabled || !has_rcs()) {
-			return;
-		}
-
-		if (a_settings.recoil.yaw == 0 && a_settings.recoil.pitch == 0) {
-			return;
-		}
-
-		auto x = a_settings.recoil.pitch;
-		auto y = a_settings.recoil.yaw;
-
-		if (a_settings.recoil.humanize)
-		{
-			x += utils::random(0.1f, 0.5f);
-			y += utils::random(0.1f, 0.6f);
-		}
-
-		if (target) {
-			QAngle punch = g::local_player->m_aimPunchAngle();
-			angle.pitch -= punch.pitch * (a_settings.recoil.yaw / 50.f);	//was 50
-			angle.yaw -= punch.yaw * (a_settings.recoil.pitch / 50.f);	//was 50
-		}
-		else if (a_settings.rcs_type == 0) { //always
-			QAngle NewPunch = { CurrentPunch.pitch - RCSLastPunch.pitch, CurrentPunch.yaw - RCSLastPunch.yaw, 0 };
-			angle.pitch -= NewPunch.pitch * (a_settings.recoil.yaw / 50.f); //was 50
-			angle.yaw -= NewPunch.yaw * (a_settings.recoil.pitch / 50.f);  //was 50
-		}
-		else if (a_settings.rcs_type == 1) { //on aim
-			QAngle NewPunch = { CurrentPunch.pitch - RCSLastPunch.pitch, CurrentPunch.yaw - RCSLastPunch.yaw, 0 };
-			angle.pitch -= NewPunch.pitch * (a_settings.recoil.yaw / 50.f);
-			angle.yaw -= NewPunch.yaw * (a_settings.recoil.pitch / 50.f);
-		}
-		angle.NormalizeClamp();
-	}
-
-	void OnMove(CUserCmd* pCmd)
-	{
-		if (!is_enabled(pCmd)) {
-			RCSLastPunch = { 0, 0, 0 };
-			is_delayed = false;
-			shot_delay = false;
-			kill_delay = false;
-			silent_enabled = a_settings.silent.enabled && a_settings.silent.fov > 0;
-			target = NULL;
-			return;
-		}
-		QAngle angles = pCmd->viewangles;
-		QAngle current = angles;
-		float fov = 15.f;
-
-		CurrentPunch = g::local_player->m_aimPunchAngle();
-		if (IsNotSilent(fov)) {
-			RCS2(angles, target);
-		}
-		RCSLastPunch = CurrentPunch;
-		angles.NormalizeClamp();
-		pCmd->viewangles = angles;
-		if (IsNotSilent(fov)) {
-			g::engine_client->SetViewAngles(angles);
-		}
-		silent_enabled = false;
 	}
 
 	//--------------------------------------------------------------------------------
@@ -416,7 +360,7 @@ namespace aimbot
 			cmd->buttons &= ~IN_ATTACK;
 	}
 	//--------------------------------------------------------------------------------
-	bool can_aiming()
+	bool is_able_to_aim()
 	{
 		if (a_settings.check_flash && g::local_player->IsFlashed())
 			return false;
@@ -449,6 +393,9 @@ namespace aimbot
 	std::vector<int> hitboxes()
 	{
 		std::vector<int> list;
+
+		auto& active = g::local_player->m_hActiveWeapon();
+		auto& aa_settings = settings::aimbot::m_items[active->m_iItemDefinitionIndex()];
 
 		if (a_settings.hitboxes.head)
 			list.push_back(HITBOX_HEAD); //голова
@@ -489,6 +436,56 @@ namespace aimbot
 			//list.emplace_back(HITBOX_LEFT_FOOT);
 		}
 
+		if (aa_settings.rcs_override_hitbox)
+		{
+			if (g::local_player->m_iShotsFired() >= 3)
+			{
+				list.pop_back();
+
+				list.push_back(HITBOX_UPPER_CHEST); //верх груди
+				list.push_back(HITBOX_LOWER_CHEST); //низ груди
+				list.push_back(HITBOX_THORAX); //живот
+				list.push_back(HITBOX_BELLY); //поясница
+			}
+			else if (g::local_player->m_iShotsFired() < 3)
+			{
+				list.pop_back();
+
+				if (aa_settings.hitboxes.head)
+					list.push_back(HITBOX_HEAD);
+
+				if (aa_settings.hitboxes.neck)
+					list.push_back(HITBOX_NECK);
+
+				if (aa_settings.hitboxes.body)
+				{
+					list.push_back(HITBOX_UPPER_CHEST); //верх груди
+					list.push_back(HITBOX_LOWER_CHEST); //низ груди
+					list.push_back(HITBOX_THORAX); //живот
+					list.push_back(HITBOX_BELLY); //поясница
+				}
+
+				if (aa_settings.hitboxes.legs)
+				{
+					list.push_back(HITBOX_RIGHT_THIGH); //бедро
+					list.push_back(HITBOX_LEFT_THIGH); //бедро
+
+					list.push_back(HITBOX_RIGHT_CALF); //колено
+					list.push_back(HITBOX_LEFT_CALF);
+				}
+
+				if (aa_settings.hitboxes.hands)
+				{
+					list.push_back(HITBOX_RIGHT_UPPER_ARM);
+					list.push_back(HITBOX_RIGHT_FOREARM);
+					list.push_back(HITBOX_LEFT_UPPER_ARM);
+					list.push_back(HITBOX_LEFT_FOREARM);
+
+					list.push_back(HITBOX_PELVIS); //таз
+				}
+			}
+		}
+
 		return list;
 	}
 	//--------------------------------------------------------------------------------
@@ -499,7 +496,9 @@ namespace aimbot
 			return {};
 
 		float fov = 0.f;
+	
 		QAngle aim_angles;
+		QAngle silent_angles;
 
 		std::vector<target_t> targets;
 		std::vector<target_t> tick_players;
@@ -523,11 +522,11 @@ namespace aimbot
 					continue;
 
 				const auto result_of_duplicates = std::find_if(duplicates.begin(), duplicates.end(), [player_data](entity_pos_t const& c)
-					{
-						const auto is_same = c.sim_time == player_data.m_flSimulationTime || (c.eye_pos == player_data.eye_pos && c.origin == player_data.world_pos);
+				{
+					const auto is_same = c.sim_time == player_data.m_flSimulationTime || (c.eye_pos == player_data.eye_pos && c.origin == player_data.world_pos);
 
-						return c.id == player_data.index && is_same;
-					});
+					return c.id == player_data.index && is_same;
+				});
 
 				if (result_of_duplicates != duplicates.end())
 					continue;
@@ -536,16 +535,27 @@ namespace aimbot
 				if (!player || !player->IsPlayer() || !player->IsAlive() || player->is_dormant())
 					continue;
 
+				auto model = player->GetModel();
+				if (!model)
+					continue;
+
+				auto hdr = g::mdl_info->GetStudiomodel(model);
+				if (!hdr)
+					continue;
+
 				duplicates.push_back({ player_data.index, player_data.m_flSimulationTime, player_data.eye_pos, player_data.world_pos });
 
 				for (const auto& hitbox_id : hitbox_ids)
 				{
-					const auto hitbox = player_data.hitboxes[hitbox_id][0];
+					const auto& hitbox = player_data.hitboxes[hitbox_id][0];
 					if (!hitbox.IsValid())
 						continue;
 
 					math::vector2angles(hitbox - eye_pos, aim_angles);
 					aim_angles.NormalizeClamp();
+
+					math::vector2angles(hitbox - eye_pos, silent_angles);
+					silent_angles.NormalizeClamp();
 
 					fov = a_settings.dynamic_fov ?
 						math::GetRealDistanceFOV(eye_pos.DistTo(hitbox), current_angles, aim_angles) :
@@ -560,6 +570,7 @@ namespace aimbot
 						sim_time,
 						player_data.angles,
 						aim_angles,
+						silent_angles,
 						hitbox_id,
 						player_data.hitboxes[hitbox_id],
 						player_data.offset,
@@ -584,7 +595,6 @@ namespace aimbot
 
 		return targets;
 	}
-
 	//--------------------------------------------------------------------------------
 	bool find_target(const QAngle& angles, const int& tick_count, target_t& result)
 	{
@@ -606,7 +616,7 @@ namespace aimbot
 				return false;
 		}
 
-		if (!can_aiming() || a_settings.fov <= 0.f)
+		if (!is_able_to_aim() || a_settings.fov <= 0.f)
 			return false;
 
 		const auto eye_pos = g::local_player->GetEyePos();
@@ -685,8 +695,13 @@ namespace aimbot
 				math::vector2angles(hitbox - eye_pos, aim_angles);
 				aim_angles.NormalizeClamp();
 
+				QAngle silent_angles;
+				math::vector2angles(hitbox - eye_pos, silent_angles);
+				silent_angles.NormalizeClamp();
+
 				result = item;
 				result.aim_angles = aim_angles;
+				result.silent_angles = silent_angles;
 				result.is_visible = is_visible;
 				result.hitbox = hitbox;
 				target = item.entity;
@@ -717,6 +732,160 @@ namespace aimbot
 	}
 	//--------------------------------------------------------------------------------
 
+	void get_backtrack_data(CUserCmd* cmd)
+	{
+		if (a_settings.backtrack.ticks <= 0 || !g::local_player || !g::local_player->IsAlive())
+			return;
+
+		backtrack_data_t bt;
+
+		for (int i = 1; i < g::global_vars->maxClients; i++)
+		{
+			auto player = c_base_player::GetPlayerByIndex(i);
+			if (!player || !player->IsPlayer() || !player->IsAlive() || player->is_dormant())
+				continue;
+
+			if (player->m_vecVelocity().Length2D() < 0.01f)
+				continue;
+
+			auto model = player->GetModel();
+			if (!model)
+				continue;
+
+			auto hdr = g::mdl_info->GetStudiomodel(model);
+			if (!hdr)
+				continue;
+
+			bt.is_moving = player->m_vecVelocity().Length2D() > 0.01f ? true : false;
+			
+			auto hitbox_set = hdr->GetHitboxSet(player->m_nHitboxSet());
+
+			if (!hitbox_set)
+				continue;
+
+			auto hitbox_head = hitbox_set->GetHitbox(HITBOX_HEAD);
+			auto hitbox_center = (hitbox_head->bbmin + hitbox_head->bbmax) * 0.5f;
+	
+			player->PVSFix();
+
+			player->SetupBones(bt.matrix, 128, BONE_USED_BY_ANYTHING, g::global_vars->curtime);
+
+			data[i].push_front(bt);
+
+			for (int j = 0; j < data[i].size(); j++)
+			{
+				if (data[i].empty())
+					continue;
+
+				if (j > a_settings.backtrack.ticks)
+					data[i].pop_back();
+			}
+		}
+	}
+
+	void backtrack_chams(IMatRenderContext* context, const DrawModelState_t& state, const ModelRenderInfo_t& info, matrix3x4_t* bone)
+	{
+		if (a_settings.backtrack.ticks <= 0 || !g::local_player || !g::local_player->IsAlive() || !context || !bone)
+			return;
+
+		static auto original = hooks::draw_model_execute::original;
+
+		c_base_player* player = reinterpret_cast<c_base_player*>(g::entity_list->GetClientEntity(info.entity_index));
+
+		static IMaterial* material = g::mat_system->FindMaterial("debug/debugambientcube", TEXTURE_GROUP_OTHER);
+
+		if (player && player->IsPlayer() && player->IsAlive())
+		{
+			if (info.entity_index > 0 && info.entity_index <= 64)
+			{
+				if (data.count(info.entity_index) > 0)
+				{
+					auto& bdata = data.at(info.entity_index);
+					if (!bdata.empty())
+					{
+						for (int i = 1; i < bdata.size(); i++)
+						{
+							if (i > a_settings.backtrack.ticks)
+								continue;
+
+							if (!player->IsAlive())
+								continue;
+
+							if (g::local_player && g::local_player->m_hActiveWeapon().Get()->get_weapon_data()->WeaponType == WEAPONTYPE_KNIFE)
+								continue;
+
+							if (g::local_player->m_iTeamNum() != player->m_iTeamNum())
+							{
+								if (settings::chams::enemy::backtrack_chams && settings::chams::enemy::backtrack_chams_mode == 0) //Show all ticks
+								{
+									auto& record = bdata.at(i);
+									if (record.is_moving)
+									{
+										material->ColorModulate(Color::Green.r() / 255.0f, Color::Green.g() / 255.0f, Color::Green.b() / 255.0f);
+										material->AlphaModulate(Color::Green.a() / 255.0f);
+										material->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
+										g::mdl_render->ForcedMaterialOverride(material);
+										original(g::mdl_render, context, &state, &info, record.matrix);
+										g::mdl_render->ForcedMaterialOverride(nullptr);
+									}
+								}
+
+								if (settings::chams::enemy::backtrack_chams && settings::chams::enemy::backtrack_chams_mode == 1) //Show last tick
+								{
+									if (i == a_settings.backtrack.ticks)
+									{
+										if (bdata.at(i).is_moving)
+										{
+											material->ColorModulate(Color::Green.r() / 255.0f, Color::Green.g() / 255.0f, Color::Green.b() / 255.0f);
+											material->AlphaModulate(Color::Green.a() / 255.0f);
+											material->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
+											g::mdl_render->ForcedMaterialOverride(material);
+											original(g::mdl_render, context, &state, &info, bdata.at(i).matrix);
+											g::mdl_render->ForcedMaterialOverride(nullptr);
+										}
+									}
+								}
+							}
+
+							if (g::local_player->m_iTeamNum() == player->m_iTeamNum())
+							{
+								if (settings::chams::teammates::backtrack_chams && settings::misc::deathmatch && settings::chams::teammates::backtrack_chams_mode == 0) //Show all ticks
+								{
+									auto& record = bdata.at(i);
+									if (record.is_moving)
+									{
+										material->ColorModulate(Color::Red.r() / 255.0f, Color::Red.g() / 255.0f, Color::Red.b() / 255.0f);
+										material->AlphaModulate(Color::Red.a() / 255.0f);
+										material->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
+										g::mdl_render->ForcedMaterialOverride(material);
+										original(g::mdl_render, context, &state, &info, record.matrix);
+										g::mdl_render->ForcedMaterialOverride(nullptr);
+									}
+								}
+
+								if (settings::chams::teammates::backtrack_chams && settings::misc::deathmatch && settings::chams::teammates::backtrack_chams_mode == 1) //Show last tick
+								{
+									if (i == a_settings.backtrack.ticks)
+									{
+										if (bdata.at(i).is_moving)
+										{
+											material->ColorModulate(Color::Red.r() / 255.0f, Color::Red.g() / 255.0f, Color::Red.b() / 255.0f);
+											material->AlphaModulate(Color::Red.a() / 255.0f);
+											material->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
+											g::mdl_render->ForcedMaterialOverride(material);
+											original(g::mdl_render, context, &state, &info, bdata.at(i).matrix);
+											g::mdl_render->ForcedMaterialOverride(nullptr);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	void handle(CUserCmd* cmd)
 	{
 		if (!g::local_player || !g::local_player->IsAlive())
@@ -726,53 +895,6 @@ namespace aimbot
 		{
 			reset_vars();
 			return;
-		}
-
-		auto active = g::local_player->m_hActiveWeapon();
-		auto aa_settings = settings::aimbot::m_items[active->m_iItemDefinitionIndex()];
-
-		auto hitbox_head_backup = aa_settings.hitboxes.head;
-		auto hitbox_body_backup = aa_settings.hitboxes.body;
-		auto hitbox_legs_backup = aa_settings.hitboxes.legs;
-		auto hitbox_hands_backup = aa_settings.hitboxes.hands;
-		auto hitbox_neck_backup = aa_settings.hitboxes.neck;
-
-		if (aa_settings.rcs_override_hitbox)
-		{
-			if (g::local_player->m_iShotsFired() >= 3)
-			{
-				if (aa_settings.hitboxes.head == true)
-					aa_settings.hitboxes.head = !hitbox_head_backup;
-
-				if (aa_settings.hitboxes.neck == true)
-					aa_settings.hitboxes.neck = !hitbox_neck_backup;
-
-				if (aa_settings.hitboxes.body == false)
-					aa_settings.hitboxes.body = !hitbox_body_backup;
-
-				if (aa_settings.hitboxes.legs == true)
-					aa_settings.hitboxes.legs = !hitbox_legs_backup;
-
-				if (aa_settings.hitboxes.hands == true)
-					aa_settings.hitboxes.hands = !hitbox_hands_backup;
-			}
-			else if (g::local_player->m_iShotsFired() < 3)
-			{
-				if (aa_settings.hitboxes.head == false)
-					aa_settings.hitboxes.head = hitbox_head_backup;
-
-				if (aa_settings.hitboxes.neck == false)
-					aa_settings.hitboxes.neck = hitbox_neck_backup;
-
-				if (aa_settings.hitboxes.body == true)
-					aa_settings.hitboxes.body = hitbox_body_backup;
-
-				if (aa_settings.hitboxes.legs == false)
-					aa_settings.hitboxes.legs = hitbox_legs_backup;
-
-				if (aa_settings.hitboxes.hands == false)
-					aa_settings.hitboxes.hands = hitbox_hands_backup;
-			}
 		}
 
 		weapon_data = weapon->get_weapon_data();
@@ -786,7 +908,7 @@ namespace aimbot
 		const auto eye_pos = g::local_player->GetEyePos();
 
 		fetch_net_delays(cmd->tick_count);
-
+		
 		auto set_and_restore_poses = [](const Vector& origin, const QAngle& angles, const std::function<void()>& fn)
 		{
 			const auto old_pos = target->m_vecOrigin();
@@ -810,12 +932,12 @@ namespace aimbot
 			{
 				target = nullptr;
 				tick_count = cmd->tick_count;
-				silent_angles = angles = current;
 			};
 
 			angles = result.aim_angles;
+			silent_angles = result.silent_angles;
 			tick_count = TIME_TO_TICKS(result.time + interpolation_time);
-
+			
 			const auto min_hitchance = is_trigger() ? a_settings.trigger.hitchance : a_settings.min_hitchanse;
 			if (min_hitchance > 5.f)
 			{
@@ -837,7 +959,7 @@ namespace aimbot
 
 			if (target)
 			{
-				silent_angles = angles;
+				silent_angles = result.silent_angles;
 				if (!is_trigger())
 					handle_shot_delay(cmd);
 			}
@@ -870,12 +992,12 @@ namespace aimbot
 
 		punches::current = g::local_player->m_aimPunchAngle();
 		{
-			if (!RCS(angles, target))
+			if (!RCS(angles, target, cmd))
 				punches::last_corrected = { 0, 0, 0 };
 
 			angles.NormalizeClamp();
 
-			RCS(silent_angles, target);
+			RCS(silent_angles, target, cmd);
 			silent_angles.NormalizeClamp();
 		}
 		punches::last = punches::current;
@@ -884,8 +1006,6 @@ namespace aimbot
 			math::smooth(a_settings.smooth, current, angles, angles, a_settings.recoil.humanize);
 
 		angles.NormalizeClamp();
-
-		cmd->viewangles = angles;
 
 		auto engine_angles = true;
 
@@ -907,14 +1027,8 @@ namespace aimbot
 			{
 				engine_angles = false;
 
-				/*if (weapon->CanFire()) //old method
-					cmd->viewangles = silent_angles;*/
-
-				if (weapon->CanFire()) //new method
-				{
-					silent_angles.NormalizeClamp();
-					g::engine_client->SetViewAngles(silent_angles);
-				}
+				if (weapon->CanFire())
+					cmd->viewangles = silent_angles;
 			}
 		}
 
@@ -922,6 +1036,8 @@ namespace aimbot
 
 		if (engine_angles)
 			g::engine_client->SetViewAngles(angles);
+
+		cmd->viewangles = angles;
 
 		silent_enabled = a_settings.silent.enabled && a_settings.silent.always;
 

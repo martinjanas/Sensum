@@ -225,7 +225,9 @@ namespace settings
 			extern bool flat;
 			extern bool wireframe;
 			extern bool health_chams;
+			extern bool backtrack_chams;
 
+			extern int backtrack_chams_mode;
 			extern int selected_material;
 
 			extern Color color_visible;
@@ -239,7 +241,9 @@ namespace settings
 			extern bool flat;
 			extern bool wireframe;
 			extern bool health_chams;
+			extern bool backtrack_chams;
 
+			extern int backtrack_chams_mode;
 			extern int selected_material;
 
 			extern Color color_visible;
@@ -252,7 +256,7 @@ namespace settings
 			extern bool flat;
 			extern bool wireframe;
 			extern bool desync_chams;
-
+			
 			extern int desync_chams_mode;
 			extern int selected_material;
 
@@ -347,6 +351,8 @@ namespace settings
 		extern bool disable_on_weapon;
 		extern bool radar;
 		extern int debug_fov;
+		extern bool music_kit_apply;
+		extern int music_kit;
 		extern bool triggerbot_in_zoom_only;
 		extern bool lknife;
 		extern bool noscope;

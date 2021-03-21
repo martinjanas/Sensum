@@ -140,7 +140,8 @@ namespace visuals
 		case EClassId::CDecoyProjectile:
 		case EClassId::CSmokeGrenadeProjectile:
 		case EClassId::CSensorGrenadeProjectile:
-			name = entity->m_hOwnerEntity().Get()->GetPlayerInfo().szName; break;
+			if(entity->m_hOwnerEntity())
+			   name = entity->m_hOwnerEntity().Get()->GetPlayerInfo().szName; break;
 		}
 
 		grenade_info_t info;
@@ -286,7 +287,7 @@ namespace visuals
 
 	void DrawFov()
 	{
-		auto pWeapon = g::local_player->m_hActiveWeapon();
+		auto& pWeapon = g::local_player->m_hActiveWeapon();
 		if (!pWeapon)
 			return;
 
@@ -324,7 +325,7 @@ namespace visuals
 				Ray_t ray;
 				CTraceFilter filter;
 
-				QAngle angles = viewanglesBackup;
+				QAngle angles = globals::viewangles;//viewanglesBackup;
 				math::angle2vectors(angles, forward);
 				filter.pSkip = g::local_player;
 				src3D = g::local_player->GetEyePos();
@@ -344,7 +345,7 @@ namespace visuals
 				if (g::debug_overlay->ScreenPosition(maxAimAt, max2D))
 					return;
 
-				radiusFOV = fabsf(w / 2 - max2D.x);
+				radiusFOV = fabsf((float)w / 2.f - max2D.x);
 			}
 			else
 			{
@@ -353,11 +354,6 @@ namespace visuals
 
 			globals::draw_list->AddCircle(ImVec2(center.x, center.y), radiusFOV, ImGui::GetColorU32(settings::visuals::drawfov_color), 255);
 		}
-	}
-
-	void runCM(CUserCmd* cmd)
-	{
-		viewanglesBackup = cmd->viewangles;
 	}
 
 	void RenderHitmarker()
@@ -407,7 +403,7 @@ namespace visuals
 		cx = w / 2;
 		cy = h / 2;
 
-		auto weapon = g::local_player->m_hActiveWeapon();
+		auto& weapon = g::local_player->m_hActiveWeapon();
 
 		if (weapon)
 		{
@@ -549,57 +545,7 @@ namespace visuals
 
 		QAngle OrigAng;
 
-		static IMaterial* material = nullptr;
-
-		static IMaterial* Normal = g::mat_system->FindMaterial("sensum_regular", TEXTURE_GROUP_MODEL);
-		static IMaterial* Dogtags = g::mat_system->FindMaterial("models/inventory_items/dogtags/dogtags_outline", TEXTURE_GROUP_MODEL);
-		static IMaterial* Flat = g::mat_system->FindMaterial("debug/debugdrawflat", TEXTURE_GROUP_MODEL);
-		static IMaterial* Metallic = g::mat_system->FindMaterial("sensum_reflective", TEXTURE_GROUP_MODEL);
-		static IMaterial* Platinum = g::mat_system->FindMaterial("models/player/ct_fbi/ct_fbi_glass", TEXTURE_GROUP_MODEL);
-		static IMaterial* Glass = g::mat_system->FindMaterial("models/inventory_items/cologne_prediction/cologne_prediction_glass", TEXTURE_GROUP_MODEL);
-		static IMaterial* Crystal = g::mat_system->FindMaterial("models/inventory_items/trophy_majors/crystal_clear", TEXTURE_GROUP_MODEL);
-		static IMaterial* Gold = g::mat_system->FindMaterial("models/inventory_items/trophy_majors/gold", TEXTURE_GROUP_MODEL);
-		static IMaterial* DarkChrome = g::mat_system->FindMaterial("models/gibs/glass/glass", TEXTURE_GROUP_MODEL);
-		static IMaterial* PlasticGloss = g::mat_system->FindMaterial("models/inventory_items/trophy_majors/gloss", TEXTURE_GROUP_MODEL);
-		static IMaterial* Glow = g::mat_system->FindMaterial("vgui/achievements/glow", TEXTURE_GROUP_MODEL);
-
-		Normal->IncrementReferenceCount();
-		Dogtags->IncrementReferenceCount();
-		Flat->IncrementReferenceCount();
-		Metallic->IncrementReferenceCount();
-		Platinum->IncrementReferenceCount();
-		Glass->IncrementReferenceCount();
-		Crystal->IncrementReferenceCount();
-		Gold->IncrementReferenceCount();
-		DarkChrome->IncrementReferenceCount();
-		PlasticGloss->IncrementReferenceCount();
-		Glow->IncrementReferenceCount();
-
-		switch (settings::chams::localplayer::desync_chams_mode)
-		{
-		case 0: material = Normal;
-			break;
-		case 1: material = MaterialManager::Get().material_crystal_blue;
-			break;
-		case 2: material = Flat;
-			break;
-		case 3: material = Metallic;
-			break;
-		case 4: material = Platinum;
-			break;
-		case 5: material = Glass;
-			break;
-		case 6: material = Crystal;
-			break;
-		case 7: material = Gold;
-			break;
-		case 8: material = DarkChrome;
-			break;
-		case 9: material = PlasticGloss;
-			break;
-		case 10: material = Glow;
-			break;
-		}
+		static IMaterial* material = g::mat_system->FindMaterial("debug/debugambientcube", TEXTURE_GROUP_OTHER);
 
 		OrigAng = g::local_player->GetAbsAngles();
 		g::local_player->SetAngle2(QAngle(0, g::local_player->GetPlayerAnimState()->m_flEyeYaw, 0)); //around 90% accurate
@@ -743,7 +689,7 @@ namespace visuals
 				continue;
 
 			const auto classid = entity->GetClientClass()->m_ClassID;
-			if (settings::visuals::world_grenades && (classid == 9 || classid == 134 || classid == 111 || classid == 113 || classid == 156 || classid == 48)) //9 = HE,113 = molly,156 = smoke,48 = decoy
+			if (settings::visuals::world_grenades && (classid == EClassId::CBaseCSGrenadeProjectile || classid == EClassId::CMolotovProjectile || classid == EClassId::CSmokeGrenadeProjectile || classid == EClassId::CDecoyProjectile))
 				world_grenades(entity);
 			else if (settings::visuals::planted_c4 && entity->IsPlantedC4())
 				push_entity(entity, "Bomb", "", false, Color::Yellow);

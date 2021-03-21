@@ -13,30 +13,26 @@ namespace entities
 		Vector local_pos;
 		Vector world_pos;
 		QAngle angles;
+		
+		int tick_base;
+		int health;
+		int armor_value;
+		int hp = 0;
+		int damage;
+		int bombsite_index;
+		int bombIndex;
+
+		float bomb_time = 0.f;
+		float defuse_time = 0.f;
+
+		bool has_sniper;
 		bool is_scoped;
 		bool is_defusing;
 		bool is_flashed;
 		bool is_alive;
-		int tick_base;
-		int health;
-		int armor_value;
-
-		bool has_sniper;
-
-		int hp = 0;
-		int damage;
-		float bomb_time = 0.f;
-		float defuse_time = 0.f;
-		int bomb_indexStatus;
-
-		bool isBombPlantedStatus;
-
-		bool AfterPlant;
-
+		bool is_bomb_planted;
+		bool bomb_has_been_planted;
 		bool is_matchmaking = false;
-
-		int bombIndex;
-		bool IsBombPlanted;
 
 		c_base_player* local;
 	};
@@ -70,6 +66,7 @@ namespace entities
 		bool is_desyncing;
 		bool draw_entity;
 		bool sound;
+		bool has_knife;
 
 		c_base_combat_weapon* weapData;
 
@@ -90,6 +87,7 @@ namespace entities
 		Vector eye_pos;
 		Vector offset;
 		Vector origin;
+		Vector old_origin;
 		Vector world_pos;
 		QAngle angles;
 

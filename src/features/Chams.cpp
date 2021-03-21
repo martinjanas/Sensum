@@ -15,6 +15,7 @@ void RenderPlayers(const bool& ignorez, const bool& flat, const bool& wireframe,
 	material->AlphaModulate(color.a() / 255.0f);
 	material->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, ignorez);
 	material->SetMaterialVarFlag(MATERIAL_VAR_WIREFRAME, wireframe);
+	material->SetMaterialVarFlag(MATERIAL_VAR_FLAT, flat);
 
 	/*material->FindVar("$envmap")->SetStringValue("env_cubemap");
 	material->FindVar("$envmaptint")->SetVectorValue(.3f, .3f, .3f);

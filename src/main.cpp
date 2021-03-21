@@ -40,25 +40,25 @@ void wait_for_modules()
 void setup_hotkeys(LPVOID base)
 {
 	input_system::register_hotkey(VK_INSERT, []()
-		{
+	{
 			render::menu::toggle();
 
 			render::switch_hwnd();
-		});
+	});
 
 	if (is_unhookable)
 	{
 		bool is_active = true;
 		input_system::register_hotkey(VK_DELETE, [&is_active]()
+		{
+			hooks::destroy();
+			if (render::menu::is_visible())
 			{
-				hooks::destroy();
-				if (render::menu::is_visible())
-				{
-					render::menu::toggle();
-					render::switch_hwnd();
-				}
-				is_active = false;
-			});
+				render::menu::toggle();
+				render::switch_hwnd();
+			}
+			is_active = false;
+		});
 
 		while (is_active)
 			Sleep(500);

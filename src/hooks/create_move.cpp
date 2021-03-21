@@ -18,6 +18,10 @@ float view_angle = 0.0f;
 static CCSGOPlayerAnimState g_AnimState;
 static int max_choke_ticks = 8; //was 6
 
+char buf_[256];
+bool done = false;
+int count = 0;
+
 float AngleDiff(float destAngle, float srcAngle) {
 	float delta;
 
@@ -35,18 +39,15 @@ float AngleDiff(float destAngle, float srcAngle) {
 
 namespace hooks
 {
-	bool __stdcall create_move::hooked(float input_sample_frametime, CUserCmd* cmd)
+	void __stdcall create_move::hooked(int sequence_number, float input_sample_frametime, bool active, bool sendpacket)
 	{
-		cmd->viewangles.NormalizeClamp();
-		g::engine_client->SetViewAngles(cmd->viewangles);
+		original(g::base_client, sequence_number, input_sample_frametime, active);
+
+		CUserCmd* cmd = g::input->GetUserCmd(sequence_number);
+		CVerifiedUserCmd* verified = g::input->GetVerifiedCmd(sequence_number);
 
 		if (!cmd || !cmd->command_number)
-			return original(g::client_mode, input_sample_frametime, cmd);
-
-		const auto ebp = reinterpret_cast<uintptr_t*>(uintptr_t(_AddressOfReturnAddress()) - sizeof(void*));
-		auto& send_packet = *reinterpret_cast<bool*>(*ebp - 0x1C);
-
-		bool* sendpacket2 = reinterpret_cast<bool*>(reinterpret_cast<uintptr_t>(_AddressOfReturnAddress()) + 0x14);
+			return;
 
 		if (settings::misc::bhop)
 			features::bhop(cmd);
@@ -98,7 +99,7 @@ namespace hooks
 
 		QAngle OldAngles = cmd->viewangles;
 
-		auto Desync = [OldAngles](CUserCmd* cmd, bool* send_packet)
+		auto Desync = [OldAngles, &sendpacket](CUserCmd* cmd)
 		{
 			if (cmd->buttons & (IN_ATTACK | IN_ATTACK2 | IN_USE) ||
 				g::local_player->m_nMoveType() == MOVETYPE_LADDER || g::local_player->m_nMoveType() == MOVETYPE_NOCLIP
@@ -137,16 +138,16 @@ namespace hooks
 			static bool broke_lby = false;
 
 			if (next_lby >= g::global_vars->curtime) {
-				if (!broke_lby && *send_packet && g::client_state->chokedcommands > 0)
+				if (!broke_lby && sendpacket && g::client_state->chokedcommands > 0)
 					return;
 
 				broke_lby = false;
-				*send_packet = false;
+				sendpacket = false;
 				cmd->viewangles.yaw += 120.0f * side; //was 120.f and side
 			}
 			else {
 				broke_lby = true;
-				*send_packet = false;
+				sendpacket = false;
 				cmd->viewangles.yaw += 120.0f * -side; //was 120.f and -side
 			}
 			math::FixAngles(cmd->viewangles);
@@ -155,6 +156,9 @@ namespace hooks
 
 		if (settings::visuals::grenade_prediction)
 			grenade_prediction::fetch_points(cmd);
+
+		if (settings::misc::fast_stop)
+			features::fast_stop(cmd);
 
 		if (cmd->weaponselect == 0)
 		{
@@ -165,19 +169,14 @@ namespace hooks
 		static int definition_index = 7;
 		auto a_settings = &settings::aimbot::m_items[definition_index];
 
-		if (a_settings->recoil.enabled)
-			aimbot::OnMove(cmd);
+		if (settings::chams::enemy::backtrack_chams || settings::chams::teammates::backtrack_chams)
+			aimbot::get_backtrack_data(cmd);
 
 		if (settings::misc::smoke_helper)
 			visuals::SmokeHelperAimbot(cmd);
 
-		if(settings::misc::flash_helper)
-		   visuals::PopflashHelperAimbot(cmd);
-
-		visuals::runCM(cmd);
-
-		if (settings::misc::fast_stop)
-			features::fast_stop(cmd);
+		if (settings::misc::flash_helper)
+			visuals::PopflashHelperAimbot(cmd);
 
 		if (g::local_player && g::local_player->IsAlive() && (cmd->buttons & IN_ATTACK || cmd->buttons & IN_ATTACK2))
 			saver.LastShotEyePos = g::local_player->GetEyePos();
@@ -186,13 +185,13 @@ namespace hooks
 			visuals::KnifeLeft();
 
 		if (settings::desync::enabled && std::fabsf(g::local_player->m_flSpawnTime() - g::global_vars->curtime) > 1.0f)
-			Desync(cmd, sendpacket2);
+			Desync(cmd);
 
 		math::FixAngles(cmd->viewangles);
 		cmd->viewangles.yaw = std::remainderf(cmd->viewangles.yaw, 360.0f);
 
 		if (settings::desync::enabled && g::client_state->chokedcommands >= max_choke_ticks) {
-			*sendpacket2 = true;
+			sendpacket = true;
 			cmd->viewangles = g::client_state->viewangles;
 		}
 
@@ -216,7 +215,7 @@ namespace hooks
 			*anim_state = anim_state_backup;
 		}
 
-		if (*sendpacket2) {
+		if (sendpacket) {
 			real_angle = g_AnimState.m_flGoalFeetYaw;
 			view_angle = g_AnimState.m_flEyeYaw;
 		}
@@ -231,6 +230,9 @@ namespace hooks
 		cmd->sidemove = std::clamp(cmd->sidemove, -450.0f, 450.0f);
 		cmd->upmove = std::clamp(cmd->upmove, -320.0f, 320.0f);
 
-		return false;
+		globals::viewangles = cmd->viewangles;
+
+		verified->m_cmd = *cmd;
+		verified->m_crc = cmd->GetChecksum();
 	}
 }

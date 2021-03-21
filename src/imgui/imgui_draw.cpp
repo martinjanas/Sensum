@@ -134,6 +134,8 @@ namespace IMGUI_STB_NAMESPACE
 using namespace IMGUI_STB_NAMESPACE;
 #endif
 
+#include "../settings/globals.h"
+
 //-----------------------------------------------------------------------------
 // Style functions
 //-----------------------------------------------------------------------------

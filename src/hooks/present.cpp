@@ -28,7 +28,7 @@ namespace hooks
 		notifies::handle(globals::draw_list);
 		render::spectators::show();
 		grenade_prediction::render(globals::draw_list);
-		esp::render_helpers(globals::draw_list);
+		esp::render_helpers();
 		esp::render(globals::draw_list);
 		visuals::render(globals::draw_list);
 		//features::aimlines(globals::draw_list); //Work in progress - I need to figure out how to make the lines not render through walls.

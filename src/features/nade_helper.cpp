@@ -4,6 +4,9 @@ namespace visuals
 {
 	void SmokeHelperAimbot(CUserCmd* cmd)
 	{
+		if (!g::local_player)
+			return;
+
 		if (strstr(g::engine_client->GetLevelName(), "mirage"))
 		{
 			for (auto& it : Mirage)
@@ -14,12 +17,12 @@ namespace visuals
 					if (g::local_player->m_hActiveWeapon()->IsSmoke() && dist <= 70)
 					{
 						QAngle angle = QAngle(it.ang.x, it.ang.y, it.ang.z);
-						int fov = math::GetFovToPlayer(g::client_state->viewangles, angle);
+						float fov = math::GetFovToPlayer(cmd->viewangles, angle);
 
-						math::smooth(16.f, g::client_state->viewangles, angle, angle, false);
+						math::smooth(16.f, cmd->viewangles, angle, angle, false);
 
 						angle.NormalizeClamp();
-
+						
 						if (fov <= 4.f)
 						{
 							if (cmd->buttons & (IN_ATTACK | IN_ATTACK2))
@@ -40,17 +43,17 @@ namespace visuals
 					if (g::local_player->m_hActiveWeapon()->IsSmoke() && dist <= 70)
 					{
 						QAngle angle = QAngle(it.ang.x, it.ang.y, it.ang.z);
-						int fov = math::GetFovToPlayer(g::client_state->viewangles, angle);
+						float fov = math::GetFovToPlayer(cmd->viewangles, angle);
 
-                        math::smooth(16.f, g::client_state->viewangles, angle, angle, false);
+						math::smooth(16.f, cmd->viewangles, angle, angle, false);
 
-                        angle.NormalizeClamp();
+						angle.NormalizeClamp();
 
-                        if (fov <= 4.f)
-                        {
-                            if (cmd->buttons & (IN_ATTACK | IN_ATTACK2))
-                                g::engine_client->SetViewAngles(angle);
-                        }
+						if (fov <= 4.f)
+						{
+							if (cmd->buttons & (IN_ATTACK | IN_ATTACK2))
+								g::engine_client->SetViewAngles(angle);
+						}
 					}
 				}
 			}
@@ -66,17 +69,17 @@ namespace visuals
 					if (g::local_player->m_hActiveWeapon()->IsSmoke() && dist <= 70)
 					{
 						QAngle angle = QAngle(it.ang.x, it.ang.y, it.ang.z);
-						int fov = math::GetFovToPlayer(g::client_state->viewangles, angle);
+						float fov = math::GetFovToPlayer(cmd->viewangles, angle);
 
-                        math::smooth(16.f, g::client_state->viewangles, angle, angle, false);
+						math::smooth(16.f, cmd->viewangles, angle, angle, false);
 
-                        angle.NormalizeClamp();
+						angle.NormalizeClamp();
 
-                        if (fov <= 4.f)
-                        {
-                            if (cmd->buttons & (IN_ATTACK | IN_ATTACK2))
-                                g::engine_client->SetViewAngles(angle);
-                        }
+						if (fov <= 4.f)
+						{
+							if (cmd->buttons & (IN_ATTACK | IN_ATTACK2))
+								g::engine_client->SetViewAngles(angle);
+						}
 					}
 				}
 			}
@@ -92,17 +95,17 @@ namespace visuals
 					if (g::local_player->m_hActiveWeapon()->IsSmoke() && dist <= 70)
 					{
 						QAngle angle = QAngle(it.ang.x, it.ang.y, it.ang.z);
-						int fov = math::GetFovToPlayer(g::client_state->viewangles, angle);
+						float fov = math::GetFovToPlayer(cmd->viewangles, angle);
 
-                        math::smooth(16.f, g::client_state->viewangles, angle, angle, false);
+						math::smooth(16.f, cmd->viewangles, angle, angle, false);
 
-                        angle.NormalizeClamp();
+						angle.NormalizeClamp();
 
-                        if (fov <= 4.f)
-                        {
-                            if (cmd->buttons & (IN_ATTACK | IN_ATTACK2))
-                                g::engine_client->SetViewAngles(angle);
-                        }
+						if (fov <= 4.f)
+						{
+							if (cmd->buttons & (IN_ATTACK | IN_ATTACK2))
+								g::engine_client->SetViewAngles(angle);
+						}
 					}
 				}
 			}
@@ -118,17 +121,17 @@ namespace visuals
 					if (g::local_player->m_hActiveWeapon()->IsSmoke() && dist <= 70)
 					{
 						QAngle angle = QAngle(it.ang.x, it.ang.y, it.ang.z);
-						int fov = math::GetFovToPlayer(g::client_state->viewangles, angle);
+						float fov = math::GetFovToPlayer(cmd->viewangles, angle);
 
-                        math::smooth(16.f, g::client_state->viewangles, angle, angle, false);
+						math::smooth(16.f, cmd->viewangles, angle, angle, false);
 
-                        angle.NormalizeClamp();
+						angle.NormalizeClamp();
 
-                        if (fov <= 4.f)
-                        {
-                            if (cmd->buttons & (IN_ATTACK | IN_ATTACK2))
-                                g::engine_client->SetViewAngles(angle);
-                        }
+						if (fov <= 4.f)
+						{
+							if (cmd->buttons & (IN_ATTACK | IN_ATTACK2))
+								g::engine_client->SetViewAngles(angle);
+						}
 					}
 				}
 			}
@@ -144,17 +147,17 @@ namespace visuals
 					if (g::local_player->m_hActiveWeapon()->IsSmoke() && dist <= 70)
 					{
 						QAngle angle = QAngle(it.ang.x, it.ang.y, it.ang.z);
-						int fov = math::GetFovToPlayer(g::client_state->viewangles, angle);
+						float fov = math::GetFovToPlayer(cmd->viewangles, angle);
 
-                        math::smooth(16.f, g::client_state->viewangles, angle, angle, false);
+						math::smooth(16.f, cmd->viewangles, angle, angle, false);
 
-                        angle.NormalizeClamp();
+						angle.NormalizeClamp();
 
-                        if (fov <= 4.f)
-                        {
-                            if (cmd->buttons & (IN_ATTACK | IN_ATTACK2))
-                                g::engine_client->SetViewAngles(angle);
-                        }
+						if (fov <= 4.f)
+						{
+							if (cmd->buttons & (IN_ATTACK | IN_ATTACK2))
+								g::engine_client->SetViewAngles(angle);
+						}
 					}
 				}
 			}
@@ -170,17 +173,17 @@ namespace visuals
 					if (g::local_player->m_hActiveWeapon()->IsSmoke() && dist <= 70)
 					{
 						QAngle angle = QAngle(it.ang.x, it.ang.y, it.ang.z);
-						int fov = math::GetFovToPlayer(g::client_state->viewangles, angle);
+						float fov = math::GetFovToPlayer(cmd->viewangles, angle);
 
-                        math::smooth(16.f, g::client_state->viewangles, angle, angle, false);
+						math::smooth(16.f, cmd->viewangles, angle, angle, false);
 
-                        angle.NormalizeClamp();
+						angle.NormalizeClamp();
 
-                        if (fov <= 4.f)
-                        {
-                            if (cmd->buttons & (IN_ATTACK | IN_ATTACK2))
-                                g::engine_client->SetViewAngles(angle);
-                        }
+						if (fov <= 4.f)
+						{
+							if (cmd->buttons & (IN_ATTACK | IN_ATTACK2))
+								g::engine_client->SetViewAngles(angle);
+						}
 					}
 				}
 			}
@@ -196,30 +199,30 @@ namespace visuals
 					if (g::local_player->m_hActiveWeapon()->IsSmoke() && dist <= 70)
 					{
 						QAngle angle = QAngle(it.ang.x, it.ang.y, it.ang.z);
-						int fov = math::GetFovToPlayer(g::client_state->viewangles, angle);
+						float fov = math::GetFovToPlayer(cmd->viewangles, angle);
 
-                        math::smooth(16.f, g::client_state->viewangles, angle, angle, false);
+						math::smooth(16.f, cmd->viewangles, angle, angle, false);
 
-                        angle.NormalizeClamp();
+						angle.NormalizeClamp();
 
-                        if (fov <= 4.f)
-                        {
-                            if (cmd->buttons & (IN_ATTACK | IN_ATTACK2))
-                                g::engine_client->SetViewAngles(angle);
-                        }
+						if (fov <= 4.f)
+						{
+							if (cmd->buttons & (IN_ATTACK | IN_ATTACK2))
+								g::engine_client->SetViewAngles(angle);
+						}
 					}
 				}
 			}
 		}
 	}
 
-	void RenderCircle(ImDrawList* draw_list)
+	void RenderCircle()
 	{
-		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
+		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected() || !g::local_player)
 			return;
 
 		if (!settings::misc::smoke_helper)
-			return;
+			return; 
 
 		Vector CrosshairScreen;
 
@@ -251,6 +254,7 @@ namespace visuals
 						globals::draw_list->AddText(ImVec2(CrosshairScreen.x + 12.f, CrosshairScreen.y - 7.f), IM_COL32(255, 255, 255, 255), it.info.c_str());
 						globals::draw_list->AddText(ImVec2(CrosshairScreen.x + 12.f, CrosshairScreen.y - -7.f), IM_COL32(255, 255, 255, 255), it.type.c_str());
 						globals::draw_list->AddLine(ImVec2(cx, cy), ImVec2(CrosshairScreen.x, CrosshairScreen.y), IM_COL32(0, 0, 0, 255), 2.f);
+						globals::draw_list->AddCircle(ImVec2(cx, cy), 10.f, utils::to_im32(Color::White), 255);
 					}
 				}
 			}
@@ -278,6 +282,7 @@ namespace visuals
 						globals::draw_list->AddText(ImVec2(CrosshairScreen.x + 12.f, CrosshairScreen.y - 7.f), IM_COL32(255, 255, 255, 255), it.info.c_str());
 						globals::draw_list->AddText(ImVec2(CrosshairScreen.x + 12.f, CrosshairScreen.y - -7.f), IM_COL32(255, 255, 255, 255), it.type.c_str());
 						globals::draw_list->AddLine(ImVec2(cx, cy), ImVec2(CrosshairScreen.x, CrosshairScreen.y), IM_COL32(0, 0, 0, 255), 2.f);
+						globals::draw_list->AddCircle(ImVec2(cx, cy), 10.f, utils::to_im32(Color::White), 255);
 					}
 				}
 			}
@@ -305,6 +310,7 @@ namespace visuals
 						globals::draw_list->AddText(ImVec2(CrosshairScreen.x + 12.f, CrosshairScreen.y - 7.f), IM_COL32(255, 255, 255, 255), it.info.c_str());
 						globals::draw_list->AddText(ImVec2(CrosshairScreen.x + 12.f, CrosshairScreen.y - -7.f), IM_COL32(255, 255, 255, 255), it.type.c_str());
 						globals::draw_list->AddLine(ImVec2(cx, cy), ImVec2(CrosshairScreen.x, CrosshairScreen.y), IM_COL32(0, 0, 0, 255), 2.f);
+						globals::draw_list->AddCircle(ImVec2(cx, cy), 10.f, utils::to_im32(Color::White), 255);
 					}
 				}
 			}
@@ -332,6 +338,7 @@ namespace visuals
 						globals::draw_list->AddText(ImVec2(CrosshairScreen.x + 12.f, CrosshairScreen.y - 7.f), IM_COL32(255, 255, 255, 255), it.info.c_str());
 						globals::draw_list->AddText(ImVec2(CrosshairScreen.x + 12.f, CrosshairScreen.y - -7.f), IM_COL32(255, 255, 255, 255), it.type.c_str());
 						globals::draw_list->AddLine(ImVec2(cx, cy), ImVec2(CrosshairScreen.x, CrosshairScreen.y), IM_COL32(0, 0, 0, 255), 2.f);
+						globals::draw_list->AddCircle(ImVec2(cx, cy), 10.f, utils::to_im32(Color::White), 255);
 					}
 				}
 			}
@@ -359,6 +366,7 @@ namespace visuals
 						globals::draw_list->AddText(ImVec2(CrosshairScreen.x + 12.f, CrosshairScreen.y - 7.f), IM_COL32(255, 255, 255, 255), it.info.c_str());
 						globals::draw_list->AddText(ImVec2(CrosshairScreen.x + 12.f, CrosshairScreen.y - -7.f), IM_COL32(255, 255, 255, 255), it.type.c_str());
 						globals::draw_list->AddLine(ImVec2(cx, cy), ImVec2(CrosshairScreen.x, CrosshairScreen.y), IM_COL32(0, 0, 0, 255), 2.f);
+						globals::draw_list->AddCircle(ImVec2(cx, cy), 10.f, utils::to_im32(Color::White), 255);
 					}
 				}
 			}
@@ -386,6 +394,7 @@ namespace visuals
 						globals::draw_list->AddText(ImVec2(CrosshairScreen.x + 12.f, CrosshairScreen.y - 7.f), IM_COL32(255, 255, 255, 255), it.info.c_str());
 						globals::draw_list->AddText(ImVec2(CrosshairScreen.x + 12.f, CrosshairScreen.y - -7.f), IM_COL32(255, 255, 255, 255), it.type.c_str());
 						globals::draw_list->AddLine(ImVec2(cx, cy), ImVec2(CrosshairScreen.x, CrosshairScreen.y), IM_COL32(0, 0, 0, 255), 2.f);
+						globals::draw_list->AddCircle(ImVec2(cx, cy), 10.f, utils::to_im32(Color::White), 255);
 					}
 				}
 			}
@@ -413,6 +422,7 @@ namespace visuals
 						globals::draw_list->AddText(ImVec2(CrosshairScreen.x + 12.f, CrosshairScreen.y - 7.f), IM_COL32(255, 255, 255, 255), it.info.c_str());
 						globals::draw_list->AddText(ImVec2(CrosshairScreen.x + 12.f, CrosshairScreen.y - -7.f), IM_COL32(255, 255, 255, 255), it.type.c_str());
 						globals::draw_list->AddLine(ImVec2(cx, cy), ImVec2(CrosshairScreen.x, CrosshairScreen.y), IM_COL32(0, 0, 0, 255), 2.f);
+						globals::draw_list->AddCircle(ImVec2(cx, cy), 10.f, utils::to_im32(Color::White), 255);
 					}
 				}
 			}
@@ -440,6 +450,7 @@ namespace visuals
 						globals::draw_list->AddText(ImVec2(CrosshairScreen.x + 12.f, CrosshairScreen.y - 7.f), IM_COL32(255, 255, 255, 255), it.info.c_str());
 						globals::draw_list->AddText(ImVec2(CrosshairScreen.x + 12.f, CrosshairScreen.y - -7.f), IM_COL32(255, 255, 255, 255), it.type.c_str());
 						globals::draw_list->AddLine(ImVec2(cx, cy), ImVec2(CrosshairScreen.x, CrosshairScreen.y), IM_COL32(0, 0, 0, 255), 2.f);
+						globals::draw_list->AddCircle(ImVec2(cx, cy), 10.f, utils::to_im32(Color::White), 255);
 					}
 				}
 			}
@@ -448,7 +459,7 @@ namespace visuals
 
 	void DrawRing3D()
 	{
-		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
+		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected() || !g::local_player)
 			return;
 
 		if (!settings::misc::smoke_helper)
@@ -599,9 +610,9 @@ namespace visuals
 		}
 	}
 
-	void RenderInfo(ImDrawList* draw_list)
+	void RenderInfo()
 	{
-		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
+		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected() || !g::local_player)
 			return;
 
 		if (!settings::misc::smoke_helper)

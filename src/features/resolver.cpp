@@ -13,7 +13,9 @@ namespace resolver
 			auto player = c_base_player::GetPlayerByIndex(i);
 			if (player && player->IsPlayer() && player != g::local_player)
 			{
-				player->m_angEyeAngles().yaw = player->m_flLowerBodyYawTarget();
+				auto state = player->GetPlayerAnimState();
+				//player->m_angEyeAngles().yaw = player->m_flLowerBodyYawTarget();
+				player->m_angEyeAngles().yaw = state->m_flGoalFeetYaw;
 				player->m_angEyeAngles().NormalizeClamp();
 			}
 		}

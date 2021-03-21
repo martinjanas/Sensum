@@ -12,7 +12,7 @@
 namespace g
 {
 	CLocalPlayer local_player;
-
+	
 	CInput* input = nullptr;
 	IMDLCache* mdl_cache = nullptr;
 	ICvar* cvar = nullptr;

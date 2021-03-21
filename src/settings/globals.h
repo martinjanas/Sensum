@@ -28,6 +28,9 @@ namespace globals
 	extern std::map<int, int> team_damage;
 	extern std::map<int, int> team_kill;
 
+	extern QAngle aim_punch;
+	extern QAngle viewangles;
+
 	void save();
 	void load();
 

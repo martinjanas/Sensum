@@ -114,23 +114,7 @@ bool c_base_entity::is_dormant()
 
 bool c_base_player::DrawSpecificEntity()
 {
-	if (!this)
-		return false;
-
-	float dist = g::local_player->m_vecOrigin().DistTo(this->m_vecOrigin());
-
-	//if (dist >= 500.f)
-		//return false;
-
-	if (globals::sound)
-		return true;
-	else if (!globals::sound)
-		return false;
-
-	auto index = this->m_hActiveWeapon().Get()->m_iItemDefinitionIndex();
-	auto type = this->m_hActiveWeapon().Get()->get_weapon_data()->WeaponType;
-
-	return index == WEAPON_SMOKEGRENADE || index == WEAPON_FLASHBANG || index == WEAPON_HEGRENADE || index == WEAPON_INCGRENADE || index == WEAPON_MOLOTOV || index == WEAPON_KNIFE || type == WEAPONTYPE_KNIFE;
+	return globals::sound;
 }
 
 float c_base_combat_weapon::GetInaccuracy()

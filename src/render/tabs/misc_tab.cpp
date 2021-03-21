@@ -99,6 +99,11 @@ namespace render
 					columns(2);
 					{
 						ImGui::Combo("", &settings::visuals::skychanger_mode, skyList, IM_ARRAYSIZE(skyList));
+
+						ImGui::NextColumn();
+
+						if (ImGui::Button("Apply##skychanger", ImVec2(ImGui::GetContentRegionAvailWidth() - 2.f, 0.f)))
+							color_modulation::sky_changer();
 					}
 					columns(1);
 
@@ -149,6 +154,19 @@ namespace render
 						"Both"
 					};
 
+					const char* music_kits[] = {
+						"Valve CSGO 1", "Valve CSGO 2", "Daniel Sadowski - Crimson Assault", "Noisia - Sharpened", "Robert Allaire - Insurgency",
+						"Sean Murray - A*D*8", "Feed Me - High Noon", "Dren - Death's Head Demolition", "Austin Wintory - Desert Fire",
+						"Sasha - LNOE", "Skog - Metal", "Midnight Riders - All I want for Christmas", "Matt Lange - IsoRhythm",
+						"Mateo Messina - For Not Mankind", "Various Artists - Hotline Miami", "Daniel Sadowski - Total Domination",
+						"Damjan Mravunac - The Talos Principle", "Proxy - Battlepack", "Ki:Theory - MOLOTOV", "Troels Folmann - Uber Blasto Phone",
+						"Kelly Bailey - Hazardous Environments", "Skog - II-Headshot", "Daniel Sadowski - The 8-Bit Kit", "Awolnation - I Am", 
+						"Mord Fustang - Diamonds", "Michael Bross - Invasion!", "Ian Hultquist - Lion's Mouth", "New Beat Fund - Sponge Fingerz",
+						"Beartooth - Disgusting", "Lennie Moore - Java Havana Funkaloo", "Darude - Sandstorm", "The Verkkars - EZ4ENCE", "Halo - Halo",
+						"Scarlxrd - King", "Valve - Halflife Alyx", "Amon Tobin - All for Dust", "Darren Korb - Hades", "Neckdeep - The Lowlife Pack",
+						"Scarlxrd - CHAIN$AW.LXADXUT"
+					};
+
 					checkbox("Engine Prediction", &settings::movement::engine_prediction);
 					checkbox("Radar", &settings::misc::radar);
 					checkbox("No Flash", &settings::misc::no_flash);
@@ -171,7 +189,20 @@ namespace render
 						ImGui::NextColumn();
 
 						ImGui::PushItemWidth(-1);
-						ImGui::Combo("Mode", &settings::misc::fast_stop_mode, fastStopModes, IM_ARRAYSIZE(fastStopModes));
+						ImGui::Combo("Mode##faststop", &settings::misc::fast_stop_mode, fastStopModes, IM_ARRAYSIZE(fastStopModes));
+						ImGui::PopItemWidth();
+					}
+					columns(1);
+
+					columns(2);
+					{
+						if (ImGui::Button("Apply##musickitchanger", ImVec2(ImGui::GetContentRegionAvailWidth() - 2.f, 0.f)))
+							color_modulation::music_kit_changer();
+
+						ImGui::NextColumn();
+
+						ImGui::PushItemWidth(-1);
+						ImGui::Combo("Mode##musickit", &settings::misc::music_kit, music_kits, IM_ARRAYSIZE(music_kits));
 						ImGui::PopItemWidth();
 					}
 					columns(1);

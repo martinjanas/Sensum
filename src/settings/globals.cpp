@@ -37,6 +37,9 @@ namespace globals
 
 	std::map<int, int> team_kill = { };
 
+	QAngle aim_punch = QAngle();
+	QAngle viewangles = QAngle();
+
 	namespace view_matrix
 	{
 		bool has_offset = false;

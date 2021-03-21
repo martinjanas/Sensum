@@ -18,10 +18,13 @@ namespace features
 
 namespace color_modulation
 {
+	const char* GetMapOriginalSkybox();
+	void NightMode();
 	void event();
 	void handle();
 	void sky_changer();
 	void set_material_tone();
+	void music_kit_changer();
 }
 
 namespace visuals
@@ -41,10 +44,9 @@ namespace visuals
 	void DrawRing3D();
 	void DrawRing3DPopflash();
 	void DrawDamageIndicator();
-	void runCM(CUserCmd* cmd);
-	void RenderInfo(ImDrawList* draw_list);
-	void RenderCircle(ImDrawList* draw_list);
-	void RenderCirclePopflash(ImDrawList* draw_list);
+	void RenderInfo();
+	void RenderCircle();
+	void RenderCirclePopflash();
 	void SmokeHelperAimbot(CUserCmd* cmd);
 	void PopflashHelperAimbot(CUserCmd* cmd);
 }
@@ -52,15 +54,24 @@ namespace visuals
 namespace esp
 {
 	void render(ImDrawList* draw_list);
-	void render_helpers(ImDrawList* draw_list);
+	void render_helpers();
 }
 
 namespace aimbot
 {
 	void handle(CUserCmd* pCmd);
-	void OnMove(CUserCmd* pCmd);
 	float get_fov();
 	float GetFov();
+	void backtrack_chams(IMatRenderContext* context, const DrawModelState_t& state, const ModelRenderInfo_t& info, matrix3x4_t* bone);
+	void get_backtrack_data(CUserCmd* cmd);
+	
+	namespace punches
+	{
+		extern QAngle current;
+
+		extern QAngle last;
+		extern QAngle last_corrected;
+	}
 }
 
 namespace skins

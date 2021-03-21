@@ -157,11 +157,12 @@ namespace render
 							}
 						}
 						ImGui::ListBoxFooter();
+
+
+						if (ImGui::Button("Refresh", button_size))
+							is_loaded = false;
 					}
 					ImGui::PopFont();
-
-					if (ImGui::Button("Refresh", button_size))
-						is_loaded = false;
 				});
 
 			ImGui::NextColumn();

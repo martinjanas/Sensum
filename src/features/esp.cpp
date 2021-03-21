@@ -13,6 +13,9 @@
 ConVar* type = nullptr;
 ConVar* mode = nullptr;
 
+entities::sound_t _sounds[MAX_PLAYERS];
+entities::player_data_t m_players[MAX_PLAYERS];
+
 ImU32 GetU32(Color _color)
 {
 	return ((_color[3] & 0xff) << 24) + ((_color[2] & 0xff) << 16) + ((_color[1] & 0xff) << 8)
@@ -78,17 +81,17 @@ namespace esp
 		return RECT{ (long)left, (long)top, (long)right, (long)bottom };
 	}
 
-	void render_helpers(ImDrawList* draw_list)
+	void render_helpers()
 	{
 		if (settings::misc::smoke_helper)
 		{
-			visuals::RenderInfo(draw_list);
-			visuals::RenderCircle(draw_list);
+			visuals::RenderInfo();
+			visuals::RenderCircle();
 		}
 
 		if (settings::misc::flash_helper)
 		{
-			visuals::RenderCirclePopflash(draw_list);
+			visuals::RenderCirclePopflash();
 		}
 	}
 
@@ -160,6 +163,19 @@ namespace esp
 			entities::local_mutex.unlock();
 		}
 
+		if (entities::locker.try_lock())
+		{
+			memcpy(m_players, entities::m_items.front().players, sizeof(m_players));
+			entities::locker.unlock();
+		}
+
+		if (settings::esp::sound && entities::m_mutex_sounds.try_lock())
+		{
+			memcpy(_sounds, entities::m_sounds, sizeof(_sounds));
+
+			entities::m_mutex_sounds.unlock();
+		}
+
 		int x, y;
 
 		g::engine_client->GetScreenSize(x, y);
@@ -199,7 +215,7 @@ namespace esp
 			{
 				if (!data.draw_entity)
 				{
-					if (!data.is_visible || data.in_smoke || m_local.is_flashed || !on_screen)
+					if (data.in_smoke || m_local.is_flashed || !on_screen)
 						continue;
 				}
 			}*/
@@ -249,13 +265,29 @@ namespace esp
 
 			const auto box_color = data.is_dormant ? smoke_color : data.is_visible && !data.in_smoke && !m_local.is_flashed ? visible_color : occluded_color;
 
+			if (settings::esp::sound)
+			{
+				Vector out;
+
+				for (const auto& sound : _sounds)
+				{
+					if (sound.index != 0)
+					{
+						if (math::world2screen(sound.origin, out))
+						{
+							globals::draw_list->AddRect(ImVec2(out.x + 3.f, out.y + 3.f), ImVec2(out.x - 3.f, out.y - 3.f), utils::to_im32(Color::White));
+						}
+					}
+				}
+			}
+
 			if (settings::esp::bone_esp)
 			{
 				for (int i = 1; i <= g::entity_list->GetHighestEntityIndex(); i++)
 				{
 					c_base_player* entity = c_base_player::GetPlayerByIndex(i);
 
-					if (!entity || !entity->IsPlayer() || entity == g::local_player)
+					if (!entity || !entity->IsPlayer() || entity == g::local_player || !entity->IsAlive() || entity->IsDormant() || entity->m_iTeamNum() == g::local_player->m_iTeamNum())
 						continue;
 
 					if (settings::esp::visible_only && !g::local_player->CanSeePlayer(entity, entity->get_hitbox_position(entity, HITBOX_CHEST)))
@@ -293,12 +325,9 @@ namespace esp
 							if (abs(vDeltaChild.z) < 5 && (vDeltaParent.Length() < 5 && vDeltaChild.Length() < 5) || j == iChestBone)
 								continue;
 
-							if (entity->IsAlive() && !entity->IsDormant() && entity->m_iTeamNum() != g::local_player->m_iTeamNum())
+							if (math::world2screen(vParent, sParent) && math::world2screen(vChild, sChild))
 							{
-								if (math::world2screen(vParent, sParent) && math::world2screen(vChild, sChild))
-								{
-									globals::draw_list->AddLine(ImVec2(sParent.x, sParent.y), ImVec2(sChild.x, sChild.y), utils::to_im32(settings::esp::bone_esp_color));
-								}
+								globals::draw_list->AddLine(ImVec2(sParent.x, sParent.y), ImVec2(sChild.x, sChild.y), utils::to_im32(settings::esp::bone_esp_color), 0.2f);
 							}
 						}
 					}
@@ -338,18 +367,19 @@ namespace esp
 				imdraw::outlined_text("Defusing", ImVec2(box.right + 2.f, box.top - defusing_text_size.y - -30.f), red_color);
 			}
 
-			if (settings::esp::kevlarinfo && data.has_kevlar && data.has_helmet && !data.is_dormant && is_matchmaking())
+			if (settings::esp::kevlarinfo && !data.is_dormant && is_matchmaking())
 			{
-				static const auto defusing_text_size = ImGui::CalcTextSize("HK");
+				const char* text = "";
 
-				imdraw::outlined_text("HK", ImVec2(box.right + 2.f, box.top - defusing_text_size.y - -10.0f), white_color);
-			}
+				if (data.has_kevlar && data.has_helmet)
+					text = "HK";
+				
+				if (data.has_kevlar && !data.has_helmet)
+					text = "K";
 
-			if (settings::esp::kevlarinfo && data.has_kevlar && !data.has_helmet && !data.is_dormant && is_matchmaking())
-			{
-				static const auto defusing_text_size = ImGui::CalcTextSize("K");
+				static const auto defusing_text_size = ImGui::CalcTextSize(text);
 
-				imdraw::outlined_text("K", ImVec2(box.right + 2.f, box.top - defusing_text_size.y - -10.0f), white_color);
+				imdraw::outlined_text(text, ImVec2(box.right + 2.f, box.top - defusing_text_size.y - -10.0f), white_color);
 			}
 
 			if (settings::esp::is_desyncing && data.is_desyncing)
@@ -391,7 +421,7 @@ namespace esp
 				imdraw::outlined_text(buf, ImVec2(box.left + width / 2.f - weapon_size.x / 2.f, y_pos), white_color);
 			}
 
-			if (settings::esp::ammo && !data.is_dormant)
+			if (settings::esp::ammo && !data.is_dormant && !data.has_knife)
 			{
 				char buf[256];
 				sprintf_s(buf, "(%1.f/%1.f)", data.m_iAmmo, data.m_MaxAmmo);
@@ -410,7 +440,7 @@ namespace esp
 
 			if (settings::esp::snaplines && !data.is_dormant)
 			{
-				draw_list->AddLine(ImVec2(m_local.local_pos.x, m_local.local_pos.y), ImVec2(data.origin.x, data.origin.y), green_color, 1.5f);
+				draw_list->AddLine(ImVec2(m_local.local_pos.x, m_local.local_pos.y), ImVec2(data.old_origin.x, data.old_origin.y), green_color, 1.5f);
 			}
 
 			auto render_line = [box, draw_list](const Color& color, const int& value, const int& position, const bool& with_offset = false, const int& offset_position = 0)

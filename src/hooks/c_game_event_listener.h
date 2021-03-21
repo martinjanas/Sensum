@@ -108,9 +108,16 @@ class c_game_event_listener final : public IGameEventListener2
 
 		if (name == FNV("game_newmap"))
 		{
+			if (g::engine_client->IsInGame() && g::engine_client->IsConnected())
+			{
+				color_modulation::GetMapOriginalSkybox();
+			}
+
 			no_smoke::event();
 			color_modulation::event();
 			globals::team_damage.clear();
+			globals::team_kill.clear();
+
 		}
 		else if (name == FNV("player_footstep"))
 		{
@@ -229,18 +236,15 @@ class c_game_event_listener final : public IGameEventListener2
 			if (!enemy || !g::local_player || enemy->m_iTeamNum() == g::local_player->m_iTeamNum())
 				return;
 
-			if (!utils::IsPlayingMM())
-				return;
-
-			if(settings::esp::buylog)
+			if(settings::esp::buylog && utils::IsPlayingMM())
 			   WeaponCheck(context->GetString("weapon"), enemy);
 		}
 		else if (name == FNV("round_start"))
 		{
 			decltype(entities::m_local) m_local;
 
-			m_local.isBombPlantedStatus = false;
-			m_local.AfterPlant = false;
+			m_local.is_bomb_planted = false;
+			m_local.bomb_has_been_planted = false;
 		}
 		else if (name == FNV("cs_pre_restart") || name == FNV("switch_team") || name == FNV("announce_phase_end") || name == FNV("round_freeze_end"))
 			clantag::restore();

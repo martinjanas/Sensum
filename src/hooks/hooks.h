@@ -26,9 +26,9 @@ namespace hooks
 
 	struct create_move
 	{
-		static const int index = 24;
-		using fn = bool(__thiscall*)(IClientMode*, float, CUserCmd*);
-		static bool __stdcall hooked(float input_sample_frametime, CUserCmd* cmd);
+		static const int index = 22;
+		using fn = void(__thiscall*)(IBaseClientDLL*, int, float, bool);
+		static void __stdcall hooked(int sequence_number, float input_sample_frametime, bool active, bool sendpacket);
 
 		inline static fn original;
 		inline static void* setup;

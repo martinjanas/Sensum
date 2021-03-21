@@ -144,10 +144,10 @@ namespace render
 					checkbox("Has Kit", &settings::esp::haskit);
 					checkbox("Ammo ESP", &settings::esp::ammo);
 					checkbox("Money ESP", &settings::esp::money);
-					checkbox("Sound ESP", &settings::esp::soundesp);
+					checkbox("Sound beams", &settings::esp::soundesp);
 
 					//checkbox("Beams", &settings::esp::beams);
-					//checkbox("Sound Direction (?)", &settings::esp::sound);
+					checkbox("Sound ESP", &settings::esp::sound);
 				
 					checkbox("Bomb Damage ESP", &settings::esp::bomb_esp);
 					checkbox("Offscreen ESP", &settings::esp::offscreen);
@@ -177,6 +177,11 @@ namespace render
 						"Misc"
 					};
 
+					static const char* backtrack_chams_modes[] = {
+						"All Ticks",
+						"Last Tick"
+					};
+
 					ImGui::Combo("List##chams", &settings::chams::chams_list_mode, chams_list, IM_ARRAYSIZE(chams_list));
 
 					bool b_wip = false;
@@ -197,6 +202,18 @@ namespace render
 							ImGui::PopItemWidth();
 
 							checkbox("Flat", &settings::chams::enemy::flat);
+
+							ImGui::NextColumn();
+
+							checkbox("Backtrack", &settings::chams::enemy::backtrack_chams);
+
+							ImGui::NextColumn();
+
+							ImGui::PushItemWidth(-1);
+							{
+								ImGui::Combo("##enemybtchams", &settings::chams::enemy::backtrack_chams_mode, backtrack_chams_modes, IM_ARRAYSIZE(backtrack_chams_modes));
+							}
+							ImGui::PopItemWidth();
 						}
 						columns(1);
 						break;
@@ -214,6 +231,14 @@ namespace render
 							ImGui::PopItemWidth();
 
 							checkbox("Flat", &settings::chams::teammates::flat);
+
+							ImGui::NextColumn();
+
+							checkbox("Backtrack", &settings::chams::teammates::backtrack_chams);
+
+							ImGui::PushItemWidth(-1);
+							ImGui::Combo("List##teammatesbtchams", &settings::chams::teammates::backtrack_chams_mode, backtrack_chams_modes, IM_ARRAYSIZE(backtrack_chams_modes));
+							ImGui::PopItemWidth();
 						}
 						columns(1);
 						break;
@@ -426,7 +451,7 @@ namespace render
 						}
 					}
 
-					checkbox("Dark Menu", &settings::visuals::newstyle);
+					checkbox("Light Menu", &settings::visuals::newstyle);
 					if (old_style_state != settings::visuals::newstyle)
 						imdraw::apply_style(settings::visuals::newstyle);
 				});

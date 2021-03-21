@@ -62,15 +62,23 @@ struct IDirect3DDevice9;
 
 class CLocalPlayer
 {
-	friend bool operator==(const CLocalPlayer& lhs, void* rhs);
 public:
 	CLocalPlayer() : m_local(nullptr) {}
+	
+	operator bool() const 
+	{ 
+		return *m_local != nullptr; 
+	}
 
-	operator bool() const { return *m_local != nullptr; }
-	operator c_base_player* () const { return *m_local; }
+	operator c_base_player* () const 
+	{ 
+		return *m_local; 
+	}
 
-	c_base_player* operator->() { return *m_local; }
-
+	c_base_player* operator->() 
+	{ 
+		return *m_local; 
+	}
 private:
 	c_base_player** m_local;
 };

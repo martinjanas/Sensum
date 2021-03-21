@@ -61,6 +61,9 @@ namespace entities
 
 	bool IsDesyncing(c_base_player* player)
 	{
+		if (player->GetPlayerInfo().fakeplayer || strstr(player->GetPlayerInfo().szName, "BOT"))
+			return false;
+
 		auto hdr = g::mdl_info->GetStudiomodel(player->GetModel());
 		if (!hdr)
 			return false;
@@ -75,9 +78,6 @@ namespace entities
 			if (activity == 979)
 				return true;
 		}
-
-		if (player->GetPlayerInfo().fakeplayer)
-			return false;
 
 		return false;
 	}
@@ -104,7 +104,7 @@ namespace entities
 				if (player && player != local && (settings::misc::deathmatch || player->m_iTeamNum() != local->m_iTeamNum()))
 				{
 					if (player->m_iTeamNum() == team_ct || player->m_iTeamNum() == team_t)
-						m_sounds[k] = sound_t{ player->GetIndex(), player->m_vecOrigin() };
+						m_sounds[k] = sound_t{ player->GetIndex(), player->m_vecOrigin()};
 				}
 			}
 		}
@@ -312,18 +312,18 @@ namespace entities
 
 		if (bomb && !bomb->m_bBombTicking())
 		{
-			tick_data.bomb_indexStatus = GetBombsiteIndex(bomb);
-			tick_data.isBombPlantedStatus = bomb->IsPlantedC4();
-			tick_data.AfterPlant = false;
+			tick_data.bombsite_index = GetBombsiteIndex(bomb);
+			tick_data.is_bomb_planted = bomb->IsPlantedC4();
+			tick_data.bomb_has_been_planted = false;
 		}
 
 		if (bomb && bomb->m_bBombTicking())
 		{
 			tick_data.bomb_time = get_bomb_time(bomb, tick_data.tick_base);
 			tick_data.defuse_time = get_defuse_time(bomb, tick_data.tick_base);
-			tick_data.bomb_indexStatus = GetBombsiteIndex(bomb);
-			tick_data.isBombPlantedStatus = bomb->IsPlantedC4();
-			tick_data.AfterPlant = true;
+			tick_data.bombsite_index = GetBombsiteIndex(bomb);
+			tick_data.is_bomb_planted = bomb->IsPlantedC4();
+			tick_data.bomb_has_been_planted = true;
 
 			tick_data.hp = get_health(tick_data.local, bomb);
 		}
@@ -417,6 +417,7 @@ namespace entities
 			player_data.icon = player->m_hActiveWeapon()->GetGunIcon();
 			player_data.kevlar_icon = player->GetArmorIcon();
 			player_data.wep_str_size = player->m_hActiveWeapon()->GetGunStringSize();
+			player_data.has_knife = player->m_hActiveWeapon()->get_weapon_data()->WeaponType == WEAPONTYPE_KNIFE;
 
 			player_data.is_dormant = false;
 			player_data.is_scoped = player->m_bIsScoped();
@@ -428,11 +429,11 @@ namespace entities
 			player_data.has_defkit = player->m_bHasDefuser();
 			player_data.is_desyncing = IsDesyncing(player);
 			player_data.draw_entity = player->DrawSpecificEntity();
-
+			
 			auto weapData = player->m_hActiveWeapon();
 
 			if (!weapData)
-				return;
+				continue;
 
 			player_data.is_enemy = true;
 			player_data.m_iMoney = player->m_iMoney();
@@ -441,8 +442,8 @@ namespace entities
 			player_data.m_flSimulationTime = player->m_flSimulationTime();
 			player_data.m_iAmmo = weapData.Get()->m_iClip1();
 
-			if (weapData->IsKnife())
-				player_data.m_iAmmo = 0; player_data.m_MaxAmmo = 0;
+			//if (weapData->IsKnife())
+				//player_data.m_iAmmo = 0; player_data.m_MaxAmmo = 0;
 
 			player_data.m_MaxAmmo = player->m_hActiveWeapon().Get()->m_iPrimaryReserveAmmoCount(); //player->m_hActiveWeapon().Get()->GetMaxAmmo();
 			const auto tick_offset = player->m_vecVelocity() * g::global_vars->interval_per_tick;
@@ -528,6 +529,7 @@ namespace entities
 
 			player_data.box = GetBBox(player, player_data.points);
 			player_data.origin = player->m_vecOrigin();
+			player_data.old_origin = origin;
 			player_data.offset = tick_offset;
 			player_data.angles = player->m_angEyeAngles();
 
@@ -540,5 +542,7 @@ namespace entities
 			m_items.resize(13);
 		}
 		locker.unlock();
+
+		GetSoundOfEntities(local);
 	}
 }

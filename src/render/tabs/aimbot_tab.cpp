@@ -332,14 +332,11 @@ namespace render
 				{
 					checkbox("Enabled", &settings->recoil.enabled);
 					checkbox("First Bullet", &settings->recoil.first_bullet);
+					checkbox("Target Chest While Spraying (?)", &settings->rcs_override_hitbox);
+					tooltip("Aimbot will lock on chest if your iShotsFired is over 3.");
 					checkbox("Random Yaw & Pitch Amount (?)", &settings->recoil.humanize);
 					tooltip("Will randomize yaw and pitch.");
-					//checkbox("RCS Hitbox Override (?)", &settings->rcs_override_hitbox); //Doesnt work very well, need to recode the whole aimbot.
-					//tooltip("If shotsFired >= 3 - disable all hitboxes, except body, if shotsFired < 3 - enable hitboxes you had.");
-
-					//ImGui::SliderFloatLeftAligned("Pitch:", &settings->recoil.pitch, 0, 2, "%.1f %");
-					//ImGui::SliderFloatLeftAligned("Yaw:", &settings->recoil.yaw, 0, 2, "%.1f %");
-
+					
 					float pitch_max = 2.0f, yaw_max = 2.0f;
 
 					float pitch_perc = (settings->recoil.pitch / pitch_max) * 100.0f;

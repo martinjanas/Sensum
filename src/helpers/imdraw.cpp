@@ -51,6 +51,35 @@ namespace imdraw
 
 		if (dark)
 		{
+			style.Alpha = 1.f;
+			colors[ImGuiCol_WindowBg] = ImVec4(0.94f, 0.94f, 0.94f, 1.00f);
+
+			colors[ImGuiCol_Text] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
+			colors[ImGuiCol_TextDisabled] = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
+
+			colors[ImGuiCol_CheckMark] = ImVec4(0.3f, 0.3f, 0.3f, 1.f);
+			colors[ImGuiCol_CheckBg] = ImVec4(1.f, 1.f, 1.f, 1.f);
+			colors[ImGuiCol_CheckBgActive] = ImVec4(0.4f, 0.4f, 0.4f, 1.f);
+			colors[ImGuiCol_CheckBgHovered] = ImVec4(0.7f, 0.7f, 0.7f, 1.f);
+
+			colors[ImGuiCol_FrameBg] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+			colors[ImGuiCol_FrameBgHovered] = ImVec4(0.8f, 0.1f, 0.1f, 0.40f);
+			colors[ImGuiCol_FrameBgActive] = ImVec4(0.8f, 0.1f, 0.1f, 0.67f);
+
+			colors[ImGuiCol_SliderBg] = ImVec4(1.f, 1.f, 1.f, 1.f);
+			colors[ImGuiCol_SliderBgActive] = ImVec4(1.f, 1.f, 1.f, 1.f);
+			colors[ImGuiCol_SliderBgHovered] = ImVec4(1.f, 1.f, 1.f, 1.f);
+			colors[ImGuiCol_SliderGrab] = ImVec4(0.7f, 0.7f, 0.7f, 0.7f);
+			colors[ImGuiCol_SliderGrabActive] = ImVec4(0.7f, 0.7f, 0.7f, 1.f);
+
+			colors[ImGuiCol_ListBoxItem] = ImVec4(0.8f, 0.8f, 0.8f, 1.f);
+			colors[ImGuiCol_ListBoxItemActive] = ImVec4(0.8f, 0.8f, 0.8f, 1.f);
+			colors[ImGuiCol_ListBoxItemHovered] = ImVec4(0.8f, 0.8f, 0.8f, 1.f);
+
+			colors[ImGuiCol_PopupBg] = ImVec4(0.92f, 0.92f, 0.92f, 0.98f);
+		}
+		else
+		{
 			style.Alpha = 0.95f;
 			colors[ImGuiCol_WindowBg] = ImVec4(0.12f, 0.12f, 0.12f, 0.98f);
 
@@ -83,35 +112,6 @@ namespace imdraw
 			colors[ImGuiCol_ListBoxItemHovered] = ImVec4(0.26f, 0.26f, 0.26f, 1.f);
 
 			colors[ImGuiCol_PopupBg] = ImVec4(0.2f, 0.2f, 0.2f, 0.98f);
-		}
-		else
-		{
-			style.Alpha = 1.f;
-			colors[ImGuiCol_WindowBg] = ImVec4(0.94f, 0.94f, 0.94f, 1.00f);
-
-			colors[ImGuiCol_Text] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
-			colors[ImGuiCol_TextDisabled] = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
-
-			colors[ImGuiCol_CheckMark] = ImVec4(0.3f, 0.3f, 0.3f, 1.f);
-			colors[ImGuiCol_CheckBg] = ImVec4(1.f, 1.f, 1.f, 1.f);
-			colors[ImGuiCol_CheckBgActive] = ImVec4(0.4f, 0.4f, 0.4f, 1.f);
-			colors[ImGuiCol_CheckBgHovered] = ImVec4(0.7f, 0.7f, 0.7f, 1.f);
-
-			colors[ImGuiCol_FrameBg] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-			colors[ImGuiCol_FrameBgHovered] = ImVec4(0.8f, 0.1f, 0.1f, 0.40f);
-			colors[ImGuiCol_FrameBgActive] = ImVec4(0.8f, 0.1f, 0.1f, 0.67f);
-
-			colors[ImGuiCol_SliderBg] = ImVec4(1.f, 1.f, 1.f, 1.f);
-			colors[ImGuiCol_SliderBgActive] = ImVec4(1.f, 1.f, 1.f, 1.f);
-			colors[ImGuiCol_SliderBgHovered] = ImVec4(1.f, 1.f, 1.f, 1.f);
-			colors[ImGuiCol_SliderGrab] = ImVec4(0.7f, 0.7f, 0.7f, 0.7f);
-			colors[ImGuiCol_SliderGrabActive] = ImVec4(0.7f, 0.7f, 0.7f, 1.f);
-
-			colors[ImGuiCol_ListBoxItem] = ImVec4(0.8f, 0.8f, 0.8f, 1.f);
-			colors[ImGuiCol_ListBoxItemActive] = ImVec4(0.8f, 0.8f, 0.8f, 1.f);
-			colors[ImGuiCol_ListBoxItemHovered] = ImVec4(0.8f, 0.8f, 0.8f, 1.f);
-
-			colors[ImGuiCol_PopupBg] = ImVec4(0.92f, 0.92f, 0.92f, 0.98f);
 		}
 	}
 
