@@ -140,6 +140,7 @@
     <ClCompile Include="features\Sounds.cpp" />
     <ClCompile Include="features\thirdperson.cpp" />
     <ClCompile Include="features\zeusbot.cpp" />
+    <ClCompile Include="glow.cpp" />
     <ClCompile Include="helpers\autowall.cpp" />
     <ClCompile Include="helpers\console.cpp" />
     <ClCompile Include="helpers\entities.cpp" />

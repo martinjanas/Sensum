@@ -284,7 +284,7 @@ namespace g
 	extern CHudChat* hud_chat;
 	extern C_TEFireBullets* fire_bullets;
 	extern c_cs_game_rules_proxy* game_rules_proxy;
-	extern glow_manager_t* glow_manager;
+	extern CGlowManager* glow_manager;
 	extern IStudioRender* g_studiorender;
 	extern IDemoPlayer* demo_player;
 

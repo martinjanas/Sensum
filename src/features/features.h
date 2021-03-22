@@ -32,7 +32,6 @@ namespace visuals
 	void fetch_entities();
 	void render(ImDrawList* draw_list);
 	void more_chams() noexcept;
-	void glow() noexcept;
 	void RenderPunchCross();
 	void RenderHitmarker();
 	void RenderNoScopeOverlay();
@@ -49,6 +48,7 @@ namespace visuals
 	void RenderCirclePopflash();
 	void SmokeHelperAimbot(CUserCmd* cmd);
 	void PopflashHelperAimbot(CUserCmd* cmd);
+	void glow();
 }
 
 namespace esp

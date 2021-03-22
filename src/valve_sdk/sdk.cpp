@@ -48,7 +48,7 @@ namespace g
 	IWeaponSystem* weapon_system = nullptr;
 	IFileSystem* file_system = nullptr;
 	IViewRenderBeams* view_render_beams = nullptr;
-	glow_manager_t* glow_manager = nullptr;
+	CGlowManager* glow_manager = nullptr;
 	IStudioRender* g_studiorender = nullptr;
 	IDemoPlayer* demo_player = nullptr;
 
@@ -103,7 +103,7 @@ namespace g
 		view_render_beams = *(IViewRenderBeams**)(utils::pattern_scan(VIEW_RENDER_BEAMS) + 1);
 		fire_bullets = *(C_TEFireBullets**)(utils::pattern_scan(FIRE_BULLETS) + 0x131);
 		game_rules_proxy = **(c_cs_game_rules_proxy***)(utils::pattern_scan(GAME_RULES_PROXY) + 1);
-		glow_manager = (glow_manager_t*)(*(uintptr_t*)(utils::pattern_scan(GetModuleHandleA("client.dll"), "0F 11 05 ? ? ? ? 83 C8 01 C7 05 ? ? ? ? 00 00 00 00") + 3));
+		glow_manager = (CGlowManager*)(*(uintptr_t*)(utils::pattern_scan(GetModuleHandleA("client.dll"), "0F 11 05 ? ? ? ? 83 C8 01 C7 05 ? ? ? ? 00 00 00 00") + 3));
 		demo_player = **reinterpret_cast<IDemoPlayer***>(utils::pattern_scan("engine.dll", "8B 0D ? ? ? ? 8B 01 8B 40 1C FF D0 84 C0 74 0A") + 0x2);
 
 		base_client = get_interface<IBaseClientDLL>("client.dll", "VClient018");
