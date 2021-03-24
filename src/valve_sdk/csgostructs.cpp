@@ -230,7 +230,7 @@ bool c_base_entity::IsDefuseKit()
 
 CCSWeaponInfo* c_base_combat_weapon::get_weapon_data()
 {
-	return CallVFunction<CCSWeaponInfo* (__thiscall*)(void*)>(this, 460)(this);
+	return g::weapon_system->GetWpnData(this->m_iItemDefinitionIndex());
 }
 
 bool c_base_combat_weapon::HasBullets()
