@@ -1,16 +1,95 @@
+name: Autocloser
 on:
   issues:
-    types: [opened, edited]
-
+    types: [opened, edited, reopened]
 jobs:
-  auto_close_issues:
+  autoclose:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-      - name: Automatically close issues that don't follow the issue template
-        uses: lucasbento/auto-close-issues@v1.0.2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          issue-close-message: "@${issue.user.login}: hello! :wave:\n\nThis issue is being automatically closed because it does not follow the issue template." # optional property
-          closed-issues-label: "🙁 Not following issue template" # optional property
+    - name: Autoclose issues
+      uses: arkon/issue-closer-action@v3.0
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        rules: |
+          [
+            {
+              "type": "title",
+              "regex": "d3dx9.lib",
+              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+            },
+            {
+              "type": "title",
+              "regex": "Compile",
+              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+            },
+            {
+              "type": "title",
+              "regex": "compile",
+              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+            },
+            {
+              "type": "title",
+              "regex": "cant compile",
+              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+            },
+            {
+              "type": "title",
+              "regex": "Cant compile",
+              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+            },
+            {
+              "type": "title",
+              "regex": "Cant Compile",
+              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+            },
+            {
+              "type": "title",
+              "regex": "Can't compile",
+              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+            },
+            {
+              "type": "title",
+              "regex": "Error",
+              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+            },
+            {
+              "type": "title",
+              "regex": "error",
+              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+            },
+            {
+              "type": "title",
+              "regex": "Error when building",
+              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+            },
+            {
+              "type": "title",
+              "regex": "missing",
+              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+            },
+            {
+              "type": "title",
+              "regex": "d3dx9",
+              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+            },
+            {
+              "type": "title",
+              "regex": "include",
+              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+            },
+            {
+              "type": "title",
+              "regex": "build",
+              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+            },
+            {
+              "type": "title",
+              "regex": "compiling",
+              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+            },
+            {
+              "type": "title",
+              "regex": "inject",
+              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+            }
+          ]
