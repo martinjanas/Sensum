@@ -293,6 +293,7 @@ namespace g
 	extern ISteamClient* steam_client;
 	extern ISteamFriends* steam_friends;
 	extern ISteamGameCoordinator* game_coordinator;
+	extern ISteamUtils* steam_utils;
 
 	void initialize();
 }

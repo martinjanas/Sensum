@@ -57,6 +57,7 @@ namespace g
 	ISteamClient* steam_client = nullptr;
 	ISteamFriends* steam_friends = nullptr;
 	ISteamGameCoordinator* game_coordinator = nullptr;
+	ISteamUtils* steam_utils = nullptr;
 
 	CHudChat* hud_chat = nullptr;
 	C_TEFireBullets* fire_bullets = nullptr;
@@ -140,6 +141,7 @@ namespace g
 		game_coordinator = static_cast<ISteamGameCoordinator*>(steam_client->GetISteamGenericInterface(_steam_user, _steam_pipe, "SteamGameCoordinator001"));
 		steam_friends = steam_client->GetISteamFriends(_steam_user, _steam_pipe, "SteamFriends015");
 		steam_http = steam_client->GetISteamHTTP(_steam_user, _steam_pipe, "STEAMHTTP_INTERFACE_VERSION002");
+		steam_utils = steam_client->GetISteamUtils(_steam_pipe, "SteamUtils009");
 
 		hud_chat = hud_system->FindHudElement<CHudChat>("CHudChat");
 
@@ -176,6 +178,7 @@ namespace g
 		PRINT_INTERFACE(input_system);
 		PRINT_INTERFACE(steam_friends);
 		PRINT_INTERFACE(steam_http);
+		PRINT_INTERFACE(steam_utils);
 		PRINT_INTERFACE(engine_vgui);
 		PRINT_INTERFACE(render);
 		PRINT_INTERFACE(player_resource);

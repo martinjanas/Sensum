@@ -48,7 +48,9 @@ namespace visuals
 	void RenderCirclePopflash();
 	void SmokeHelperAimbot(CUserCmd* cmd);
 	void PopflashHelperAimbot(CUserCmd* cmd);
-	void glow();
+	void glow_players();
+	void glow_misc();
+
 }
 
 namespace esp

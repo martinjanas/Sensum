@@ -69,6 +69,7 @@ namespace entities
 		bool has_knife;
 
 		c_base_combat_weapon* weapData;
+		c_base_player* player;
 
 		bool in_smoke;
 		bool is_visible;

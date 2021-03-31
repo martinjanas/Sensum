@@ -18,8 +18,8 @@ namespace utils
 	float random(const float& min, const float& max);
 
 	bool can_lag(const bool& voice_check = true);
+	IDirect3DTexture9* get_avatar_as_texture(IDirect3DDevice9* device, CSteamID steamID);
 	float get_interpolation_compensation();
-	long long GetEpochTime();
 	Vector CalcHelpPos(Vector target);
 	Vector CalcDir(const Vector& vAngles);
 

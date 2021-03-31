@@ -20,6 +20,7 @@
 #include "valve_sdk/netvars.hpp"
 
 bool is_unhookable = true;
+char buf[256];
 
 void wait_for_modules()
 {
@@ -86,7 +87,10 @@ DWORD __stdcall on_attach(LPVOID base)
 
 	config::cache("configs");
 
-	notifies::push("Injection Succesful", notify_state_s::debug_state);
+	static const auto name = g::steam_friends->GetPersonaName();
+	sprintf_s(buf, "Injected, hello %s!", name);
+
+	notifies::push(buf);
 
 	/*g::cvar->ConsoleColorPrintf(Color::Green, "This is ConsoleColorPrintf\n\n"); //TODO: Do console log system.
 	g::cvar->ConsolePrintf("This is ConsolePrintf\n\n");

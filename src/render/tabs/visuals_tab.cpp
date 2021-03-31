@@ -333,6 +333,8 @@ namespace render
 									ImGui::PushItemWidth(-1);
 									ImGui::Combo("Mode", &settings::glow::style_enemy, glow_modes, IM_ARRAYSIZE(glow_modes));
 									ImGui::PopItemWidth();
+
+									checkbox("Visible Only", &settings::glow::visible_only);
 								}
 								columns(1);
 								break;
@@ -346,6 +348,8 @@ namespace render
 									ImGui::PushItemWidth(-1);
 									ImGui::Combo("Mode", &settings::glow::style_teammate, glow_modes, IM_ARRAYSIZE(glow_modes));
 									ImGui::PopItemWidth();
+
+									checkbox("Visible Only", &settings::glow::teammates_visible_only);
 								}
 								columns(1);
 								break;

@@ -16,8 +16,76 @@
 #include <vector>
 #include <chrono>
 
+void copy_convert(const uint8_t* rgba, uint8_t* out, const size_t size)
+{
+	auto in = reinterpret_cast<const uint32_t*>(rgba);
+	auto buf = reinterpret_cast<uint32_t*>(out);
+	for (auto i = 0u; i < (size / 4); ++i)
+	{
+		const auto pixel = *in++;
+		*buf++ = (pixel & 0xFF00FF00) | ((pixel & 0xFF0000) >> 16) | ((pixel & 0xFF) << 16);
+	}
+}
+
 namespace utils
 {
+	IDirect3DTexture9* get_avatar_as_texture(IDirect3DDevice9* device, CSteamID steamID)
+	{
+		IDirect3DTexture9* texture = nullptr;
+
+		static int iImage = 0;
+
+		if (iImage == 0)
+			iImage = g::steam_friends->GetSmallFriendAvatar(steamID);
+
+		if (iImage == -1)
+			return nullptr;
+
+		uint32_t uAvatarWidth, uAvatarHeight;
+		if (!g::steam_utils->GetImageSize(iImage, &uAvatarWidth, &uAvatarHeight))
+			return nullptr;
+
+		const int uImageSizeInBytes = uAvatarWidth * uAvatarHeight * 4;
+		uint8_t* pAvatarRGBA = new uint8_t[uImageSizeInBytes];
+		if (!g::steam_utils->GetImageRGBA(iImage, (unsigned int*)pAvatarRGBA, uImageSizeInBytes))
+		{
+			delete[] pAvatarRGBA;
+			return nullptr;
+		}
+
+		auto res = device->CreateTexture(uAvatarWidth,
+			uAvatarHeight,
+			1,
+			D3DUSAGE_DYNAMIC,
+			D3DFMT_A8R8G8B8,
+			D3DPOOL_DEFAULT,
+			&texture,
+			nullptr);
+
+		std::vector<uint8_t> texData;
+		texData.resize(uAvatarWidth * uAvatarHeight * 4u);
+
+		copy_convert(pAvatarRGBA, texData.data(), uAvatarWidth * uAvatarHeight * 4u);
+
+		D3DLOCKED_RECT rect;
+		res = texture->LockRect(0, &rect, nullptr, D3DLOCK_DISCARD);
+
+		auto src = texData.data();
+		auto dst = reinterpret_cast<uint8_t*>(rect.pBits);
+		for (auto y = 0u; y < uAvatarHeight; ++y)
+		{
+			std::copy(src, src + (uAvatarWidth * 4), dst);
+
+			src += uAvatarWidth * 4;
+			dst += rect.Pitch;
+		}
+
+		res = texture->UnlockRect(0);
+
+		delete[] pAvatarRGBA;
+		return texture;
+	}
+
 	float get_interpolation_compensation()
 	{
 		static const auto cl_interp = g::cvar->find("cl_interp");

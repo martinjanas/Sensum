@@ -429,6 +429,7 @@ namespace entities
 			player_data.has_defkit = player->m_bHasDefuser();
 			player_data.is_desyncing = IsDesyncing(player);
 			player_data.draw_entity = player->DrawSpecificEntity();
+			player_data.player = player;
 			
 			auto weapData = player->m_hActiveWeapon();
 

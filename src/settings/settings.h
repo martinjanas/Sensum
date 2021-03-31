@@ -186,7 +186,7 @@ namespace settings
 		extern Color bone_esp_color;
 	}
 
-	namespace glow
+	namespace glow //Im gonna rewrite this glow namespace into structs for enemy, teammates & localplayer as in the chams namespace, I'm just lazy atm...
 	{
 		extern bool glowEnemyEnabled;
 		extern bool glowTeamEnabled;
@@ -195,6 +195,8 @@ namespace settings
 		extern bool glowDroppedKitsEnabled;
 		extern bool glowNadesEnabled;
 		extern bool glowOverride;
+		extern bool visible_only;
+		extern bool teammates_visible_only; //Too lazy to make structs for enemy, teammates & localplayer, maybe later, sorry.Jesus... //MartiN409
 		
 		extern int style_enemy;
 		extern int style_teammate;

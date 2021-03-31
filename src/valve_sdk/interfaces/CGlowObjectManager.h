@@ -5,15 +5,15 @@
 class CGlowObjectDefinition 
 {
 public:
-	void* get_entity()
+	/*void* get_entity()
 	{
 		return entity;
-	}
+	}*/
 
 	void color(Color& color)
 	{
 		this->clr = Vector(color.r() / 255.f, color.g() / 255.f, color.b() / 255.f);
-		this->m_flAlpha = color.a();
+		this->m_flAlpha = (float)color.a();
 	}
 
 	void glow_style(int style)
@@ -46,7 +46,6 @@ public:
 		return m_nNextFreeSlot != -2;
 	}
 
-private:
 	void*		  entity;
 	Vector        clr;						
 	float         m_flAlpha;                 //0x0010

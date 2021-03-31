@@ -66,6 +66,8 @@ namespace settings
 		bool glowDroppedKitsEnabled = false;
 		bool glowNadesEnabled = false;
 		bool glowOverride = false;
+		bool visible_only = false;
+		bool teammates_visible_only = false;
 
 		int style_enemy = 0;
 		int style_teammate = 0;
@@ -401,6 +403,9 @@ namespace settings
 				Option::Load(root["glow.dropped_weapons_color"], glow::glowDroppedWeaponsColor);
 				Option::Load(root["glow.dropped_kits_color"], glow::glowDroppedKitsColor);
 
+				Option::Load(root["glow.enemy_visible_only"], glow::visible_only);
+				Option::Load(root["glow.teammates_visible_only"], glow::teammates_visible_only);
+
 				Option::Load(root["desync.enabled"], desync::enabled);
 				Option::Load(root["desync.yaw_flip"], desync::yaw_flip);
 				Option::Load(root["desync.resolver"], desync::resolver);
@@ -637,7 +642,7 @@ namespace settings
 
 				Option::Save(config["misc_spread_crosshair_color"], settings::visuals::spread_cross_color);
 				Option::Save(config["mics.rcs_cross_color"], visuals::recoilcolor);
-				Option::Save(config["misc.bullet_tracer_color"], settings::visuals::colorBulletTracer); //Here the bug happens
+				Option::Save(config["misc.bullet_tracer_color"], settings::visuals::colorBulletTracer);
 
 				config["glow.enemy"] = glow::glowEnemyEnabled;
 				config["glow.team"] = glow::glowTeamEnabled;
@@ -647,6 +652,9 @@ namespace settings
 				config["glow.nades"] = glow::glowNadesEnabled;
 				config["glow.override"] = glow::glowOverride;
 				config["glow.list_mode"] = glow::glow_list_mode;
+
+				config["glow.enemy_visible_only"] = glow::visible_only;
+				config["glow.teammates_visible_only"] = glow::teammates_visible_only;
 
 				Option::Save(config["glow.enemy_color"], glow::glowEnemyColor);
 				Option::Save(config["glow.team_color"], glow::glowTeamColor);

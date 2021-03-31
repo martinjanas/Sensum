@@ -44,6 +44,7 @@ namespace hooks
 		read_packet::setup = reinterpret_cast<void*>(utils::GetVirtual(g::demo_player, hooks::read_packet::index));
 		hud_update::setup = reinterpret_cast<void*>(utils::GetVirtual(g::base_client, hooks::hud_update::index));
 		is_playing_demo::setup = reinterpret_cast<void*>(utils::GetVirtual(g::engine_client, hooks::is_playing_demo::index));
+		console_color_printf::setup = reinterpret_cast<void*>(utils::GetVirtual(g::cvar, hooks::console_color_printf::index));
 
 		if (MH_Initialize() != MH_OK) {
 			MessageBoxA(NULL, "Failed to initialize Minhook.", MB_OK, MB_ICONERROR);
@@ -115,6 +116,10 @@ namespace hooks
 
 		if (MH_CreateHook(is_playing_demo::setup, &hooks::is_playing_demo::hooked, reinterpret_cast<void**>(&is_playing_demo::original)) != MH_OK) {
 			MessageBoxA(NULL, "Outdated index - Is Playing Demo", MB_OK, MB_ICONERROR);
+		}
+
+		if (MH_CreateHook(console_color_printf::setup, &hooks::console_color_printf::hooked, reinterpret_cast<void**>(&console_color_printf::original)) != MH_OK) {
+			MessageBoxA(NULL, "Outdated index - ConsoleColorPrintf", MB_OK, MB_ICONERROR);
 		}
 
 		if (MH_EnableHook(MH_ALL_HOOKS) != MH_OK) {
@@ -335,7 +340,8 @@ namespace hooks
 
 	int __stdcall post_screen_effects::hooked(int value)
 	{
-		visuals::glow();
+		visuals::glow_players();
+		visuals::glow_misc();
 
 		return original(g::client_mode, value);
 	}
@@ -349,5 +355,12 @@ namespace hooks
 		}
 
 		return original(g::engine_client);
+	}
+
+	void __stdcall console_color_printf::hooked(ICvar* ecx, const Color& color, const char* text, std::size_t args...)
+	{
+		if (color == Color(255, 90, 90, 255))
+			original(g::cvar, color, "", args);
+		else original(g::cvar, color, text, args);
 	}
 }

@@ -240,6 +240,16 @@ namespace hooks
 		inline static void* setup;
 	};
 
+	struct console_color_printf
+	{
+		static const int index = 25;
+		using fn = void(__cdecl*)(ICvar*, const Color&, const char*, ...);
+		static void __stdcall hooked(ICvar* ecx, const Color& clr, const char* text, std::size_t args...);
+
+		inline static fn original;
+		inline static void* setup;
+	};
+
 	/*struct dispatch_user_message
 	{
 		static const int index = 38;
