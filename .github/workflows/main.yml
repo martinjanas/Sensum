@@ -15,81 +15,81 @@ jobs:
             {
               "type": "title",
               "regex": "d3dx9.lib",
-              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+              "message": "this issue was automatically closed because blacklisted word was detected."
             },
             {
               "type": "title",
               "regex": "Compile",
-              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+              "message": "this issue was automatically closed because blacklisted word was detected."
             },
             {
               "type": "title",
               "regex": "compile",
-              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+              "message": "this issue was automatically closed because blacklisted word was detected."
             },
             {
               "type": "title",
               "regex": "cant compile",
-              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+              "message": "this issue was automatically closed because blacklisted word was detected."
             },
             {
               "type": "title",
               "regex": "Cant compile",
-              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+              "message": "this issue was automatically closed because blacklisted word was detected."
             },
             {
               "type": "title",
               "regex": "Cant Compile",
-              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+              "message": "this issue was automatically closed because blacklisted word was detected."
             },
             {
               "type": "title",
               "regex": "Can't compile",
-              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+              "message": "this issue was automatically closed because blacklisted word was detected."
             },
             {
               "type": "title",
               "regex": "Error",
-              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+              "message": "this issue was automatically closed because blacklisted word was detected."
             },
             {
               "type": "title",
               "regex": "error",
-              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+              "message": "this issue was automatically closed because blacklisted word was detected."
             },
             {
               "type": "title",
               "regex": "Error when building",
-              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+              "message": "this issue was automatically closed because blacklisted word was detected."
             },
             {
               "type": "title",
               "regex": "missing",
-              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+              "message": "this issue was automatically closed because blacklisted word was detected."
             },
             {
               "type": "title",
               "regex": "d3dx9",
-              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+              "message": "this issue was automatically closed because blacklisted word was detected."
             },
             {
               "type": "title",
               "regex": "include",
-              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+              "message": "this issue was automatically closed because blacklisted word was detected."
             },
             {
               "type": "title",
               "regex": "build",
-              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+              "message": "this issue was automatically closed because blacklisted word was detected."
             },
             {
               "type": "title",
               "regex": "compiling",
-              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+              "message": "this issue was automatically closed because blacklisted word was detected."
             },
             {
               "type": "title",
               "regex": "inject",
-              "message": "@${issue.user.login} this issue was automatically closed because it did not follow the issue template"
+              "message": "this issue was automatically closed because blacklisted word was detected."
             }
           ]
