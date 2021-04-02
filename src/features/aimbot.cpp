@@ -47,6 +47,8 @@ namespace aimbot
 	{
 		matrix3x4_t matrix[128];
 		bool is_moving;
+		bool is_dormant;
+		bool is_alive;
 	};
 
 	std::map<int, std::deque<backtrack_data_t>> data;
@@ -209,7 +211,7 @@ namespace aimbot
 			int group_index = -1;
 			for (size_t k = 0; k < settings::aimbot::m_groups.size(); k++)
 			{
-				const auto group = settings::aimbot::m_groups[k];
+				const auto& group = settings::aimbot::m_groups[k];
 				if (std::find(group.weapons.begin(), group.weapons.end(), weapon->m_iItemDefinitionIndex()) != group.weapons.end())
 				{
 					group_index = k;
@@ -245,7 +247,7 @@ namespace aimbot
 			if (!g::local_player->m_bIsScoped())
 				time_in_scope = GetTickCount64();
 
-			if (a_settings.check_zoom && time_in_scope + 60 > GetTickCount64())
+			if (a_settings.check_zoom && static_cast<unsigned long long>(time_in_scope) + 60 > GetTickCount64())
 				return false;
 		}
 
@@ -734,38 +736,50 @@ namespace aimbot
 
 	void get_backtrack_data(CUserCmd* cmd)
 	{
-		if (a_settings.backtrack.ticks <= 0 || !g::local_player || !g::local_player->IsAlive())
+		if(!a_settings.enabled || a_settings.backtrack.ticks <= 0)
+		   return;
+
+		if (!settings::chams::enemy::backtrack_chams && !settings::chams::teammates::backtrack_chams)
+			return;
+
+		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
 			return;
 
 		backtrack_data_t bt;
 
-		for (int i = 1; i < g::global_vars->maxClients; i++)
+		c_base_player* player;
+		for (int i = 1; i < g::engine_client->GetMaxClients(); i++)
 		{
-			auto player = c_base_player::GetPlayerByIndex(i);
-			if (!player || !player->IsPlayer() || !player->IsAlive() || player->is_dormant())
+			player = c_base_player::GetPlayerByIndex(i);
+
+			if (!player)
 				continue;
 
-			if (player->m_vecVelocity().Length2D() < 0.01f)
+			if (!player->IsPlayer() || !player->IsAlive() || player->IsDormant())
 				continue;
 
 			auto model = player->GetModel();
+
 			if (!model)
-				continue;
+				return;
 
 			auto hdr = g::mdl_info->GetStudiomodel(model);
-			if (!hdr)
-				continue;
 
-			bt.is_moving = player->m_vecVelocity().Length2D() > 0.01f ? true : false;
-			
+			if (!hdr)
+				return;
+
+			bt.is_moving = (player->m_vecVelocity().x != 0.f || player->m_vecVelocity().y != 0.f || player->m_vecVelocity().z != 0.f);
+			bt.is_dormant = player->IsDormant();
+			bt.is_alive = player->IsAlive();
+
 			auto hitbox_set = hdr->GetHitboxSet(player->m_nHitboxSet());
 
 			if (!hitbox_set)
-				continue;
+				return;
 
 			auto hitbox_head = hitbox_set->GetHitbox(HITBOX_HEAD);
 			auto hitbox_center = (hitbox_head->bbmin + hitbox_head->bbmax) * 0.5f;
-	
+
 			player->PVSFix();
 
 			player->SetupBones(bt.matrix, 128, BONE_USED_BY_ANYTHING, g::global_vars->curtime);
@@ -779,13 +793,28 @@ namespace aimbot
 
 				if (j > a_settings.backtrack.ticks)
 					data[i].pop_back();
+
+				if (data[i].front().is_dormant || !data[i].front().is_alive)
+					data[i].clear();
+
+				if (!(player->m_vecVelocity().x != 0.f || player->m_vecVelocity().y != 0.f || player->m_vecVelocity().z != 0.f))
+					data.at(i).clear();
+
+				if (!player)
+					data.at(i).clear();
 			}
 		}
 	}
 
 	void backtrack_chams(IMatRenderContext* context, const DrawModelState_t& state, const ModelRenderInfo_t& info, matrix3x4_t* bone)
 	{
-		if (a_settings.backtrack.ticks <= 0 || !g::local_player || !g::local_player->IsAlive() || !context || !bone)
+		if (a_settings.backtrack.ticks <= 0)
+			return;
+
+		if (!settings::chams::enemy::backtrack_chams && !settings::chams::teammates::backtrack_chams)
+			return;
+
+		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected() || !bone)
 			return;
 
 		static auto original = hooks::draw_model_execute::original;
@@ -794,91 +823,77 @@ namespace aimbot
 
 		static IMaterial* material = g::mat_system->FindMaterial("debug/debugambientcube", TEXTURE_GROUP_OTHER);
 
-		if (player && player->IsPlayer() && player->IsAlive())
+		if (!g::local_player)
+			return;
+
+		if (info.entity_index > 0 && info.entity_index <= 64)
 		{
-			if (info.entity_index > 0 && info.entity_index <= 64)
+			if (data.empty())
+				return;
+
+			auto& bt_data = data.at(info.entity_index);
+
+			if (bt_data.empty())
+				return;
+
+			for (int i = 1; i < bt_data.size(); i++)
 			{
-				if (data.count(info.entity_index) > 0)
+				if (!player)
+					continue;
+
+				if (!player->IsPlayer())
+					continue;
+
+				if (!player->IsAlive())
+					continue;
+
+				if (i > a_settings.backtrack.ticks)
+					continue;
+
+				auto active_wpn = g::local_player->m_hActiveWeapon().Get();
+
+				if (!active_wpn)
+					continue;
+				
+				auto wpn_data = active_wpn->get_weapon_data();
+
+				if (!wpn_data)
+					continue;
+
+				if (wpn_data->WeaponType == WEAPONTYPE_KNIFE)
+					continue;
+
+				bool is_enemy = g::local_player->m_iTeamNum() != player->m_iTeamNum();
+				bool is_teammate = !is_enemy;
+
+				if (is_enemy && settings::chams::enemy::backtrack_chams)
 				{
-					auto& bdata = data.at(info.entity_index);
-					if (!bdata.empty())
+					if (i == a_settings.backtrack.ticks)
 					{
-						for (int i = 1; i < bdata.size(); i++)
+						if (bt_data.at(i).is_moving)
 						{
-							if (i > a_settings.backtrack.ticks)
-								continue;
+							material->ColorModulate(settings::chams::enemy::color_backtrack.r() / 255.0f, settings::chams::enemy::color_backtrack.g() / 255.0f, settings::chams::enemy::color_backtrack.b() / 255.0f);
+							material->AlphaModulate(settings::chams::enemy::color_backtrack.a() / 255.0f);
+							material->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
+							g::mdl_render->ForcedMaterialOverride(material);
+							original(g::mdl_render, context, &state, &info, bt_data.at(i).matrix);
+							g::mdl_render->ForcedMaterialOverride(nullptr);
+						}
+					}
+				}
 
-							if (!player->IsAlive())
-								continue;
-
-							if (g::local_player && g::local_player->m_hActiveWeapon().Get()->get_weapon_data()->WeaponType == WEAPONTYPE_KNIFE)
-								continue;
-
-							if (g::local_player->m_iTeamNum() != player->m_iTeamNum())
-							{
-								if (settings::chams::enemy::backtrack_chams && settings::chams::enemy::backtrack_chams_mode == 0) //Show all ticks
-								{
-									auto& record = bdata.at(i);
-									if (record.is_moving)
-									{
-										material->ColorModulate(Color::Green.r() / 255.0f, Color::Green.g() / 255.0f, Color::Green.b() / 255.0f);
-										material->AlphaModulate(Color::Green.a() / 255.0f);
-										material->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
-										g::mdl_render->ForcedMaterialOverride(material);
-										original(g::mdl_render, context, &state, &info, record.matrix);
-										g::mdl_render->ForcedMaterialOverride(nullptr);
-									}
-								}
-
-								if (settings::chams::enemy::backtrack_chams && settings::chams::enemy::backtrack_chams_mode == 1) //Show last tick
-								{
-									if (i == a_settings.backtrack.ticks)
-									{
-										if (bdata.at(i).is_moving)
-										{
-											material->ColorModulate(Color::Green.r() / 255.0f, Color::Green.g() / 255.0f, Color::Green.b() / 255.0f);
-											material->AlphaModulate(Color::Green.a() / 255.0f);
-											material->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
-											g::mdl_render->ForcedMaterialOverride(material);
-											original(g::mdl_render, context, &state, &info, bdata.at(i).matrix);
-											g::mdl_render->ForcedMaterialOverride(nullptr);
-										}
-									}
-								}
-							}
-
-							if (g::local_player->m_iTeamNum() == player->m_iTeamNum())
-							{
-								if (settings::chams::teammates::backtrack_chams && settings::misc::deathmatch && settings::chams::teammates::backtrack_chams_mode == 0) //Show all ticks
-								{
-									auto& record = bdata.at(i);
-									if (record.is_moving)
-									{
-										material->ColorModulate(Color::Red.r() / 255.0f, Color::Red.g() / 255.0f, Color::Red.b() / 255.0f);
-										material->AlphaModulate(Color::Red.a() / 255.0f);
-										material->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
-										g::mdl_render->ForcedMaterialOverride(material);
-										original(g::mdl_render, context, &state, &info, record.matrix);
-										g::mdl_render->ForcedMaterialOverride(nullptr);
-									}
-								}
-
-								if (settings::chams::teammates::backtrack_chams && settings::misc::deathmatch && settings::chams::teammates::backtrack_chams_mode == 1) //Show last tick
-								{
-									if (i == a_settings.backtrack.ticks)
-									{
-										if (bdata.at(i).is_moving)
-										{
-											material->ColorModulate(Color::Red.r() / 255.0f, Color::Red.g() / 255.0f, Color::Red.b() / 255.0f);
-											material->AlphaModulate(Color::Red.a() / 255.0f);
-											material->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
-											g::mdl_render->ForcedMaterialOverride(material);
-											original(g::mdl_render, context, &state, &info, bdata.at(i).matrix);
-											g::mdl_render->ForcedMaterialOverride(nullptr);
-										}
-									}
-								}
-							}
+				if (is_teammate && settings::chams::teammates::backtrack_chams)
+				{
+					if (i == a_settings.backtrack.ticks)
+					{
+						if (bt_data.at(i).is_moving)
+						{
+							material->ColorModulate(settings::chams::teammates::color_backtrack.r() / 255.0f, settings::chams::teammates::color_backtrack.g() / 255.0f, settings::chams::teammates::color_backtrack.b() / 255.0f);
+							material->AlphaModulate(settings::chams::teammates::color_backtrack.a() / 255.0f);
+							material->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
+							g::mdl_render->ForcedMaterialOverride(material);
+							original(g::mdl_render, context, &state, &info, bt_data.at(i).matrix);
+							g::mdl_render->ForcedMaterialOverride(nullptr);
 						}
 					}
 				}
@@ -911,8 +926,8 @@ namespace aimbot
 		
 		auto set_and_restore_poses = [](const Vector& origin, const QAngle& angles, const std::function<void()>& fn)
 		{
-			const auto old_pos = target->m_vecOrigin();
-			const auto old_angles = target->GetAbsAngles();
+			const auto& old_pos = target->m_vecOrigin();
+			const auto& old_angles = target->GetAbsAngles();
 
 			target->SetAbsOrigin(origin);
 			//target->SetAbsAngles(angles);

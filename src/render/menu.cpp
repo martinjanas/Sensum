@@ -7,7 +7,7 @@
 #include "../helpers/console.h"
 #include "../helpers/notifies.h"
 #include "../features/features.h"
-#define VERSION "1.11"
+#define VERSION "1.12"
 
 const char* const KeyNames[] = {
     "Unknown",
@@ -358,7 +358,7 @@ namespace render
 				{ 30,{ "Tec-9", WEAPONTYPE_PISTOL } },
 				{ 64,{ "R8 Revolver", WEAPONTYPE_PISTOL } },
 				{ 4,{ "Glock-18", WEAPONTYPE_PISTOL } },
-
+               
 				{ 27,{ "MAG-7", WEAPONTYPE_SHOTGUN } },
 				{ 35,{ "Nova", WEAPONTYPE_SHOTGUN } },
 				{ 29,{ "Sawed-Off", WEAPONTYPE_SHOTGUN } },
@@ -465,7 +465,7 @@ namespace render
 
 					ImGui::Separator();
 
-					for (auto item : k_item_names)
+					for (auto& item : k_item_names)
 					{
 						if (item.second.type == group.first)
 						{
@@ -615,7 +615,7 @@ namespace render
 				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.8f, 0.1f, 0.1f, 1.f));
 				ImGui::PushStyleColor(ImGuiCol_ButtonOutline, ImVec4(0.8f, 0.1f, 0.1f, 1.f));
 
-				auto button_color = ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive);
+				auto& button_color = ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive);
 
 				for (size_t k = 0; k < menu_items_count; k++)
 				{

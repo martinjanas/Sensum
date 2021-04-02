@@ -89,7 +89,7 @@ namespace entities
 
 		g::engine_sound->GetActiveSounds(sounds);
 
-		const auto origin = local->m_vecOrigin();
+		const auto& origin = local->m_vecOrigin();
 
 		m_mutex_sounds.lock();
 		{
@@ -146,8 +146,8 @@ namespace entities
 		if (!collideable)
 			return {};
 
-		auto min = collideable->OBBMins();
-		auto max = collideable->OBBMaxs();
+		auto& min = collideable->OBBMins();
+		auto& max = collideable->OBBMaxs();
 
 		const matrix3x4_t& trans = ent->m_rgflCoordinateFrame();
 
@@ -431,7 +431,7 @@ namespace entities
 			player_data.draw_entity = player->DrawSpecificEntity();
 			player_data.player = player;
 			
-			auto weapData = player->m_hActiveWeapon();
+			auto& weapData = player->m_hActiveWeapon();
 
 			if (!weapData)
 				continue;
@@ -454,7 +454,7 @@ namespace entities
 
 			const auto on_screen = math::world2screen(player->m_vecOrigin(), origin);
 
-			const auto old_origin = player->GetAbsOrigin();
+			const auto& old_origin = player->GetAbsOrigin();
 			player->SetAbsOrigin(player_data.world_pos);
 			player->InvalidateBoneCache();
 

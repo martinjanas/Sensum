@@ -13,9 +13,6 @@ namespace render
 	{
 		void colors_tab()
 		{
-			auto& style = ImGui::GetStyle();
-			auto& colors = style.Colors;
-
 			child("Colors", []()
 			{
 					separator("Chams");
@@ -38,6 +35,9 @@ namespace render
 					ColorEdit4("Dropped Weapons##chams", &settings::chams::misc::color_dropped_weapons_chams, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
 
 					ColorEdit4("Dropped Defuse Kits     ##chams", &settings::chams::misc::color_dropped_defusekit_chams, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
+					ColorEdit4("Enemy Backtrack ##chams", &settings::chams::enemy::color_backtrack, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
+					ImGui::SameLine();
+					ColorEdit4("Team Backtrack ##chams", &settings::chams::teammates::color_backtrack, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
 
 					separator("ESP");
 					ColorEdit4("ESP Visible ", &settings::esp::visibleColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
@@ -54,60 +54,25 @@ namespace render
 					ColorEdit4("Bullet Tracer (?)", &settings::visuals::colorBulletTracer, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
 					tooltip("Disabled saving of Bullet Tracer - Causes bug that will make beams not render :(. Default color is purple.");
 					ColorEdit4("AA Indicator", &settings::esp::aa_indicator_color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
-					ColorEdit4("Sound ESP", &settings::esp::colorSoundEsp, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
+					ColorEdit4("Sound Beams", &settings::esp::colorSoundEsp, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
 
 					separator("Glow");
 
-					ColorEdit4("Enemy", &settings::glow::glowEnemyColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
+					ColorEdit4("Enemy Visible##glow", &settings::glow::enemy::visible_color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
 					ImGui::SameLine();
-					ColorEdit4("Planted C4##glow", &settings::glow::glowC4PlantedColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
+					ColorEdit4("Enemy XQZ##glow", &settings::glow::enemy::invisible_color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
+
+					ColorEdit4("Planted C4      ##glow", &settings::glow::misc::bomb::color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
 					ImGui::SameLine();
-					ColorEdit4("Weapons##glow", &settings::glow::glowDroppedWeaponsColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
+					ColorEdit4("Weapons##glow", &settings::glow::misc::weapons::color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
 					tooltip("Dropped Weapons");
-					ColorEdit4("Team  ", &settings::glow::glowTeamColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
+					ColorEdit4("Team Visible  ##glow", &settings::glow::teammates::visible_color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
 					ImGui::SameLine();
-					ColorEdit4("Grenades  ##glow", &settings::glow::glowNadesColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
-					ImGui::SameLine();
-					ColorEdit4("Kits##glow", &settings::glow::glowDroppedKitsColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
-			});
+					ColorEdit4("Team XQZ##glow", &settings::glow::teammates::invisible_color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
 
-			ImGui::NextColumn();
-
-			child("Menu Theme", [&]()
-			{
-					ColorEdit4("Window BG", &colors[ImGuiCol_WindowBg], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
+					ColorEdit4("Grenades       ##glow", &settings::glow::misc::nades::color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
 					ImGui::SameLine();
-					ColorEdit4("Text", &colors[ImGuiCol_Text], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
-					ColorEdit4("Text Disabled", &colors[ImGuiCol_TextDisabled], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
-					ImGui::SameLine();
-					ColorEdit4("Button Text", &colors[ImGuiCol_ButtonText], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
-					ColorEdit4("Button Hovered", &colors[ImGuiCol_ButtonHovered], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
-					ImGui::SameLine();
-					ColorEdit4("Button Active", &colors[ImGuiCol_ButtonActive], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
-					ColorEdit4("Button Outline", &colors[ImGuiCol_ButtonOutline], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
-					ImGui::SameLine();
-					ColorEdit4("Check Mark", &colors[ImGuiCol_CheckMark], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
-					ColorEdit4("Check BG", &colors[ImGuiCol_CheckBg], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
-					ImGui::SameLine();
-					ColorEdit4("Check BG Active", &colors[ImGuiCol_CheckBgActive], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
-					ColorEdit4("Check BG Hovered", &colors[ImGuiCol_CheckBgHovered], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
-					ImGui::SameLine();
-					ColorEdit4("Frame BG", &colors[ImGuiCol_FrameBg], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
-					ColorEdit4("Frame BG Hovered", &colors[ImGuiCol_FrameBgHovered], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
-					ImGui::SameLine();
-					ColorEdit4("Frame BG Active", &colors[ImGuiCol_FrameBgActive], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
-					ColorEdit4("Slider BG", &colors[ImGuiCol_SliderBg], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
-					
-					/*colors[ImGuiCol_SliderBgActive] = ImVec4(0.2f, 0.2f, 0.2f, 1.f);
-					colors[ImGuiCol_SliderBgHovered] = ImVec4(0.16f, 0.16f, 0.16f, 1.f);
-					colors[ImGuiCol_SliderGrab] = ImVec4(0.26f, 0.26f, 0.26f, 0.8f);
-					colors[ImGuiCol_SliderGrabActive] = ImVec4(0.26f, 0.26f, 0.26f, 1.f);
-
-					colors[ImGuiCol_ListBoxItem] = ImVec4(0.1f, 0.1f, 0.1f, 1.f);
-					colors[ImGuiCol_ListBoxItemActive] = ImVec4(0.2f, 0.2f, 0.2f, 1.f);
-					colors[ImGuiCol_ListBoxItemHovered] = ImVec4(0.26f, 0.26f, 0.26f, 1.f);
-
-					colors[ImGuiCol_PopupBg] = ImVec4(0.2f, 0.2f, 0.2f, 0.98f);*/
+					ColorEdit4("Kits##glow", &settings::glow::misc::kits::color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueBar);
 			});
 		}
 	}

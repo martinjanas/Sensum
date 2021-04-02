@@ -59,33 +59,56 @@ namespace settings
 
 	namespace glow
 	{
-		bool glowEnemyEnabled = false;
-		bool glowTeamEnabled = false;
-		bool glowC4PlantedEnabled = false;
-		bool glowDroppedWeaponsEnabled = false;
-		bool glowDroppedKitsEnabled = false;
-		bool glowNadesEnabled = false;
-		bool glowOverride = false;
-		bool visible_only = false;
-		bool teammates_visible_only = false;
-
-		int style_enemy = 0;
-		int style_teammate = 0;
 		int glow_list_mode = 0;
 
-		
-		Color glowEnemyColor = Color(255, 0, 0, 255);
-		Color glowTeamColor(0, 255, 0, 255);
-		Color glowC4PlantedColor = Color(255, 255, 255, 255);
-		Color glowDroppedWeaponsColor = Color(255, 255, 255, 255);
-		Color glowDroppedKitsColor = Color(255, 255, 255, 255);
-		Color glowNadesColor = Color(255, 255, 255, 255);
-		Color glowHE = Color(255, 0, 0, 255);
-		Color glowMolotovIncendiary = Color(255, 128, 0, 255);
-		Color glowFlashbang = Color(255, 255, 0);
-		Color glowDecoy = Color(0, 255, 0, 255);
-		Color glowSmoke = Color(105, 105, 105, 255);
-		Color glowDroppedC4Color = Color(0, 255, 0, 255);
+		namespace enemy
+		{
+			bool enabled = false;
+			bool visible_only = false;
+
+			int style = 0;
+			
+			Color visible_color = Color::Green;
+			Color invisible_color = Color::Red;
+		}
+
+		namespace teammates
+		{
+			bool enabled = false;
+			bool visible_only = false;
+
+			int style = 0;
+
+			Color visible_color = Color::Blue;
+			Color invisible_color = Color::Red;
+		}
+
+		namespace misc
+		{
+			namespace nades
+			{
+				bool enabled = false;
+				Color color = Color::Red;
+			}
+
+			namespace kits
+			{
+				bool enabled = false;
+				Color color = Color::Red;
+			}
+
+			namespace weapons
+			{
+				bool enabled = false;
+				Color color = Color::Red;
+			}
+
+			namespace bomb
+			{
+				bool enabled = false;
+				Color color = Color::Red;
+			}
+		}
 	}
 
 	namespace chams
@@ -106,6 +129,7 @@ namespace settings
 
 			Color color_visible = Color(0, 128, 0, 255);
 			Color color_not_visible = Color(255, 0, 0, 255);
+			Color color_backtrack = Color(0, 255, 128, 128);
 		}
 
 		namespace teammates
@@ -122,6 +146,7 @@ namespace settings
 
 			Color color_visible = Color(0, 128, 0, 255);
 			Color color_not_visible = Color(255, 0, 0, 255);
+			Color color_backtrack = Color(0, 255, 128, 128);
 		}
 
 		namespace localplayer
@@ -309,14 +334,13 @@ namespace settings
 
 				Option::Load(root["chams.localplayer_enabled"], chams::localplayer::enabled, false);
 
-				//Option::Load(root["chams.flat"], chams::flat, false);
-				//Option::Load(root["chams.wireframe"], chams::wireframe, false);
-				//Option::Load(root["chams.health"], chams::health_chams);
 				Option::Load(root["chams.enemy_color_vis"], chams::enemy::color_visible);
 				Option::Load(root["chams.team_color_vis"], chams::teammates::color_visible);
 				Option::Load(root["chams.local_color_vis"], chams::localplayer::color);
 				Option::Load(root["chams.enemy_color_xqz"], chams::enemy::color_not_visible);
 				Option::Load(root["chams.team_color_xqz"], chams::teammates::color_not_visible);
+				Option::Load(root["chams.enemy_backtrack_color"], chams::enemy::color_backtrack);
+				Option::Load(root["chams.team_backtrack_color"], chams::teammates::color_backtrack);
 
 				Option::Load(root["chams.legit_aa"], chams::localplayer::desync_chams);
 				Option::Load(root["chams.legitaa_material_mode"], chams::localplayer::desync_chams_mode);
@@ -387,24 +411,25 @@ namespace settings
 				Option::Load(root["misc.smoke_helper"], misc::smoke_helper);
 				Option::Load(root["misc.flash_helper"], misc::flash_helper);
 
-				Option::Load(root["glow.enemy"], glow::glowEnemyEnabled);
-				Option::Load(root["glow.team"], glow::glowTeamEnabled);
-				Option::Load(root["glow.plantedc4"], glow::glowC4PlantedEnabled);
-				Option::Load(root["glow.nades"], glow::glowNadesEnabled);
-				Option::Load(root["glow.dropped_weapons"], glow::glowDroppedWeaponsEnabled);
-				Option::Load(root["glow.dropped_kits"], glow::glowDroppedKitsEnabled);
-				Option::Load(root["glow.override"], glow::glowOverride);
+				Option::Load(root["glow.enemy"], glow::enemy::enabled);
+				Option::Load(root["glow.team"], glow::teammates::enabled);
+				Option::Load(root["glow.plantedc4"], glow::misc::bomb::enabled);
+				Option::Load(root["glow.nades"], glow::misc::nades::enabled);
+				Option::Load(root["glow.dropped_weapons"], glow::misc::weapons::enabled);
+				Option::Load(root["glow.dropped_kits"], glow::misc::kits::enabled);
 				Option::Load(root["glow.list_mode"], glow::glow_list_mode);
 
-				Option::Load(root["glow.enemy_color"], glow::glowEnemyColor);
-				Option::Load(root["glow.team_color"], glow::glowTeamColor);
-				Option::Load(root["glow.plantedc4_color"], glow::glowC4PlantedColor);
-				Option::Load(root["glow.nades_color"], glow::glowNadesColor);
-				Option::Load(root["glow.dropped_weapons_color"], glow::glowDroppedWeaponsColor);
-				Option::Load(root["glow.dropped_kits_color"], glow::glowDroppedKitsColor);
+				Option::Load(root["glow.enemy_visible_only"], glow::enemy::visible_only);
+				Option::Load(root["glow.team_visible_only"], glow::teammates::visible_only);
 
-				Option::Load(root["glow.enemy_visible_only"], glow::visible_only);
-				Option::Load(root["glow.teammates_visible_only"], glow::teammates_visible_only);
+				Option::Load(root["glow.enemy_color"], glow::enemy::visible_color);
+				Option::Load(root["glow.enemy_invisible_color"], glow::enemy::invisible_color);
+				Option::Load(root["glow.team_color"], glow::teammates::visible_color);
+				Option::Load(root["glow.team_invisible_color"], glow::teammates::invisible_color);
+				Option::Load(root["glow.plantedc4_color"], glow::misc::bomb::color);
+				Option::Load(root["glow.nades_color"], glow::misc::nades::color);
+				Option::Load(root["glow.dropped_weapons_color"], glow::misc::weapons::color);
+				Option::Load(root["glow.dropped_kits_color"], glow::misc::kits::color);
 
 				Option::Load(root["desync.enabled"], desync::enabled);
 				Option::Load(root["desync.yaw_flip"], desync::yaw_flip);
@@ -562,11 +587,6 @@ namespace settings
 
 				config["chams.localplayer_enabled"] = chams::localplayer::enabled;
 
-				//config["chams.flat"] = chams::flat;
-				//config["chams.wireframe"] = chams::wireframe;
-				//config["chams.health"] = chams::health_chams;
-				
-
 				config["chams.legit_aa"] = chams::localplayer::desync_chams;
 				config["chams.legitaa_material_mode"] = chams::localplayer::desync_chams_mode;
 				
@@ -582,6 +602,8 @@ namespace settings
 				Option::Save(config["chams.local_color_vis"], chams::localplayer::color);
 				Option::Save(config["chams.enemy_color_xqz"], chams::enemy::color_not_visible);
 				Option::Save(config["chams.team_color_xqz"], chams::teammates::color_not_visible);
+				Option::Save(config["chams.enemy_backtrack_color"], chams::enemy::color_backtrack);
+				Option::Save(config["chams.team_backtrack_color"], chams::teammates::color_backtrack);
 
 				Option::Save(config["chams.dropped_weapons_color"], chams::misc::color_dropped_weapons_chams);
 				Option::Save(config["chams.plantedc4_color"], chams::misc::color_planted_bomb_chams);
@@ -644,24 +666,27 @@ namespace settings
 				Option::Save(config["mics.rcs_cross_color"], visuals::recoilcolor);
 				Option::Save(config["misc.bullet_tracer_color"], settings::visuals::colorBulletTracer);
 
-				config["glow.enemy"] = glow::glowEnemyEnabled;
-				config["glow.team"] = glow::glowTeamEnabled;
-				config["glow.dropped_weapons"] = glow::glowDroppedWeaponsEnabled;
-				config["glow.dropped_kits"] = glow::glowDroppedKitsEnabled;
-				config["glow.plantedc4"] = glow::glowC4PlantedEnabled;
-				config["glow.nades"] = glow::glowNadesEnabled;
-				config["glow.override"] = glow::glowOverride;
+				config["glow.enemy"] = glow::enemy::enabled;
+				config["glow.team"] = glow::teammates::enabled;
+				config["glow.dropped_weapons"] = glow::misc::weapons::enabled;
+				config["glow.dropped_kits"] = glow::misc::kits::enabled;
+				config["glow.plantedc4"] = glow::misc::bomb::enabled;
+				config["glow.nades"] = glow::misc::nades::enabled;
 				config["glow.list_mode"] = glow::glow_list_mode;
 
-				config["glow.enemy_visible_only"] = glow::visible_only;
-				config["glow.teammates_visible_only"] = glow::teammates_visible_only;
+				config["glow.enemy_visible_only"] = glow::enemy::visible_only;
+				config["glow.teammates_visible_only"] = glow::teammates::visible_only;
 
-				Option::Save(config["glow.enemy_color"], glow::glowEnemyColor);
-				Option::Save(config["glow.team_color"], glow::glowTeamColor);
-				Option::Save(config["glow.plantedc4_color"], glow::glowC4PlantedColor);
-				Option::Save(config["glow.nades_color"], glow::glowNadesColor);
-				Option::Save(config["glow.dropped_weapons_color"], glow::glowDroppedWeaponsColor);
-				Option::Save(config["glow.dropped_kits_color"], glow::glowDroppedKitsColor);
+				Option::Save(config["glow.enemy_color"], glow::enemy::visible_color);
+				Option::Save(config["glow.team_color"], glow::teammates::visible_color);
+
+				Option::Save(config["glow.enemy_invisible_color"], glow::enemy::invisible_color);
+				Option::Save(config["glow.team_invisible_color"], glow::teammates::invisible_color);
+
+				Option::Save(config["glow.plantedc4_color"], glow::misc::bomb::color);
+				Option::Save(config["glow.nades_color"], glow::misc::nades::color);
+				Option::Save(config["glow.dropped_weapons_color"], glow::misc::weapons::color);
+				Option::Save(config["glow.dropped_kits_color"], glow::misc::kits::color);
 
 				config["desync.enabled"] = desync::enabled;
 				config["desync.yaw_flip"] = desync::yaw_flip;

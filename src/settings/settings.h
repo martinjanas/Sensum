@@ -186,34 +186,57 @@ namespace settings
 		extern Color bone_esp_color;
 	}
 
-	namespace glow //Im gonna rewrite this glow namespace into structs for enemy, teammates & localplayer as in the chams namespace, I'm just lazy atm...
+	namespace glow
 	{
-		extern bool glowEnemyEnabled;
-		extern bool glowTeamEnabled;
-		extern bool glowC4PlantedEnabled;
-		extern bool glowDroppedWeaponsEnabled;
-		extern bool glowDroppedKitsEnabled;
-		extern bool glowNadesEnabled;
-		extern bool glowOverride;
-		extern bool visible_only;
-		extern bool teammates_visible_only; //Too lazy to make structs for enemy, teammates & localplayer, maybe later, sorry.Jesus... //MartiN409
-		
-		extern int style_enemy;
-		extern int style_teammate;
 		extern int glow_list_mode;
+		namespace enemy
+		{
+			extern bool enabled;
+			extern bool visible_only;
 
-		extern Color glowEnemyColor;
-		extern Color glowTeamColor;
-		extern Color glowC4PlantedColor;
-		extern Color glowDroppedWeaponsColor;
-		extern Color glowDroppedKitsColor;
-		extern Color glowNadesColor;
-		extern Color glowHE;
-		extern Color glowMolotovIncendiary;
-		extern Color glowFlashbang;
-		extern Color glowDecoy;
-		extern Color glowSmoke;
-		extern Color glowDroppedC4Color;
+			extern int style;
+
+			extern Color visible_color;
+			extern Color invisible_color;
+		}
+
+		namespace teammates
+		{
+			extern bool enabled;
+			extern bool visible_only;
+
+			extern int style;
+
+			extern Color visible_color;
+			extern Color invisible_color;
+		}
+
+		namespace misc
+		{
+			namespace nades
+			{
+				extern bool enabled;
+				extern Color color;
+			}
+
+			namespace kits
+			{
+				extern bool enabled;
+				extern Color color;
+			}
+
+			namespace weapons
+			{
+				extern bool enabled;
+				extern Color color;
+			}
+
+			namespace bomb
+			{
+				extern bool enabled;
+				extern Color color;
+			}
+		}
 	}
 	
 	namespace chams
@@ -234,6 +257,7 @@ namespace settings
 
 			extern Color color_visible;
 			extern Color color_not_visible;
+			extern Color color_backtrack;
 		}
 
 		namespace teammates
@@ -250,6 +274,7 @@ namespace settings
 
 			extern Color color_visible;
 			extern Color color_not_visible;
+			extern Color color_backtrack;
 		}
 
 		namespace localplayer

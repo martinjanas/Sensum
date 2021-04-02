@@ -191,8 +191,8 @@ namespace render
 						case WEAPON_DEAGLE:
 						case WEAPON_ELITE:
 						case WEAPON_HKP2000:
-						case 201:
 							checkbox("Auto Pistol", &settings->autopistol);
+							break;
 						default:
 							break;
 						}
@@ -261,7 +261,7 @@ namespace render
 					if (!utils::is_connected())
 						return;
 
-					auto weapon = g::local_player->m_hActiveWeapon();
+					auto& weapon = g::local_player->m_hActiveWeapon();
 					if (!weapon || !weapon->IsWeapon())
 						return;
 

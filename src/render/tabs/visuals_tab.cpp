@@ -206,14 +206,6 @@ namespace render
 							ImGui::NextColumn();
 
 							checkbox("Backtrack", &settings::chams::enemy::backtrack_chams);
-
-							ImGui::NextColumn();
-
-							ImGui::PushItemWidth(-1);
-							{
-								ImGui::Combo("##enemybtchams", &settings::chams::enemy::backtrack_chams_mode, backtrack_chams_modes, IM_ARRAYSIZE(backtrack_chams_modes));
-							}
-							ImGui::PopItemWidth();
 						}
 						columns(1);
 						break;
@@ -235,10 +227,6 @@ namespace render
 							ImGui::NextColumn();
 
 							checkbox("Backtrack", &settings::chams::teammates::backtrack_chams);
-
-							ImGui::PushItemWidth(-1);
-							ImGui::Combo("List##teammatesbtchams", &settings::chams::teammates::backtrack_chams_mode, backtrack_chams_modes, IM_ARRAYSIZE(backtrack_chams_modes));
-							ImGui::PopItemWidth();
 						}
 						columns(1);
 						break;
@@ -326,58 +314,57 @@ namespace render
 							case 0:
 								columns(2);
 								{
-									checkbox("Enabled", &settings::glow::glowEnemyEnabled);
+									checkbox("Enabled", &settings::glow::enemy::enabled);
 
 									ImGui::NextColumn();
 
 									ImGui::PushItemWidth(-1);
-									ImGui::Combo("Mode", &settings::glow::style_enemy, glow_modes, IM_ARRAYSIZE(glow_modes));
+									checkbox("Visible Only", &settings::glow::enemy::visible_only);
 									ImGui::PopItemWidth();
 
-									checkbox("Visible Only", &settings::glow::visible_only);
+									ImGui::Combo("Mode", &settings::glow::enemy::style, glow_modes, IM_ARRAYSIZE(glow_modes));
 								}
 								columns(1);
 								break;
 							case 1:
 								columns(2);
 								{
-									checkbox("Enabled", &settings::glow::glowTeamEnabled);
+									checkbox("Enabled", &settings::glow::teammates::enabled);
 
 									ImGui::NextColumn();
 
 									ImGui::PushItemWidth(-1);
-									ImGui::Combo("Mode", &settings::glow::style_teammate, glow_modes, IM_ARRAYSIZE(glow_modes));
+									checkbox("Visible Only", &settings::glow::teammates::visible_only);
 									ImGui::PopItemWidth();
 
-									checkbox("Visible Only", &settings::glow::teammates_visible_only);
+									ImGui::Combo("Mode", &settings::glow::teammates::style, glow_modes, IM_ARRAYSIZE(glow_modes));
 								}
 								columns(1);
 								break;
 							case 2:
 								columns(2);
 								{
-									checkbox("Planted C4", &settings::glow::glowC4PlantedEnabled);
+									checkbox("Planted C4", &settings::glow::misc::bomb::enabled);
 
 									ImGui::NextColumn();
 
 									ImGui::PushItemWidth(-1);
-									checkbox("Nades", &settings::glow::glowNadesEnabled);
+									checkbox("Nades", &settings::glow::misc::nades::enabled);
 									ImGui::PopItemWidth();
 								}
 								columns(1);
 
 								columns(2);
 								{
-									checkbox("Dropped Guns", &settings::glow::glowDroppedWeaponsEnabled);
+									checkbox("Dropped Guns", &settings::glow::misc::weapons::enabled);
 
 									ImGui::NextColumn();
 
 									ImGui::PushItemWidth(-1);
-									checkbox("Dropped Kits", &settings::glow::glowDroppedKitsEnabled);
+									checkbox("Dropped Kits", &settings::glow::misc::kits::enabled);
 									ImGui::PopItemWidth();
 								}
 								columns(1);
-								break;
 							}
 						});
 				});

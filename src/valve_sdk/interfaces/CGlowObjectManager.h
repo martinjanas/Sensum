@@ -10,6 +10,16 @@ public:
 		return entity;
 	}*/
 
+	void set(Color& color, bool render_when_occluded, bool render_when_unoccluded, int style)
+	{
+		this->clr = Vector(color.r() / 255.f, color.g() / 255.f, color.b() / 255.f);
+		this->m_flAlpha = (float)color.a();
+
+		this->m_bRenderWhenOccluded = render_when_occluded;
+		this->m_bRenderWhenUnoccluded = render_when_unoccluded;
+		this->m_nGlowStyle = style;
+	}
+
 	void color(Color& color)
 	{
 		this->clr = Vector(color.r() / 255.f, color.g() / 255.f, color.b() / 255.f);
