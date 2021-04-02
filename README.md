@@ -1,6 +1,6 @@
 # Sensum - Internal legit cheat - [Discord Server](https://discord.gg/dDwHyydXw7)
 
-List of features: https://pastebin.com/twMkYr0q | **Check the Discussions tab to request a feature.**
+[**List of features**](https://pastebin.com/twMkYr0q) | ***Check the Discussions tab to request a feature.***
 
 Remember to compile in Release x86 to minimalize fps drops and other problems, config location since now is in "C:\\Sensum".
 
