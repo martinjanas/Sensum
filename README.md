@@ -1,4 +1,4 @@
-# Sensum - Internal legit cheat - https://discord.gg/dDwHyydXw7
+# Sensum - Internal legit cheat - [Discord Server](https://discord.gg/dDwHyydXw7)
 
 List of features: https://pastebin.com/twMkYr0q | **Check the Discussions tab to request a feature.**
 
