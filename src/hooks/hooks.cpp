@@ -261,11 +261,11 @@ namespace hooks
 		if (g::engine_client->IsInGame() && g::engine_client->IsConnected() && settings::misc::noscope && !strcmp("HudZoom", g::vgui_panel->GetName(panel)))
 			return;
 
-		if (settings::misc::smoke_helper)
+		/*if (settings::misc::smoke_helper)
 		{
 			visuals::DrawRing3D();
 			visuals::DrawRing3DPopflash();
-		}
+		}*/
 
 		original(g::vgui_panel, panel, forceRepaint, allowForce);
 
@@ -329,7 +329,7 @@ namespace hooks
 	{
 		if (g::mdl_render->IsForcedMaterialOverride() && !strstr(info.pModel->szName, "arms") && !strstr(info.pModel->szName, "weapons/v_"))
 			return original(g::mdl_render, context, &state, &info, bone);
-		
+
 		aimbot::backtrack_chams(context, state, info, bone);
 		Chams::Get().OnDrawModelExecute(context, state, info, bone);
 		

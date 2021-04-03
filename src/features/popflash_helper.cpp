@@ -513,7 +513,7 @@ namespace visuals
 				{
 					if (g::local_player->m_hActiveWeapon()->IsFlash() && dist <= 1000.f)
 					{
-						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 12, Color::Red, 1.0f);
+						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 255, Color::Red, 1.0f);
 					}
 				}
 			}
@@ -534,7 +534,7 @@ namespace visuals
 				{
 					if (g::local_player->m_hActiveWeapon()->IsFlash() && dist <= 500.f)
 					{
-						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 12, Color::Red, 1.0f);
+						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 255, Color::Red, 1.0f);
 					}
 				}
 			}
@@ -555,7 +555,7 @@ namespace visuals
 				{
 					if (g::local_player->m_hActiveWeapon()->IsFlash() && dist <= 500.f)
 					{
-						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 12, Color::Red, 1.0f);
+						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 255, Color::Red, 1.0f);
 					}
 				}
 			}
@@ -576,7 +576,7 @@ namespace visuals
 				{
 					if (g::local_player->m_hActiveWeapon()->IsFlash() && dist <= 500.f)
 					{
-						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 12, Color::Red, 1.0f);
+						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 255, Color::Red, 1.0f);
 					}
 				}
 			}
@@ -597,7 +597,7 @@ namespace visuals
 				{
 					if (g::local_player->m_hActiveWeapon()->IsFlash() && dist <= 500.f)
 					{
-						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 12, Color::Red, 1.0f);
+						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 255, Color::Red, 1.0f);
 					}
 				}
 			}
@@ -618,7 +618,7 @@ namespace visuals
 				{
 					if (g::local_player->m_hActiveWeapon()->IsFlash() && dist <= 500.f)
 					{
-						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 12, Color::Red, 1.0f);
+						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 255, Color::Red, 1.0f);
 					}
 				}
 			}
@@ -639,7 +639,7 @@ namespace visuals
 				{
 					if (g::local_player->m_hActiveWeapon()->IsFlash() && dist <= 500.f)
 					{
-						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 12, Color::Red, 1.0f);
+						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 255, Color::Red, 1.0f);
 					}
 				}
 			}
@@ -660,7 +660,7 @@ namespace visuals
 				{
 					if (g::local_player->m_hActiveWeapon()->IsFlash() && dist <= 500.f)
 					{
-						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 12, Color::Red, 1.0f);
+						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 255, Color::Red, 1.0f);
 					}
 				}
 			}

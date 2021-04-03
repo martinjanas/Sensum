@@ -17,7 +17,7 @@ public:
 
 GrenadeData Mirage[] = //Info, Position, Angle
 {
-	{ "Connector", "JUMP", Vector(1135.f, 647.f, -197.f), Vector(-29.42f, -140.f, 0.f), 60.f },
+	{ "Connector", "JUMP", Vector(1135.99f, 647.98f, -197.32f), Vector(-28.93f, -140.63f, 0.0f), 60.f },
 	{ "Jungle", "LCLICK", Vector(815.f, -1416.f, -44.f), Vector(-28.29f, -173.14f, 0.f), 60.f },
 	{ "Window Mid", "JUMP", Vector(1423.964355f, -248.026840f, -167.906188f), Vector(-25.723558f, -170.518921f, 0.f), 0.f },
 	{ "Catwalk", "LCLICK", Vector(1423.997803f, 71.985359f, -112.840103f), Vector(-32.653351f, -163.530762f, 0.f), 0.f },

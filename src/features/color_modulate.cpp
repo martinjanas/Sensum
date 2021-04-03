@@ -24,6 +24,7 @@ namespace color_modulation
 	ConVar* r_3dsky = nullptr;
 	ConVar* r_drawspecificstaticprop = nullptr;
 	ConVar* engine_focus = nullptr;
+	ConVar* cl_threaded_bone_setup = nullptr;
 	ConVar* r_modelAmbientMin = nullptr;
 	ConVar* mat_postprocess_enable = nullptr;
 	ConVar* mat_force_tonemap_scale = nullptr;
@@ -250,12 +251,20 @@ namespace color_modulation
 			engine_focus->m_fnChangeCallbacks.m_Size = 0;
 		}
 
+		if (!cl_threaded_bone_setup)
+		{
+			cl_threaded_bone_setup = g::cvar->find(xorstr_("cl_threaded_bone_setup"));
+			cl_threaded_bone_setup->m_fnChangeCallbacks.m_Size = 0;
+		}
+
 		r_modelAmbientMin->SetValue(settings::visuals::night_mode ? 1.f : 0.f);
 		mat_force_tonemap_scale->SetValue(settings::visuals::night_mode ? 0.2f : 1.f);
 
 		viewmodel_fov->SetValue(settings::misc::viewmodel_fov);
 		mat_postprocess_enable->SetValue(post_processing ? 1 : 0);
 		engine_focus->SetValue(0);
+		cl_threaded_bone_setup->SetValue(1); //Threaded bone setup for more fps, found this while typing "find bones" into the console.
+		//If you google its cvar name there should be reddit post about it and how it aparently boosts fps, the post is from 2015.
 
 		static auto backup_viewmodel_x = g::cvar->find("viewmodel_offset_x")->GetFloat();
 		static auto backup_viewmodel_y = g::cvar->find("viewmodel_offset_y")->GetFloat();

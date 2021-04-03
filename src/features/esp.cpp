@@ -629,7 +629,7 @@ void VGSHelper::DrawRing3D(int16_t x, int16_t y, int16_t z, int16_t radius, uint
 			end22d.x = end2d.x;
 			end22d.y = end2d.y;
 
-			VGSHelper::Get().DrawLine(start22d[0], start22d[1], end22d[0], end22d[1], color1, thickness);
+			globals::draw_list->AddLine(ImVec2(start22d.x, start22d.y), ImVec2(end22d.x, end22d.y), utils::to_im32(color1), thickness);
 		}
 	}
 }

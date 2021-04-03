@@ -33,6 +33,12 @@ namespace hooks
 		visuals::render(globals::draw_list);
 		//features::aimlines(globals::draw_list); //Work in progress - I need to figure out how to make the lines not render through walls.
 
+		if (settings::misc::smoke_helper)
+		{
+			visuals::DrawRing3D();
+			visuals::DrawRing3DPopflash();
+		}
+
 		ImGui::Render();
 
 		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());

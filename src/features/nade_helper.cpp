@@ -477,7 +477,7 @@ namespace visuals
 				{
 					if (g::local_player->m_hActiveWeapon()->IsSmoke() && dist <= 500.f)
 					{
-						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 12, Color::White, 1.0f);
+						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 255, Color::White, 1.0f);
 					}
 				}
 			}
@@ -495,7 +495,7 @@ namespace visuals
 				{
 					if (g::local_player->m_hActiveWeapon()->IsSmoke() && dist <= 500.f)
 					{
-						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 12, Color::White, 1.0f);
+						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 255, Color::White, 1.0f);
 					}
 				}
 			}
@@ -513,7 +513,7 @@ namespace visuals
 				{
 					if (g::local_player->m_hActiveWeapon()->IsSmoke() && dist <= 500.f)
 					{
-						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 12, Color::White, 1.0f);
+						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 255, Color::White, 1.0f);
 					}
 				}
 			}
@@ -531,7 +531,7 @@ namespace visuals
 				{
 					if (g::local_player->m_hActiveWeapon()->IsSmoke() && dist <= 500.f)
 					{
-						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 12, Color::White, 1.0f);
+						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 255, Color::White, 1.0f);
 					}
 				}
 			}
@@ -549,7 +549,7 @@ namespace visuals
 				{
 					if (g::local_player->m_hActiveWeapon()->IsSmoke() && dist <= 500.f)
 					{
-						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 12, Color::White, 1.0f);
+						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 255, Color::White, 1.0f);
 					}
 				}
 			}
@@ -567,7 +567,7 @@ namespace visuals
 				{
 					if (g::local_player->m_hActiveWeapon()->IsSmoke() && dist <= 500.f)
 					{
-						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 12, Color::White, 1.0f);
+						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 255, Color::White, 1.0f);
 					}
 				}
 			}
@@ -603,7 +603,7 @@ namespace visuals
 				{
 					if (g::local_player->m_hActiveWeapon()->IsSmoke() && dist <= 500.f)
 					{
-						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 12, Color::White, 1.0f);
+						VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 255, Color::White, 1.0f);
 					}
 				}
 			}
