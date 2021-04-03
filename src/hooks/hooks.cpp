@@ -319,6 +319,37 @@ namespace hooks
 		if (settings::chams::localplayer::desync_chams && settings::desync::enabled)
 			visuals::DesyncChams();
 
+		/*static IMaterial* material = g::mat_system->FindMaterial("debug/debugambientcube", TEXTURE_GROUP_MODEL);
+
+		for (int i = 1; i < g::entity_list->GetHighestEntityIndex(); i++)
+		{
+			auto player = c_base_player::GetPlayerByIndex(i);
+
+			if (player)
+			{
+				auto client_class = player->GetClientClass();
+
+				if (!client_class)
+					return;
+
+				auto class_id = client_class->m_ClassID;
+
+				if (!class_id)
+					return;
+
+				if (class_id == EClassId::CCSRagdoll)
+				{
+					material->ColorModulate(Color::Green.r() / 255.0f, Color::Green.g() / 255.0f, Color::Green.b() / 255.0f);
+					material->AlphaModulate(Color::Green.a() / 255.0f);
+					material->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
+
+					g::mdl_render->ForcedMaterialOverride(material);
+					player->DrawModel(1, 255);
+					g::mdl_render->ForcedMaterialOverride(nullptr);
+				}
+			}
+		}*/
+
 		original(view);
 
 		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())

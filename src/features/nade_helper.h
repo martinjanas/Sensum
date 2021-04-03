@@ -5,18 +5,17 @@
 #include "../features/features.h"
 #include "../settings/globals.h"
 
-class GrenadeData
+struct grenade_data_t
 {
-public:
 	std::string info;
 	std::string type;
-	Vector pos = Vector(0, 0, 0);
-	Vector ang = Vector(0, 0, 0);
-	float ring_height = 0.f;
+	Vector pos;
+	Vector ang;
+	float ring_height;
 };
 
-GrenadeData Mirage[] = //Info, Position, Angle
-{
+std::vector<grenade_data_t> grenade_data_mirage = {
+
 	{ "Connector", "JUMP", Vector(1135.99f, 647.98f, -197.32f), Vector(-28.93f, -140.63f, 0.0f), 60.f },
 	{ "Jungle", "LCLICK", Vector(815.f, -1416.f, -44.f), Vector(-28.29f, -173.14f, 0.f), 60.f },
 	{ "Window Mid", "JUMP", Vector(1423.964355f, -248.026840f, -167.906188f), Vector(-25.723558f, -170.518921f, 0.f), 0.f },
@@ -48,8 +47,8 @@ GrenadeData Mirage[] = //Info, Position, Angle
 	{ "CT Spawn", "JUMP", Vector(1087.09f, -1016.95f, -194.16f), Vector(-29.63f, -144.91f, 0.f), 60.f }
 };
 
-GrenadeData Inferno[] = //Info, Position, Angle, Ring Height
-{
+std::vector<grenade_data_t> grenade_data_inferno = {
+
 	{ "CT Spawn", "LCLICK", Vector(116.294136f, 1580.581055f, 185.121933f), Vector(-32.574593f, 58.334656f, 0.f), 60.f },
 	{ "Bombsite B", "LCLICK", Vector(1971.687988f, 2636.702393f, 128.093811f), Vector(-39.996227f, 175.975357f, 0.f), -10.f },
 	{ "Mid", "RUN", Vector(-857.968750f, 449.902283f, -31.604805f),  Vector(-44.401531f, 1.405892f, 0.f), -10.f},
@@ -66,8 +65,8 @@ GrenadeData Inferno[] = //Info, Position, Angle, Ring Height
 	{ "Balcony", "LCLICK", Vector(1913.227295f, 1225.968750f, 174.093811f),  Vector(-46.497322f, -87.005005f, 0.f), 0.f }
 };
 
-GrenadeData Dust2[] =
-{
+std::vector<grenade_data_t> grenade_data_dust2 = {
+
 	{ "B Entrance", "LCLICK", Vector(-1846.553223f, 1232.569824f, 32.496025f), Vector(-8.613732f, 118.773392f, 0.f), 0.f },
 	{ "CT Mid", "LCLICK", Vector(-538.606567f, 1382.031250f, -111.957108f), Vector(-35.360550f, 53.845985f, 0.f), 0.f },
 	{ "Xbox", "LCLICK", Vector(229.130554f, 112.497559f, 5.215744f), Vector(-40.624023f, 108.758316f, 0.f), 0.f },
@@ -79,16 +78,16 @@ GrenadeData Dust2[] =
 	{ "Upper Tunnel", "LCLICK", Vector(-985.452942f, 2553.223877f, 1.318862f), Vector(-26.764244f, -143.848251f, 0.f), 0.f }
 };
 
-GrenadeData Nuke[] =
-{
+std::vector<grenade_data_t> grenade_data_nuke = {
+
 	{ "Hangar", "LCLICK", Vector(-164.092941f, -1954.733765f, -415.916107f), Vector(-13.613587f, 1.278547f, 0.f), 0.f },
 	{ "Red Container", "LCLICK", Vector(-533.003357f, -833.215759f, -193.634827f), Vector(-30.904673f, -43.816589f, 0.f), 0.f },
 	{ "Between Containers", "RUN", Vector(-423.996399f, -1753.002075f, -415.914856f), Vector(-2.624159f, -50.804165f, 0.f), 0.f },
 	{ "T Outside", "JUMP", Vector(1664.031250f, -280.002014f, -351.906250f), Vector(-25.048063f, -135.212463f, 0.f), 0.f }
 };
 
-GrenadeData Overpass[] =
-{
+std::vector<grenade_data_t> grenade_data_overpass = {
+
 	{ "Toilet Entrance", "RUN", Vector(-730.031250f, -2225.143799f, 240.093811f), Vector(-51.612926f, 149.045975f, 0.f), 0.f },
 	{ "B Bridge", "LCLICK", Vector(-617.486389f, -1509.028809f, 144.093811f), Vector(-48.988934f, 113.071342f, 0.f), 0.f },
 	{ "B Center", "LCLICK", Vector(-525.982300f, -1551.984375f, 144.093811f), Vector(-43.807911f, 110.431473f, 0.f), 0.f },
@@ -113,8 +112,8 @@ GrenadeData Overpass[] =
 	{ "Short B", "LCLICK", Vector(-2115.841309f, 992.920288f, 480.093810f), Vector(-22.936214f, -57.690578f, 0.f), 0.f }
 };
 
-GrenadeData Train[] =
-{
+std::vector<grenade_data_t> grenade_data_train = {
+
 	{ "B Upper", "LCLICK", Vector(-1055.968750f, -1607.969116f, -151.906188f), Vector(-9.076089f, -21.028521f, 0.f), 0.f },
 	{ "B Lower", "LCLICK", Vector(-1159.978027f, -1088.112549f, -95.909508f), Vector(-9.122071f, 13.307947f, 0.f), 0.f },
 	{ "Blue to Bombsite", "RUN", Vector(-1155.979004f, -1301.504395f, -95.906189f), Vector(-15.857571f, 38.882820f, 0.f), 0.f },
@@ -131,8 +130,8 @@ GrenadeData Train[] =
 	{ "Main", "LCLICK", Vector(1021.096924f, -254.988556f, -215.906189f), Vector(-38.494926f, 154.562332f, 0.f), 0.f }
 };
 
-GrenadeData Cache[] =
-{
+std::vector<grenade_data_t> grenade_data_cache = {
+
 	{ "B Center", "LCLICK", Vector(827.971313f, -1463.968750f, 1614.093750f), Vector(-21.995483f, 162.191437f, 0.f), 0.f },
 	{ "Mid Center", "LCLICK", Vector(1711.974121f, 463.987732f, 1614.093750f), Vector(-10.675973f, -167.299591f, 0.f), 0.f },
 	{ "One-way", "LCLICK", Vector(1037.031250f, 513.031250f, 1613.550293f), Vector(-49.137814f, 104.639671f, 0.f), 0.f },
@@ -148,8 +147,8 @@ GrenadeData Cache[] =
 	{ "Forklift", "RUN", Vector(761.97f, 1297.22f, 1766.09f), Vector(-4.16f, 127.43f, 0.f), 60.f }
 };
 
-GrenadeData Cobblestone[] =
-{
+std::vector<grenade_data_t> grenade_data_cobblestone = {
+
 	{ "One-way Long", "DUCK & RCLICK", Vector(272.031250f, -291.031250f, -63.906189f), Vector(-30.971577f, 17.418360f, 0.f), 0.f },
 	{ "B Long", "JUMP", Vector(-1540.973389f, -1226.978027f, -25.199188f), Vector(-50.672855f, 41.294445f, 0.f), 0.f },
 	{ "Matrix", "LCLICK", Vector(-1864.968750f, -1611.968750f, 96.093810f), Vector(-11.221231f, 136.023499f, 0.f), 0.f },

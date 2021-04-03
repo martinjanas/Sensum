@@ -8,14 +8,6 @@
 
 #include <mutex>
 
-#define CHECK_VALID( _v)    0
-FORCEINLINE vec_t DotProduct(const Vector& a, const Vector& b)
-{
-	CHECK_VALID(a);
-	CHECK_VALID(b);
-	return(a.x * b.x + a.y * b.y + a.z * b.z);
-}
-
 enum ACT
 {
 	ACT_NONE,
@@ -350,7 +342,7 @@ namespace grenade_prediction
 		const auto last_point = saved_points[saved_points.size() - 1].second;
 		draw_list->AddCircle(ImVec2(last_point.x, last_point.y), 5.f, red_color);
 
-		const auto first_point = saved_points.at(0);
+		const auto& first_point = saved_points.at(0);
 		draw_list->AddRectFilled(ImVec2(first_point.first.x - 5.f, first_point.first.y - 5.f), ImVec2(first_point.second.x + 5.f, first_point.second.y + 5.f), was_flashed ? black_color : white_color);
 	}
 }

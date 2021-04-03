@@ -37,6 +37,8 @@ void Chams::OnDrawModelExecute(IMatRenderContext* ctx, const DrawModelState_t& s
 
 	const char* model_name = info.pModel->szName;
 
+	static IMaterial* material = g::mat_system->FindMaterial("debug/debugambientcube", TEXTURE_GROUP_MODEL);
+
 	if (info.entity_index > 0 && info.entity_index <= 64)
 	{
 		if (player && g::local_player)
@@ -92,8 +94,6 @@ void Chams::OnDrawModelExecute(IMatRenderContext* ctx, const DrawModelState_t& s
 			}
 		}
 	}
-
-	static IMaterial* material = g::mat_system->FindMaterial("debug/debugambientcube", TEXTURE_GROUP_MODEL);
 
 	if (settings::chams::misc::weapon_chams) //Since I dont know the perfomance difference between strstr and std::string.find,
 	{                                        // I will use strstr, more research needed.
