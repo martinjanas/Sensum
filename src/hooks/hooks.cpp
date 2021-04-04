@@ -17,6 +17,29 @@ static CCSGOPlayerAnimState g_AnimState;
 
 std::map<int, item_setting> m_items = { };
 
+void print_grenade_data()
+{
+	if (!g::local_player || !g::engine_client->IsConnected() || !g::engine_client->IsInGame())
+		return;
+
+	char buf[256];
+
+	Vector origin = g::local_player->GetAbsOrigin();
+	//QAngle angle = g::local_player->GetAbsAngles();
+
+	QAngle angle;
+	g::engine_client->GetViewAngles(angle);
+
+	sprintf_s(buf, "\nVector(%.2ff, %.2ff, %.2ff), Vector(%.2ff, %.2ff, %.1ff)\n", origin.x, origin.y, (origin.z + 64.06f), angle.pitch, angle.yaw, angle.roll);
+
+	g::cvar->ConsolePrintf(buf);
+}
+
+namespace convars
+{
+	ConCommand* g_data;
+}
+
 namespace hooks
 {
 	c_game_event_listener* event_listener;
@@ -142,6 +165,10 @@ namespace hooks
 
 		g::cvar->ConsoleColorPrintf(Color::White, "hooks::init() Done!\n");
 
+		//convars::g_data = new ConCommand("g_data", reinterpret_cast<FnCommandCallbackV1_t>(print_grenade_data), "print_grenade_data", FCVAR_RELEASE);
+
+		//g::cvar->RegisterConCommand(convars::g_data);
+
 		//convars::sensum_i_dont_speak_nn_lang = new ConVar("sensum_i_dont_speak_nn_lang", "0", FCVAR_RELEASE, "We dont speak nn language, sorry not sorry.");
 		//convars::con = new ConCommand("bhop", reinterpret_cast<FnCommandCallbackV1_t>(base), "base", FCVAR_RELEASE);
 
@@ -158,6 +185,10 @@ namespace hooks
 
 		if (!utils::Insecure())
 			delete sequence::hook;
+
+		//g::cvar->UnregisterConCommand(convars::g_data);
+
+		//delete convars::g_data;
 
 		//g::cvar->UnregisterConCommand(convars::sensum_mute_russians);
 		//g::cvar->UnregisterConCommand(convars::sensum_i_dont_speak_nn_lang);
@@ -250,6 +281,8 @@ namespace hooks
 
 		if (!g::local_player->m_bIsScoped())
 			view->fov = settings::misc::debug_fov;
+
+		globals::fov = view->fov;
 
 		original(g::client_mode, view);
 	}

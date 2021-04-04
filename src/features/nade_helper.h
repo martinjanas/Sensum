@@ -36,15 +36,17 @@ std::vector<grenade_data_t> grenade_data_mirage = {
 	{ "CT Spawn", "JUMP", Vector(1257.861938f, -871.968750f, -143.906188f), Vector(-21.318205f, -144.344666f, 0.f), 0.f },
 	{ "One-way", "LCLICK", Vector(-1209.077515f, -873.270447f, -167.906188f), Vector(-48.526600f, 67.790833f, 0.f), 0.f },
 	{ "One-way", "RCLICK", Vector(-964.056885f, -2489.520264f, -167.913391f), Vector(-41.926632f, -10.765607f, 0.f), 0.f },
-	{ "Ramp (Jump)", "JUMP", Vector(-2026.397583f, -2029.968750f, -299.060150f), Vector(-15.312100f, 12.573707f, 0.f), 0.f },
+	{ "Ramp", "JUMP", Vector(-2026.397583f, -2029.968750f, -299.060150f), Vector(-15.312100f, 12.573707f, 0.f), 0.f },
 	{ "One-way Kitchen", "LCLICK", Vector(-2600.019287f, 535.973022f, -159.906188f), Vector(-16.582365f, -50.818062f, 0.f), 0.f },
-	{"B Short Leftside", "JUMP & LCLICK", Vector(-752.031250f, -57.039669f, -98.207809f), Vector(2.328622f, 138.313522f, 0.f), 60.f},
+	{ "B Short Leftside", "JUMP & LCLICK", Vector(-752.031250f, -57.039669f, -98.207809f), Vector(2.328622f, 138.313522f, 0.f), 60.f},
 	{ "CT Spawn", "JUMP", Vector(344.09f, -622.41f, -99.41f), Vector(-20.42f, -116.26f, 0.f), 0.f },
 	{ "CT Spawn", "LCLICK", Vector(-264.03f, -1504.03f, -99.91f), Vector(-20.26f, -108.16f, 0.f), 60.f },
 	{ "CT Spawn", "LCLICK", Vector(-493.03f, -1309.03f, -95.91f), Vector(-6.74f, -108.59f, 0.f), 60.f },
 	{ "CT Spawn", "LCLICK", Vector(-129.52f, -2413.97f, -99.91f), Vector(-2.67f, 166.37f, 0.f), 60.f },
 	{ "CT Spawn", "LCLICK", Vector(-31.92f, -1418.03f, -103.91f), Vector(-35.24f, -116.29f, 0.f), 60.f },
-	{ "CT Spawn", "JUMP", Vector(1087.09f, -1016.95f, -194.16f), Vector(-29.63f, -144.91f, 0.f), 60.f }
+	{ "CT Spawn", "JUMP", Vector(1087.09f, -1016.95f, -194.16f), Vector(-29.63f, -144.91f, 0.f), 60.f },
+	{ "B Door", "RUN", Vector(-161.00f, 497.64f, -4.74f), Vector(-43.04f, -159.03f, 0.0f), 60.f },
+	{ "Connector", "LCLICK", Vector(-972.03f, -374.03f, -284.89f), Vector(-57.60f, -75.98f, 0.0f), 60.f }
 };
 
 std::vector<grenade_data_t> grenade_data_inferno = {

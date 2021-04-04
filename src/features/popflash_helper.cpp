@@ -1,4 +1,5 @@
 #include "popflash_helper.h"
+#include "../render/render.h"
 
 std::map<std::string, std::vector<popflash_data_t>> popflash_data =
 {
@@ -57,6 +58,9 @@ namespace visuals
 		if (!settings::misc::flash_helper)
 			return;
 
+		if (g::engine_client->IsConsoleVisible())
+			return;
+
 		Vector InfoPosScreen;
 		Vector CrosshairScreen;
 
@@ -108,6 +112,9 @@ namespace visuals
 			return;
 
 		if (!settings::misc::flash_helper)
+			return;
+
+		if (g::engine_client->IsConsoleVisible())
 			return;
 
 		for (auto& x : popflash_data)

@@ -6,6 +6,7 @@
 
 #include <d3dx9.h>
 #include <D3dx9math.h>
+#include <algorithm>
 
 void math::correct_movement(CUserCmd* cmd, const QAngle& old_angles)
 {
@@ -505,14 +506,24 @@ void math::AngleMatrix(const QAngle& angles, const Vector& position, matrix3x4_t
 
 float math::GetRealDistanceFOV(const float& distance, const QAngle& current, const QAngle& aim)
 {
-	Vector aim_at, aiming_at;
-	angle2vectors(current, aiming_at);
-	aiming_at *= distance;
+	QAngle delta = aim - current;
+	delta.NormalizeClamp();
 
-	angle2vectors(aim, aim_at);
-	aim_at *= distance;
+	float hyp = sqrtf(powf(delta.pitch, 2.0f) + powf(delta.yaw, 2.0f));
 
-	return aiming_at.DistTo(aim_at) / 5;
+	Vector v_aim, v_current;
+	angle2vectors(current, v_current);
+	angle2vectors(aim, v_aim);
+
+	float delta_distance = v_current.DistTo(v_aim);
+	
+	float real_distance = sin(D3DXToRadian(delta_distance)) * distance;
+
+	float value = sqrtf(powf(delta.pitch, 2.0f) + powf(delta.yaw, 2.0f)) * real_distance;
+
+	value = std::clamp(value, -180.0f, 180.0f);
+
+	return value;
 }
 
 float math::GetFovToPlayer(const QAngle& current_angles, const QAngle& aim_angles)

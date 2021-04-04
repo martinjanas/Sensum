@@ -16,6 +16,7 @@ namespace globals
 	extern float last_yaw_offset;
 
 	extern float window_alpha;
+	extern float fov;
 
 	extern int teamkills;
 

@@ -1,4 +1,6 @@
 #include "nade_helper.h"
+#include "../render/render.h"
+
 #include <map>
 
 std::map<std::string, std::vector<grenade_data_t>> data =
@@ -58,6 +60,9 @@ namespace visuals
 		if (!settings::misc::smoke_helper)
 			return;
 
+		if (g::engine_client->IsConsoleVisible())
+			return;
+
 		Vector CrosshairScreen;
 
 		int x, y;
@@ -106,6 +111,9 @@ namespace visuals
 		if (!settings::misc::smoke_helper)
 			return;
 
+		if (g::engine_client->IsConsoleVisible())
+			return;
+
 		for (auto& x : data)
 		{
 			if (strstr(g::engine_client->GetLevelName(), x.first.c_str()))
@@ -134,6 +142,9 @@ namespace visuals
 			return;
 
 		if (!settings::misc::smoke_helper)
+			return;
+
+		if (g::engine_client->IsConsoleVisible())
 			return;
 
 		Vector InfoPosScreen;

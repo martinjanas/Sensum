@@ -318,7 +318,9 @@ namespace visuals
 
 			float radiusFOV;
 
-			if (dynamic_fov)
+			radiusFOV = std::tan(DEG2RAD(settings.fov / 2.f)) / std::tan(DEG2RAD(globals::fov / 2.f)) * screenSize.x;
+
+			/*if (dynamic_fov)
 			{
 				Vector src3D, dst3D, forward;
 				trace_t tr;
@@ -350,7 +352,7 @@ namespace visuals
 			else
 			{
 				radiusFOV = tanf(DEG2RAD(aimbot::get_fov())) / tanf(screenFov) * center.x;
-			}
+			}*/
 
 			globals::draw_list->AddCircle(ImVec2(center.x, center.y), radiusFOV, ImGui::GetColorU32(settings::visuals::drawfov_color), 255);
 		}

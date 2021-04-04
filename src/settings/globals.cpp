@@ -24,6 +24,7 @@ namespace globals
 	float last_yaw_offset = 90.f;
 
 	float window_alpha = 1.f;
+	float fov;
 
 	int teamkills = 0;
 

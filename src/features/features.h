@@ -50,7 +50,7 @@ namespace visuals
 	void PopflashHelperAimbot(CUserCmd* cmd);
 	void glow_players();
 	void glow_misc();
-
+	void print_data_to_txt(CUserCmd* cmd);
 }
 
 namespace esp
