@@ -430,6 +430,11 @@ namespace entities
 			player_data.is_desyncing = IsDesyncing(player);
 			player_data.draw_entity = player->DrawSpecificEntity();
 			player_data.player = player;
+			player_data.model = player->GetModel();
+			player_data.is_player = player->IsPlayer();
+			player_data.team_num = player->m_iTeamNum();
+			player_data.hdr = g::mdl_info->GetStudiomodel(player_data.model);
+			player_data.is_alive = player->IsAlive();
 			
 			auto& weapData = player->m_hActiveWeapon();
 

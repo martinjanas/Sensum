@@ -311,45 +311,9 @@ namespace visuals
 			float ratio = screenSize.x / screenSize.y;
 			float screenFov = atanf((ratio) * (0.75f) * tan(DEG2RAD(fov * 0.5f)));
 
-			float radiusFOV;
+			float radius = tanf(DEG2RAD(aimbot::get_fov())) / tanf(screenFov) * center.x;
 
-			radiusFOV = std::tan(DEG2RAD(settings.fov / 2.f)) / std::tan(DEG2RAD(globals::fov / 2.f)) * screenSize.x;
-
-			/*if (dynamic_fov)
-			{
-				Vector src3D, dst3D, forward;
-				trace_t tr;
-				Ray_t ray;
-				CTraceFilter filter;
-
-				QAngle angles = globals::viewangles;//viewanglesBackup;
-				math::angle2vectors(angles, forward);
-				filter.pSkip = g::local_player;
-				src3D = g::local_player->GetEyePos();
-				dst3D = src3D + (forward * 8192);
-
-				ray.Init(src3D, dst3D);
-				g::engine_trace->trace_ray(ray, MASK_SHOT, &filter, &tr);
-
-				QAngle leftViewAngles = QAngle(angles.pitch, angles.yaw - 90.f, 0.f);
-				math::AngleNormalize(leftViewAngles);
-				math::angle2vectors(leftViewAngles, forward);
-				forward *= settings.fov * 7.f;
-
-				Vector maxAimAt = tr.endpos + forward;
-
-				Vector max2D;
-				if (g::debug_overlay->ScreenPosition(maxAimAt, max2D))
-					return;
-
-				radiusFOV = fabsf((float)w / 2.f - max2D.x);
-			}
-			else
-			{
-				radiusFOV = tanf(DEG2RAD(aimbot::get_fov())) / tanf(screenFov) * center.x;
-			}*/
-
-			globals::draw_list->AddCircle(ImVec2(center.x, center.y), radiusFOV, ImGui::GetColorU32(settings::visuals::drawfov_color), 255);
+			globals::draw_list->AddCircle(ImVec2(center.x, center.y), radius, ImGui::GetColorU32(settings::visuals::drawfov_color), 255);
 		}
 	}
 

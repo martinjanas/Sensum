@@ -196,6 +196,31 @@ namespace esp
 
 		ImGui::PushFont(render::fonts::visuals);
 
+		for (const auto& data : m_entities)
+		{
+			if (data.index == 0 || !data.hitboxes[0][0].IsValid())
+				continue;
+
+			if (settings::esp::sound)
+			{
+				static Vector out;
+
+				for (const auto& sound : _sounds)
+				{
+					if (!data.is_alive)
+						continue;
+
+					if (sound.index != 0)
+					{
+						if (math::world2screen(sound.origin, out))
+						{
+							globals::draw_list->AddRect(ImVec2(out.x + 3.f, out.y + 3.f), ImVec2(out.x - 3.f, out.y - 3.f), utils::to_im32(Color::White));
+						}
+					}
+				}
+			}
+		}
+
 		RECT box;
 		for (const auto& data : m_entities)
 		{
@@ -265,70 +290,46 @@ namespace esp
 
 			const auto box_color = data.is_dormant ? smoke_color : data.is_visible && !data.in_smoke && !m_local.is_flashed ? visible_color : occluded_color;
 
-			if (settings::esp::sound)
-			{
-				Vector out;
-
-				for (const auto& sound : _sounds)
-				{
-					if (sound.index != 0)
-					{
-						if (math::world2screen(sound.origin, out))
-						{
-							globals::draw_list->AddRect(ImVec2(out.x + 3.f, out.y + 3.f), ImVec2(out.x - 3.f, out.y - 3.f), utils::to_im32(Color::White));
-						}
-					}
-				}
-			}
-
 			if (settings::esp::bone_esp)
 			{
-				for (int i = 1; i <= g::entity_list->GetHighestEntityIndex(); i++)
+				if (!data.is_player || data.player == g::local_player || data.m_iHealth <= 0 || data.is_dormant || data.team_num == g::local_player->m_iTeamNum())
+					continue;
+
+				//studiohdr_t* hdr = g::mdl_info->GetStudiomodel(data.model);
+
+				if (!data.hdr)
+					continue;
+
+				static Vector vParent, vChild, sParent, sChild;
+
+				for (int j = 0; j < data.hdr->numbones; j++)
 				{
-					c_base_player* entity = c_base_player::GetPlayerByIndex(i);
+					mstudiobone_t* pBone = data.hdr->GetBone(j);
 
-					if (!entity || !entity->IsPlayer() || entity == g::local_player || !entity->IsAlive() || entity->IsDormant() || entity->m_iTeamNum() == g::local_player->m_iTeamNum())
-						continue;
-
-					if (settings::esp::visible_only && !g::local_player->CanSeePlayer(entity, entity->get_hitbox_position(entity, HITBOX_CHEST)))
-						continue;
-
-					studiohdr_t* pStudioHdr = g::mdl_info->GetStudiomodel(entity->GetModel());
-
-					if (!pStudioHdr)
-						continue;
-
-					Vector vParent, vChild, sParent, sChild;
-
-					for (int j = 0; j < pStudioHdr->numbones; j++)
+					if (pBone && (pBone->flags & BONE_USED_BY_HITBOX) && (pBone->parent != -1))
 					{
-						mstudiobone_t* pBone = pStudioHdr->GetBone(j);
+						vChild = data.player->get_bone_position(j);
+						vParent = data.player->get_bone_position(pBone->parent);
 
-						if (pBone && (pBone->flags & BONE_USED_BY_HITBOX) && (pBone->parent != -1))
+						int iChestBone = 6;
+						Vector vBreastBone;
+						Vector vUpperDirection = data.player->get_bone_position(iChestBone + 1) - data.player->get_bone_position(iChestBone);
+						vBreastBone = data.player->get_bone_position(iChestBone) + vUpperDirection / 2;
+						Vector vDeltaChild = vChild - vBreastBone;
+						Vector vDeltaParent = vParent - vBreastBone;
+
+						if ((vDeltaParent.Length() < 9 && vDeltaChild.Length() < 9))
+							vParent = vBreastBone;
+
+						if (j == iChestBone - 1)
+							vChild = vBreastBone;
+
+						if (abs(vDeltaChild.z) < 5 && (vDeltaParent.Length() < 5 && vDeltaChild.Length() < 5) || j == iChestBone)
+							continue;
+
+						if (math::world2screen(vParent, sParent) && math::world2screen(vChild, sChild))
 						{
-							vChild = entity->get_bone_position(j);
-							vParent = entity->get_bone_position(pBone->parent);
-
-							int iChestBone = 6;
-							Vector vBreastBone;
-							Vector vUpperDirection = entity->get_bone_position(iChestBone + 1) - entity->get_bone_position(iChestBone);
-							vBreastBone = entity->get_bone_position(iChestBone) + vUpperDirection / 2;
-							Vector vDeltaChild = vChild - vBreastBone;
-							Vector vDeltaParent = vParent - vBreastBone;
-
-							if ((vDeltaParent.Length() < 9 && vDeltaChild.Length() < 9))
-								vParent = vBreastBone;
-
-							if (j == iChestBone - 1)
-								vChild = vBreastBone;
-
-							if (abs(vDeltaChild.z) < 5 && (vDeltaParent.Length() < 5 && vDeltaChild.Length() < 5) || j == iChestBone)
-								continue;
-
-							if (math::world2screen(vParent, sParent) && math::world2screen(vChild, sChild))
-							{
-								globals::draw_list->AddLine(ImVec2(sParent.x, sParent.y), ImVec2(sChild.x, sChild.y), utils::to_im32(settings::esp::bone_esp_color), 0.2f);
-							}
+							globals::draw_list->AddLine(ImVec2(sParent.x, sParent.y), ImVec2(sChild.x, sChild.y), utils::to_im32(settings::esp::bone_esp_color));
 						}
 					}
 				}

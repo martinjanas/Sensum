@@ -13,20 +13,17 @@
 #include "..//jsoncpp/json.h"
 #include "..//helpers/input.h"
 
-static CCSGOPlayerAnimState g_AnimState;
-
 std::map<int, item_setting> m_items = { };
 
 void print_grenade_data()
 {
+	char buf[256];
+
 	if (!g::local_player || !g::engine_client->IsConnected() || !g::engine_client->IsInGame())
 		return;
 
-	char buf[256];
-
 	Vector origin = g::local_player->GetAbsOrigin();
-	//QAngle angle = g::local_player->GetAbsAngles();
-
+	
 	QAngle angle;
 	g::engine_client->GetViewAngles(angle);
 

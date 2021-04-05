@@ -72,28 +72,22 @@ std::string allcolors[] =
 
 void WeaponCheck(std::string weapon, c_base_player* player)
 {
+	char buf[256];
 	std::string wepName;
 
 	auto it = weaponNames.find(weapon);
 	if (it != weaponNames.end())
 		wepName = it->second;
-	else
-		wepName = weapon;
+	else wepName = it->first;
 
-	auto filter = CHudChat::ChatFilters::CHAT_FILTER_NONE;
+	static auto filter = CHudChat::ChatFilters::CHAT_FILTER_NONE;
 	static int green = 3;
 	static int yellow = 15;
 	static int white = 0;
 
-	std::stringstream text;
+	sprintf_s(buf, "%s [Buy] %s Player %s %s bought %s %s %s", allcolors[yellow].c_str(), allcolors[green].c_str(), allcolors[white].c_str(), player->GetPlayerInfo().szName, allcolors[green].c_str(), allcolors[white].c_str(), wepName);
 
-	/*if (strstr(weapon.c_str(), "item_kevlar") || strstr(weapon.c_str(), "item_assaultsuit"))
-		text.str().c_str = "";*/ // WIP
-
-
-	text << allcolors[yellow] << "[Buy]" << " " << allcolors[green] << "Player " << allcolors[white] << player->GetPlayerInfo().szName << allcolors[green] << "bought" << allcolors[white] << wepName;
-
-	g::hud_chat->ChatPrintf(0, filter, text.str().c_str());
+	g::hud_chat->ChatPrintf(0, filter, buf);
 }
 
 class c_game_event_listener final : public IGameEventListener2

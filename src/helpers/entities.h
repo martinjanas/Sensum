@@ -65,14 +65,16 @@ namespace entities
 		bool has_defkit;
 		bool is_desyncing;
 		bool draw_entity;
-		bool sound;
 		bool has_knife;
+		bool is_player;
+		bool in_smoke;
+		bool is_visible;
+		bool is_alive;
+
+		int team_num;
 
 		c_base_combat_weapon* weapData;
 		c_base_player* player;
-
-		bool in_smoke;
-		bool is_visible;
 
 		float m_iHealth;
 		float m_iMoney;
@@ -91,6 +93,9 @@ namespace entities
 		Vector old_origin;
 		Vector world_pos;
 		QAngle angles;
+
+		const model_t* model;
+		studiohdr_t* hdr;
 
 		std::array<Vector, 4> hitboxes[HITBOX_MAX];
 	};
