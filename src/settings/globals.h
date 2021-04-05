@@ -56,7 +56,6 @@ namespace globals
 			extern int key;
 		}
 
-		extern int desync;
 		extern int esp;
 		extern int trigger;
 		extern int zeus_bot;

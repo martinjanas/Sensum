@@ -324,22 +324,12 @@ namespace hooks
 
 	void __stdcall emit_sound::hooked(IRecipientFilter& filter, int iEntIndex, int iChannel, const char* pSoundEntry, unsigned int nSoundEntryHash, const char* pSample, float flVolume, int nSeed, float flAttenuation, int iFlags, int iPitch, const Vector* pOrigin, const Vector* pDirection, void* pUtlVecOrigins, bool bUpdatePositions, float soundtime, int speakerentity, int unk)
 	{
-		if (!strcmp(pSoundEntry, "UIPanorama.popup_accept_match_beep")) {
+		if (!strcmp(pSoundEntry, "UIPanorama.popup_accept_match_beep")) 
+		{
 			static auto fnAccept = reinterpret_cast<bool(__stdcall*)(const char*)>(utils::pattern_scan(GetModuleHandleA("client.dll"), "55 8B EC 83 E4 F8 8B 4D 08 BA ? ? ? ? E8 ? ? ? ? 85 C0 75 12"));
 
-			static HWND window = FindWindow(NULL, L"Counter-Strike: Global Offensive");
-
-			if (fnAccept) {
+			if (fnAccept)
 				fnAccept("");
-
-				FLASHWINFO fi;
-				fi.cbSize = sizeof(FLASHWINFO);
-				fi.hwnd = window;
-				fi.dwFlags = FLASHW_ALL | FLASHW_TIMERNOFG;
-				fi.uCount = 0;
-				fi.dwTimeout = 0;
-				FlashWindowEx(&fi);
-			}
 		}
 
 		original(g::engine_sound, filter, iEntIndex, iChannel, pSoundEntry, nSoundEntryHash, pSample, flVolume, nSeed, flAttenuation, iFlags, iPitch, pOrigin, pDirection, pUtlVecOrigins, bUpdatePositions, soundtime, speakerentity, unk);
@@ -347,10 +337,10 @@ namespace hooks
 
 	void __fastcall scene_end::hooked(IVRenderView*& view)
 	{
-		visuals::more_chams();
+		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
+			return;
 
-		if (settings::chams::localplayer::desync_chams && settings::desync::enabled)
-			visuals::DesyncChams();
+		visuals::more_chams();
 
 		/*static IMaterial* material = g::mat_system->FindMaterial("debug/debugambientcube", TEXTURE_GROUP_MODEL);
 
@@ -384,9 +374,6 @@ namespace hooks
 		}*/
 
 		original(view);
-
-		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
-			return;
 	}
 
 	void __stdcall draw_model_execute::hooked(IMatRenderContext* context, const DrawModelState_t& state, const ModelRenderInfo_t& info, matrix3x4_t* bone)

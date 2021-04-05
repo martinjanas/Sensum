@@ -154,10 +154,8 @@ namespace settings
 			bool enabled = false;
 			bool wireframe = false;
 			bool flat = false;
-			bool desync_chams = false;
 			bool backtrack_chams = false;
 		
-			int desync_chams_mode = 0;
 			int selected_material = 1;
 			int backtrack_chams_mode = 0;
 
@@ -342,10 +340,6 @@ namespace settings
 				Option::Load(root["chams.enemy_backtrack_color"], chams::enemy::color_backtrack);
 				Option::Load(root["chams.team_backtrack_color"], chams::teammates::color_backtrack);
 
-				Option::Load(root["chams.legit_aa"], chams::localplayer::desync_chams);
-				Option::Load(root["chams.legitaa_material_mode"], chams::localplayer::desync_chams_mode);
-				Option::Load(root["chams.legitaa_color"], chams::localplayer::desync_color);
-				
 				Option::Load(root["chams.dropped_weapons"], chams::misc::dropped_weapons);
 				Option::Load(root["chams.dropped_weapons_color"], chams::misc::color_dropped_weapons_chams);
 				Option::Load(root["chams.plantedc4"], chams::misc::planted_bomb_chams);
@@ -509,7 +503,7 @@ namespace settings
 
 				settings::aimbot::m_groups.clear();
 
-				for (auto group : root["aimbot.groups"])
+				for (auto& group : root["aimbot.groups"])
 				{
 					std::vector<int> weapons = { };
 
@@ -587,9 +581,6 @@ namespace settings
 
 				config["chams.localplayer_enabled"] = chams::localplayer::enabled;
 
-				config["chams.legit_aa"] = chams::localplayer::desync_chams;
-				config["chams.legitaa_material_mode"] = chams::localplayer::desync_chams_mode;
-				
 				config["chams.dropped_weapons"] = chams::misc::dropped_weapons;
 				config["chams.plantedc4"] = chams::misc::planted_bomb_chams;
 				config["chams.nades"] = chams::misc::nade_chams;
@@ -755,7 +746,7 @@ namespace settings
 				config["legitbot.items"] = aimbot_items;
 
 				Json::Value aimbot_groups;
-				for (auto group : aimbot::m_groups)
+				for (auto& group : aimbot::m_groups)
 				{
 					Json::Value act;
 					act["name"] = group.name;

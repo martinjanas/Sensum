@@ -3,7 +3,6 @@
 #include <deque>
 
 #include "../valve_sdk/csgostructs.hpp"
-#include "../helpers/MaterialManager.h"
 #include "../helpers/singleton.hpp"
 
 class Chams : public Singleton<Chams>

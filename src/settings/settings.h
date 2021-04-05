@@ -282,13 +282,10 @@ namespace settings
 			extern bool enabled;
 			extern bool flat;
 			extern bool wireframe;
-			extern bool desync_chams;
-			
-			extern int desync_chams_mode;
+
 			extern int selected_material;
 
 			extern Color color;
-			extern Color desync_color;
 		}
 
 		namespace misc

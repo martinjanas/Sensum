@@ -8,13 +8,8 @@
 #include "../helpers/runtime_saver.h"
 #include "../render/render.h"
 #include "../helpers/autowall.h"
-#include "../helpers/MaterialManager.h"
 
 #include <mutex>
-
-extern float side;
-
-QAngle viewanglesBackup;
 
 namespace visuals
 {
@@ -238,7 +233,7 @@ namespace visuals
 		x -= (dx * (punchAngle.yaw));
 		y += (dy * (punchAngle.pitch));
 
-		auto active_wep = g::local_player->m_hActiveWeapon();
+		auto& active_wep = g::local_player->m_hActiveWeapon();
 
         if (active_wep)
         {
@@ -279,7 +274,7 @@ namespace visuals
 			return;
 		}
 
-		auto weapon = g::local_player->m_hActiveWeapon();
+		auto& weapon = g::local_player->m_hActiveWeapon();
 		if (!weapon) return;
 
 		left_knife->SetValue(!weapon->IsKnife());
@@ -493,90 +488,6 @@ namespace visuals
 		}
 	}
 
-	void AAIndicator()
-	{
-		int x, y;
-
-		g::engine_client->GetScreenSize(x, y);
-
-		if (!g::local_player || !g::local_player->IsAlive())
-			return;
-
-		if (!utils::IsPlayingMM_AND_IsValveServer())
-			return;
-
-		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
-			return;
-
-		const auto radius = 80.f;
-
-		int cx = x / 2;
-		int cy = y / 2;
-
-		auto draw_arrow = [&](float rot, ImU32 color) -> void
-		{
-			globals::draw_list->AddTriangleFilled(ImVec2(cx + cosf(rot) * radius, cy + sinf(rot) * radius),
-				ImVec2(cx + cosf(rot + DEG2RAD(10)) * (radius - 23.f),
-					cy + sinf(rot + DEG2RAD(10)) * (radius - 23.f)),
-				ImVec2(cx + cosf(rot - DEG2RAD(10)) * (radius - 23.f),
-					cy + sinf(rot - DEG2RAD(10)) * (radius - 23.f)),
-				IM_COL32_BLACK);
-
-			globals::draw_list->AddTriangleFilled(ImVec2(cx + cosf(rot) * radius, cy + sinf(rot) * radius),
-				ImVec2(cx + cosf(rot + DEG2RAD(10)) * (radius - 22.f),
-					cy + sinf(rot + DEG2RAD(10)) * (radius - 22.f)),
-				ImVec2(cx + cosf(rot - DEG2RAD(10)) * (radius - 22.f),
-					cy + sinf(rot - DEG2RAD(10)) * (radius - 22.f)),
-				color);
-		};
-
-
-		draw_arrow(side > 0.0f ? PI : -PI * 4, IM_COL32(settings::esp::aa_indicator_color.r(), settings::esp::aa_indicator_color.g(), settings::esp::aa_indicator_color.b(), settings::esp::aa_indicator_color.a()));
-	}
-
-	void DesyncChams()
-	{
-		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
-			return;
-
-		if (g::local_player->m_bGunGameImmunity() || g::local_player->m_fFlags() & FL_FROZEN)
-			return;
-
-		if (!utils::IsPlayingMM_AND_IsValveServer())
-			return;
-
-		QAngle OrigAng;
-
-		static IMaterial* material = g::mat_system->FindMaterial("debug/debugambientcube", TEXTURE_GROUP_OTHER);
-
-		OrigAng = g::local_player->GetAbsAngles();
-		g::local_player->SetAngle2(QAngle(0, g::local_player->GetPlayerAnimState()->m_flEyeYaw, 0)); //around 90% accurate
-		if (g::input->m_fCameraInThirdPerson)
-		{
-			g::mdl_render->ForcedMaterialOverride(material);
-			g::render_view->SetColorModulation(settings::chams::localplayer::desync_color.r(), settings::chams::localplayer::desync_color.g(), settings::chams::localplayer::desync_color.b());
-		}
-		g::local_player->GetClientRenderable()->DrawModel(0x1, 255);
-		g::local_player->SetAngle2(OrigAng);
-	}
-
-	float damage_for_armor(float damage, int armor_value) {
-		float armor_ratio = 0.5f;
-		float armor_bonus = 0.5f;
-		if (armor_value > 0) {
-			float armor_new = damage * armor_ratio;
-			float armor = (damage - armor_new) * armor_bonus;
-
-			if (armor > static_cast<float>(armor_value)) {
-				armor = static_cast<float>(armor_value) * (1.f / armor_bonus);
-				armor_new = damage - armor;
-			}
-
-			damage = armor_new;
-		}
-		return damage;
-	}
-
 	void SpreadCircle()
 	{
 		if (!g::local_player || !g::local_player->IsAlive())
@@ -675,9 +586,6 @@ namespace visuals
 
 		if (settings::visuals::spread_cross)
 			SpreadCircle();
-
-		if (settings::desync::enabled)
-			AAIndicator();
 
 		if (settings::misc::damage_indicator)
 			DrawDamageIndicator();

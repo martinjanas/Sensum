@@ -239,10 +239,6 @@ namespace render
 
 							ImGui::NextColumn();
 
-							ImGui::PushItemWidth(-1);
-							checkbox("Desync chams", &settings::chams::localplayer::desync_chams);
-							ImGui::PopItemWidth();
-
 							checkbox("Flat", &settings::chams::localplayer::flat);
 						}
 						columns(1);

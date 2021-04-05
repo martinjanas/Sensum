@@ -9,8 +9,6 @@
 
 #include <thread>
 
-extern float side;
-
 namespace clantag_features = clantag;
 
 namespace globals
@@ -62,7 +60,6 @@ namespace globals
 			int key = 0;
 		}
 
-		int desync = 0;
 		int esp = 0;
 		int trigger = 18; // 18 = L-ALT key, 16 = L-SHIFT, 0 = NOTHING
 		int zeus_bot = 0;
@@ -84,12 +81,6 @@ namespace globals
 
 			if (key == esp)
 				settings::esp::enabled = !settings::esp::enabled;
-
-			if (!settings::desync::yaw_flip && key == desync)
-				desync::flip_yaw = !desync::flip_yaw;
-
-			if (key == desync)
-				side = -side;
 
 			if (key == thirdperson::key && !g::engine_client->IsConsoleVisible())
 				thirdperson::enabled = !thirdperson::enabled;
@@ -134,7 +125,6 @@ namespace globals
 				Option::Load(root["binds.trigger"], binds::trigger, 0);
 				Option::Load(root["binds.zeus_bot"], binds::zeus_bot, 0);
 				Option::Load(root["binds.thirdperson"], binds::thirdperson::key, 86);
-				Option::Load(root["binds.desync"], binds::desync, VK_XBUTTON1);
 				Option::Load(root["binds.slow_walk"], binds::slow_walk);
 				Option::Load(root["binds.edge_jump"], binds::edge_jump);
 
@@ -168,7 +158,6 @@ namespace globals
 				root["binds.trigger"] = binds::trigger;
 				root["binds.zeus_bot"] = binds::zeus_bot;
 				root["binds.thirdperson"] = binds::thirdperson::key;
-				root["binds.desync"] = binds::desync;
 				root["binds.slow_walk"] = binds::slow_walk;
 				root["binds.edge_jump"] = binds::edge_jump;
 

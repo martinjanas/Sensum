@@ -37,8 +37,6 @@ namespace visuals
 	void RenderNoScopeOverlay();
 	void SpreadCircle();
 	void DrawFov();
-	void DesyncChams();
-	void AAIndicator();
 	void KnifeLeft();
 	void DrawRing3D();
 	void DrawRing3DPopflash();
@@ -50,7 +48,6 @@ namespace visuals
 	void PopflashHelperAimbot(CUserCmd* cmd);
 	void glow_players();
 	void glow_misc();
-	void print_data_to_txt(CUserCmd* cmd);
 }
 
 namespace esp
@@ -141,11 +138,6 @@ namespace clantag
 
 	void restore();
 	void animate();
-}
-
-namespace desync
-{
-	extern bool flip_yaw;
 }
 
 namespace slow_walk

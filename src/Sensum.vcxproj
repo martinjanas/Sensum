@@ -123,7 +123,6 @@
     <ClCompile Include="features\Chams.cpp" />
     <ClCompile Include="features\clantag.cpp" />
     <ClCompile Include="features\color_modulate.cpp" />
-    <ClCompile Include="features\desync.cpp" />
     <ClCompile Include="features\edge_jump.cpp" />
     <ClCompile Include="features\engine_prediction.cpp" />
     <ClCompile Include="features\fast_stop.cpp" />
@@ -147,7 +146,6 @@
     <ClCompile Include="helpers\http.cpp" />
     <ClCompile Include="helpers\imdraw.cpp" />
     <ClCompile Include="helpers\input.cpp" />
-    <ClCompile Include="helpers\MaterialManager.cpp" />
     <ClCompile Include="helpers\notifies.cpp" />
     <ClCompile Include="helpers\utils.cpp" />
     <ClCompile Include="hooks\create_move.cpp" />
@@ -216,7 +214,6 @@
     <ClInclude Include="helpers\imdraw.h" />
     <ClInclude Include="helpers\input.h" />
     <ClInclude Include="helpers\array.h" />
-    <ClInclude Include="helpers\MaterialManager.h" />
     <ClInclude Include="helpers\notifies.h" />
     <ClInclude Include="helpers\proto_parse.h" />
     <ClInclude Include="helpers\runtime_saver.h" />

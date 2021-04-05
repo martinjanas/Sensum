@@ -214,9 +214,6 @@
     <ClCompile Include="helpers\imdraw.cpp">
       <Filter>helpers</Filter>
     </ClCompile>
-    <ClCompile Include="features\desync.cpp">
-      <Filter>features\movement</Filter>
-    </ClCompile>
     <ClCompile Include="hooks\fire_bullets.cpp">
       <Filter>hooks</Filter>
     </ClCompile>
@@ -275,9 +272,6 @@
       <Filter>features\misc</Filter>
     </ClCompile>
     <ClCompile Include="helpers\HitPossitionHelper.cpp">
-      <Filter>helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="helpers\MaterialManager.cpp">
       <Filter>helpers</Filter>
     </ClCompile>
     <ClCompile Include="settings\config.cpp">
@@ -610,9 +604,6 @@
       <Filter>features\misc</Filter>
     </ClInclude>
     <ClInclude Include="helpers\HitPossitionHelper.h">
-      <Filter>helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="helpers\MaterialManager.h">
       <Filter>helpers</Filter>
     </ClInclude>
     <ClInclude Include="helpers\runtime_saver.h">
