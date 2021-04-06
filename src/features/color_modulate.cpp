@@ -258,7 +258,9 @@ namespace color_modulation
 		}
 
 		r_modelAmbientMin->SetValue(settings::visuals::night_mode ? 1.f : 0.f);
-		mat_force_tonemap_scale->SetValue(settings::visuals::night_mode ? 0.2f : 1.f);
+		
+		if(mat_force_tonemap_scale)
+		   mat_force_tonemap_scale->SetValue(settings::visuals::night_mode ? 0.2f : 1.f);
 
 		viewmodel_fov->SetValue(settings::misc::viewmodel_fov);
 		mat_postprocess_enable->SetValue(post_processing ? 1 : 0);

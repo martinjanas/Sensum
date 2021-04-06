@@ -421,7 +421,7 @@ namespace entities
 			player_data.icon = player->m_hActiveWeapon()->GetGunIcon();
 			player_data.kevlar_icon = player->GetArmorIcon();
 			player_data.wep_str_size = player->m_hActiveWeapon()->GetGunStringSize();
-			player_data.has_knife = player->m_hActiveWeapon()->get_weapon_data()->WeaponType == WEAPONTYPE_KNIFE;
+			player_data.has_knife = (player->m_hActiveWeapon() && player->m_hActiveWeapon()->get_weapon_data() && player->m_hActiveWeapon()->get_weapon_data()->WeaponType == WEAPONTYPE_KNIFE);
 
 			player_data.is_dormant = false;
 			player_data.is_scoped = player->m_bIsScoped();

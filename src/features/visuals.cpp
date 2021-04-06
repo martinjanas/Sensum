@@ -243,10 +243,10 @@ namespace visuals
 			int dy = yy / 97;
 			int dx = xx / 97;
 
-			_x -= (dx * (m_local.punch_angle.yaw));
-			_y += (dy * (m_local.punch_angle.pitch));
+			_x -= (dx * (local.punch_angle.yaw));
+			_y += (dy * (local.punch_angle.pitch));
 
-			auto& active_wpn = m_local.active_weapon;
+			auto& active_wpn = local.active_weapon;
 
 			if (!active_wpn)
 				return;
@@ -259,14 +259,14 @@ namespace visuals
 			switch (settings::visuals::rcs_cross_mode)
 			{
 			case 0:
-				if (m_local.shots_fired > 1)
+				if (local.shots_fired > 1)
 				{
 					globals::draw_list->AddLine(ImVec2(_x - 5, _y), ImVec2(_x + 5, _y), ImGui::GetColorU32(settings::visuals::recoilcolor));
 					globals::draw_list->AddLine(ImVec2(_x, _y - 5), ImVec2(_x, y + 5), ImGui::GetColorU32(settings::visuals::recoilcolor));
 				}
 				break;
 			case 1:
-				if (m_local.shots_fired > 1)
+				if (local.shots_fired > 1)
 				{
 					globals::draw_list->AddCircle(ImVec2(_x, _y), settings::visuals::radius, ImGui::GetColorU32(settings::visuals::recoilcolor), 255);
 				}
@@ -323,7 +323,7 @@ namespace visuals
 			if (!local.local)
 				return;
 
-			auto& active_wpn = m_local.active_weapon;
+			auto& active_wpn = local.active_weapon;
 
 			if (!active_wpn)
 				return;

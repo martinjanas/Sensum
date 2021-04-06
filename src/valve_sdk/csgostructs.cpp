@@ -554,6 +554,9 @@ bool c_base_combat_weapon::IsSniper()
 
 bool c_base_combat_weapon::IsSmoke()
 {
+	if (!this)
+		return false;
+
 	auto index = m_iItemDefinitionIndex();
 
 	return index == WEAPON_SMOKEGRENADE;
