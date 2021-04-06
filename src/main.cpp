@@ -35,7 +35,7 @@ void wait_for_modules()
 
 	for (auto& module : modules)
 		while (!utils::get_module(module))
-			LI_FN(Sleep).cached()(10);
+			   Sleep(10);
 }
 
 void setup_hotkeys(LPVOID base)
@@ -64,7 +64,7 @@ void setup_hotkeys(LPVOID base)
 		while (is_active)
 			Sleep(500);
 
-		LI_FN(FreeLibraryAndExitThread)(static_cast<HMODULE>(base), 1);
+		FreeLibraryAndExitThread(static_cast<HMODULE>(base), 1);
 	}
 }
 

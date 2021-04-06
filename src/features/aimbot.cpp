@@ -788,20 +788,20 @@ namespace aimbot
 
 			for (int j = 0; j < data[i].size(); j++)
 			{
-				if (data[i].empty())
-					continue;
+				if (!data[i].empty())
+				{
+					if (!player)
+						data.at(i).clear();
 
-				if (j > a_settings.backtrack.ticks)
-					data[i].pop_back();
+					if (j > a_settings.backtrack.ticks)
+						data[i].pop_back();
 
-				if (data[i].front().is_dormant || !data[i].front().is_alive)
-					data[i].clear();
+					if (data[i].front().is_dormant || !data[i].front().is_alive)
+						data[i].clear();
 
-				if (!(player->m_vecVelocity().x != 0.f || player->m_vecVelocity().y != 0.f || player->m_vecVelocity().z != 0.f))
-					data.at(i).clear();
-
-				if (!player)
-					data.at(i).clear();
+					if (!(player->m_vecVelocity().x != 0.f || player->m_vecVelocity().y != 0.f || player->m_vecVelocity().z != 0.f))
+						data.at(i).clear();
+				}
 			}
 		}
 	}
@@ -817,83 +817,86 @@ namespace aimbot
 		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected() || !bone)
 			return;
 
+		if (!g::local_player)
+			return;
+
 		static auto original = hooks::draw_model_execute::original;
 
 		c_base_player* player = reinterpret_cast<c_base_player*>(g::entity_list->GetClientEntity(info.entity_index));
 
 		static IMaterial* material = g::mat_system->FindMaterial("debug/debugambientcube", TEXTURE_GROUP_OTHER);
 
-		if (!g::local_player)
-			return;
-
 		if (info.entity_index > 0 && info.entity_index <= 64)
 		{
 			if (data.empty())
 				return;
-
-			auto& bt_data = data.at(info.entity_index);
-
-			if (bt_data.empty())
-				return;
-
-			for (int i = 1; i < bt_data.size(); i++)
+			
+			if (data.count(info.entity_index) > 0)
 			{
-				if (!player)
-					continue;
+				auto& bt_data = data.at(info.entity_index);
 
-				if (!player->IsPlayer())
-					continue;
+				if (bt_data.empty())
+					return;
 
-				if (!player->IsAlive())
-					continue;
-
-				if (i > a_settings.backtrack.ticks)
-					continue;
-
-				auto active_wpn = g::local_player->m_hActiveWeapon().Get();
-
-				if (!active_wpn)
-					continue;
-				
-				auto wpn_data = active_wpn->get_weapon_data();
-
-				if (!wpn_data)
-					continue;
-
-				if (wpn_data->WeaponType == WEAPONTYPE_KNIFE)
-					continue;
-
-				bool is_enemy = g::local_player->m_iTeamNum() != player->m_iTeamNum();
-				bool is_teammate = !is_enemy;
-
-				if (is_enemy && settings::chams::enemy::backtrack_chams)
+				for (int i = 1; i < bt_data.size(); i++)
 				{
-					if (i == a_settings.backtrack.ticks)
+					if (!player)
+						continue;
+
+					if (!player->IsPlayer())
+						continue;
+
+					if (!player->IsAlive())
+						continue;
+
+					if (i > a_settings.backtrack.ticks)
+						continue;
+
+					auto active_wpn = g::local_player->m_hActiveWeapon().Get();
+
+					if (!active_wpn)
+						continue;
+
+					auto wpn_data = active_wpn->get_weapon_data();
+
+					if (!wpn_data)
+						continue;
+
+					if (wpn_data->WeaponType == WEAPONTYPE_KNIFE)
+						continue;
+
+					bool is_enemy = g::local_player->m_iTeamNum() != player->m_iTeamNum();
+					bool is_teammate = !is_enemy;
+
+					if (is_enemy && settings::chams::enemy::backtrack_chams)
 					{
-						if (bt_data.at(i).is_moving)
+						if (i == a_settings.backtrack.ticks)
 						{
-							material->ColorModulate(settings::chams::enemy::color_backtrack.r() / 255.0f, settings::chams::enemy::color_backtrack.g() / 255.0f, settings::chams::enemy::color_backtrack.b() / 255.0f);
-							material->AlphaModulate(settings::chams::enemy::color_backtrack.a() / 255.0f);
-							material->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
-							g::mdl_render->ForcedMaterialOverride(material);
-							original(g::mdl_render, context, &state, &info, bt_data.at(i).matrix);
-							g::mdl_render->ForcedMaterialOverride(nullptr);
+							if (bt_data.at(i).is_moving)
+							{
+								material->ColorModulate(settings::chams::enemy::color_backtrack.r() / 255.0f, settings::chams::enemy::color_backtrack.g() / 255.0f, settings::chams::enemy::color_backtrack.b() / 255.0f);
+								material->AlphaModulate(settings::chams::enemy::color_backtrack.a() / 255.0f);
+								material->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
+								g::mdl_render->ForcedMaterialOverride(material);
+								original(g::mdl_render, context, &state, &info, bt_data.at(i).matrix);
+								g::mdl_render->ForcedMaterialOverride(nullptr);
+							}
 						}
 					}
-				}
 
-				if (is_teammate && settings::chams::teammates::backtrack_chams)
-				{
-					if (i == a_settings.backtrack.ticks)
+					if (is_teammate && settings::chams::teammates::backtrack_chams)
 					{
-						if (bt_data.at(i).is_moving)
+						if (i == a_settings.backtrack.ticks)
 						{
-							material->ColorModulate(settings::chams::teammates::color_backtrack.r() / 255.0f, settings::chams::teammates::color_backtrack.g() / 255.0f, settings::chams::teammates::color_backtrack.b() / 255.0f);
-							material->AlphaModulate(settings::chams::teammates::color_backtrack.a() / 255.0f);
-							material->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
-							g::mdl_render->ForcedMaterialOverride(material);
-							original(g::mdl_render, context, &state, &info, bt_data.at(i).matrix);
-							g::mdl_render->ForcedMaterialOverride(nullptr);
+							if (bt_data.at(i).is_moving)
+							{
+								material->ColorModulate(settings::chams::teammates::color_backtrack.r() / 255.0f, settings::chams::teammates::color_backtrack.g() / 255.0f, settings::chams::teammates::color_backtrack.b() / 255.0f);
+								material->AlphaModulate(settings::chams::teammates::color_backtrack.a() / 255.0f);
+								material->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
+								g::mdl_render->ForcedMaterialOverride(material);
+								original(g::mdl_render, context, &state, &info, bt_data.at(i).matrix);
+								g::mdl_render->ForcedMaterialOverride(nullptr);
+							}
 						}
 					}
 				}

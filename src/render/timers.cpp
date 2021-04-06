@@ -244,7 +244,7 @@ namespace render
 					}
 					columns(1);
 
-					for (const auto it : pinfo)
+					for (const auto& it : pinfo)
 					{
 						ImVec4 color;
 
@@ -335,7 +335,7 @@ namespace render
 					}
 					columns(1);
 
-					for (const auto it : ginfo)
+					for (const auto& it : ginfo)
 					{
 						ImVec4 color;
 
