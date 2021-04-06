@@ -3,6 +3,8 @@
 #include "../settings/settings.h"
 #include "../helpers/math.h"
 #include "../valve_sdk/csgostructs.hpp"
+#include "../helpers/entities.h"
+
 #include <vector>
 
 namespace features
@@ -31,15 +33,9 @@ namespace visuals
 {
 	void fetch_entities();
 	void render(ImDrawList* draw_list);
-	void recoil_crosshair();
-	void hitmarker();
-	void no_scope_overlay();
-	void spread_circle();
-	void draw_aimbot_fov();
 	void leftknife();
 	void drawring_3d();
 	void drawring_3d_popflash();
-	void damage_indicator();
 	void RenderInfo();
 	void RenderCircle();
 	void RenderCirclePopflash();

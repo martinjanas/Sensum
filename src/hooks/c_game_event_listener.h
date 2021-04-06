@@ -72,22 +72,24 @@ std::string allcolors[] =
 
 void WeaponCheck(std::string weapon, c_base_player* player)
 {
-	char buf[256];
 	std::string wepName;
 
 	auto it = weaponNames.find(weapon);
 	if (it != weaponNames.end())
 		wepName = it->second;
-	else wepName = it->first;
+	else
+		wepName = weapon;
 
-	static auto filter = CHudChat::ChatFilters::CHAT_FILTER_NONE;
+	auto filter = CHudChat::ChatFilters::CHAT_FILTER_NONE;
 	static int green = 3;
 	static int yellow = 15;
 	static int white = 0;
 
-	sprintf_s(buf, "%s [Buy] %s Player %s %s bought %s %s %s", allcolors[yellow].c_str(), allcolors[green].c_str(), allcolors[white].c_str(), player->GetPlayerInfo().szName, allcolors[green].c_str(), allcolors[white].c_str(), wepName);
+	std::stringstream text;
 
-	g::hud_chat->ChatPrintf(0, filter, buf);
+	text << allcolors[yellow] << "[Buy]" << " " << allcolors[green] << "Player " << allcolors[white] << player->GetPlayerInfo().szName << allcolors[green] << "bought" << allcolors[white] << wepName;
+
+	g::hud_chat->ChatPrintf(0, filter, text.str().c_str());
 }
 
 class c_game_event_listener final : public IGameEventListener2
@@ -230,8 +232,8 @@ class c_game_event_listener final : public IGameEventListener2
 			if (!enemy || !g::local_player || enemy->m_iTeamNum() == g::local_player->m_iTeamNum())
 				return;
 
-			if(settings::esp::buylog && utils::IsPlayingMM())
-			   WeaponCheck(context->GetString("weapon"), enemy);
+			if (settings::esp::buylog && utils::IsPlayingMM())
+				WeaponCheck(context->GetString("weapon"), enemy);
 		}
 		else if (name == FNV("round_start"))
 		{
