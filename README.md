@@ -2,6 +2,9 @@
 
 [**List of features**](https://pastebin.com/twMkYr0q) | ***Check the Discussions tab to request a feature.***
 
+**Further optimizations**
+This project is using the SSE2 instructions set by default, if your cpu supports AVX, AVX2 or AVX512 you can enable it in the project settings under c++ -> code generation to gain more performance.
+
 **Frequently Asked Questions:**
 - > Where is the config location?
   -- C:\Sensum\configs    
