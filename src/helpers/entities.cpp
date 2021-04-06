@@ -452,10 +452,7 @@ namespace entities
 			player_data.m_flSimulationTime = player->m_flSimulationTime();
 			player_data.m_iAmmo = weapData.Get()->m_iClip1();
 
-			//if (weapData->IsKnife())
-				//player_data.m_iAmmo = 0; player_data.m_MaxAmmo = 0;
-
-			player_data.m_MaxAmmo = player->m_hActiveWeapon().Get()->m_iPrimaryReserveAmmoCount(); //player->m_hActiveWeapon().Get()->GetMaxAmmo();
+			player_data.m_MaxAmmo = player->m_hActiveWeapon().Get()->m_iPrimaryReserveAmmoCount();
 			const auto tick_offset = player->m_vecVelocity() * g::global_vars->interval_per_tick;
 
 			in_smoke = true;

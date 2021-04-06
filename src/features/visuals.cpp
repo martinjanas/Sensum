@@ -175,6 +175,263 @@ namespace visuals
 		left_knife->SetValue(!weapon->IsKnife());
 	}
 
+	void draw_fov(entities::local_data_t& local, int xx, int yy)
+	{
+		if (settings::esp::drawFov)
+		{
+			if (!g::engine_client->IsConnected() || !g::engine_client->IsInGame())
+				return;
+
+			if (local.local != g::local_player)
+				return;
+
+			if (!local.local)
+				return;
+
+			auto& pWeapon = local.active_weapon;
+
+			if (!pWeapon)
+				return;
+
+			const auto& settings = settings::aimbot::m_items[pWeapon->m_iItemDefinitionIndex()];
+
+			if (settings.enabled)
+			{
+				if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
+					return;
+
+				if (!local.is_alive)
+					return;
+
+				if (settings.dynamic_fov)
+					return;
+
+				if (settings.fov <= 0.f)
+					return;
+
+				Vector2D screenSize = Vector2D(x, y);
+				Vector2D center = screenSize * 0.5f;
+
+				float ratio = screenSize.x / screenSize.y;
+				float screenFov = atanf((ratio) * (0.75f) * tan(DEG2RAD(static_cast<float>(g::local_player->GetFOV()) * 0.5f)));
+
+				float radius = tanf(DEG2RAD(aimbot::get_fov())) / tanf(screenFov) * center.x;
+
+				globals::draw_list->AddCircle(ImVec2(center.x, center.y), radius, ImGui::GetColorU32(settings::visuals::drawfov_color), 255);
+			}
+		}
+	}
+
+	void rcs_cross(entities::local_data_t& local, int xx, int yy)
+	{
+		if (settings::visuals::rcs_cross)
+		{
+			if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
+				return;
+
+			if (local.local != g::local_player)
+				return;
+
+			if (!local.local)
+				return;
+
+			if (!local.is_alive)
+				return;
+
+			int _x = xx;
+			int _y = yy;
+			int dy = yy / 97;
+			int dx = xx / 97;
+
+			_x -= (dx * (m_local.punch_angle.yaw));
+			_y += (dy * (m_local.punch_angle.pitch));
+
+			auto& active_wpn = m_local.active_weapon;
+
+			if (!active_wpn)
+				return;
+
+			static auto index = active_wpn->m_iItemDefinitionIndex();
+
+			if (index == WEAPON_USP_SILENCER || index == WEAPON_DEAGLE || index == WEAPON_GLOCK || index == WEAPON_REVOLVER || index == WEAPON_HKP2000)
+				return;
+
+			switch (settings::visuals::rcs_cross_mode)
+			{
+			case 0:
+				if (m_local.shots_fired > 1)
+				{
+					globals::draw_list->AddLine(ImVec2(_x - 5, _y), ImVec2(_x + 5, _y), ImGui::GetColorU32(settings::visuals::recoilcolor));
+					globals::draw_list->AddLine(ImVec2(_x, _y - 5), ImVec2(_x, y + 5), ImGui::GetColorU32(settings::visuals::recoilcolor));
+				}
+				break;
+			case 1:
+				if (m_local.shots_fired > 1)
+				{
+					globals::draw_list->AddCircle(ImVec2(_x, _y), settings::visuals::radius, ImGui::GetColorU32(settings::visuals::recoilcolor), 255);
+				}
+				break;
+			}
+		}
+	}
+
+	void hitmarker(entities::local_data_t& local, int xx, int yy)
+	{
+		if (settings::visuals::hitmarker)
+		{
+			if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
+				return;
+
+			if (local.local != g::local_player)
+				return;
+
+			if (!local.local)
+				return;
+
+			if (g::global_vars->realtime - saver.HitmarkerInfo.HitTime > .5f)
+				return;
+
+			float percent = (g::global_vars->realtime - saver.HitmarkerInfo.HitTime) / .5f;
+			float percent2 = percent;
+
+			if (percent > 1.f)
+			{
+				percent = 1.f;
+				percent2 = 1.f;
+			}
+
+			percent = 1.f - percent;
+			float addsize = percent2 * 5.f;
+
+			ImVec4 clr = ImVec4{ 1.0f, 1.0f, 1.0f, percent * 1.0f };
+
+			globals::draw_list->AddLine(ImVec2(xx - 3.f - addsize, yy - 3.f - addsize), ImVec2(xx + 3.f + addsize, yy + 3.f + addsize), ImGui::GetColorU32(clr));
+			globals::draw_list->AddLine(ImVec2(xx - 3.f - addsize, yy + 3.f + addsize), ImVec2(xx + 3.f + addsize, yy - 3.f - addsize), ImGui::GetColorU32(clr));
+		}
+	}
+
+	void noscope(entities::local_data_t& local, int xx, int yy)
+	{
+		if (settings::misc::noscope)
+		{
+			if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
+				return;
+
+			if (local.local != g::local_player)
+				return;
+
+			if (!local.local)
+				return;
+
+			auto& active_wpn = m_local.active_weapon;
+
+			if (!active_wpn)
+				return;
+
+			if (g::local_player->m_bIsScoped() && active_wpn->IsSniper())
+			{
+				globals::draw_list->AddLine(ImVec2(0, yy), ImVec2(x, yy), ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }));
+				globals::draw_list->AddLine(ImVec2(xx, 0), ImVec2(xx, y), ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }));
+				globals::draw_list->AddCircle(ImVec2(xx, yy), 255, ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }), 255);
+			}
+		}
+	}
+
+	void spread_cross(entities::local_data_t& local, int xx, int yy)
+	{
+		if (settings::visuals::spread_cross)
+		{
+			if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
+				return;
+
+			if (local.local != g::local_player)
+				return;
+
+			if (!local.local)
+				return;
+
+			if (!local.is_alive)
+				return;
+
+			auto& active_wpn = local.active_weapon;
+
+			if (!active_wpn)
+				return;
+
+			float spread = active_wpn->GetInaccuracy() * 1000.f;
+
+			if (spread == 0.f)
+				return;
+
+			globals::draw_list->AddCircle(ImVec2(xx, yy), spread, ImGui::GetColorU32(settings::visuals::spread_cross_color), 255);
+			globals::draw_list->AddCircleFilled(ImVec2(xx, yy), spread - 1, ImGui::GetColorU32({ 0.0f, 0.0f, 0.0f, 0.2f }), 255);
+		}
+	}
+
+	void damage_indicator(entities::local_data_t& local)
+	{
+		if (settings::misc::damage_indicator)
+		{
+			if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
+				return;
+
+			if (local.local != g::local_player)
+				return;
+
+			if (!local.local && !local.is_alive)
+				return;
+
+			float CurrentTime = local.tick_base * g::global_vars->interval_per_tick;
+
+			for (int i = 0; i < indicator.size(); i++)
+			{
+				if (indicator[i].flEraseTime < CurrentTime)
+				{
+					indicator.erase(indicator.begin() + i);
+					continue;
+				}
+
+				if (!indicator[i].bInitialized)
+				{
+					indicator[i].Position = indicator[i].Player->get_bone_position(8);
+					indicator[i].bInitialized = true;
+				}
+
+				if (CurrentTime - indicator[i].flLastUpdate > 0.001f)
+				{
+					indicator[i].Position.z -= (0.5f * (CurrentTime - indicator[i].flEraseTime));
+					indicator[i].flLastUpdate = CurrentTime;
+				}
+
+				if (!indicator[i].Player)
+				{
+					indicator.erase(indicator.begin() + i);
+					continue;
+				}
+
+				Vector ScreenPosition;
+
+				Color color = Color::White;
+
+				if (indicator[i].iDamage >= 100)
+					color = Color::Red;
+
+				if (indicator[i].iDamage >= 50 && indicator[i].iDamage < 100)
+					color = Color::Orange;
+
+				if (indicator[i].iDamage < 50)
+					color = Color::White;
+
+				if (math::world2screen(indicator[i].Position, ScreenPosition))
+				{
+					ImGui::PushFont(render::fonts::visuals);
+					imdraw::outlined_text(std::to_string(indicator[i].iDamage).c_str(), ImVec2(ScreenPosition.x, ScreenPosition.y), utils::to_im32(color));
+					ImGui::PopFont();
+				}
+			}
+		}
+	}
+
 	void fetch_entities()
 	{
 		render_mutex.lock();
@@ -248,206 +505,11 @@ namespace visuals
 		}
 		ImGui::PopFont();
 
-		if (settings::misc::damage_indicator)
-		{
-			if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
-				return;
-
-			if (!m_local.local && !m_local.is_alive)
-				return;
-
-			float CurrentTime = g::local_player->m_nTickBase() * g::global_vars->interval_per_tick;
-
-			for (int i = 0; i < indicator.size(); i++)
-			{
-				if (indicator[i].flEraseTime < CurrentTime)
-				{
-					indicator.erase(indicator.begin() + i);
-					continue;
-				}
-
-				if (!indicator[i].bInitialized)
-				{
-					indicator[i].Position = indicator[i].Player->get_bone_position(8);
-					indicator[i].bInitialized = true;
-				}
-
-				if (CurrentTime - indicator[i].flLastUpdate > 0.001f)
-				{
-					indicator[i].Position.z -= (0.5f * (CurrentTime - indicator[i].flEraseTime));
-					indicator[i].flLastUpdate = CurrentTime;
-				}
-
-				if (!indicator[i].Player)
-				{
-					indicator.erase(indicator.begin() + i);
-					continue;
-				}
-
-				Vector ScreenPosition;
-
-				Color color = Color::White;
-
-				if (indicator[i].iDamage >= 100)
-					color = Color::Red;
-
-				if (indicator[i].iDamage >= 50 && indicator[i].iDamage < 100)
-					color = Color::Orange;
-
-				if (indicator[i].iDamage < 50)
-					color = Color::White;
-
-				if (math::world2screen(indicator[i].Position, ScreenPosition))
-				{
-					ImGui::PushFont(render::fonts::visuals);
-					imdraw::outlined_text(std::to_string(indicator[i].iDamage).c_str(), ImVec2(ScreenPosition.x, ScreenPosition.y), utils::to_im32(color));
-					ImGui::PopFont();
-				}
-			}
-		}
-
-		if (settings::esp::drawFov)
-		{
-			if (!m_local.local)
-				return;
-
-			auto& pWeapon = m_local.active_weapon;
-
-			if (!pWeapon)
-				return;
-
-			if (!g::engine_client->IsConnected() || !g::engine_client->IsInGame())
-				return;
-
-			const auto& settings = settings::aimbot::m_items[pWeapon->m_iItemDefinitionIndex()];
-
-			if (settings.enabled)
-			{
-				if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
-					return;
-
-				if (!g::local_player && !g::local_player->IsAlive())
-					return;
-
-				if (settings.dynamic_fov)
-					return;
-
-				if (settings.fov <= 0.f)
-					return;
-
-				Vector2D screenSize = Vector2D(x, y);
-				Vector2D center = screenSize * 0.5f;
-
-				float ratio = screenSize.x / screenSize.y;
-				float screenFov = atanf((ratio) * (0.75f) * tan(DEG2RAD(static_cast<float>(g::local_player->GetFOV()) * 0.5f)));
-
-				float radius = tanf(DEG2RAD(aimbot::get_fov())) / tanf(screenFov) * center.x;
-
-				globals::draw_list->AddCircle(ImVec2(center.x, center.y), radius, ImGui::GetColorU32(settings::visuals::drawfov_color), 255);
-			}
-		}
-
-		if (settings::visuals::rcs_cross)
-		{
-			if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
-				return;
-
-			if (!m_local.local && !m_local.is_alive)
-				return;
-			int _x = xx;
-			int _y = yy;
-			int dy = yy / 97;
-			int dx = xx / 97;
-
-			_x -= (dx * (m_local.punch_angle.yaw));
-			_y += (dy * (m_local.punch_angle.pitch));
-
-			if (!m_local.active_weapon)
-				return;
-
-			static auto index = m_local.active_weapon->m_iItemDefinitionIndex();
-
-			if (index == WEAPON_USP_SILENCER || index == WEAPON_DEAGLE || index == WEAPON_GLOCK || index == WEAPON_REVOLVER || index == WEAPON_HKP2000)
-				return;
-
-			switch (settings::visuals::rcs_cross_mode)
-			{
-			case 0:
-				if (m_local.shots_fired > 1)
-				{
-					globals::draw_list->AddLine(ImVec2(_x - 5, _y), ImVec2(_x + 5, _y), ImGui::GetColorU32(settings::visuals::recoilcolor));
-					globals::draw_list->AddLine(ImVec2(_x, _y - 5), ImVec2(_x, y + 5), ImGui::GetColorU32(settings::visuals::recoilcolor));
-				}
-				break;
-			case 1:
-				if (m_local.shots_fired > 1)
-				{
-					globals::draw_list->AddCircle(ImVec2(_x, _y), settings::visuals::radius, ImGui::GetColorU32(settings::visuals::recoilcolor), 255);
-				}
-				break;
-			}
-		}
-
-		if (settings::visuals::hitmarker)
-		{
-			if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
-				return;
-
-			if (g::global_vars->realtime - saver.HitmarkerInfo.HitTime > .5f)
-				return;
-
-			float percent = (g::global_vars->realtime - saver.HitmarkerInfo.HitTime) / .5f;
-			float percent2 = percent;
-
-			if (percent > 1.f)
-			{
-				percent = 1.f;
-				percent2 = 1.f;
-			}
-
-			percent = 1.f - percent;
-			float addsize = percent2 * 5.f;
-
-			ImVec4 clr = ImVec4{ 1.0f, 1.0f, 1.0f, percent * 1.0f };
-
-			globals::draw_list->AddLine(ImVec2(xx - 3.f - addsize, yy - 3.f - addsize), ImVec2(xx + 3.f + addsize, yy + 3.f + addsize), ImGui::GetColorU32(clr));
-			globals::draw_list->AddLine(ImVec2(xx - 3.f - addsize, yy + 3.f + addsize), ImVec2(xx + 3.f + addsize, yy - 3.f - addsize), ImGui::GetColorU32(clr));
-		}
-
-		if (settings::misc::noscope)
-		{
-			if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
-				return;
-
-			if (!m_local.local)
-				return;
-
-			if (m_local.active_weapon)
-			{
-				if (g::local_player->m_bIsScoped() && m_local.active_weapon->IsSniper())
-				{
-					globals::draw_list->AddLine(ImVec2(0, yy), ImVec2(x, yy), ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }));
-					globals::draw_list->AddLine(ImVec2(xx, 0), ImVec2(xx, y), ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }));
-					globals::draw_list->AddCircle(ImVec2(xx, yy), 255, ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }), 255);
-				}
-			}
-		}
-
-		if (settings::visuals::spread_cross)
-		{
-			if (!m_local.local || !m_local.is_alive)
-				return;
-
-			if (!m_local.active_weapon)
-				return;
-
-			float spread = m_local.active_weapon->GetInaccuracy() * 1000.f;
-
-			if (spread == 0.f)
-				return;
-
-			globals::draw_list->AddCircle(ImVec2(xx, yy), spread, ImGui::GetColorU32(settings::visuals::spread_cross_color), 255);
-			globals::draw_list->AddCircleFilled(ImVec2(xx, yy), spread - 1, ImGui::GetColorU32({ 0.0f, 0.0f, 0.0f, 0.2f }), 255);
-		}
+		damage_indicator(m_local);
+		draw_fov(m_local, xx, yy);
+		noscope(m_local, xx, yy);
+		spread_cross(m_local, xx, yy);
+		hitmarker(m_local, xx, yy);
+		rcs_cross(m_local, xx, yy);
 	}
 }
