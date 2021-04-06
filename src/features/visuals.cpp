@@ -375,14 +375,14 @@ namespace visuals
 			case 0:
 				if (m_local.shots_fired > 1)
 				{
-					draw_list->AddLine(ImVec2(_x - 5, _y), ImVec2(_x + 5, _y), ImGui::GetColorU32(settings::visuals::recoilcolor));
-					draw_list->AddLine(ImVec2(_x, _y - 5), ImVec2(_x, y + 5), ImGui::GetColorU32(settings::visuals::recoilcolor));
+					globals::draw_list->AddLine(ImVec2(_x - 5, _y), ImVec2(_x + 5, _y), ImGui::GetColorU32(settings::visuals::recoilcolor));
+					globals::draw_list->AddLine(ImVec2(_x, _y - 5), ImVec2(_x, y + 5), ImGui::GetColorU32(settings::visuals::recoilcolor));
 				}
 				break;
 			case 1:
 				if (m_local.shots_fired > 1)
 				{
-					draw_list->AddCircle(ImVec2(_x, _y), settings::visuals::radius, ImGui::GetColorU32(settings::visuals::recoilcolor), 255);
+					globals::draw_list->AddCircle(ImVec2(_x, _y), settings::visuals::radius, ImGui::GetColorU32(settings::visuals::recoilcolor), 255);
 				}
 				break;
 			}
@@ -410,8 +410,8 @@ namespace visuals
 
 			ImVec4 clr = ImVec4{ 1.0f, 1.0f, 1.0f, percent * 1.0f };
 
-			draw_list->AddLine(ImVec2(xx - 3.f - addsize, yy - 3.f - addsize), ImVec2(xx + 3.f + addsize, yy + 3.f + addsize), ImGui::GetColorU32(clr));
-			draw_list->AddLine(ImVec2(xx - 3.f - addsize, yy + 3.f + addsize), ImVec2(xx + 3.f + addsize, yy - 3.f - addsize), ImGui::GetColorU32(clr));
+			globals::draw_list->AddLine(ImVec2(xx - 3.f - addsize, yy - 3.f - addsize), ImVec2(xx + 3.f + addsize, yy + 3.f + addsize), ImGui::GetColorU32(clr));
+			globals::draw_list->AddLine(ImVec2(xx - 3.f - addsize, yy + 3.f + addsize), ImVec2(xx + 3.f + addsize, yy - 3.f - addsize), ImGui::GetColorU32(clr));
 		}
 
 		if (settings::misc::noscope)
@@ -426,9 +426,9 @@ namespace visuals
 			{
 				if (g::local_player->m_bIsScoped() && m_local.active_weapon->IsSniper())
 				{
-					draw_list->AddLine(ImVec2(0, yy), ImVec2(x, yy), ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }));
-					draw_list->AddLine(ImVec2(xx, 0), ImVec2(xx, y), ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }));
-					draw_list->AddCircle(ImVec2(xx, yy), 255, ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }), 255);
+					globals::draw_list->AddLine(ImVec2(0, yy), ImVec2(x, yy), ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }));
+					globals::draw_list->AddLine(ImVec2(xx, 0), ImVec2(xx, y), ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }));
+					globals::draw_list->AddCircle(ImVec2(xx, yy), 255, ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }), 255);
 				}
 			}
 		}
@@ -446,8 +446,8 @@ namespace visuals
 			if (spread == 0.f)
 				return;
 
-			draw_list->AddCircle(ImVec2(xx, yy), spread, ImGui::GetColorU32(settings::visuals::spread_cross_color), 255);
-			draw_list->AddCircleFilled(ImVec2(xx, yy), spread - 1, ImGui::GetColorU32({ 0.0f, 0.0f, 0.0f, 0.2f }), 255);
+			globals::draw_list->AddCircle(ImVec2(xx, yy), spread, ImGui::GetColorU32(settings::visuals::spread_cross_color), 255);
+			globals::draw_list->AddCircleFilled(ImVec2(xx, yy), spread - 1, ImGui::GetColorU32({ 0.0f, 0.0f, 0.0f, 0.2f }), 255);
 		}
 	}
 }

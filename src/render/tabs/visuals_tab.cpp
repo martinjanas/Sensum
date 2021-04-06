@@ -392,7 +392,8 @@ namespace render
 					tooltip("Will display HK if enemy has kevlar + helmer or K if enemy has kevlar only.");
 					checkbox("Grenade Prediction", &settings::visuals::grenade_prediction);
 					checkbox("Damage Indicator", &settings::misc::damage_indicator);
-					checkbox("Aimbot Fov", &settings::esp::drawFov);
+					checkbox("Aimbot Fov (?)", &settings::esp::drawFov);
+					tooltip("Only supported on static fov.");
 					checkbox("Spread Crosshair", &settings::visuals::spread_cross);
 					checkbox("Bullet Tracer", &settings::visuals::bullet_tracer);
 
