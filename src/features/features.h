@@ -31,16 +31,15 @@ namespace visuals
 {
 	void fetch_entities();
 	void render(ImDrawList* draw_list);
-	void more_chams() noexcept;
-	void RenderPunchCross();
-	void RenderHitmarker();
-	void RenderNoScopeOverlay();
-	void SpreadCircle();
-	void DrawFov();
-	void KnifeLeft();
-	void DrawRing3D();
-	void DrawRing3DPopflash();
-	void DrawDamageIndicator();
+	void recoil_crosshair();
+	void hitmarker();
+	void no_scope_overlay();
+	void spread_circle();
+	void draw_aimbot_fov();
+	void leftknife();
+	void drawring_3d();
+	void drawring_3d_popflash();
+	void damage_indicator();
 	void RenderInfo();
 	void RenderCircle();
 	void RenderCirclePopflash();
@@ -48,6 +47,12 @@ namespace visuals
 	void PopflashHelperAimbot(CUserCmd* cmd);
 	void glow_players();
 	void glow_misc();
+}
+
+namespace chams
+{
+	void on_draw_model_execute(IMatRenderContext* ctx, const DrawModelState_t& state, const ModelRenderInfo_t& pInfo, matrix3x4_t* pCustomBoneToWorld);
+	void misc_chams();
 }
 
 namespace esp

@@ -23,7 +23,7 @@ public:
 	void Init();
 	void DrawText(std::string text, float x, float y, Color color, int size = 15);
 	void DrawIcon(std::string text, float x, float y, Color color, int size);
-	void DrawRing3D(int16_t x, int16_t y, int16_t z, int16_t radius, uint16_t points, Color color1, float thickness);
+	void drawring_3d(int16_t x, int16_t y, int16_t z, int16_t radius, uint16_t points, Color color1, float thickness);
 	void DrawLine(float x1, float y1, float x2, float y2, Color color, float size = 1.f);
 	void DrawBox(float x1, float y1, float x2, float y2, Color clr, float size = 1.f);
 	void DrawFilledBox(float x1, float y1, float x2, float y2, Color clr);

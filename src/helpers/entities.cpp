@@ -341,6 +341,7 @@ namespace entities
 
 		tick_data.health = local->m_iHealth();
 		tick_data.armor_value = local->m_ArmorValue();
+		tick_data.shots_fired = local->m_iShotsFired();
 
 		tick_data.has_sniper = tick_data.is_alive && local->m_hActiveWeapon() && local->m_hActiveWeapon()->IsSniper();
 
@@ -350,6 +351,9 @@ namespace entities
 		tick_data.hp = 0;
 		tick_data.bomb_time = 0.f;
 		tick_data.defuse_time = 0.f;
+
+		tick_data.punch_angle = local->m_aimPunchAngle();
+		tick_data.active_weapon = local->m_hActiveWeapon();
 
 		fetch_hp(tick_data);
 	}

@@ -6,7 +6,6 @@
 #include "../helpers/console.h"
 #include "../helpers/notifies.h"
 #include "../features/features.h"
-#include "../features/Chams.h"
 
 #include <intrin.h>
 
@@ -32,12 +31,6 @@ namespace hooks
 		esp::render(globals::draw_list);
 		visuals::render(globals::draw_list);
 		//features::aimlines(globals::draw_list); //Work in progress - I need to figure out how to make the lines not render through walls.
-
-		if (settings::misc::smoke_helper)
-		{
-			visuals::DrawRing3D();
-			visuals::DrawRing3DPopflash();
-		}
 
 		ImGui::Render();
 

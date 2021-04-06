@@ -103,7 +103,7 @@ namespace visuals
 		}
 	}
 
-	void DrawRing3D()
+	void drawring_3d()
 	{
 		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected() || !g::local_player)
 			return;
@@ -128,7 +128,7 @@ namespace visuals
 					{
 						if (g::local_player->m_hActiveWeapon()->IsSmoke() && dist <= 500.f)
 						{
-							VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 255, Color::White, 1.0f);
+							VGSHelper::Get().drawring_3d(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 255, Color::White, 1.0f);
 						}
 					}
 				}

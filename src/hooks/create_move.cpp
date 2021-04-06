@@ -69,7 +69,7 @@ namespace hooks
 			saver.LastShotEyePos = g::local_player->GetEyePos();
 
 		if (settings::misc::lefthandknife)
-			visuals::KnifeLeft();
+			visuals::leftknife();
 
 		engine_prediction::finish(cmd);
 		features::edge_jump_post(cmd);

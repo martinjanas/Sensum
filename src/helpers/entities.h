@@ -13,6 +13,9 @@ namespace entities
 		Vector local_pos;
 		Vector world_pos;
 		QAngle angles;
+		QAngle punch_angle;
+
+		CHandle<c_base_combat_weapon> active_weapon;
 		
 		int tick_base;
 		int health;
@@ -20,7 +23,8 @@ namespace entities
 		int hp = 0;
 		int damage;
 		int bombsite_index;
-		int bombIndex;
+		int bomb_index;
+		int shots_fired;
 
 		float bomb_time = 0.f;
 		float defuse_time = 0.f;
@@ -52,7 +56,7 @@ namespace entities
 
 		bool is_shooting = false;
 		Vector shot_origin;
-
+	
 		bool is_enemy;
 		bool is_scoped;
 		bool is_flashed;
@@ -83,7 +87,7 @@ namespace entities
 		float m_ArmorValue;
 		float m_flShotTime;
 		float m_flSimulationTime;
-
+		
 		Vector points[8];
 
 		RECT box;
@@ -93,10 +97,10 @@ namespace entities
 		Vector old_origin;
 		Vector world_pos;
 		QAngle angles;
-
+		
 		const model_t* model;
 		studiohdr_t* hdr;
-
+	
 		std::array<Vector, 4> hitboxes[HITBOX_MAX];
 	};
 #pragma pack(pop)

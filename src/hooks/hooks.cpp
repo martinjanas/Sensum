@@ -7,7 +7,6 @@
 #include "../helpers/notifies.h"
 #include "../features/features.h"
 #include "c_game_event_listener.h"
-#include "../features/Chams.h"
 #include "../helpers/HitPossitionHelper.h"
 #include "../helpers/runtime_saver.h"
 #include "..//jsoncpp/json.h"
@@ -337,7 +336,7 @@ namespace hooks
 		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
 			return;
 
-		visuals::more_chams();
+		chams::misc_chams();
 
 		/*static IMaterial* material = g::mat_system->FindMaterial("debug/debugambientcube", TEXTURE_GROUP_MODEL);
 
@@ -379,7 +378,7 @@ namespace hooks
 			return original(g::mdl_render, context, &state, &info, bone);
 
 		aimbot::backtrack_chams(context, state, info, bone);
-		Chams::Get().OnDrawModelExecute(context, state, info, bone);
+		chams::on_draw_model_execute(context, state, info, bone);
 		
 		original(g::mdl_render, context, &state, &info, bone);
 		

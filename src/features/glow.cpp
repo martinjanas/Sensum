@@ -1,4 +1,4 @@
-#include "features/features.h"
+#include "../features/features.h"
 
 namespace visuals  //TODO: Glow is dropping fps and sometimes shows weird 3d cube in the world.
 {

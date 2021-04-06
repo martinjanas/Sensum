@@ -8,12 +8,17 @@
 #include "../helpers/runtime_saver.h"
 #include "../render/render.h"
 #include "../helpers/autowall.h"
+#include "../helpers/entities.h"
 
 #include <mutex>
 
 namespace visuals
 {
 	std::mutex render_mutex;
+
+	decltype(entities::m_local) m_local;
+
+	int x, y;
 
 	struct entity_data_t
 	{
@@ -112,15 +117,12 @@ namespace visuals
 		if (g::local_player->IsFlashed())
 			return;
 
-		/*if (!g::local_player->CanSeePlayer(entity, entity->GetRenderOrigin()))
-			return; */
-
 		if (utils::is_line_goes_through_smoke(g::local_player->GetEyePos(), entity->GetRenderOrigin()))
 			return;
 
 		auto bbox = GetBBox(entity);
-
 		auto class_id = entity->GetClientClass()->m_ClassID;
+
 		std::string name = "";
 
 		auto grenade = reinterpret_cast<c_base_combat_weapon*>(entity);
@@ -128,15 +130,14 @@ namespace visuals
 		if (!grenade)
 			return;
 
-		switch (class_id)
-		{
-		case EClassId::CBaseCSGrenadeProjectile:
-		case EClassId::CMolotovProjectile:
-		case EClassId::CDecoyProjectile:
-		case EClassId::CSmokeGrenadeProjectile:
-		case EClassId::CSensorGrenadeProjectile:
-			if(entity->m_hOwnerEntity())
-			   name = entity->m_hOwnerEntity().Get()->GetPlayerInfo().szName; break;
+		switch (class_id) {
+			case EClassId::CBaseCSGrenadeProjectile:
+			case EClassId::CMolotovProjectile:
+			case EClassId::CDecoyProjectile:
+			case EClassId::CSmokeGrenadeProjectile:
+			case EClassId::CSensorGrenadeProjectile:
+				if(entity->m_hOwnerEntity())
+				   name = entity->m_hOwnerEntity().Get()->GetPlayerInfo().szName; break;
 		}
 
 		grenade_info_t info;
@@ -156,12 +157,12 @@ namespace visuals
 			push_entity(entity, info.name, name, true, info.color);
 	}
 
-	void DrawDamageIndicator()
+	void damage_indicator()
 	{
 		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
 			return;
 
-		if (!g::local_player && !g::local_player->IsAlive())
+		if (!m_local.local && !m_local.is_alive)
 			return;
 
 		float CurrentTime = g::local_player->m_nTickBase() * g::global_vars->interval_per_tick;
@@ -192,7 +193,7 @@ namespace visuals
 				continue;
 			}
 
-			Vector ScreenPosition;
+			static Vector ScreenPosition;
 
 			Color color = Color::White;
 
@@ -212,59 +213,51 @@ namespace visuals
 		}
 	}
 
-	void RenderPunchCross()
+	void recoil_crosshair()
 	{
-		int w, h;
-
-		g::engine_client->GetScreenSize(w, h);
-
 		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
 			return;
 
-		if (!g::local_player && !g::local_player->IsAlive())
+		g::engine_client->GetScreenSize(x, y);
+
+		if (!m_local.local && !m_local.is_alive)
 			return;
 
-		int x = w / 2;
-		int y = h / 2;
-		int dy = h / 97;
-		int dx = w / 97;
+		x /= 2;
+		y /= 2;
+		int dy = x / 97;
+		int dx = y / 97;
 
-		QAngle punchAngle = g::local_player->m_aimPunchAngle();
-		x -= (dx * (punchAngle.yaw));
-		y += (dy * (punchAngle.pitch));
+		x -= (dx * (m_local.punch_angle.yaw));
+		y += (dy * (m_local.punch_angle.pitch));
 
-		auto& active_wep = g::local_player->m_hActiveWeapon();
+		if (m_local.active_weapon)
+			return;
 
-        if (active_wep)
-        {
-            auto index = active_wep->m_iItemDefinitionIndex();
+		static auto index = m_local.active_weapon->m_iItemDefinitionIndex();
 
-            if (index == WEAPON_USP_SILENCER || index == WEAPON_DEAGLE || index == WEAPON_GLOCK || index == WEAPON_REVOLVER || 
-                index == WEAPON_HKP2000)
-                return;
-        }
-
-		float radius = settings::visuals::radius;
+		if (index == WEAPON_USP_SILENCER || index == WEAPON_DEAGLE || index == WEAPON_GLOCK || index == WEAPON_REVOLVER || index == WEAPON_HKP2000)
+			return;
 
 		switch (settings::visuals::rcs_cross_mode)
 		{
 		case 0:
-            if (g::local_player->m_iShotsFired() > 1)
+            if (m_local.shots_fired > 1)
             {
                 globals::draw_list->AddLine(ImVec2(x - 5, y), ImVec2(x + 5, y), ImGui::GetColorU32(settings::visuals::recoilcolor));
                 globals::draw_list->AddLine(ImVec2(x, y - 5), ImVec2(x, y + 5), ImGui::GetColorU32(settings::visuals::recoilcolor));
             }
 			break;
 		case 1:
-            if (g::local_player->m_iShotsFired() > 1)
+            if (m_local.shots_fired > 1)
             {
-                globals::draw_list->AddCircle(ImVec2(x, y), radius, ImGui::GetColorU32(settings::visuals::recoilcolor), 255);
+                globals::draw_list->AddCircle(ImVec2(x, y), settings::visuals::radius, ImGui::GetColorU32(settings::visuals::recoilcolor), 255);
             }
 			break;
 		}
 	}
 
-	void KnifeLeft()
+	void leftknife()
 	{
 		static auto left_knife = g::cvar->find("cl_righthand");
 
@@ -280,7 +273,7 @@ namespace visuals
 		left_knife->SetValue(!weapon->IsKnife());
 	}
 
-	void DrawFov()
+	void draw_aimbot_fov()
 	{
 		auto& pWeapon = g::local_player->m_hActiveWeapon();
 		if (!pWeapon)
@@ -317,18 +310,17 @@ namespace visuals
 		}
 	}
 
-	void RenderHitmarker()
+	void hitmarker()
 	{
 		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
 			return;
 
 		static int cx;
 		static int cy;
-		static int w, h;
-
-		g::engine_client->GetScreenSize(w, h);
-		cx = w / 2;
-		cy = h / 2;
+		
+		g::engine_client->GetScreenSize(x, y);
+		cx = x / 2;
+		cy = y / 2;
 
 		if (g::global_vars->realtime - saver.HitmarkerInfo.HitTime > .5f)
 			return;
@@ -351,126 +343,48 @@ namespace visuals
 		globals::draw_list->AddLine(ImVec2(cx - 3.f - addsize, cy + 3.f + addsize), ImVec2(cx + 3.f + addsize, cy - 3.f - addsize), ImGui::GetColorU32(clr));
 	}
 
-	void RenderNoScopeOverlay()
+	void no_scope_overlay()
 	{
 		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
 			return;
 
 		static int cx;
 		static int cy;
-		static int w, h;
+		
+		g::engine_client->GetScreenSize(x, y);
+		cx = x / 2;
+		cy = y / 2;
 
-		g::engine_client->GetScreenSize(w, h);
-		cx = w / 2;
-		cy = h / 2;
-
-		auto& weapon = g::local_player->m_hActiveWeapon();
-
-		if (weapon)
+		if (m_local.active_weapon)
 		{
-			if (g::local_player->m_bIsScoped() && weapon->IsSniper())
+			if (g::local_player->m_bIsScoped() && m_local.active_weapon->IsSniper())
 			{
-				globals::draw_list->AddLine(ImVec2(0, cy), ImVec2(w, cy), ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }));
-				globals::draw_list->AddLine(ImVec2(cx, 0), ImVec2(cx, h), ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }));
+				globals::draw_list->AddLine(ImVec2(0, cy), ImVec2(x, cy), ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }));
+				globals::draw_list->AddLine(ImVec2(cx, 0), ImVec2(cx, y), ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }));
 				globals::draw_list->AddCircle(ImVec2(cx, cy), 255, ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }), 255);
 			}
 		}
 	}
 
-	void more_chams() noexcept
+	void spread_circle()
 	{
-		static IMaterial* mat = g::mat_system->FindMaterial("debug/debugambientcube", TEXTURE_GROUP_MODEL);
-
-		for (int i = 0; i < g::entity_list->GetHighestEntityIndex(); i++) {
-			auto entity = reinterpret_cast<c_base_player*>(g::entity_list->GetClientEntity(i));
-
-			auto grenade = reinterpret_cast<c_base_combat_weapon*>(g::entity_list->GetClientEntity(i));
-
-			if (entity && entity != g::local_player) {
-				auto client_class = entity->GetClientClass();
-				auto model_name = g::mdl_info->GetModelName(entity->GetModel());
-
-				switch (client_class->m_ClassID) {
-				case EClassId::CPlantedC4:
-				case EClassId::CBaseAnimating:
-					if (settings::chams::misc::planted_bomb_chams) {
-						g::render_view->SetColorModulation(settings::chams::misc::color_planted_bomb_chams.r() / 255.f, settings::chams::misc::color_planted_bomb_chams.g() / 255.f, settings::chams::misc::color_planted_bomb_chams.b() / 255.f);
-						mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, true);
-						g::mdl_render->ForcedMaterialOverride(mat);
-						entity->DrawModel(1, 255);
-					}
-					break;
-				case EClassId::CHEGrenade:
-				case EClassId::CFlashbang:
-				case EClassId::CMolotovGrenade:
-				case EClassId::CMolotovProjectile:
-				case EClassId::CIncendiaryGrenade:
-				case EClassId::CDecoyGrenade:
-				case EClassId::CDecoyProjectile:
-				case EClassId::CSmokeGrenade:
-				case EClassId::CSmokeGrenadeProjectile:
-				case EClassId::ParticleSmokeGrenade:
-				case EClassId::CBaseCSGrenade:
-				case EClassId::CBaseCSGrenadeProjectile:
-				case EClassId::CBaseGrenade:
-				case EClassId::CBaseParticleEntity:
-				case EClassId::CSensorGrenade:
-				case EClassId::CSensorGrenadeProjectile:
-					if (settings::chams::misc::nade_chams && grenade && grenade->m_nExplodeEffectTickBegin() < 1) {
-						g::render_view->SetColorModulation(settings::chams::misc::color_nade_chams.r() / 255.f, settings::chams::misc::color_nade_chams.g() / 255.f, settings::chams::misc::color_nade_chams.b() / 255.f);
-						mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, true);
-						g::mdl_render->ForcedMaterialOverride(mat);
-						entity->DrawModel(1, 255);
-					}
-					break;
-				}
-
-				if (client_class->m_ClassID == CAK47 || client_class->m_ClassID == CDEagle || client_class->m_ClassID == CC4 ||
-					client_class->m_ClassID >= CWeaponAug && client_class->m_ClassID <= CWeaponXM1014) {
-					if (settings::chams::misc::dropped_weapons) {
-						g::render_view->SetColorModulation(settings::chams::misc::color_dropped_weapons_chams.r() / 255.f, settings::chams::misc::color_dropped_weapons_chams.g() / 255.f, settings::chams::misc::color_dropped_weapons_chams.b() / 255.f);
-						mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, true);
-						g::mdl_render->ForcedMaterialOverride(mat);
-						entity->DrawModel(1, 255);
-					}
-				}
-				g::mdl_render->ForcedMaterialOverride(nullptr);
-				mat->IncrementReferenceCount();
-
-
-				if (client_class->m_ClassID == CEconEntity) {
-					if (settings::chams::misc::dropped_defusekit_chams) {
-						g::render_view->SetColorModulation(settings::chams::misc::color_dropped_defusekit_chams.r() / 255.f, settings::chams::misc::color_dropped_defusekit_chams.g() / 255.f, settings::chams::misc::color_dropped_defusekit_chams.b() / 255.f);
-						mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, true);
-						g::mdl_render->ForcedMaterialOverride(mat);
-						entity->DrawModel(1, 255);
-					}
-				}
-				//g::mdl_render->ForcedMaterialOverride(nullptr);
-				//mat->IncrementReferenceCount();
-			}
-		}
-	}
-
-	void SpreadCircle()
-	{
-		if (!g::local_player || !g::local_player->IsAlive())
+		if (!m_local.local || !m_local.is_alive)
 			return;
 
-		c_base_combat_weapon* weapon = g::local_player->m_hActiveWeapon().Get();
-
-		if (!weapon)
+		if (!m_local.active_weapon)
 			return;
 
-		float spread = weapon->GetInaccuracy() * 1000;
+		float spread = m_local.active_weapon->GetInaccuracy() * 1000.f;
 
 		if (spread == 0.f)
 			return;
 
-		int x, y;
+		static float cx;
+		static float cy;
+
 		g::engine_client->GetScreenSize(x, y);
-		float cx = x / 2.f;
-		float cy = y / 2.f;
+		cx = x / 2.f;
+		cy = y / 2.f;
 
 		globals::draw_list->AddCircle(ImVec2(cx, cy), spread, ImGui::GetColorU32(settings::visuals::spread_cross_color), 255);
 		globals::draw_list->AddCircleFilled(ImVec2(cx, cy), spread - 1, ImGui::GetColorU32({ 0.0f, 0.0f, 0.0f, 0.2f }), 255);
@@ -486,6 +400,12 @@ namespace visuals
 		{
 			render_mutex.unlock();
 			return;
+		}
+
+		if (entities::local_mutex.try_lock())
+		{
+			m_local = entities::m_local;
+			entities::local_mutex.unlock();
 		}
 
 		for (auto i = 1; i <= g::entity_list->GetHighestEntityIndex(); ++i)
@@ -537,22 +457,22 @@ namespace visuals
 		}
 
 		if (settings::visuals::rcs_cross)
-			RenderPunchCross();
+			recoil_crosshair();
 
 		if (settings::esp::drawFov)
-			DrawFov();
+			draw_aimbot_fov();
 
 		if (settings::visuals::hitmarker)
-			RenderHitmarker();
+			hitmarker();
 
 		if (settings::misc::noscope)
-			RenderNoScopeOverlay();
+			no_scope_overlay();
 
 		if (settings::visuals::spread_cross)
-			SpreadCircle();
+			spread_circle();
 
 		if (settings::misc::damage_indicator)
-			DrawDamageIndicator();
+			damage_indicator();
 
 		ImGui::PopFont();
 	}

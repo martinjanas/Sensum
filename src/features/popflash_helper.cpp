@@ -106,7 +106,7 @@ namespace visuals
 		}
 	}
 
-	void DrawRing3DPopflash()
+	void drawring_3d_popflash()
 	{
 		if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected() || !g::local_player)
 			return;
@@ -134,7 +134,7 @@ namespace visuals
 					{
 						if (g::local_player->m_hActiveWeapon()->IsFlash() && dist <= 1000.f)
 						{
-							VGSHelper::Get().DrawRing3D(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 255, Color::Red, 1.0f);
+							VGSHelper::Get().drawring_3d(ppos.x, ppos.y, ppos.z - it.ring_height, 15.f, 255, Color::Red, 1.0f);
 						}
 					}
 				}

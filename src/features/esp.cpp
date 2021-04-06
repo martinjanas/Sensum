@@ -14,7 +14,6 @@ ConVar* type = nullptr;
 ConVar* mode = nullptr;
 
 entities::sound_t _sounds[MAX_PLAYERS];
-entities::player_data_t m_players[MAX_PLAYERS];
 
 ImU32 GetU32(Color _color)
 {
@@ -87,11 +86,13 @@ namespace esp
 		{
 			visuals::RenderInfo();
 			visuals::RenderCircle();
+			visuals::drawring_3d();
 		}
 
 		if (settings::misc::flash_helper)
 		{
 			visuals::RenderCirclePopflash();
+			visuals::drawring_3d_popflash();
 		}
 	}
 
@@ -161,12 +162,6 @@ namespace esp
 		{
 			m_local = entities::m_local;
 			entities::local_mutex.unlock();
-		}
-
-		if (entities::locker.try_lock())
-		{
-			memcpy(m_players, entities::m_items.front().players, sizeof(m_players));
-			entities::locker.unlock();
 		}
 
 		if (settings::esp::sound && entities::m_mutex_sounds.try_lock())
@@ -294,8 +289,6 @@ namespace esp
 			{
 				if (!data.is_player || data.player == g::local_player || data.m_iHealth <= 0 || data.is_dormant || data.team_num == g::local_player->m_iTeamNum())
 					continue;
-
-				//studiohdr_t* hdr = g::mdl_info->GetStudiomodel(data.model);
 
 				if (!data.hdr)
 					continue;
@@ -605,7 +598,7 @@ void VGSHelper::DrawText(std::string text, float x, float y, Color color, int si
 	}
 }
 
-void VGSHelper::DrawRing3D(int16_t x, int16_t y, int16_t z, int16_t radius, uint16_t points, Color color1, float thickness)
+void VGSHelper::drawring_3d(int16_t x, int16_t y, int16_t z, int16_t radius, uint16_t points, Color color1, float thickness)
 {
 	Vector pos = Vector(x, y, z);
 

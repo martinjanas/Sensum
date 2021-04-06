@@ -301,9 +301,7 @@
     <ClCompile Include="features\aimlines.cpp">
       <Filter>features\visuals</Filter>
     </ClCompile>
-    <ClCompile Include="glow.cpp">
-      <Filter>features\visuals</Filter>
-    </ClCompile>
+    <ClCompile Include="features\glow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\directx9\imgui_impl_dx9.h">
@@ -589,9 +587,6 @@
       <Filter>helpers</Filter>
     </ClInclude>
     <ClInclude Include="features\esp.hpp">
-      <Filter>features\visuals</Filter>
-    </ClInclude>
-    <ClInclude Include="features\Chams.h">
       <Filter>features\visuals</Filter>
     </ClInclude>
     <ClInclude Include="features\nade_helper.h">
