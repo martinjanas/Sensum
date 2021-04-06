@@ -301,7 +301,9 @@
     <ClCompile Include="features\aimlines.cpp">
       <Filter>features\visuals</Filter>
     </ClCompile>
-    <ClCompile Include="features\glow.cpp" />
+    <ClCompile Include="features\glow.cpp">
+      <Filter>features\visuals</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\directx9\imgui_impl_dx9.h">

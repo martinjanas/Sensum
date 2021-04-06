@@ -1,6 +1,6 @@
 #include "../features/features.h"
 
-namespace visuals  //TODO: Glow is dropping fps and sometimes shows weird 3d cube in the world.
+namespace visuals
 {
 	void glow_players()
 	{
@@ -45,7 +45,9 @@ namespace visuals  //TODO: Glow is dropping fps and sometimes shows weird 3d cub
 
 				Color color = !is_vis ? settings::glow::enemy::visible_color : settings::glow::enemy::invisible_color;
 
-				objects.set(color, (settings::glow::enemy::visible_only && is_vis) ? false : true, (settings::glow::enemy::visible_only && is_vis) ? false : true, settings::glow::enemy::style);
+				bool visible = (settings::glow::enemy::visible_only && is_vis);
+
+				objects.set(color, visible ? false : true, !visible ? true : false, settings::glow::enemy::style);
 			}
 
 			if (settings::glow::teammates::enabled && player->m_iTeamNum() == g::local_player->m_iTeamNum())
@@ -54,7 +56,9 @@ namespace visuals  //TODO: Glow is dropping fps and sometimes shows weird 3d cub
 
 				Color color = !is_vis ? settings::glow::teammates::visible_color : settings::glow::teammates::invisible_color;
 
-				objects.set(color, (settings::glow::teammates::visible_only && is_vis) ? false : true, (settings::glow::teammates::visible_only && is_vis) ? false : true, settings::glow::teammates::style);
+				bool visible = (settings::glow::enemy::visible_only && is_vis);
+
+				objects.set(color, visible ? false : true, !visible ? true : false, settings::glow::enemy::style);
 			}
 		}
 	}
