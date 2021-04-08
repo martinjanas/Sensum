@@ -42,10 +42,7 @@ namespace hooks
 
 	void init()
 	{
-		if (!utils::Insecure())
-		{
-			sequence::hook = new recv_prop_hook(c_base_view_model::m_nSequence(), sequence::hooked);
-		}
+		sequence::hook = new recv_prop_hook(c_base_view_model::m_nSequence(), sequence::hooked);
 		end_scene::setup = reinterpret_cast<void*>(utils::GetVirtual(g::d3_device, hooks::end_scene::index));
 		create_move::setup = reinterpret_cast<void*>(utils::GetVirtual(g::base_client, hooks::create_move::index));
 		reset::setup = reinterpret_cast<void*>(utils::GetVirtual(g::d3_device, hooks::reset::index));
@@ -156,7 +153,6 @@ namespace hooks
 		g::game_events->add_listener(event_listener, xorstr_("round_freeze_end"), false);
 		g::game_events->add_listener(event_listener, xorstr_("announce_phase_end"), false);
 		g::game_events->add_listener(event_listener, xorstr_("round_start"), false);
-		g::game_events->add_listener(event_listener, xorstr_("player_footstep"), false);
 		g::game_events->add_listener(event_listener, xorstr_("player_death"), false);
 
 		g::cvar->ConsoleColorPrintf(Color::White, "hooks::init() Done!\n");
@@ -179,8 +175,7 @@ namespace hooks
 
 		g::game_events->remove_listener(event_listener);
 
-		if (!utils::Insecure())
-			delete sequence::hook;
+		sequence::hook->~recv_prop_hook();
 
 		//g::cvar->UnregisterConCommand(convars::g_data);
 
@@ -214,9 +209,10 @@ namespace hooks
 
 			player->IsPlayingDemo() ? settings::chams::misc::dropped_weapons = false : true;
 
-
 			return ret;
 		}
+
+		return original(g::demo_player);
 	}
 
 	void __fastcall hud_update::hooked(IBaseClientDLL* _this, void* edx, bool active)
@@ -289,12 +285,6 @@ namespace hooks
 
 		if (g::engine_client->IsInGame() && g::engine_client->IsConnected() && settings::misc::noscope && !strcmp("HudZoom", g::vgui_panel->GetName(panel)))
 			return;
-
-		/*if (settings::misc::smoke_helper)
-		{
-			visuals::DrawRing3D();
-			visuals::DrawRing3DPopflash();
-		}*/
 
 		original(g::vgui_panel, panel, forceRepaint, allowForce);
 

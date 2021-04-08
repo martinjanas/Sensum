@@ -26,35 +26,35 @@ namespace hooks
 		if (settings::misc::auto_strafe)
 			features::auto_strafe(cmd);
 
+		if (settings::misc::fast_stop)
+			features::fast_stop(cmd);
+
+		slow_walk::handle(cmd);
+
+		features::edge_jump_pre(cmd);
+		engine_prediction::start(cmd);
+
 		if (settings::misc::smoke_helper)
 			visuals::SmokeHelperAimbot(cmd);
 
 		if (settings::misc::flash_helper)
 			visuals::PopflashHelperAimbot(cmd);
 
-		slow_walk::handle(cmd);
-
 		entities::on_create_move(cmd);
-		features::edge_jump_pre(cmd);
-		engine_prediction::start(cmd);
-
+		
 		visuals::fetch_entities();
 		entities::fetch_targets(cmd);
 
 		if (settings::visuals::grenade_prediction)
 			grenade_prediction::fetch_points(cmd);
 
-		if (settings::misc::fast_stop)
-			features::fast_stop(cmd);
+		features::selfnade(cmd);
 
 		if (cmd->weaponselect == 0)
 		{
 			aimbot::handle(cmd);
 			zeusbot::handle(cmd);
 		}
-
-		static int definition_index = 7;
-		auto a_settings = &settings::aimbot::m_items[definition_index];
 
 		if (settings::chams::enemy::backtrack_chams || settings::chams::teammates::backtrack_chams)
 			aimbot::get_backtrack_data(cmd);
@@ -80,6 +80,8 @@ namespace hooks
 		cmd->forwardmove = std::clamp(cmd->forwardmove, -450.0f, 450.0f);
 		cmd->sidemove = std::clamp(cmd->sidemove, -450.0f, 450.0f);
 		cmd->upmove = std::clamp(cmd->upmove, -320.0f, 320.0f);
+
+		cmd->viewangles.Normalize();
 
 		globals::viewangles = cmd->viewangles;
 

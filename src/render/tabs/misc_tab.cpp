@@ -182,6 +182,8 @@ namespace render
 					checkbox("Smoke Helper (?)", &settings::misc::smoke_helper);
 					tooltip("Jump = jump throw, LClick/RClick = left/right mouse buttons.");
 					checkbox("Flash Helper - WIP", &settings::misc::flash_helper);
+					checkbox("Grief Nade (?)", &settings::misc::selfnade);
+					tooltip("Look up, hold mouse2, once fully primed start holding mouse1, once is HE in air - crouch, does -98 dmg.");					
 					columns(2);
 					{
 						checkbox("Fast Stop", &settings::misc::fast_stop);

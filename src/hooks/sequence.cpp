@@ -18,9 +18,9 @@ namespace hooks
 			switch (sequence)
 			{
 			case 7:
-				return 8;
+				return 8; break;
 			default:
-				return sequence;
+				return sequence; break;
 			}
 		}
 		case FNV("models/weapons/v_knife_butterfly.mdl"):
@@ -28,11 +28,11 @@ namespace hooks
 			switch (sequence)
 			{
 			case SEQUENCE_DEFAULT_DRAW:
-				return utils::random(SEQUENCE_BUTTERFLY_DRAW, SEQUENCE_BUTTERFLY_DRAW2);
+				return utils::random(SEQUENCE_BUTTERFLY_DRAW, SEQUENCE_BUTTERFLY_DRAW2); break;
 			case SEQUENCE_DEFAULT_LOOKAT01:
-				return utils::random(SEQUENCE_BUTTERFLY_LOOKAT01, SEQUENCE_BUTTERFLY_LOOKAT03);
+				return utils::random(SEQUENCE_BUTTERFLY_LOOKAT01, SEQUENCE_BUTTERFLY_LOOKAT03); break;
 			default:
-				return sequence + 1;
+				return sequence + 1; break;
 			}
 		}
 		case FNV("models/weapons/v_knife_falchion_advanced.mdl"):
@@ -42,14 +42,14 @@ namespace hooks
 			case SEQUENCE_DEFAULT_IDLE2:
 				return SEQUENCE_FALCHION_IDLE1;
 			case SEQUENCE_DEFAULT_HEAVY_MISS1:
-				return utils::random(SEQUENCE_FALCHION_HEAVY_MISS1, SEQUENCE_FALCHION_HEAVY_MISS1_NOFLIP);
+				return utils::random(SEQUENCE_FALCHION_HEAVY_MISS1, SEQUENCE_FALCHION_HEAVY_MISS1_NOFLIP); break;
 			case SEQUENCE_DEFAULT_LOOKAT01:
-				return utils::random(SEQUENCE_FALCHION_LOOKAT01, SEQUENCE_FALCHION_LOOKAT02);
+				return utils::random(SEQUENCE_FALCHION_LOOKAT01, SEQUENCE_FALCHION_LOOKAT02); break;
 			case SEQUENCE_DEFAULT_DRAW:
 			case SEQUENCE_DEFAULT_IDLE1:
-				return sequence;
+				return sequence; break;
 			default:
-				return sequence - 1;
+				return sequence - 1; break;
 			}
 		}
 		case FNV("models/weapons/v_knife_push.mdl"):
@@ -60,18 +60,18 @@ namespace hooks
 				return SEQUENCE_DAGGERS_IDLE1;
 			case SEQUENCE_DEFAULT_LIGHT_MISS1:
 			case SEQUENCE_DEFAULT_LIGHT_MISS2:
-				return utils::random(SEQUENCE_DAGGERS_LIGHT_MISS1, SEQUENCE_DAGGERS_LIGHT_MISS5);
+				return utils::random(SEQUENCE_DAGGERS_LIGHT_MISS1, SEQUENCE_DAGGERS_LIGHT_MISS5); break;
 			case SEQUENCE_DEFAULT_HEAVY_MISS1:
-				return utils::random(SEQUENCE_DAGGERS_HEAVY_MISS2, SEQUENCE_DAGGERS_HEAVY_MISS1);
+				return utils::random(SEQUENCE_DAGGERS_HEAVY_MISS2, SEQUENCE_DAGGERS_HEAVY_MISS1); break;
 			case SEQUENCE_DEFAULT_HEAVY_HIT1:
 			case SEQUENCE_DEFAULT_HEAVY_BACKSTAB:
 			case SEQUENCE_DEFAULT_LOOKAT01:
-				return sequence + 3;
+				return sequence + 3; break;
 			case SEQUENCE_DEFAULT_DRAW:
 			case SEQUENCE_DEFAULT_IDLE1:
-				return sequence;
+				return sequence; break;
 			default:
-				return sequence + 2;
+				return sequence + 2; break;
 			}
 		}
 		case FNV("models/weapons/v_knife_survival_bowie.mdl"):
@@ -80,9 +80,9 @@ namespace hooks
 			{
 			case SEQUENCE_DEFAULT_DRAW:
 			case SEQUENCE_DEFAULT_IDLE1:
-				return sequence;
+				return sequence; break;
 			case SEQUENCE_DEFAULT_IDLE2:
-				return SEQUENCE_BOWIE_IDLE1;
+				return SEQUENCE_BOWIE_IDLE1; break;
 			default:
 				return sequence - 1;
 			}
@@ -96,9 +96,9 @@ namespace hooks
 			switch (sequence)
 			{
 			case SEQUENCE_DEFAULT_DRAW:
-				return utils::random(SEQUENCE_BUTTERFLY_DRAW, SEQUENCE_BUTTERFLY_DRAW2);
+				return utils::random(SEQUENCE_BUTTERFLY_DRAW, SEQUENCE_BUTTERFLY_DRAW2); break;
 			case SEQUENCE_DEFAULT_LOOKAT01:
-				return utils::random(SEQUENCE_BUTTERFLY_LOOKAT01, 14);
+				return utils::random(SEQUENCE_BUTTERFLY_LOOKAT01, 14); break;
 			default:
 				return sequence + 1;
 			}
@@ -108,17 +108,17 @@ namespace hooks
 			switch (sequence)
 			{
 			case SEQUENCE_DEFAULT_LOOKAT01:
-				return utils::random(12, 13);
+				return utils::random(12, 13); break;
 			}
 		}
 		case FNV("models/weapons/v_knife_widowmaker.mdl"):
 		{
 			switch (sequence)
 			{
-			case SEQUENCE_DEFAULT_LOOKAT01:
-				return utils::random(14, 15);
+			case SEQUENCE_DEFAULT_LOOKAT01: 
+				return utils::random(14, 15); break;
 			case SEQUENCE_DEFAULT_HEAVY_BACKSTAB:
-				return sequence - 1;
+				return sequence - 1; break;
 			}
 		}
 		case FNV("models/weapons/v_knife_css.mdl"):
@@ -126,7 +126,7 @@ namespace hooks
 			switch (sequence)
 			{
 			case SEQUENCE_DEFAULT_LOOKAT01:
-				return utils::random(SEQUENCE_CSS_LOOKAT02, SEQUENCE_CSS_LOOKAT02);
+				return utils::random(SEQUENCE_CSS_LOOKAT02, SEQUENCE_CSS_LOOKAT02); break;
 			default:
 				return sequence;
 			}

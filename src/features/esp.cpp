@@ -10,6 +10,37 @@
 #include "../render/fonts/undefeated.hpp"
 #include "../helpers/entities.h"
 
+void draw_circle(Color& colors, const Vector& position) 
+{
+	static BeamInfo_t beam_info;
+	beam_info.m_nType = TE_BEAMRINGPOINT;
+	beam_info.m_pszModelName = "sprites/physbeam.vmt";
+	beam_info.m_nModelIndex = g::mdl_info->GetModelIndex("sprites/physbeam.vmt");
+	beam_info.m_nHaloIndex = -1;
+	beam_info.m_flHaloScale = 5;
+	beam_info.m_flLife = 1.f;
+	beam_info.m_flWidth = 15.f;
+	beam_info.m_flFadeLength = 1.0f;
+	beam_info.m_flAmplitude = 0.f;
+	beam_info.m_flRed = colors.r();
+	beam_info.m_flGreen = colors.g();
+	beam_info.m_flBlue = colors.b();
+	beam_info.m_flBrightness = colors.a();
+	beam_info.m_flSpeed = 0.f;
+ 	beam_info.m_nStartFrame = 0.f;
+	beam_info.m_flFrameRate = 60.f;
+	beam_info.m_nSegments = -1;
+	beam_info.m_nFlags = FBEAM_SHADEIN;
+	beam_info.m_vecCenter = position + Vector(0, 0, 5);
+	beam_info.m_flStartRadius = 20.f;
+	beam_info.m_flEndRadius = 320.f; //640.f
+
+	Beam_t* beam = g::view_render_beams->CreateBeamRingPoint(beam_info);
+
+	if (beam)
+		g::view_render_beams->DrawBeam(beam);
+}
+
 ConVar* type = nullptr;
 ConVar* mode = nullptr;
 
@@ -25,6 +56,8 @@ namespace esp
 {
 	decltype(entities::m_local) m_local;
 	entities::player_data_t m_entities[MAX_PLAYERS];
+
+	float last_time = 0.f;
 
 	bool is_enabled()
 	{
@@ -214,6 +247,22 @@ namespace esp
 					}
 				}
 			}
+
+			if (settings::esp::soundesp)
+			{
+				for (const auto& sound : _sounds)
+				{
+					if (sound.index != 0)
+					{
+						if ((last_time + 0.35f) < g::global_vars->realtime)
+						{
+							draw_circle(settings::esp::colorSoundEsp, sound.origin);
+
+							last_time = g::global_vars->realtime;
+						}
+					}
+				}
+			}
 		}
 
 		RECT box;
@@ -230,15 +279,6 @@ namespace esp
 
 			if (settings::esp::visible_only && (!data.is_visible || data.in_smoke || m_local.is_flashed || !on_screen))
 				continue;
-
-			/*if (settings::esp::visible_only)
-			{
-				if (!data.draw_entity)
-				{
-					if (data.in_smoke || m_local.is_flashed || !on_screen)
-						continue;
-				}
-			}*/
 
 			{
 				bool at_screen = true;

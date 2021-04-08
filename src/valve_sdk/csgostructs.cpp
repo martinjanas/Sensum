@@ -678,7 +678,7 @@ void c_base_attributable_item::SetModelIndex(int modelIndex)
 
 void c_base_view_model::SendViewModelMatchingSequence(int sequence)
 {
-	return CallVFunction<void(__thiscall*)(void*, int)>(this, 214)(this, sequence);
+	return CallVFunction<void(__thiscall*)(void*, int)>(this, 246)(this, sequence); //was 214
 }
 
 void c_base_view_model::SetModelIndex(int sequence)

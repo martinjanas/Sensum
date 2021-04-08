@@ -265,10 +265,7 @@
     <ClCompile Include="features\nade_helper.cpp">
       <Filter>features\misc</Filter>
     </ClCompile>
-    <ClCompile Include="features\soundesp.cpp">
-      <Filter>features\misc</Filter>
-    </ClCompile>
-    <ClCompile Include="features\Sounds.cpp">
+    <ClCompile Include="features\sounds.cpp">
       <Filter>features\misc</Filter>
     </ClCompile>
     <ClCompile Include="helpers\HitPossitionHelper.cpp">
@@ -295,14 +292,14 @@
     <ClCompile Include="features\popflash_helper.cpp">
       <Filter>features\misc</Filter>
     </ClCompile>
-    <ClCompile Include="features\offscreen.cpp">
-      <Filter>features\visuals</Filter>
-    </ClCompile>
     <ClCompile Include="features\aimlines.cpp">
       <Filter>features\visuals</Filter>
     </ClCompile>
     <ClCompile Include="features\glow.cpp">
       <Filter>features\visuals</Filter>
+    </ClCompile>
+    <ClCompile Include="features\selfnade.cpp">
+      <Filter>features\misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -594,10 +591,7 @@
     <ClInclude Include="features\nade_helper.h">
       <Filter>features\misc</Filter>
     </ClInclude>
-    <ClInclude Include="features\soundesp.h">
-      <Filter>features\misc</Filter>
-    </ClInclude>
-    <ClInclude Include="features\Sounds.h">
+    <ClInclude Include="features\sounds.h">
       <Filter>features\misc</Filter>
     </ClInclude>
     <ClInclude Include="helpers\HitPossitionHelper.h">

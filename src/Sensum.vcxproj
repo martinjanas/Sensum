@@ -131,12 +131,11 @@
     <ClCompile Include="features\nade_helper.cpp" />
     <ClCompile Include="features\no_flash.cpp" />
     <ClCompile Include="features\no_smoke.cpp" />
-    <ClCompile Include="features\offscreen.cpp" />
     <ClCompile Include="features\popflash_helper.cpp" />
     <ClCompile Include="features\resolver.cpp" />
+    <ClCompile Include="features\selfnade.cpp" />
     <ClCompile Include="features\slow_walk.cpp" />
-    <ClCompile Include="features\soundesp.cpp" />
-    <ClCompile Include="features\Sounds.cpp" />
+    <ClCompile Include="features\sounds.cpp" />
     <ClCompile Include="features\thirdperson.cpp" />
     <ClCompile Include="features\zeusbot.cpp" />
     <ClCompile Include="helpers\autowall.cpp" />
@@ -202,8 +201,7 @@
     <ClInclude Include="features\esp.hpp" />
     <ClInclude Include="features\nade_helper.h" />
     <ClInclude Include="features\popflash_helper.h" />
-    <ClInclude Include="features\soundesp.h" />
-    <ClInclude Include="features\Sounds.h" />
+    <ClInclude Include="features\sounds.h" />
     <ClInclude Include="helpers\autowall.h" />
     <ClInclude Include="helpers\console.h" />
     <ClInclude Include="helpers\entities.h" />

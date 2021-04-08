@@ -149,7 +149,7 @@ namespace render
 					//checkbox("Beams", &settings::esp::beams);
 					checkbox("Sound ESP", &settings::esp::sound);
 				
-					checkbox("Bomb Damage ESP", &settings::esp::bomb_esp);
+					checkbox("Bomb Carrier ESP", &settings::esp::bomb_esp);
 					checkbox("Offscreen ESP", &settings::esp::offscreen);
 				});
 

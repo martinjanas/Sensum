@@ -394,6 +394,7 @@ namespace settings
 		extern bool smoke_helper;
 		extern bool flash_helper;
 		extern bool ow_reveal;
+		extern bool selfnade;
 
 		extern float viewmodel_offset_x;
 		extern float viewmodel_offset_y;

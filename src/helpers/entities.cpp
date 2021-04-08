@@ -20,6 +20,8 @@ namespace entities
 
 	CUtlVector<SndInfo_t> sounds;
 
+	entities::sound_t _sounds[MAX_PLAYERS];
+
 	matrix3x4_t bone_matrix[MAXSTUDIOBONES];
 
 	QAngle aim_angles;
@@ -97,11 +99,14 @@ namespace entities
 
 			for (int k = 0; k < sounds.Count(); k++)
 			{
-				if (!(sounds[k].m_nSoundSource > 0) || !sounds[k].m_bUpdatePositions || (sounds[k].m_nChannel != 0 && sounds[k].m_nChannel != 4))
+				//if (!(sounds[k].m_nSoundSource > 0) || !sounds[k].m_bUpdatePositions || (sounds[k].m_nChannel != 0 && sounds[k].m_nChannel != 4))
+					//continue;
+
+				if (!(sounds[k].m_nSoundSource > 0) || (sounds[k].m_nChannel != 0 && sounds[k].m_nChannel != 4))
 					continue;
 
 				auto* player = reinterpret_cast<c_base_player*>(g::entity_list->GetClientEntity(sounds[k].m_nSoundSource));
-				if (player && player != local && (settings::misc::deathmatch || player->m_iTeamNum() != local->m_iTeamNum()))
+				if (player && player->IsPlayer() && player != local && (settings::misc::deathmatch || player->m_iTeamNum() != local->m_iTeamNum()))
 				{
 					if (player->m_iTeamNum() == team_ct || player->m_iTeamNum() == team_t)
 						m_sounds[k] = sound_t{ player->GetIndex(), player->m_vecOrigin()};

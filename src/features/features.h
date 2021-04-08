@@ -16,6 +16,7 @@ namespace features
 	void edge_jump_pre(CUserCmd* cmd);
 	void edge_jump_post(CUserCmd* cmd);
 	void aimlines(ImDrawList* draw_list);
+	void selfnade(CUserCmd* cmd);
 }
 
 namespace color_modulation

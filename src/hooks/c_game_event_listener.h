@@ -5,7 +5,6 @@
 #include "../helpers/HitPossitionHelper.h"
 #include "../helpers/runtime_saver.h"
 #include "../features/esp.hpp"
-#include "../features/soundesp.h"
 
 ConVar* game_type = nullptr;
 ConVar* game_mode = nullptr;
@@ -115,10 +114,6 @@ class c_game_event_listener final : public IGameEventListener2
 			globals::team_kill.clear();
 
 		}
-		else if (name == FNV("player_footstep"))
-		{
-			sound_esp.event_player_footstep(context);
-		}
 		else if (name == FNV("player_death"))
 		{
 			auto attacker = c_base_player::GetPlayerByUserId(context->GetInt("attacker"));
@@ -157,8 +152,6 @@ class c_game_event_listener final : public IGameEventListener2
 				return;
 
 			HitPossitionHelper::Get().OnFireEvent(context);
-
-			sound_esp.event_player_hurt(context);
 
 			if (attacker->m_iTeamNum() == target->m_iTeamNum())
 				globals::team_damage[context->GetInt("attacker")] += context->GetInt("dmg_health");

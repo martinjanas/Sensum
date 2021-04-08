@@ -4,7 +4,6 @@
 #include "../helpers/utils.h"
 #include "../helpers/console.h"
 #include "../features/features.h"
-#include "../features/soundesp.h"
 
 namespace hooks
 {
@@ -46,7 +45,7 @@ namespace hooks
 		}
 
 		else if (stage == FRAME_NET_UPDATE_START && g::engine_client->IsInGame()) {
-			sound_esp.draw();
+			
 		}
 
 		else if (stage == FRAME_NET_UPDATE_END && g::engine_client->IsInGame()) {
