@@ -2,6 +2,8 @@
 #include "../../settings/globals.h"
 #include "../../features/features.h"
 
+#include <algorithm>
+
 namespace render
 {
 	namespace menu
@@ -64,6 +66,7 @@ namespace render
 					static auto show_all_kits = false;
 
 					static char query_kit[64];
+
 					ImGui::InputText("##skins.query", query_kit, sizeof(query_kit));
 
 					ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.f, 0.f, 0.f, 0.1f));

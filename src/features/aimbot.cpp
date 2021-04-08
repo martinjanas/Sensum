@@ -1036,18 +1036,8 @@ namespace aimbot
 
 		if (target && silent_enabled && can_use_silent)
 		{
-			if (a_settings.silent.with_smooth)
-			{
-				can_use_silent = target && silent_enabled && a_settings.silent.fov >= result.fov && weapon->CanFire();
-				cmd->viewangles = can_use_silent ? silent_angles : angles;
-			}
-			else
-			{
-				engine_angles = false;
-
-				if (weapon->CanFire())
-					cmd->viewangles = silent_angles;
-			}
+			can_use_silent = target && silent_enabled && a_settings.silent.fov >= result.fov && weapon->CanFire();
+			cmd->viewangles = can_use_silent ? silent_angles : angles;
 		}
 
 		math::correct_movement(cmd, current);
@@ -1056,7 +1046,7 @@ namespace aimbot
 			g::engine_client->SetViewAngles(angles);
 
 		cmd->viewangles = angles;
-
+		
 		silent_enabled = a_settings.silent.enabled && a_settings.silent.always;
 
 		if (target && shot_delay && a_settings.autodelay)

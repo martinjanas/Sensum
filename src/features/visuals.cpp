@@ -262,7 +262,7 @@ namespace visuals
 				if (local.shots_fired > 1)
 				{
 					globals::draw_list->AddLine(ImVec2(_x - 5, _y), ImVec2(_x + 5, _y), ImGui::GetColorU32(settings::visuals::recoilcolor));
-					globals::draw_list->AddLine(ImVec2(_x, _y - 5), ImVec2(_x, y + 5), ImGui::GetColorU32(settings::visuals::recoilcolor));
+					globals::draw_list->AddLine(ImVec2(_x, _y - 5), ImVec2(_x, _y + 5), ImGui::GetColorU32(settings::visuals::recoilcolor));
 				}
 				break;
 			case 1:

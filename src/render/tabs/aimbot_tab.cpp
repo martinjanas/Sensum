@@ -296,7 +296,7 @@ namespace render
 
 					ImGui::PushID("aimbot.other");
 					{
-						checkbox("Dynamic FOV", &settings->dynamic_fov);
+						checkbox("Distance Based FOV", &settings->dynamic_fov);
 						checkbox("Legit Backtrack", &settings->backtrack.legit);
 
 						ImGui::SliderFloatLeftAligned("FOV:", &settings->fov, 0, 15.f, "%.1f %");
