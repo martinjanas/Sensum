@@ -91,5 +91,15 @@ jobs:
               "type": "title",
               "regex": "inject",
               "message": "this issue was automatically closed because blacklisted word was detected."
+            },
+            {
+              "type": "title",
+              "regex": "banned",
+              "message": "this issue was automatically closed because blacklisted word was detected."
+            },
+            {
+              "type": "title",
+              "regex": "ban",
+              "message": "this issue was automatically closed because blacklisted word was detected."
             }
           ]

@@ -27,16 +27,30 @@ int c_base_entity::GetSequenceActivity(studiohdr_t* hdr, const int& sequence)
 	return get_sequence_activity(this, hdr, sequence);
 }
 
+int filterException(int code, PEXCEPTION_POINTERS ex)
+{
+	return EXCEPTION_EXECUTE_HANDLER;
+}
+
+uint8_t* UpdateVisibilityAllEntitiesOffset = nullptr;
+
 void c_base_entity::UpdateVisibilityAllEntities()
 {
-	uint8_t* UpdateVisibilityAllEntitiesOffset = nullptr;
-
 	if (!UpdateVisibilityAllEntitiesOffset)
 		UpdateVisibilityAllEntitiesOffset = utils::pattern_scan(UPDATE_VISIBILITY_ENTITIES);
 
-	auto fn_offset = reinterpret_cast<void(__thiscall*)(void*)>(UpdateVisibilityAllEntitiesOffset);
+	__try
+	{
+		auto fn_offset = reinterpret_cast<void(__thiscall*)(void*)>(UpdateVisibilityAllEntitiesOffset);
 
-	fn_offset(this);
+		fn_offset(this);
+	}
+	__except (filterException(GetExceptionCode(), GetExceptionInformation()))
+	{
+#ifdef _DEBUG
+		console::print("[error] UpdateVisibilityAllEntities");
+#endif
+	}
 }
 
 const matrix3x4_t& c_base_entity::m_rgflCoordinateFrame()

@@ -6,9 +6,6 @@
 #include "../helpers/runtime_saver.h"
 #include "../features/esp.hpp"
 
-ConVar* game_type = nullptr;
-ConVar* game_mode = nullptr;
-
 std::map<std::string, std::string> weaponNames =
 {
 { "weapon_ak47", "AK47" },

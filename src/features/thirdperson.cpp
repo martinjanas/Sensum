@@ -10,7 +10,7 @@ void features::thirdperson()
 	if (!g::input->m_fCameraInThirdPerson)
 		return;
 
-	auto weapon = g::local_player->m_hActiveWeapon();
+	auto& weapon = g::local_player->m_hActiveWeapon();
 
 	const auto weapon_type = weapon->get_weapon_data()->WeaponType;
 
@@ -45,5 +45,5 @@ void features::thirdperson()
 
 	g::input->m_vecCameraOffset = angles;
 
-	//g::local_player->UpdateVisibilityAllEntities(); //TODO: Crashing, UpdateVisibilityAllEntities() has outdated pattern. FIX ME.
+	g::local_player->UpdateClientSideAnimation();
 }

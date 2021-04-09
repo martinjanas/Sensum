@@ -20,6 +20,9 @@ namespace hooks
 		if (!cmd || !cmd->command_number)
 			return;
 
+		features::edge_jump_pre(cmd);
+		engine_prediction::start(cmd);
+
 		if (settings::misc::bhop)
 			features::bhop(cmd);
 
@@ -30,9 +33,6 @@ namespace hooks
 			features::fast_stop(cmd);
 
 		slow_walk::handle(cmd);
-
-		features::edge_jump_pre(cmd);
-		engine_prediction::start(cmd);
 
 		if (settings::misc::smoke_helper)
 			visuals::SmokeHelperAimbot(cmd);
