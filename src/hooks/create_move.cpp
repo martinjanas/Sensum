@@ -20,17 +20,11 @@ namespace hooks
 		if (!cmd || !cmd->command_number)
 			return;
 
-		features::edge_jump_pre(cmd);
-		engine_prediction::start(cmd);
-
 		if (settings::misc::bhop)
 			features::bhop(cmd);
 
 		if (settings::misc::auto_strafe)
 			features::auto_strafe(cmd);
-
-		if (settings::misc::fast_stop)
-			features::fast_stop(cmd);
 
 		slow_walk::handle(cmd);
 
@@ -40,6 +34,9 @@ namespace hooks
 		if (settings::misc::flash_helper)
 			visuals::PopflashHelperAimbot(cmd);
 
+		features::edge_jump_pre(cmd);
+		engine_prediction::start(cmd);
+
 		entities::on_create_move(cmd);
 		
 		visuals::fetch_entities();
@@ -47,6 +44,9 @@ namespace hooks
 
 		if (settings::visuals::grenade_prediction)
 			grenade_prediction::fetch_points(cmd);
+
+		if (settings::misc::fast_stop)
+			features::fast_stop(cmd);
 
 		features::selfnade(cmd);
 
