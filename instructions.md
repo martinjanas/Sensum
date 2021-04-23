@@ -2,6 +2,9 @@
 Instuctions written by [@mniafi](https://github.com/mniafi/),
 Sensum by [@martinjanas](https://github.com/martinjanas/).
 
+__Disclaimer:__<br>
+The software is distributed as __source code only__
+
 From Installing Tools to Building DLL's<br>
 Host OS: Windows 10 Version 2004 _(19041.928)_
 ## Step 1 - Installing Visual Studio
@@ -145,7 +148,7 @@ Congrats! __Sensum.dll__ builded!
 
 ## FAQ
 
-1. DirectX SDK Error while installation:
+1. DirectX SDK Error while installation:<br>
  1.1 [S1023 Error](https://docs.microsoft.com/en-us/troubleshoot/windows/win32/s1023-error-when-you-install-directx-sdk) Fix by Microsoft:
  
    >To resolve this issue, you must uninstall all versions of the Visual C++ 2010 Redistributable before installing the June 2010 DirectX SDK. You may have one or more of the following products installed:
@@ -158,5 +161,10 @@ You can use Add or Remove Programs in Control Panel to uninstall the products. O
  
    MsiExec.exe /passive /X {1D8E6291-B0D5-35EC-8441-6616F567A0F7}
    ```
- After uninstalling the Microsoft Visual C++ 2010 Redistributable products, you may install the [DirectX Software Development Kit](https://www.microsoft.com/download/details.aspx?id=6812), [VC Redist 2015-2019 x86](https://aka.ms/vs/16/release/vc_redist.x86.exe) and [VC Redist 2015-2019 x64](https://aka.ms/vs/16/release/vc_redist.x64.exe)
+   After uninstalling the Microsoft Visual C++ 2010 Redistributable products, you may install the [DirectX Software Development Kit](https://www.microsoft.com/download/details.aspx?id=6812), [VC Redist 2015-2019 x86](https://aka.ms/vs/16/release/vc_redist.x86.exe) and [VC Redist 2015-2019 x64](https://aka.ms/vs/16/release/vc_redist.x64.exe)
 
+2. Config Location for __Sensum__ is in "__C:\Sensum\configs\__"
+3. To make __skinchanger work__, put __skin_kits.json__ into "__C:\Sensum__"<br>
+
+[How to Create Issue Correctly](https://github.com/martinjanas/Sensum/issues/81) | [Developer Board (ToDo,In Progress)](https://github.com/martinjanas/Sensum/projects/1) | [Feature Request](https://github.com/martinjanas/Sensum/discussions/167)
+--|--|--
