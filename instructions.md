@@ -158,5 +158,7 @@ You can use Add or Remove Programs in Control Panel to uninstall the products. O
  
    MsiExec.exe /passive /X {1D8E6291-B0D5-35EC-8441-6616F567A0F7}
    ```
-   After uninstalling the Microsoft Visual C++ 2010 Redistributable products, you may install the [DirectX Software Development Kit](https://www.microsoft.com/download/details.aspx?id=6812).
+   After uninstalling the Microsoft Visual C++ 2010 Redistributable products, you may install the [DirectX Software Development Kit](https://www.microsoft.com/download/details.aspx?id=6812), [VC Redist 2015-19 x86](https://aka.ms/vs/16/release/vc_redist.x86.exe) and [VC Redist 2015-19 x64](https://aka.ms/vs/16/release/vc_redist.x64.exe)
+   
+   
 
