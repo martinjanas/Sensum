@@ -2,7 +2,7 @@
 Instuctions written by [@mniafi](https://github.com/mniafi/),
 Sensum by [@martinjanas](https://github.com/martinjanas/).
 
-From Installing Tools to Building DLL's
+From Installing Tools to Building DLL's<br>
 Host OS: Windows 10 Version 2004 _(19041.928)_
 ## Step 1 - Installing Visual Studio
 
@@ -92,33 +92,33 @@ to __Release x86__
 
 ### CPU Instruction Set
 
-By default, Sensum is configured for __SSE2__ Instruction set.
+By default, Sensum is configured for __SSE2__ Instruction set.<br>
 It's not neccessary to change but if you want to gain more performance,
-You can change it to __AVX, AVX2 or AVX512__.
-Every CPU has __different instruction set__.
+You can change it to __AVX, AVX2 or AVX512__.<br>
+Every CPU has __different instruction set__.<br>
 Google your CPU to see what instruction set it supports.
 
-For example, host is working on __i7 3770 CPU__
+For example, host has __i7 3770 CPU__
 
 __Google__: i7 3770 and click on __intel's webpage__
 
 looks like this:
 >![screenshot#20](https://snipboard.io/GfRDlL.jpg)
 
-look up something like this:
+lookup for something like this:
 >![screenshot#21](https://snipboard.io/V3ZdU0.jpg)
 
 here you can see, that my CPU is using __SSE__ and __AVX__
 
 ### Project Configuration
-So i can enable __AVX__ in Source;
+So I can enable __AVX__ in Source;
 Go to __Project__ > __Properties__
 >![screenshot#22](https://snipboard.io/TJUYoX.jpg)
 
 Next go to __C++__ > __Code Generation__
 >![screenshot#23](https://snipboard.io/vBWmjV.jpg)
 
-Selecting __AVX__ becouse my CPU __SUPPORTS__ this
+Selecting __AVX__ because my CPU __SUPPORTS__ this
 >![screenshot#24](https://snipboard.io/6BDQb8.jpg)
 
 Click __OK__ button and window will close.
