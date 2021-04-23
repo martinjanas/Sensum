@@ -7,7 +7,8 @@ Host OS: Windows 10 Version 2004 _(19041.928)_
 ## Step 1 - Installing Visual Studio
 
 Go to [Microsoft's](https://sensum.page.link/visualstudio) webpage.
-Press on First __Free download__ button as shown on _Screenshot #1_:
+Press the "__Free download__" button on left as shown on _Screenshot #1_:<br>
+You want to download Visual Studio Community.
 
 >![Screen#1](https://snipboard.io/wM78Pg.jpg)
 
