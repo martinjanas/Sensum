@@ -2,7 +2,7 @@
 
 [**List of features**](https://pastebin.com/twMkYr0q) | ***Check the Discussions tab to request a feature.***
 
-If You are new and dont know how to start, then click ***[here](instructions.md)***
+Click on ***[this](instructions.md)*** if You are new to compiling cheats.
 
 **Further optimizations:**<br>
 This project is using the SSE2 instructions set by default.<br>
