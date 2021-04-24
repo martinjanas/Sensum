@@ -163,7 +163,7 @@ You can use Add or Remove Programs in Control Panel to uninstall the products. O
    ```
    After uninstalling the Microsoft Visual C++ 2010 Redistributable products, you may install the [DirectX Software Development Kit](https://www.microsoft.com/download/details.aspx?id=6812), [VC Redist 2015-2019 x86](https://aka.ms/vs/16/release/vc_redist.x86.exe) and [VC Redist 2015-2019 x64](https://aka.ms/vs/16/release/vc_redist.x64.exe)
 
-2. Config Location for __Sensum__ is in "__C:\Sensum\configs\__"
+2. Config Location for __Sensum__ is in "__C:\Sensum\configs__"
 3. To make __skinchanger work__, put __skin_kits.json__ into "__C:\Sensum__"<br>
 
 [How to Create Issue Correctly](https://github.com/martinjanas/Sensum/issues/81) | [Developer Board (ToDo,In Progress)](https://github.com/martinjanas/Sensum/projects/1) | [Feature Request](https://github.com/martinjanas/Sensum/discussions/167)
