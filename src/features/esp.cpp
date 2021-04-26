@@ -327,6 +327,12 @@ namespace esp
 
 			if (settings::esp::bone_esp)
 			{
+				if (!data.player)
+					continue;
+
+				if (!g::local_player)
+					continue;
+
 				if (!data.is_player || data.player == g::local_player || data.m_iHealth <= 0 || data.is_dormant || data.team_num == g::local_player->m_iTeamNum())
 					continue;
 

@@ -314,6 +314,7 @@ class CCSGOPlayerAnimState;
 class c_base_player : public c_base_entity
 {
 public:
+
 	NETVAR(bool, m_bHasDefuser, "CCSPlayer", "m_bHasDefuser");
 	NETVAR(bool, m_bGunGameImmunity, "CCSPlayer", "m_bGunGameImmunity");
 	NETVAR(int32_t, m_iShotsFired, "CCSPlayer", "m_iShotsFired");
