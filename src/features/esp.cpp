@@ -127,6 +127,13 @@ namespace esp
 			visuals::RenderCirclePopflash();
 			visuals::drawring_3d_popflash();
 		}
+
+		if (settings::misc::hegrenade_helper)
+		{
+			visuals::RenderInfoHeGrenade();
+			visuals::RenderCircleHeGrenade();
+			visuals::drawring_3d_hegrenade();
+		}
 	}
 
 	auto rotate_points(Vector* points, float rotation)->void

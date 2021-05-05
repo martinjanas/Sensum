@@ -583,6 +583,13 @@ bool c_base_combat_weapon::IsFlash()
 	return index == WEAPON_FLASHBANG;
 }
 
+bool c_base_combat_weapon::IsHeGrenade()
+{
+	auto index = m_iItemDefinitionIndex();
+
+	return index == WEAPON_HEGRENADE;
+}
+
 bool c_base_combat_weapon::HasScope()
 {
 	auto index = m_iItemDefinitionIndex();
