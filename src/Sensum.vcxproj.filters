@@ -301,6 +301,9 @@
     <ClCompile Include="features\selfnade.cpp">
       <Filter>features\misc</Filter>
     </ClCompile>
+    <ClCompile Include="features\hegrenade_helper.cpp">
+      <Filter>features\misc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\directx9\imgui_impl_dx9.h">
@@ -632,6 +635,9 @@
     </ClInclude>
     <ClInclude Include="valve_sdk\interfaces\IDemoPlayer.h">
       <Filter>valve_sdk\interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="features\hegrenade_helper.h">
+      <Filter>features\misc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

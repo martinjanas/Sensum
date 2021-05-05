@@ -37,11 +37,15 @@ namespace visuals
 	void leftknife();
 	void drawring_3d();
 	void drawring_3d_popflash();
+	void drawring_3d_hegrenade();
 	void RenderInfo();
+	void RenderInfoHeGrenade();
 	void RenderCircle();
 	void RenderCirclePopflash();
+	void RenderCircleHeGrenade();
 	void SmokeHelperAimbot(CUserCmd* cmd);
 	void PopflashHelperAimbot(CUserCmd* cmd);
+	void HeGrenadeHelperAimbot(CUserCmd* cmd);
 	void glow_players();
 	void glow_misc();
 }
