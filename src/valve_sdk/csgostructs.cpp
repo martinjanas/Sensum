@@ -590,6 +590,20 @@ bool c_base_combat_weapon::IsHeGrenade()
 	return index == WEAPON_HEGRENADE;
 }
 
+bool c_base_combat_weapon::IsMolotov()
+{
+	auto index = m_iItemDefinitionIndex();
+
+	return index == WEAPON_MOLOTOV;
+}
+
+bool c_base_combat_weapon::IsIncendiary()
+{
+	auto index = m_iItemDefinitionIndex();
+
+	return index == WEAPON_INCGRENADE;
+}
+
 bool c_base_combat_weapon::HasScope()
 {
 	auto index = m_iItemDefinitionIndex();

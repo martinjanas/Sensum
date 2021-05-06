@@ -38,14 +38,18 @@ namespace visuals
 	void drawring_3d();
 	void drawring_3d_popflash();
 	void drawring_3d_hegrenade();
+	void drawring_3d_molotov();
 	void RenderInfo();
 	void RenderInfoHeGrenade();
+	void RenderInfoMolotov();
 	void RenderCircle();
 	void RenderCirclePopflash();
 	void RenderCircleHeGrenade();
+	void RenderCircleMolotov();
 	void SmokeHelperAimbot(CUserCmd* cmd);
 	void PopflashHelperAimbot(CUserCmd* cmd);
 	void HeGrenadeHelperAimbot(CUserCmd* cmd);
+	void MolotovHelperAimbot(CUserCmd* cmd);
 	void glow_players();
 	void glow_misc();
 }

@@ -394,6 +394,7 @@ namespace settings
 		extern bool smoke_helper;
 		extern bool flash_helper;
 		extern bool hegrenade_helper;
+		extern bool molotov_helper;
 		extern bool ow_reveal;
 		extern bool selfnade;
 

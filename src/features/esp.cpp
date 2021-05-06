@@ -134,6 +134,13 @@ namespace esp
 			visuals::RenderCircleHeGrenade();
 			visuals::drawring_3d_hegrenade();
 		}
+
+		if (settings::misc::molotov_helper)
+		{
+			visuals::RenderInfoMolotov();
+			visuals::RenderCircleMolotov();
+			visuals::drawring_3d_molotov();
+		}
 	}
 
 	auto rotate_points(Vector* points, float rotation)->void

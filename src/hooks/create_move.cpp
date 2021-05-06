@@ -37,6 +37,9 @@ namespace hooks
 		if (settings::misc::hegrenade_helper)
 			visuals::HeGrenadeHelperAimbot(cmd);
 
+		if (settings::misc::molotov_helper)
+			visuals::MolotovHelperAimbot(cmd);
+
 		features::edge_jump_pre(cmd);
 		engine_prediction::start(cmd);
 
@@ -70,6 +73,9 @@ namespace hooks
 
 		if (settings::misc::hegrenade_helper)
 			visuals::HeGrenadeHelperAimbot(cmd);
+
+		if (settings::misc::molotov_helper)
+			visuals::MolotovHelperAimbot(cmd);
 
 		if (g::local_player && g::local_player->IsAlive() && (cmd->buttons & IN_ATTACK || cmd->buttons & IN_ATTACK2))
 			saver.LastShotEyePos = g::local_player->GetEyePos();

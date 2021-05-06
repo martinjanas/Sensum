@@ -298,6 +298,8 @@ public:
 	bool IsSmoke();
 	bool IsFlash();
 	bool IsHeGrenade();
+	bool IsMolotov();
+	bool IsIncendiary();
 	bool HasScope();
 	bool IsGun();
 
