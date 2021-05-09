@@ -64,6 +64,9 @@ Dont change here anything, just click __Next__
 
 Finish installation.
 
+Or you can use light version, created by [@mniafi](https://github.com/mniafi/), [DirectX SDK Installer](https://github.com/mniafi/directxsdk/releases/latest)<br>
+Just Extracts Lib and Include folders and DirectX Redist Installation.<br>
+
 ## Step 3 - Sensum
 
 First of all, go to the original [Sensum Github](https://github.com/martinjanas/Sensum) for latest version.
