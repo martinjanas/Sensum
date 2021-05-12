@@ -273,19 +273,38 @@ namespace hooks
 
 		if (settings::misc::override_viewmodel)
 		{
-			if (!g::local_player->m_bIsScoped() && !g::input->m_fCameraInThirdPerson) 
-			{
-				const auto viewmodel = g::entity_list->GetClientEntityFromHandle(g::local_player->m_hViewModel());
-				if (viewmodel)
+			if (g::local_player->IsAlive()) {
+				if (!g::local_player->m_bIsScoped() && !g::input->m_fCameraInThirdPerson)
 				{
-					Vector x, y, z, total_offset;
+					const auto viewmodel = g::entity_list->GetClientEntityFromHandle(g::local_player->m_hViewModel());
+					if (viewmodel)
+					{
+						Vector x, y, z, total_offset;
 
-					math::angle2vectors(view->angles, y);
-					math::angle2vectors(view->angles - QAngle{-90.0f, 0.0f, 0.0f}, z);
-					x.CrossProduct(y, z, x);
-					total_offset = x * -settings::misc::viewmodel_offset_x + y * settings::misc::viewmodel_offset_y - z * settings::misc::viewmodel_offset_z;
-					
-					viewmodel->GetBaseEntity()->SetAbsOrigin(viewmodel->GetRenderOrigin() + total_offset);
+						math::angle2vectors(view->angles, y);
+						math::angle2vectors(view->angles - QAngle{ -90.0f, 0.0f, 0.0f }, z);
+						x.CrossProduct(y, z, x);
+						total_offset = x * -settings::misc::viewmodel_offset_x + y * settings::misc::viewmodel_offset_y - z * settings::misc::viewmodel_offset_z;
+
+						viewmodel->GetBaseEntity()->SetAbsOrigin(viewmodel->GetRenderOrigin() + total_offset);
+					}
+				}
+			}
+			else if (auto observer_target = g::local_player->m_hObserverTarget()) {
+				if (!observer_target->m_bIsScoped() && g::local_player->m_iObserverMode() == 4 /* IN_EYE */)
+				{
+					const auto viewmodel = g::entity_list->GetClientEntityFromHandle(observer_target->m_hViewModel());
+					if (viewmodel)
+					{
+						Vector x, y, z, total_offset;
+
+						math::angle2vectors(view->angles, y);
+						math::angle2vectors(view->angles - QAngle{ -90.0f, 0.0f, 0.0f }, z);
+						x.CrossProduct(y, z, x);
+						total_offset = x * -settings::misc::viewmodel_offset_x + y * settings::misc::viewmodel_offset_y - z * settings::misc::viewmodel_offset_z;
+
+						viewmodel->GetBaseEntity()->SetAbsOrigin(viewmodel->GetRenderOrigin() + total_offset);
+					}
 				}
 			}
 		}
