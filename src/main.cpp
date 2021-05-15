@@ -90,6 +90,17 @@ DWORD __stdcall on_attach(LPVOID base)
 	static const auto name = g::steam_friends->GetPersonaName();
 	sprintf_s(buf, "Injected, hello %s!", name);
 
+
+	#ifdef _DEBUG
+	static const HWND hwnd = reinterpret_cast<HWND>(g::input_system->get_window());
+	if (hwnd != NULL)
+		SetWindowTextA(hwnd, "Sensum | Debug Mode - Expect problems!");
+
+	g::cvar->ConsoleColorPrintf(Color::Red, "\n\n\n\nSensum detected that it is running in DEBUG MODE, please recompile the cheat in RELEASE MODE to minimize lags and other problems!\n");
+	g::cvar->ConsoleColorPrintf(Color::Red, "Sensum detected that it is running in DEBUG MODE, please recompile the cheat in RELEASE MODE to minimize lags and other problems!\n");
+	g::cvar->ConsoleColorPrintf(Color::Red, "Sensum detected that it is running in DEBUG MODE, please recompile the cheat in RELEASE MODE to minimize lags and other problems!\n\n");
+	#endif
+
 	notifies::push(buf);
 
 	/*g::cvar->ConsoleColorPrintf(Color::Green, "This is ConsoleColorPrintf\n\n"); //TODO: Do console log system.
@@ -105,6 +116,10 @@ void on_detach()
 {
 #ifdef _DEBUG
 	console::detach();
+
+	static const HWND hwnd = reinterpret_cast<HWND>(g::input_system->get_window());
+	if (hwnd != NULL)
+		SetWindowTextA(hwnd, "Counter-Strike: Global Offensive");
 #endif
 	render::destroy();
 	hooks::destroy();

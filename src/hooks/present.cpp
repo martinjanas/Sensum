@@ -22,6 +22,19 @@ namespace hooks
 
 		globals::draw_list = ImGui::GetOverlayDrawList();
 
+		#ifdef _DEBUG
+		{
+			static int x, y;
+
+			g::engine_client->GetScreenSize(x, y);
+
+			static int xx = x / 2;
+			static int yy = y / 2;
+
+			globals::draw_list->AddText(ImVec2(xx - 100.f, yy + 250.f), utils::to_im32(Color::White), "Debug Mode detected - Expect lags and other problems!");
+		}
+		#endif
+
 		render::menu::show();
 		render::timers::show();
 		notifies::handle(globals::draw_list);

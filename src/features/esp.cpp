@@ -225,6 +225,8 @@ namespace esp
 		int xx = x / 2;
 		int yy = y / 2;
 
+		globals::draw_list->AddText(ImVec2(xx - 100.f, yy + 250.f), utils::to_im32(Color::White), "Sensum was launched in DEBUG - Expect problems!");
+
 		QAngle angles;
 		g::engine_client->GetViewAngles(angles);
 
