@@ -128,6 +128,8 @@
     <ClCompile Include="features\fast_stop.cpp" />
     <ClCompile Include="features\glow.cpp" />
     <ClCompile Include="features\grenade_prediction.cpp" />
+    <ClCompile Include="features\hegrenade_helper.cpp" />
+    <ClCompile Include="features\molotov_helper.cpp" />
     <ClCompile Include="features\nade_helper.cpp" />
     <ClCompile Include="features\no_flash.cpp" />
     <ClCompile Include="features\no_smoke.cpp" />
@@ -199,6 +201,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="features\esp.hpp" />
+    <ClInclude Include="features\hegrenade_helper.h" />
+    <ClInclude Include="features\molotov_helper.h" />
     <ClInclude Include="features\nade_helper.h" />
     <ClInclude Include="features\popflash_helper.h" />
     <ClInclude Include="features\sounds.h" />

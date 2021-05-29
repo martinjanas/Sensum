@@ -8,7 +8,7 @@
 #include "../helpers/notifies.h"
 #include "../features/features.h"
 
-#define VERSION "1.12.10"
+#define VERSION "1.12.11"
 
 const char* const KeyNames[] = {
     "Unknown",
@@ -656,7 +656,12 @@ namespace render
 		{
 			ImVec2 win_pos = ImGui::GetWindowPos();
 
-			static const auto copyright = "Xardch & MartiNJ409";
+			static auto copyright = "Xardch & MartiNJ409";
+
+            #ifdef _DEBUG
+            copyright = "Xardch & MartiNJ409 | Debug Mode - Expect problems!";
+            #endif
+
 			static const auto copyright_size = ImGui::CalcTextSize(copyright);
 
 			static char buildtime[256];

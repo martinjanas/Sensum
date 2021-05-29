@@ -1,6 +1,10 @@
 # Sensum - Internal legit cheat - [Discord Server](https://discord.gg/dDwHyydXw7)
 
+## Anybody posting issues in the ***Discussion tab*** will be blocked!
+
 [**List of features**](https://pastebin.com/twMkYr0q) | ***Check the Discussions tab to request a feature.***
+
+Click on ***[this](instructions.md)*** if You are new to compiling cheats.
 
 **Further optimizations:**<br>
 This project is using the SSE2 instructions set by default.<br>

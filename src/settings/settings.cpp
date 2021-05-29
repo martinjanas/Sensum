@@ -263,6 +263,8 @@ namespace settings
 		bool override_viewmodel = false;
 		bool smoke_helper = false;
 		bool flash_helper = false;
+		bool hegrenade_helper = false;
+		bool molotov_helper = false;
 		bool ow_reveal = false;
 		bool selfnade = false;
 
@@ -405,6 +407,8 @@ namespace settings
 				Option::Load(root["misc.anti_obs"], misc::anti_obs);
 				Option::Load(root["misc.smoke_helper"], misc::smoke_helper);
 				Option::Load(root["misc.flash_helper"], misc::flash_helper);
+				Option::Load(root["misc.hegrenade_helper"], misc::hegrenade_helper);
+				Option::Load(root["misc.molotov_helper"], misc::molotov_helper);
 				Option::Load(root["misc.selfnade"], misc::selfnade);
 
 				Option::Load(root["glow.enemy"], glow::enemy::enabled);
@@ -654,6 +658,8 @@ namespace settings
 				config["misc.anti_obs"] = misc::anti_obs;
 				config["misc.smoke_helper"] = misc::smoke_helper;
 				config["misc.flash_helper"] = misc::flash_helper;
+				config["misc.hegrenade_helper"] = misc::hegrenade_helper;
+				config["misc.molotov_helper"] = misc::molotov_helper;
 				config["misc.selfnade"] = misc::selfnade;
 
 				Option::Save(config["misc_spread_crosshair_color"], settings::visuals::spread_cross_color);

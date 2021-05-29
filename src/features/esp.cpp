@@ -127,6 +127,20 @@ namespace esp
 			visuals::RenderCirclePopflash();
 			visuals::drawring_3d_popflash();
 		}
+
+		if (settings::misc::hegrenade_helper)
+		{
+			visuals::RenderInfoHeGrenade();
+			visuals::RenderCircleHeGrenade();
+			visuals::drawring_3d_hegrenade();
+		}
+
+		if (settings::misc::molotov_helper)
+		{
+			visuals::RenderInfoMolotov();
+			visuals::RenderCircleMolotov();
+			visuals::drawring_3d_molotov();
+		}
 	}
 
 	auto rotate_points(Vector* points, float rotation)->void
@@ -210,6 +224,10 @@ namespace esp
 
 		int xx = x / 2;
 		int yy = y / 2;
+
+		#ifdef _DEBUG
+		globals::draw_list->AddText(ImVec2(xx - 100.f, yy + 250.f), utils::to_im32(Color::White), "Sensum was launched in DEBUG - Expect problems!");
+		#endif
 
 		QAngle angles;
 		g::engine_client->GetViewAngles(angles);
@@ -327,6 +345,12 @@ namespace esp
 
 			if (settings::esp::bone_esp)
 			{
+				if (!data.player)
+					continue;
+
+				if (!g::local_player)
+					continue;
+
 				if (!data.is_player || data.player == g::local_player || data.m_iHealth <= 0 || data.is_dormant || data.team_num == g::local_player->m_iTeamNum())
 					continue;
 
