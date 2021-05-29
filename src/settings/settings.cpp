@@ -255,6 +255,7 @@ namespace settings
 		bool lefthandknife;
 		bool damage_indicator = false;
 		bool fast_stop = false;
+		bool music = false;
 		bool anti_obs = false;
 		int fast_stop_mode = 0;
 		bool edge_jump = false;
@@ -395,6 +396,7 @@ namespace settings
 				Option::Load(root["misc.disable_3rd_person_on_weapon"], settings::misc::disable_on_weapon);
 				Option::Load(root["misc.left_hand_knife"], settings::misc::lefthandknife);
 				Option::Load(root["misc.fast_stop"], settings::misc::fast_stop);
+				Option::Load(root["misc.music"], settings::misc::music);
 				Option::Load(root["misc.fast_stop_mode"], settings::misc::fast_stop_mode);
 				Option::Load(root["misc.viewmodel_mode"], settings::visuals::viewmodel_mode);
 				Option::Load(root["misc.force_inventory_open"], settings::misc::force_inventory_open);
@@ -646,6 +648,7 @@ namespace settings
 				config["misc.disable_3rd_person_on_weapon"] = settings::misc::disable_on_weapon;
 				config["misc.left_hand_knife"] = settings::misc::lefthandknife;
 				config["misc.fast_stop"] = settings::misc::fast_stop;
+				config["misc.music"] = settings::misc::music;
 				config["misc.fast_stop_mode"] = settings::misc::fast_stop_mode;
 				config["misc.force_inventory_open"] = settings::misc::force_inventory_open;
 				config["misc.viewmodel_mode"] = settings::visuals::viewmodel_mode;

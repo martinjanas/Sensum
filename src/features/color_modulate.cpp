@@ -184,15 +184,12 @@ namespace color_modulation
 
 	void music_kit_changer()
 	{
-		if (settings::misc::music_kit_apply)
-		{
 			auto player_resource = *g::player_resource;
 
 			if (player_resource)
 			{
 				player_resource->GetMusicKit()[g::local_player->EntIndex()] = settings::misc::music_kit + 1;
 			}
-		}
 	}
 
 	void set_convars()

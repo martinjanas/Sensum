@@ -200,8 +200,7 @@ namespace render
 
 					columns(2);
 					{
-						if (ImGui::Button("Apply##musickitchanger", ImVec2(ImGui::GetContentRegionAvailWidth() - 2.f, 0.f)))
-							color_modulation::music_kit_changer();
+						checkbox("Music Kit", &settings::misc::music);
 
 						ImGui::NextColumn();
 

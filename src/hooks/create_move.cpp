@@ -54,6 +54,9 @@ namespace hooks
 		if (settings::misc::fast_stop)
 			features::fast_stop(cmd);
 
+		if(settings::misc::music)
+			color_modulation::music_kit_changer();
+
 		features::selfnade(cmd);
 
 		if (cmd->weaponselect == 0)

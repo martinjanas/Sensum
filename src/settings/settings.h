@@ -384,6 +384,7 @@ namespace settings
 		extern bool equip;
 		extern bool damage_indicator;
 		extern bool fast_stop;
+		extern bool music;
 		extern bool force_inventory_open;
 		extern bool anti_obs;
 		extern int fast_stop_mode;
