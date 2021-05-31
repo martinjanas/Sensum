@@ -10,6 +10,24 @@
 
 namespace hooks
 {
+	__declspec(naked) void __stdcall create_move::proxy(int sequence_number, float input_sample_frametime, bool active)
+	{
+		__asm
+		{
+			push ebp
+			mov ebp, esp
+			push ebx
+			push esp
+			push dword ptr[active]
+			push dword ptr[input_sample_frametime]
+			push dword ptr[sequence_number]
+			call hooked
+			pop ebx
+			pop ebp
+			retn 0Ch
+		}
+	}
+
 	void __stdcall create_move::hooked(int sequence_number, float input_sample_frametime, bool active, bool sendpacket)
 	{
 		original(g::base_client, sequence_number, input_sample_frametime, active);

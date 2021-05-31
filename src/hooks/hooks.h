@@ -29,6 +29,7 @@ namespace hooks
 		static const int index = 22;
 		using fn = void(__thiscall*)(IBaseClientDLL*, int, float, bool);
 		static void __stdcall hooked(int sequence_number, float input_sample_frametime, bool active, bool sendpacket);
+		static void __stdcall proxy(int sequence_number, float input_sample_frametime, bool active);
 
 		inline static fn original;
 		inline static void* setup;

@@ -70,7 +70,11 @@ namespace hooks
 			MessageBoxA(NULL, "Outdated index - DirectX: End Scene", MB_OK, MB_ICONERROR);
 		}
 
-		if (MH_CreateHook(create_move::setup, &hooks::create_move::hooked, reinterpret_cast<void**>(&create_move::original)) != MH_OK) {
+		/*if (MH_CreateHook(create_move::setup, &hooks::create_move::hooked, reinterpret_cast<void**>(&create_move::original)) != MH_OK) {
+			MessageBoxA(NULL, "Outdated index - Create Move", MB_OK, MB_ICONERROR);
+		}*/
+
+		if (MH_CreateHook(create_move::setup, &hooks::create_move::proxy, reinterpret_cast<void**>(&create_move::original)) != MH_OK) {
 			MessageBoxA(NULL, "Outdated index - Create Move", MB_OK, MB_ICONERROR);
 		}
 
