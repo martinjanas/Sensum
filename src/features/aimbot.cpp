@@ -303,8 +303,11 @@ namespace aimbot
 			y = scale * y / 2.f;
 		}
 
-		x = scale *= 1.26f;
-		y = scale;
+		//x = scale *= 1.26f;
+		//y = scale;
+
+		x += (scale *= 1.26f) / 2.f;
+		y += scale / 2.f;
 
 		if (x <= 0 && y <= 0)
 			return false;

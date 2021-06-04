@@ -8,7 +8,7 @@
 #include "../helpers/notifies.h"
 #include "../features/features.h"
 
-#define VERSION "1.12.12"
+#define VERSION "1.12.13"
 
 const char* const KeyNames[] = {
     "Unknown",
