@@ -18,7 +18,7 @@
 #include "features/features.h"
 #include "helpers/imdraw.h"
 #include "valve_sdk/netvars.hpp"
-
+#include "security/VMProtectSDK.h"
 bool is_unhookable = true;
 char buf[256];
 
@@ -70,6 +70,8 @@ void setup_hotkeys(LPVOID base)
 
 DWORD __stdcall on_attach(LPVOID base)
 {
+	VMProtectBeginMutation("on_attach");
+
 	wait_for_modules();
 
 #ifdef _DEBUG
@@ -108,7 +110,8 @@ DWORD __stdcall on_attach(LPVOID base)
 	g::cvar->ConsoleDPrintf("This is ConsolDPrintf\n\n");*/
 
 	setup_hotkeys(base);
-
+	
+	VMProtectEnd();
 	return TRUE;
 }
 
@@ -128,6 +131,7 @@ void on_detach()
 
 BOOL __stdcall DllMain(_In_ HINSTANCE instance, _In_ DWORD fdwReason, _In_opt_ LPVOID lpvReserved)
 {
+	VMProtectBeginMutation("DllMain");
 	if (fdwReason == DLL_PROCESS_ATTACH)
 	{
 		if (instance)
@@ -140,6 +144,7 @@ BOOL __stdcall DllMain(_In_ HINSTANCE instance, _In_ DWORD fdwReason, _In_opt_ L
 	}
 	else if (fdwReason == DLL_PROCESS_DETACH)
 		on_detach();
-
+	
+	VMProtectEnd();
 	return TRUE;
 }

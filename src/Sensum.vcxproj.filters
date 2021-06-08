@@ -645,5 +645,13 @@
     <ClInclude Include="features\molotov_helper.h">
       <Filter>features\misc</Filter>
     </ClInclude>
+    <ClInclude Include="security\VMProtectSDK.h">
+      <Filter>security</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="security\VMProtectSDK32.lib">
+      <Filter>security</Filter>
+    </Library>
   </ItemGroup>
 </Project>
