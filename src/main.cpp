@@ -19,7 +19,6 @@
 #include "helpers/imdraw.h"
 #include "valve_sdk/netvars.hpp"
 
-bool is_unhookable = true;
 char buf[256];
 
 void wait_for_modules()
@@ -46,26 +45,23 @@ void setup_hotkeys(LPVOID base)
 
 			render::switch_hwnd();
 	});
-
-	if (is_unhookable)
+	
+	bool is_active = true;
+	input_system::register_hotkey(VK_DELETE, [&is_active]()
 	{
-		bool is_active = true;
-		input_system::register_hotkey(VK_DELETE, [&is_active]()
+		hooks::destroy();
+		if (render::menu::is_visible())
 		{
-			hooks::destroy();
-			if (render::menu::is_visible())
-			{
-				render::menu::toggle();
-				render::switch_hwnd();
-			}
-			is_active = false;
-		});
+			render::menu::toggle();
+			render::switch_hwnd();
+		}
+		is_active = false;
+	});
 
-		while (is_active)
-			Sleep(500);
+	while (is_active)
+		Sleep(500);
 
-		FreeLibraryAndExitThread(static_cast<HMODULE>(base), 1);
-	}
+	FreeLibraryAndExitThread(static_cast<HMODULE>(base), 1);
 }
 
 DWORD __stdcall on_attach(LPVOID base)
@@ -133,10 +129,7 @@ BOOL __stdcall DllMain(_In_ HINSTANCE instance, _In_ DWORD fdwReason, _In_opt_ L
 		if (instance)
 			LI_FN(DisableThreadLibraryCalls)(instance);
 
-		if (is_unhookable = (strstr(GetCommandLineA(), "-insecure") || !utils::get_module(xorstr_("serverbrowser.dll"))))
-			LI_FN(CreateThread)(nullptr, 0, on_attach, instance, 0, nullptr);
-		else
-			on_attach(instance);
+		LI_FN(CreateThread)(nullptr, 0, on_attach, instance, 0, nullptr);
 	}
 	else if (fdwReason == DLL_PROCESS_DETACH)
 		on_detach();

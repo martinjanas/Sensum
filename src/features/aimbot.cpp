@@ -303,11 +303,9 @@ namespace aimbot
 			y = scale * y / 2.f;
 		}
 
-		//x = scale *= 1.26f;
-		//y = scale;
-
-		x += (scale *= 1.26f) / 2.f;
-		y += scale / 2.f;
+		//The perfect value for rcs IMO is 2.52f on both axis.
+		x += (scale *= 1.26f) / 4.84615f; //Dont mind this magic number its just calculated...
+		y += scale / 4.84615f;			  //...so the result at 100% yaw/pitch is always at 2.52f	
 
 		if (x <= 0 && y <= 0)
 			return false;
