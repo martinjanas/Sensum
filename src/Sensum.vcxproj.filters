@@ -307,6 +307,9 @@
     <ClCompile Include="features\molotov_helper.cpp">
       <Filter>features\misc</Filter>
     </ClCompile>
+    <ClCompile Include="valve_sdk\kit_parser.cpp">
+      <Filter>valve_sdk</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\directx9\imgui_impl_dx9.h">
@@ -644,6 +647,9 @@
     </ClInclude>
     <ClInclude Include="features\molotov_helper.h">
       <Filter>features\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="valve_sdk\kit_parser.hpp">
+      <Filter>valve_sdk</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

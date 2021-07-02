@@ -2,6 +2,8 @@
 #include "../../settings/globals.h"
 #include "../../features/features.h"
 
+#include "../../valve_sdk/kit_parser.hpp"
+
 #include <algorithm>
 
 namespace render
@@ -63,8 +65,6 @@ namespace render
 
 			child("Paint Kits", [&selected_entry]()
 				{
-					static auto show_all_kits = false;
-
 					static char query_kit[64];
 
 					ImGui::InputText("##skins.query", query_kit, sizeof(query_kit));
@@ -80,28 +80,15 @@ namespace render
 						const auto has_query = query_length > 0;
 
 						const auto is_glove = selected_entry.definition_index == GLOVE_CT_SIDE || selected_entry.definition_index == GLOVE_T_SIDE;
-						for (size_t k = 0; k < skins::skin_kits.size(); k++) //for (size_t k = 0; k < skins::skin_kits.size(); k++)
+						for (size_t k = 0; k < game_data::skin_kits.size(); k++)
 						{
-							weapon_kit_t weapon_kit;
-							if (!show_all_kits)
-							{
-								for (auto& definition : skins::skin_kits[k].weapons)
-								{
-									if (definition.index == (is_glove ? selected_entry.definition_override_index : selected_entry.definition_index))
-										weapon_kit = definition;
-								}
-
-								if (weapon_kit.rarity.empty())
-									continue;
-							}
-
-							const auto name = skins::skin_kits[k].english;
+							auto name = game_data::skin_kits[k].name.c_str();
 							if (has_query)
 							{
-								if (skins::skin_kits[k].english.length() < query_length)
+								if (game_data::skin_kits[k].name.length() < query_length)
 									continue;
 
-								if (skins::skin_kits[k].english.find(query) == -1)
+								if (game_data::skin_kits[k].name.find(query) == -1)
 									continue;
 							}
 
@@ -125,11 +112,11 @@ namespace render
 
 							color = ImVec4(0.29f, 0.41f, 1.f, 1.f);
 							ImGui::PushStyleColor(ImGuiCol_Text, color);
-
+							
 							char buf_name[256];
-							sprintf_s(buf_name, sizeof(buf_name), "%s##%d", name.c_str(), skins::skin_kits[k].id);
-							if (selectable(buf_name, skins::skin_kits[k].id == selected_entry.paint_kit_index))
-								selected_entry.paint_kit_index = skins::skin_kits[k].id;
+							sprintf_s(buf_name, sizeof(buf_name), "%s##%d", name, game_data::skin_kits[k].id);
+							if (selectable(buf_name, game_data::skin_kits[k].id == selected_entry.paint_kit_index))
+								selected_entry.paint_kit_index = game_data::skin_kits[k].id;
 
 							ImGui::PopStyleColor();
 						}

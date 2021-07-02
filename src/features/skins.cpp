@@ -85,21 +85,6 @@ namespace skins
 		{ GLOVE_HYDRA, "Hydra" },
 	};
 
-	void initialize_kits()
-	{
-		config::load("skin_kits.json", "", false, [](Json::Value root)
-			{
-				for (auto& item : root)
-				{
-					std::vector<weapon_kit_t> weapons;
-					for (auto& weapon : item["weapons"])
-						weapons.emplace_back(weapon_kit_t{ weapon["index"].asInt(), weapon["rarity"].asString() });
-
-					skin_kits.emplace_back(paint_kit_t{ item["id"].asInt(), item["english"].asString(), weapons });
-				}
-			});
-	}
-
 	const weapon_info_t* get_weapon_info(const int& defindex)
 	{
 		const auto entry = info.find(defindex);
@@ -344,6 +329,22 @@ namespace skins
 
 	void load()
 	{
+		config::load("statrack.json", "", false, [](Json::Value root)
+			{
+				statrack_items.clear();
+
+				Json::Value it = root["statrack"];
+				if (it.isNull())
+					return;
+
+				for (auto& item : it)
+				{
+					auto skin_data = &statrack_items[item["definition_index"].asInt()];
+					Option::Load(item["definition_index"], skin_data->definition_index);
+					Option::Load(item["stat_track.counter_new"], skin_data->statrack_new.counter);
+				}
+			});
+
 		config::load("skins.json", "", false, [](Json::Value root)
 			{
 				m_items.clear();
@@ -363,7 +364,6 @@ namespace skins
 					Option::Load(item["paint_kit_index"], skin_data->paint_kit_index);
 					Option::Load(item["wear"], skin_data->wear);
 					Option::Load(item["stat_track.enabled"], skin_data->stat_track.enabled);
-					//Option::Load(item["stat_track.counter"], skin_data->stat_track.counter);
 					Option::Load(item["seed"], skin_data->seed);
 				}
 			});
@@ -395,25 +395,6 @@ namespace skins
 				config["skins"] = items;
 
 				return config;
-			});
-	}
-
-	void load_statrack()
-	{
-		config::load("statrack.json", "", false, [](Json::Value root)
-			{
-				statrack_items.clear();
-
-				Json::Value it = root["statrack"];
-				if (it.isNull())
-					return;
-
-				for (auto& item : it)
-				{
-					auto skin_data = &statrack_items[item["definition_index"].asInt()];
-					Option::Load(item["definition_index"], skin_data->definition_index);
-					Option::Load(item["stat_track.counter_new"], skin_data->statrack_new.counter);
-				}
 			});
 	}
 

@@ -95,11 +95,9 @@ namespace skins
 	extern std::vector<weapon_name_t> glove_names;
 
 	void save();
-	void load_statrack();
-	void save_statrack();
 	void load();
-	void initialize_kits();
-
+	void save_statrack();
+	
 	void handle();
 
 	const weapon_info_t* get_weapon_info(const int& defindex);

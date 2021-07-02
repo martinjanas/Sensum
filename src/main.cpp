@@ -19,6 +19,8 @@
 #include "helpers/imdraw.h"
 #include "valve_sdk/netvars.hpp"
 
+#include "valve_sdk/kit_parser.hpp"
+
 char buf[256];
 
 void wait_for_modules()
@@ -71,37 +73,35 @@ DWORD __stdcall on_attach(LPVOID base)
 #ifdef _DEBUG
 	console::attach();
 #endif
+
 	g::initialize();
 	input_system::initialize();
 	render::initialize();
 	hooks::init();
-	//netvar_manager::get(); //Uncomment this to dump netvars.
-	skins::load_statrack();
-	skins::initialize_kits();
 	skins::load();
 	globals::load();
-
+	game_data::initialize_kits();
+	//netvar_manager::get(); //Uncomment this to dump netvars.
+	
 	config::cache("configs");
 
-	static const auto name = g::steam_friends->GetPersonaName();
-	sprintf_s(buf, "Injected, hello %s!", name);
+	{
+#ifdef _DEBUG
+		static const HWND hwnd = reinterpret_cast<HWND>(g::input_system->get_window());
+		if (hwnd != NULL)
+			SetWindowTextA(hwnd, "Sensum | Debug Mode - Expect problems!");
 
+		g::cvar->ConsoleColorPrintf(Color::Red, "\n\n\n\nSensum detected that it is running in DEBUG MODE, please recompile the cheat in RELEASE MODE to minimize lags and other problems!\n");
+		g::cvar->ConsoleColorPrintf(Color::Red, "Sensum detected that it is running in DEBUG MODE, please recompile the cheat in RELEASE MODE to minimize lags and other problems!\n");
+		g::cvar->ConsoleColorPrintf(Color::Red, "Sensum detected that it is running in DEBUG MODE, please recompile the cheat in RELEASE MODE to minimize lags and other problems!\n\n");
+#endif
 
-	#ifdef _DEBUG
-	static const HWND hwnd = reinterpret_cast<HWND>(g::input_system->get_window());
-	if (hwnd != NULL)
-		SetWindowTextA(hwnd, "Sensum | Debug Mode - Expect problems!");
+		char buf[64];
+		static const auto name = g::steam_friends->GetPersonaName();
+		sprintf_s(buf, "Injected, hello %s!", name);
 
-	g::cvar->ConsoleColorPrintf(Color::Red, "\n\n\n\nSensum detected that it is running in DEBUG MODE, please recompile the cheat in RELEASE MODE to minimize lags and other problems!\n");
-	g::cvar->ConsoleColorPrintf(Color::Red, "Sensum detected that it is running in DEBUG MODE, please recompile the cheat in RELEASE MODE to minimize lags and other problems!\n");
-	g::cvar->ConsoleColorPrintf(Color::Red, "Sensum detected that it is running in DEBUG MODE, please recompile the cheat in RELEASE MODE to minimize lags and other problems!\n\n");
-	#endif
-
-	notifies::push(buf);
-
-	/*g::cvar->ConsoleColorPrintf(Color::Green, "This is ConsoleColorPrintf\n\n"); //TODO: Do console log system.
-	g::cvar->ConsolePrintf("This is ConsolePrintf\n\n");
-	g::cvar->ConsoleDPrintf("This is ConsolDPrintf\n\n");*/
+		notifies::push(buf);
+	}
 
 	setup_hotkeys(base);
 
@@ -117,6 +117,7 @@ void on_detach()
 	if (hwnd != NULL)
 		SetWindowTextA(hwnd, "Counter-Strike: Global Offensive");
 #endif
+
 	render::destroy();
 	hooks::destroy();
 	input_system::destroy();
