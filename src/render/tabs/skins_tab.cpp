@@ -5,6 +5,18 @@
 #include "../../valve_sdk/kit_parser.hpp"
 
 #include <algorithm>
+#include <string>
+#include <cctype>
+
+bool findStringIC(const std::string& strHaystack, const std::string& strNeedle)
+{
+	auto it = std::search(
+		strHaystack.begin(), strHaystack.end(),
+		strNeedle.begin(), strNeedle.end(),
+		[](char ch1, char ch2) { return std::toupper(ch1) == std::toupper(ch2); }
+	);
+	return (it != strHaystack.end());
+}
 
 namespace render
 {
@@ -80,15 +92,21 @@ namespace render
 						const auto has_query = query_length > 0;
 
 						const auto is_glove = selected_entry.definition_index == GLOVE_CT_SIDE || selected_entry.definition_index == GLOVE_T_SIDE;
-						for (size_t k = 0; k < game_data::skin_kits.size(); k++)
+						for (size_t k = 0; k < (is_glove ? game_data::glove_kits.size() : game_data::skin_kits.size()); k++)
 						{
-							auto name = game_data::skin_kits[k].name.c_str();
+							auto name = is_glove ? game_data::glove_kits[k].name.c_str() : game_data::skin_kits[k].name.c_str();
 							if (has_query)
 							{
-								if (game_data::skin_kits[k].name.length() < query_length)
+								if (!is_glove && game_data::skin_kits[k].name.length() < query_length)
 									continue;
 
-								if (game_data::skin_kits[k].name.find(query) == -1)
+								if (!is_glove && !findStringIC(game_data::skin_kits[k].name, query))
+									continue;
+
+								if (is_glove && game_data::glove_kits[k].name.length() < query_length)
+									continue;
+
+								if (is_glove && !findStringIC(game_data::glove_kits[k].name, query))
 									continue;
 							}
 
@@ -114,9 +132,9 @@ namespace render
 							ImGui::PushStyleColor(ImGuiCol_Text, color);
 							
 							char buf_name[256];
-							sprintf_s(buf_name, sizeof(buf_name), "%s##%d", name, game_data::skin_kits[k].id);
-							if (selectable(buf_name, game_data::skin_kits[k].id == selected_entry.paint_kit_index))
-								selected_entry.paint_kit_index = game_data::skin_kits[k].id;
+							sprintf_s(buf_name, sizeof(buf_name), "%s##%d", name, is_glove ? game_data::glove_kits[k].id : game_data::skin_kits[k].id);
+							if (selectable(buf_name, is_glove ? game_data::glove_kits[k].id : game_data::skin_kits[k].id == selected_entry.paint_kit_index))
+								selected_entry.paint_kit_index = is_glove ? game_data::glove_kits[k].id : game_data::skin_kits[k].id;
 
 							ImGui::PopStyleColor();
 						}
