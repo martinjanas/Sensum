@@ -97,7 +97,6 @@ namespace visuals
 				class_id == EClassId::ParticleSmokeGrenade || class_id == EClassId::CBaseGrenade && entity && entity->m_nExplodeEffectTickBegin() < 1) {
 
 				objects.color(settings::glow::misc::nades::color);
-				objects.bloom_amount(1.0f);
 				objects.render_when_occluded(true);
 				objects.render_when_unoccluded(false);
 				objects.glow_style(0);
