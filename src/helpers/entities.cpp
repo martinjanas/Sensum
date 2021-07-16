@@ -46,15 +46,43 @@ namespace entities
 		}
 	}
 
+// 	bool is_hitbox_for_visible_check(const int& hitbox)
+// 	{
+// 		switch (hitbox) {
+// 		case HITBOX_HEAD:
+// 		case HITBOX_UPPER_CHEST:
+// 		case HITBOX_RIGHT_CALF:
+// 		case HITBOX_LEFT_CALF:
+// 		case HITBOX_RIGHT_HAND:
+// 		case HITBOX_LEFT_HAND:
+// 			return true;
+// 		default:
+// 			return false;
+// 		}
+// 	}
+
 	bool is_hitbox_for_visible_check(const int& hitbox)
 	{
 		switch (hitbox) {
 		case HITBOX_HEAD:
+		case HITBOX_NECK:
+		case HITBOX_PELVIS:
+		case HITBOX_BELLY:
+		case HITBOX_THORAX:
+		case HITBOX_LOWER_CHEST:
 		case HITBOX_UPPER_CHEST:
+		case HITBOX_RIGHT_THIGH:
+		case HITBOX_LEFT_THIGH:
 		case HITBOX_RIGHT_CALF:
 		case HITBOX_LEFT_CALF:
+		case HITBOX_RIGHT_FOOT:
+		case HITBOX_LEFT_FOOT:
 		case HITBOX_RIGHT_HAND:
 		case HITBOX_LEFT_HAND:
+		case HITBOX_RIGHT_UPPER_ARM:
+		case HITBOX_RIGHT_FOREARM:
+		case HITBOX_LEFT_UPPER_ARM:
+		case HITBOX_LEFT_FOREARM:
 			return true;
 		default:
 			return false;
@@ -67,18 +95,21 @@ namespace entities
 			return false;
 
 		auto hdr = g::mdl_info->GetStudiomodel(player->GetModel());
-		if (!hdr)
-			return false;
-
-		for (int k = 0; k < 13; k++)
+		
+		if (hdr)
 		{
-			auto overlay = player->GetAnimOverlay(k);
-			if (!overlay)
-				return false;
+			for (int k = 0; k < 13; k++)
+			{
+				auto overlay = player->GetAnimOverlay(k);
 
-			const auto activity = player->GetSequenceActivity(hdr, overlay->m_nSequence);
-			if (activity == 979)
-				return true;
+				if (overlay)
+				{
+					const auto activity = player->GetSequenceActivity(hdr, overlay->m_nSequence);
+
+					if (activity == 979)
+						return true;
+				}
+			}
 		}
 
 		return false;
@@ -372,12 +403,12 @@ namespace entities
 			return;
 		}
 
-		if (!local->IsAlive() && local->m_hObserverTarget())
-		{
-			const auto observer = (c_base_player*)c_base_player::GetEntityFromHandle(local->m_hObserverTarget());
-			if (observer && observer->IsPlayer())
-				local = observer;
-		}
+// 		if (!local->IsAlive() && local->m_hObserverTarget())
+// 		{
+// 			const auto observer = (c_base_player*)c_base_player::GetEntityFromHandle(local->m_hObserverTarget());
+// 			if (observer && observer->IsPlayer())
+// 				local = observer;
+// 		}
 
 		local_mutex.lock();
 		set_local(local, m_local, g::local_player->m_nTickBase());
@@ -539,6 +570,9 @@ namespace entities
 			player_data.in_smoke = in_smoke;
 			player_data.is_visible = is_visible;
 
+			globals::is_visible[player->GetPlayerInfo().userId] = player_data.is_visible;
+			globals::in_smoke[player->GetPlayerInfo().userId] = player_data.in_smoke;
+
 			player_data.box = GetBBox(player, player_data.points);
 			player_data.origin = player->m_vecOrigin();
 			player_data.old_origin = origin;
@@ -554,7 +588,5 @@ namespace entities
 			m_items.resize(13);
 		}
 		locker.unlock();
-
-		GetSoundOfEntities(local);
 	}
 }

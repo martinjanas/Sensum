@@ -31,11 +31,6 @@ void print_grenade_data()
 	g::cvar->ConsolePrintf(buf);
 }
 
-namespace convars
-{
-	ConCommand* g_data;
-}
-
 namespace hooks
 {
 	c_game_event_listener* event_listener;
@@ -69,10 +64,6 @@ namespace hooks
 		if (MH_CreateHook(end_scene::setup, &hooks::end_scene::hooked, reinterpret_cast<void**>(&end_scene::original)) != MH_OK) {
 			MessageBoxA(NULL, "Outdated index - DirectX: End Scene", MB_OK, MB_ICONERROR);
 		}
-
-		/*if (MH_CreateHook(create_move::setup, &hooks::create_move::hooked, reinterpret_cast<void**>(&create_move::original)) != MH_OK) {
-			MessageBoxA(NULL, "Outdated index - Create Move", MB_OK, MB_ICONERROR);
-		}*/
 
 		if (MH_CreateHook(create_move::setup, &hooks::create_move::proxy, reinterpret_cast<void**>(&create_move::original)) != MH_OK) {
 			MessageBoxA(NULL, "Outdated index - Create Move", MB_OK, MB_ICONERROR);
@@ -160,16 +151,6 @@ namespace hooks
 		g::game_events->add_listener(event_listener, xorstr_("player_death"), false);
 
 		g::cvar->ConsoleColorPrintf(Color::White, "hooks::init() Done!\n");
-
-		//convars::g_data = new ConCommand("g_data", reinterpret_cast<FnCommandCallbackV1_t>(print_grenade_data), "print_grenade_data", FCVAR_RELEASE);
-
-		//g::cvar->RegisterConCommand(convars::g_data);
-
-		//convars::sensum_i_dont_speak_nn_lang = new ConVar("sensum_i_dont_speak_nn_lang", "0", FCVAR_RELEASE, "We dont speak nn language, sorry not sorry.");
-		//convars::con = new ConCommand("bhop", reinterpret_cast<FnCommandCallbackV1_t>(base), "base", FCVAR_RELEASE);
-
-		//g::cvar->RegisterConCommand(convars::sensum_mute_russians);
-		//g::cvar->RegisterConCommand(convars::sensum_i_dont_speak_nn_lang);
 	}
 
 	void destroy()
@@ -180,16 +161,6 @@ namespace hooks
 		g::game_events->remove_listener(event_listener);
 
 		sequence::hook->~recv_prop_hook();
-
-		//g::cvar->UnregisterConCommand(convars::g_data);
-
-		//delete convars::g_data;
-
-		//g::cvar->UnregisterConCommand(convars::sensum_mute_russians);
-		//g::cvar->UnregisterConCommand(convars::sensum_i_dont_speak_nn_lang);
-
-		//delete convars::sensum_mute_russians;
-		//delete convars::sensum_i_dont_speak_nn_lang;
 	}
 
 	bool __stdcall is_playing_demo::hooked()

@@ -21,8 +21,6 @@
 
 #include "valve_sdk/kit_parser.hpp"
 
-char buf[256];
-
 void wait_for_modules()
 {
 	auto modules = std::vector<std::string>

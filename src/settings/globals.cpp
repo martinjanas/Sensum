@@ -33,8 +33,9 @@ namespace globals
 	ImDrawList* draw_list = nullptr;
 
 	std::map<int, int> team_damage = { };
-
 	std::map<int, int> team_kill = { };
+	std::map<int, bool> is_visible = { };
+	std::map<int, bool> in_smoke = { };
 
 	QAngle aim_punch = QAngle();
 	QAngle viewangles = QAngle();

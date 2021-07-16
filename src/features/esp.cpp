@@ -241,36 +241,30 @@ namespace esp
 		static const auto red_color = ImGui::GetColorU32(ImVec4::Red);
 
 		ImGui::PushFont(render::fonts::visuals);
+		
+		static Vector out;
 
 		for (const auto& data : m_entities)
 		{
 			if (data.index == 0 || !data.hitboxes[0][0].IsValid())
 				continue;
 
-			if (settings::esp::sound)
+			for (const auto& sound : _sounds)
 			{
-				static Vector out;
+				if (!data.is_alive)
+					continue;
 
-				for (const auto& sound : _sounds)
+				if (sound.index != 0)
 				{
-					if (!data.is_alive)
-						continue;
-
-					if (sound.index != 0)
+					if (settings::esp::sound)
 					{
 						if (math::world2screen(sound.origin, out))
 						{
 							globals::draw_list->AddRect(ImVec2(out.x + 3.f, out.y + 3.f), ImVec2(out.x - 3.f, out.y - 3.f), utils::to_im32(Color::White));
 						}
 					}
-				}
-			}
 
-			if (settings::esp::soundesp)
-			{
-				for (const auto& sound : _sounds)
-				{
-					if (sound.index != 0)
+					if (settings::esp::soundesp)
 					{
 						if ((last_time + 0.35f) < g::global_vars->realtime)
 						{

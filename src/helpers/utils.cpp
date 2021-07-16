@@ -513,31 +513,27 @@ namespace utils
 
 	void force_full_update()
 	{
-		return;
 		static const auto full_update_fn = reinterpret_cast<void(*)(void)>(pattern_scan(FORCE_FULL_UPDATE));
 		full_update_fn();
 
-		g::client_state->ForceFullUpdate(); //edit
-		return;
 		if (g::local_player)
 		{
-			g::client_state->ForceFullUpdate(); //edit
 			g::local_player->PostDataUpdate(0); //edit
 		}
 
 		if (!g::local_player || !g::local_player->IsAlive())
 			return;
 
-		static auto clear_hud_weapon_icon_ptr = utils::pattern_scan(CLEAR_HUD_WEAPON_ICON);
-		static auto clear_hud_weapon_icon_fn = reinterpret_cast<std::int32_t(__thiscall*)(void*, std::int32_t)>(clear_hud_weapon_icon_ptr);
-
-		auto element = g::hud_system->FindHudElement<std::uintptr_t*>("CCSGO_HudWeaponSelection");
-		auto hud_weapons = reinterpret_cast<hud_weapons_t*>(std::uintptr_t(element) - 0x9c);
-		if (!hud_weapons || *hud_weapons->get_weapon_count() == 0)
-			return;
-
-		for (std::int32_t i = 0; i < *hud_weapons->get_weapon_count(); i++)
-			i = clear_hud_weapon_icon_fn(hud_weapons, i);
+// 		static auto clear_hud_weapon_icon_ptr = utils::pattern_scan(CLEAR_HUD_WEAPON_ICON);
+// 		static auto clear_hud_weapon_icon_fn = reinterpret_cast<std::int32_t(__thiscall*)(void*, std::int32_t)>(clear_hud_weapon_icon_ptr);
+// 
+// 		auto element = g::hud_system->FindHudElement<std::uintptr_t*>("CCSGO_HudWeaponSelection");
+// 		auto hud_weapons = reinterpret_cast<hud_weapons_t*>(std::uintptr_t(element) - 0x9c);
+// 		if (!hud_weapons || *hud_weapons->get_weapon_count() == 0)
+// 			return;
+// 
+// 		for (std::int32_t i = 0; i < *hud_weapons->get_weapon_count(); i++)
+// 			i = clear_hud_weapon_icon_fn(hud_weapons, i);
 	}
 
 	bool is_line_goes_through_smoke(Vector vStartPos, Vector vEndPos)

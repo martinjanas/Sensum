@@ -175,7 +175,7 @@ namespace visuals
 		left_knife->SetValue(!weapon->IsKnife());
 	}
 
-	void draw_fov(entities::local_data_t& local, int xx, int yy)
+	void draw_fov(ImDrawList* draw_list, entities::local_data_t& local, int xx, int yy)
 	{
 		if (settings::esp::drawFov)
 		{
@@ -217,22 +217,16 @@ namespace visuals
 
 				float radius = tanf(DEG2RAD(aimbot::get_fov())) / tanf(screenFov) * center.x;
 
-				globals::draw_list->AddCircle(ImVec2(center.x, center.y), radius, ImGui::GetColorU32(settings::visuals::drawfov_color), 255);
+				draw_list->AddCircle(ImVec2(center.x, center.y), radius, ImGui::GetColorU32(settings::visuals::drawfov_color), 255);
 			}
 		}
 	}
 
-	void rcs_cross(entities::local_data_t& local, int xx, int yy)
+	void rcs_cross(ImDrawList* draw_list, entities::local_data_t& local, int xx, int yy)
 	{
 		if (settings::visuals::rcs_cross)
 		{
 			if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
-				return;
-
-			if (local.local != g::local_player)
-				return;
-
-			if (!local.local)
 				return;
 
 			if (!local.is_alive)
@@ -246,7 +240,7 @@ namespace visuals
 			_x -= (dx * (local.punch_angle.yaw));
 			_y += (dy * (local.punch_angle.pitch));
 
-			auto& active_wpn = local.active_weapon;
+			auto& active_wpn = local.local->m_hActiveWeapon();//local.active_weapon;
 
 			if (!active_wpn)
 				return;
@@ -261,21 +255,21 @@ namespace visuals
 			case 0:
 				if (local.shots_fired > 1)
 				{
-					globals::draw_list->AddLine(ImVec2(_x - 5, _y), ImVec2(_x + 5, _y), ImGui::GetColorU32(settings::visuals::recoilcolor));
-					globals::draw_list->AddLine(ImVec2(_x, _y - 5), ImVec2(_x, _y + 5), ImGui::GetColorU32(settings::visuals::recoilcolor));
+					draw_list->AddLine(ImVec2(_x - 5, _y), ImVec2(_x + 5, _y), ImGui::GetColorU32(settings::visuals::recoilcolor));
+					draw_list->AddLine(ImVec2(_x, _y - 5), ImVec2(_x, _y + 5), ImGui::GetColorU32(settings::visuals::recoilcolor));
 				}
 				break;
 			case 1:
 				if (local.shots_fired > 1)
 				{
-					globals::draw_list->AddCircle(ImVec2(_x, _y), settings::visuals::radius, ImGui::GetColorU32(settings::visuals::recoilcolor), 255);
+					draw_list->AddCircle(ImVec2(_x, _y), settings::visuals::radius, ImGui::GetColorU32(settings::visuals::recoilcolor), 255);
 				}
 				break;
 			}
 		}
 	}
 
-	void hitmarker(entities::local_data_t& local, int xx, int yy)
+	void hitmarker(ImDrawList* draw_list, entities::local_data_t& local, int xx, int yy)
 	{
 		if (settings::visuals::hitmarker)
 		{
@@ -305,12 +299,12 @@ namespace visuals
 
 			ImVec4 clr = ImVec4{ 1.0f, 1.0f, 1.0f, percent * 1.0f };
 
-			globals::draw_list->AddLine(ImVec2(xx - 3.f - addsize, yy - 3.f - addsize), ImVec2(xx + 3.f + addsize, yy + 3.f + addsize), ImGui::GetColorU32(clr));
-			globals::draw_list->AddLine(ImVec2(xx - 3.f - addsize, yy + 3.f + addsize), ImVec2(xx + 3.f + addsize, yy - 3.f - addsize), ImGui::GetColorU32(clr));
+			draw_list->AddLine(ImVec2(xx - 3.f - addsize, yy - 3.f - addsize), ImVec2(xx + 3.f + addsize, yy + 3.f + addsize), ImGui::GetColorU32(clr));
+			draw_list->AddLine(ImVec2(xx - 3.f - addsize, yy + 3.f + addsize), ImVec2(xx + 3.f + addsize, yy - 3.f - addsize), ImGui::GetColorU32(clr));
 		}
 	}
 
-	void noscope(entities::local_data_t& local, int xx, int yy)
+	void noscope(ImDrawList* draw_list, entities::local_data_t& local, int xx, int yy)
 	{
 		if (settings::misc::noscope)
 		{
@@ -330,14 +324,14 @@ namespace visuals
 
 			if (g::local_player->m_bIsScoped() && active_wpn->IsSniper())
 			{
-				globals::draw_list->AddLine(ImVec2(0, yy), ImVec2(x, yy), ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }));
-				globals::draw_list->AddLine(ImVec2(xx, 0), ImVec2(xx, y), ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }));
-				globals::draw_list->AddCircle(ImVec2(xx, yy), 255, ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }), 255);
+				draw_list->AddLine(ImVec2(0, yy), ImVec2(x, yy), ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }));
+				draw_list->AddLine(ImVec2(xx, 0), ImVec2(xx, y), ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }));
+				draw_list->AddCircle(ImVec2(xx, yy), 255, ImGui::GetColorU32(ImVec4{ 0.f, 0.f, 0.f, 1.0f }), 255);
 			}
 		}
 	}
 
-	void spread_cross(entities::local_data_t& local, int xx, int yy)
+	void spread_cross(ImDrawList* draw_list, entities::local_data_t& local, int xx, int yy)
 	{
 		if (settings::visuals::spread_cross)
 		{
@@ -363,8 +357,8 @@ namespace visuals
 			if (spread == 0.f)
 				return;
 
-			globals::draw_list->AddCircle(ImVec2(xx, yy), spread, ImGui::GetColorU32(settings::visuals::spread_cross_color), 255);
-			globals::draw_list->AddCircleFilled(ImVec2(xx, yy), spread - 1, ImGui::GetColorU32({ 0.0f, 0.0f, 0.0f, 0.2f }), 255);
+			draw_list->AddCircle(ImVec2(xx, yy), spread, ImGui::GetColorU32(settings::visuals::spread_cross_color), 255);
+			draw_list->AddCircleFilled(ImVec2(xx, yy), spread - 1, ImGui::GetColorU32({ 0.0f, 0.0f, 0.0f, 0.2f }), 255);
 		}
 	}
 
@@ -506,10 +500,10 @@ namespace visuals
 		ImGui::PopFont();
 
 		damage_indicator(m_local);
-		draw_fov(m_local, xx, yy);
-		noscope(m_local, xx, yy);
-		spread_cross(m_local, xx, yy);
-		hitmarker(m_local, xx, yy);
-		rcs_cross(m_local, xx, yy);
+		draw_fov(draw_list, m_local, xx, yy);
+		noscope(draw_list, m_local, xx, yy);
+		spread_cross(draw_list, m_local, xx, yy);
+		hitmarker(draw_list, m_local, xx, yy);
+		rcs_cross(draw_list, m_local, xx, yy);
 	}
 }

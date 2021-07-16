@@ -76,6 +76,8 @@ void ImGui_ImplDX9_RenderDrawData(ImDrawData* draw_data, ImDrawList* draw_list)
 	if (g_pd3dDevice->CreateStateBlock(D3DSBT_PIXELSTATE, &d3d9_state_block) < 0)
 		return;
 
+	d3d9_state_block->Capture();
+
 	// Copy and convert all vertices into a single contiguous buffer
 	CUSTOMVERTEX* vtx_dst;
 	ImDrawIdx* idx_dst;

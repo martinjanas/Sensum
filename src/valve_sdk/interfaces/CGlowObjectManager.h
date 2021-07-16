@@ -5,15 +5,10 @@
 class CGlowObjectDefinition 
 {
 public:
-	/*void* get_entity()
+	void set(Color& color, bool render_when_occluded, bool render_when_unoccluded, int style = 0)
 	{
-		return entity;
-	}*/
-
-	void set(Color& color, bool render_when_occluded, bool render_when_unoccluded, int style)
-	{
-		this->clr = Vector(color.r() / 255.f, color.g() / 255.f, color.b() / 255.f);
-		this->m_flAlpha = (float)color.a();
+		this->m_vecClr = Vector(color.r() / 255.f, color.g() / 255.f, color.b() / 255.f);
+		this->m_flAlpha = (float)color.a() / 255.f;
 
 		this->m_bRenderWhenOccluded = render_when_occluded;
 		this->m_bRenderWhenUnoccluded = render_when_unoccluded;
@@ -22,8 +17,8 @@ public:
 
 	void color(Color& color)
 	{
-		this->clr = Vector(color.r() / 255.f, color.g() / 255.f, color.b() / 255.f);
-		this->m_flAlpha = (float)color.a();
+		this->m_vecClr = Vector(color.r() / 255.f, color.g() / 255.f, color.b() / 255.f);
+		this->m_flAlpha = (float)color.a() / 255.f;
 	}
 
 	void glow_style(int style)
@@ -51,20 +46,20 @@ public:
 		return m_nNextFreeSlot != -2;
 	}
 	
-	int m_nNextFreeSlot;
-	void* entity;
-	Vector clr;
+	int   m_nNextFreeSlot;
+	void* m_pEntity;
+	Vector m_vecClr;
 	float m_flAlpha;
-	bool m_bGlowAlphaCappedByRenderAlpha;
+	bool  m_bGlowAlphaCappedByRenderAlpha;
 	float m_flGlowAlphaFunctionOfMaxVelocity;
 	float m_flGlowAlphaMax;
 	float m_flGlowPulseOverdrive;
-	bool m_bRenderWhenOccluded;
-	bool m_bRenderWhenUnoccluded;
-	bool m_bFullBloomRender;
-	int m_nFullBloomStencilTestValue;
-	int m_nGlowStyle;
-	int m_nSplitScreenSlot;
+	bool  m_bRenderWhenOccluded;
+	bool  m_bRenderWhenUnoccluded;
+	bool  m_bFullBloomRender;
+	int   m_nFullBloomStencilTestValue;
+	int   m_nGlowStyle;
+	int   m_nSplitScreenSlot;
 };
 
 class CGlowManager 
