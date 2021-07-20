@@ -127,13 +127,13 @@ namespace render
 					switch (settings::visuals::viewmodel_mode)
 					{
 					case 0:
-						ImGui::SliderFloatLeftAligned("Offset X:", &settings::misc::viewmodel_offset_x, -21.f, 21.f, "%.0f");
+						ImGui::SliderFloatLeftAligned("Offset X:", &settings::misc::viewmodel_offset_x, -25.f, 25.f, "%.1f");
 						break;
 					case 1:
-						ImGui::SliderFloatLeftAligned("Offset Y:", &settings::misc::viewmodel_offset_y, 0.f, 50.f, "%.0f");
+						ImGui::SliderFloatLeftAligned("Offset Y:", &settings::misc::viewmodel_offset_y, -25.f, 25.f, "%.1f");
 						break;
 					case 2:
-						ImGui::SliderFloatLeftAligned("Offset Z:", &settings::misc::viewmodel_offset_z, -30.f, 30.f, "%.0f");
+						ImGui::SliderFloatLeftAligned("Offset Z:", &settings::misc::viewmodel_offset_z, -25.f, 25.f, "%.1f");
 						break;
 					}
 

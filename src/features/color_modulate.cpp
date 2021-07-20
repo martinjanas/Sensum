@@ -15,10 +15,6 @@ namespace color_modulation
 	auto night_mode_state = false;
 	auto night_mode_first = false;
 
-	auto flViewmodel_offset_x = -1.f;
-	auto flViewmodel_offset_y = -1.f;
-	auto flViewmodel_offset_z = -1.f;
-
 	ConVar* viewmodel_fov = nullptr;
 	ConVar* debug_fov = nullptr;
 	ConVar* r_3dsky = nullptr;
@@ -85,15 +81,6 @@ namespace color_modulation
 			return true;
 
 		if (debug_model_fov != settings::misc::debug_fov)
-			return true;
-
-		if (flViewmodel_offset_x != settings::misc::viewmodel_offset_x)
-			return true;
-
-		if (flViewmodel_offset_y != settings::misc::viewmodel_offset_y)
-			return true;
-
-		if (flViewmodel_offset_z != settings::misc::viewmodel_offset_z)
 			return true;
 
 		return false;
@@ -227,24 +214,6 @@ namespace color_modulation
 			mat_force_tonemap_scale->m_fnChangeCallbacks.m_Size = 0;
 		}
 
-		if (!viewmodel_offset_x)
-		{
-			viewmodel_offset_x = g::cvar->find(xorstr_("viewmodel_offset_x"));
-			viewmodel_offset_x->m_fnChangeCallbacks.m_Size = 0;
-		}
-
-		if (!viewmodel_offset_y)
-		{
-			viewmodel_offset_y = g::cvar->find(xorstr_("viewmodel_offset_y"));
-			viewmodel_offset_y->m_fnChangeCallbacks.m_Size = 0;
-		}
-
-		if (!viewmodel_offset_z)
-		{
-			viewmodel_offset_z = g::cvar->find(xorstr_("viewmodel_offset_z"));
-			viewmodel_offset_z->m_fnChangeCallbacks.m_Size = 0;
-		}
-
 		if (!engine_focus)
 		{
 			engine_focus = g::cvar->find(xorstr_("engine_no_focus_sleep"));
@@ -267,23 +236,6 @@ namespace color_modulation
 		engine_focus->SetValue(0);
 		cl_threaded_bone_setup->SetValue(1); //Threaded bone setup for more fps, found this while typing "find bones" into the console.
 		//If you google its cvar name there should be reddit post about it and how it aparently boosts fps, the post is from 2015.
-
-		static auto backup_viewmodel_x = g::cvar->find("viewmodel_offset_x")->GetFloat();
-		static auto backup_viewmodel_y = g::cvar->find("viewmodel_offset_y")->GetFloat();
-		static auto backup_viewmodel_z = g::cvar->find("viewmodel_offset_z")->GetFloat();
-
-		if (settings::misc::override_viewmodel)
-		{
-			viewmodel_offset_x->SetValue(settings::misc::viewmodel_offset_x);
-			viewmodel_offset_y->SetValue(settings::misc::viewmodel_offset_y);
-			viewmodel_offset_z->SetValue(settings::misc::viewmodel_offset_z);
-		}
-		else
-		{
-			viewmodel_offset_x->SetValue(backup_viewmodel_x);
-			viewmodel_offset_y->SetValue(backup_viewmodel_y);
-			viewmodel_offset_z->SetValue(backup_viewmodel_z);
-		}
 	}
 
 	void set_material_tone()
