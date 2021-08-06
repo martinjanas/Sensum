@@ -561,11 +561,10 @@ namespace aimbot
 						if (bt_data.empty())
 							continue;
 
-						for (auto i = 0; i < bt_data.size(); i++)
+						for (auto i = 1; i < bt_data.size(); i++)
 						{
-							bt.hitboxes = bt_data[i].matrix[hitbox_id][0];
-							bt.is_moving = bt_data[i].is_moving;
-
+							bt.hitboxes = bt_data.at(i).matrix[hitbox_id][0];
+							bt.is_moving = bt_data.at(i).is_moving;
 						}
 						_data[player_data.index].push_front(bt);
 					}
@@ -786,24 +785,17 @@ namespace aimbot
 			auto model = player->GetModel();
 
 			if (!model)
-				return;
+				continue;
 
 			auto hdr = g::mdl_info->GetStudiomodel(model);
 
 			if (!hdr)
-				return;
+				continue;
 
 			bt.is_moving = (player->m_vecVelocity().x != 0.f || player->m_vecVelocity().y != 0.f || player->m_vecVelocity().z != 0.f);
 			bt.is_dormant = player->IsDormant();
 			bt.is_alive = player->IsAlive();
 
-			auto hitbox_set = hdr->GetHitboxSet(player->m_nHitboxSet());
-
-			if (!hitbox_set)
-				return;
-
-			auto hitbox_head = hitbox_set->GetHitbox(HITBOX_HEAD);
-			
 			player->PVSFix();
 
 			player->SetupBones(bt.matrix, 128, BONE_USED_BY_ANYTHING, g::global_vars->curtime);

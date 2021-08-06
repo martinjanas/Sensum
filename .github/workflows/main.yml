@@ -15,91 +15,91 @@ jobs:
             {
               "type": "title",
               "regex": "d3dx9.lib",
-              "message": "this issue was automatically closed because blacklisted word was detected."
+              "message": "blacklisted word was detected.Please dont create discussion in the discussion tab about this topic, You will get blocked."
             },
             {
               "type": "title",
               "regex": "Compile",
-              "message": "this issue was automatically closed because blacklisted word was detected."
+              "message": "blacklisted word was detected.Please dont create discussion in the discussion tab about this topic, You will get blocked."
             },
             {
               "type": "title",
               "regex": "compile",
-              "message": "this issue was automatically closed because blacklisted word was detected."
+              "message": "blacklisted word was detected.Please dont create discussion in the discussion tab about this topic, You will get blocked."
             },
             {
               "type": "title",
               "regex": "cant compile",
-              "message": "this issue was automatically closed because blacklisted word was detected."
+              "message": "blacklisted word was detected.Please dont create discussion in the discussion tab about this topic, You will get blocked."
             },
             {
               "type": "title",
               "regex": "Cant compile",
-              "message": "this issue was automatically closed because blacklisted word was detected."
+              "message": "blacklisted word was detected.Please dont create discussion in the discussion tab about this topic, You will get blocked."
             },
             {
               "type": "title",
               "regex": "Cant Compile",
-              "message": "this issue was automatically closed because blacklisted word was detected."
+              "message": "blacklisted word was detected.Please dont create discussion in the discussion tab about this topic, You will get blocked."
             },
             {
               "type": "title",
               "regex": "Can't compile",
-              "message": "this issue was automatically closed because blacklisted word was detected."
+              "message": "blacklisted word was detected.Please dont create discussion in the discussion tab about this topic, You will get blocked."
             },
             {
               "type": "title",
               "regex": "Error",
-              "message": "this issue was automatically closed because blacklisted word was detected."
+              "message": "blacklisted word was detected.Please dont create discussion in the discussion tab about this topic, You will get blocked."
             },
             {
               "type": "title",
               "regex": "error",
-              "message": "this issue was automatically closed because blacklisted word was detected."
+              "message": "blacklisted word was detected.Please dont create discussion in the discussion tab about this topic, You will get blocked."
             },
             {
               "type": "title",
               "regex": "Error when building",
-              "message": "this issue was automatically closed because blacklisted word was detected."
+              "message": "blacklisted word was detected.Please dont create discussion in the discussion tab about this topic, You will get blocked."
             },
             {
               "type": "title",
               "regex": "missing",
-              "message": "this issue was automatically closed because blacklisted word was detected."
+              "message": "blacklisted word was detected.Please dont create discussion in the discussion tab about this topic, You will get blocked."
             },
             {
               "type": "title",
               "regex": "d3dx9",
-              "message": "this issue was automatically closed because blacklisted word was detected."
+              "message": "blacklisted word was detected.Please dont create discussion in the discussion tab about this topic, You will get blocked."
             },
             {
               "type": "title",
               "regex": "include",
-              "message": "this issue was automatically closed because blacklisted word was detected."
+              "message": "blacklisted word was detected.Please dont create discussion in the discussion tab about this topic, You will get blocked."
             },
             {
               "type": "title",
               "regex": "build",
-              "message": "this issue was automatically closed because blacklisted word was detected."
+              "message": "blacklisted word was detected.Please dont create discussion in the discussion tab about this topic, You will get blocked."
             },
             {
               "type": "title",
               "regex": "compiling",
-              "message": "this issue was automatically closed because blacklisted word was detected."
+              "message": "blacklisted word was detected.Please dont create discussion in the discussion tab about this topic, You will get blocked."
             },
             {
               "type": "title",
               "regex": "inject",
-              "message": "this issue was automatically closed because blacklisted word was detected."
+              "message": "blacklisted word was detected.Please dont create discussion in the discussion tab about this topic, You will get blocked."
             },
             {
               "type": "title",
               "regex": "banned",
-              "message": "this issue was automatically closed because blacklisted word was detected."
+              "message": "blacklisted word was detected.Please dont create discussion in the discussion tab about this topic, You will get blocked."
             },
             {
               "type": "title",
               "regex": "ban",
-              "message": "this issue was automatically closed because blacklisted word was detected."
+              "message": "blacklisted word was detected.Please dont create discussion in the discussion tab about this topic, You will get blocked."
             }
           ]
