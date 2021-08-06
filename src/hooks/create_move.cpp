@@ -69,10 +69,10 @@ namespace hooks
 		if (settings::visuals::grenade_prediction)
 			grenade_prediction::fetch_points(cmd);
 
+		features::selfnade(cmd);
+
 		if (settings::misc::fast_stop)
 			features::fast_stop(cmd);
-
-		features::selfnade(cmd);
 
 		if (cmd->weaponselect == 0)
 		{

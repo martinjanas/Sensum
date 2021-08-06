@@ -49,6 +49,7 @@ namespace aimbot
 		bool is_moving;
 		bool is_dormant;
 		bool is_alive;
+		Vector hitboxes;
 	};
 
 	std::map<int, std::deque<backtrack_data_t>> data;
@@ -506,6 +507,9 @@ namespace aimbot
 		std::vector<target_t> targets;
 		std::vector<target_t> tick_players;
 
+		backtrack_data_t bt;
+		std::map<int, std::deque<backtrack_data_t>> _data;
+
 		duplicates.clear();
 
 		const auto max_time = TICKS_TO_TIME(std::clamp<int>(a_settings.backtrack.ticks, 0, 12) + 1);
@@ -550,7 +554,27 @@ namespace aimbot
 
 				for (const auto& hitbox_id : hitbox_ids)
 				{
-					const auto& hitbox = player_data.hitboxes[hitbox_id][0];
+					if (data.count(player_data.index) > 0)
+					{
+						auto& bt_data = data.at(player_data.index);
+
+						if (bt_data.empty())
+							continue;
+
+						for (auto i = 0; i < bt_data.size(); i++)
+						{
+							bt.hitboxes = bt_data[i].matrix[hitbox_id][0];
+							bt.is_moving = bt_data[i].is_moving;
+
+							_data[i].push_front(bt);
+						}
+					}
+				}
+
+				for (const auto& hitbox_id : hitbox_ids)
+				{
+					//const auto& hitbox = player_data.hitboxes[hitbox_id][0];
+					const auto& hitbox = _data.count(player_data.index) > 0 ? !(_data.at(player_data.index).front().is_moving) ? _data.at(player_data.index).front().hitboxes : player_data.hitboxes[hitbox_id][0] : player_data.hitboxes[hitbox_id][0];
 					if (!hitbox.IsValid())
 						continue;
 
@@ -779,8 +803,7 @@ namespace aimbot
 				return;
 
 			auto hitbox_head = hitbox_set->GetHitbox(HITBOX_HEAD);
-			auto hitbox_center = (hitbox_head->bbmin + hitbox_head->bbmax) * 0.5f;
-
+			
 			player->PVSFix();
 
 			player->SetupBones(bt.matrix, 128, BONE_USED_BY_ANYTHING, g::global_vars->curtime);
