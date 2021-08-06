@@ -566,8 +566,8 @@ namespace aimbot
 							bt.hitboxes = bt_data[i].matrix[hitbox_id][0];
 							bt.is_moving = bt_data[i].is_moving;
 
-							_data[i].push_front(bt);
 						}
+						_data[player_data.index].push_front(bt);
 					}
 				}
 
