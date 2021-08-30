@@ -1,4 +1,4 @@
-# Sensum - Internal legit cheat - [Discord Server](https://discord.gg/dDwHyydXw7)
+# Sensum - Internal legit cheat
 
 ## Anybody posting issues in the ***Discussion tab*** will be blocked!
 
