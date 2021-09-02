@@ -2,6 +2,8 @@
 #include "../features/features.h"
 #include "../hooks/hooks.h"
 
+#include "../settings/globals.h"
+
 namespace chams
 {
 	void render_players(const bool& ignorez, const bool& flat, const bool& wireframe, const Color& visible_color, const Color& occluded_color)
@@ -175,7 +177,7 @@ namespace chams
 				auto client_class = entity->GetClientClass();
 				auto model_name = g::mdl_info->GetModelName(entity->GetModel());
 
-				switch (client_class->m_ClassID) {
+				switch (client_class->m_ClassID) { //TODO: Rewrite m_ClassId, switch cant use std::map
 				case EClassId::CPlantedC4:
 				case EClassId::CBaseAnimating:
 					if (settings::chams::misc::planted_bomb_chams) {
@@ -210,8 +212,8 @@ namespace chams
 					break;
 				}
 
-				if (client_class->m_ClassID == CAK47 || client_class->m_ClassID == CDEagle || client_class->m_ClassID == CC4 ||
-					client_class->m_ClassID >= CWeaponAug && client_class->m_ClassID <= CWeaponXM1014) {
+				if (client_class->m_ClassID == globals::class_ids.at("CAK47") || client_class->m_ClassID == globals::class_ids.at("CDeagle") || client_class->m_ClassID == globals::class_ids.at("CC4") ||
+					client_class->m_ClassID >= globals::class_ids.at("CWeaponAug") && client_class->m_ClassID <= globals::class_ids.at("CWeaponXM1014")) {
 					if (settings::chams::misc::dropped_weapons) {
 						g::render_view->SetColorModulation(settings::chams::misc::color_dropped_weapons_chams.r() / 255.f, settings::chams::misc::color_dropped_weapons_chams.g() / 255.f, settings::chams::misc::color_dropped_weapons_chams.b() / 255.f);
 						mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, true);
@@ -222,8 +224,7 @@ namespace chams
 				g::mdl_render->ForcedMaterialOverride(nullptr);
 				mat->IncrementReferenceCount();
 
-
-				if (client_class->m_ClassID == CEconEntity) {
+				if (client_class->m_ClassID == globals::class_ids.at("CEconEntity")) {
 					if (settings::chams::misc::dropped_defusekit_chams) {
 						g::render_view->SetColorModulation(settings::chams::misc::color_dropped_defusekit_chams.r() / 255.f, settings::chams::misc::color_dropped_defusekit_chams.g() / 255.f, settings::chams::misc::color_dropped_defusekit_chams.b() / 255.f);
 						mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, true);

@@ -111,24 +111,23 @@ namespace render
 							}
 
 							ImVec4 color;
-							/*if (weapon_kit.rarity == "common")
+							if (is_glove ? game_data::glove_kits[k].rarity : game_data::skin_kits[k].rarity == 1)
 								color = ImVec4(0.69f, 0.76f, 0.85f, 1.f);
-							else if (weapon_kit.rarity == "rare")
+							else if (is_glove ? game_data::glove_kits[k].rarity : game_data::skin_kits[k].rarity == 2)
 								color = ImVec4(0.29f, 0.41f, 1.f, 1.f);
-							else if (weapon_kit.rarity == "uncommon")
+							else if (is_glove ? game_data::glove_kits[k].rarity : game_data::skin_kits[k].rarity == 3)
 								color = ImVec4(0.36f, 0.60f, 0.85f, 1.f);
-							else if (weapon_kit.rarity == "mythical")
+							else if (is_glove ? game_data::glove_kits[k].rarity : game_data::skin_kits[k].rarity == 4)
 								color = ImVec4(0.53f, 0.27f, 1.f, 1.f);
-							else if (weapon_kit.rarity == "legendary")
+							else if (is_glove ? game_data::glove_kits[k].rarity : game_data::skin_kits[k].rarity == 5)
 								color = ImVec4(0.82f, 0.17f, 0.90f, 1.f);
-							else if (weapon_kit.rarity == "ancient")
+							else if (is_glove ? game_data::glove_kits[k].rarity : game_data::skin_kits[k].rarity == 6)
 								color = ImVec4(0.92f, 0.29f, 0.29f, 1.f);
-							else if (weapon_kit.rarity == "immortal")
+							else if (is_glove ? game_data::glove_kits[k].rarity : game_data::skin_kits[k].rarity == 7)
 								color = ImVec4(0.89f, 0.68f, 0.22f, 1.f);
 							else
-								continue; */
+								continue;
 
-							color = ImVec4(0.29f, 0.41f, 1.f, 1.f);
 							ImGui::PushStyleColor(ImGuiCol_Text, color);
 							
 							char buf_name[256];

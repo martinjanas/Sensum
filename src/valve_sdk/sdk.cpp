@@ -2,12 +2,16 @@
 #include "../helpers/utils.h"
 #include "../helpers/console.h"
 #include "../valve_sdk/interfaces/CGlowObjectManager.h"
+#include "../settings/globals.h"
 
 #include <optional>
+#include <map>
 
 #define STRINGIFY_IMPL(s) #s
 #define STRINGIFY(s)      STRINGIFY_IMPL(s)
 #define PRINT_INTERFACE(name) console::print("%-20s: %p", STRINGIFY(name), name)
+
+static bool done = true;
 
 namespace g
 {
@@ -51,6 +55,7 @@ namespace g
 	CGlowManager* glow_manager = nullptr;
 	IStudioRender* g_studiorender = nullptr;
 	IDemoPlayer* demo_player = nullptr;
+	ServerClassDLL* server_class = nullptr;
 
 	ISteamUser* steam_user = nullptr;
 	ISteamHTTP* steam_http = nullptr;
@@ -85,6 +90,18 @@ namespace g
 	{
 		static const auto steam_api = utils::get_module("steam_api.dll");
 		return reinterpret_cast<T(__cdecl*)(void)>(GetProcAddress(steam_api, version))();
+	}
+
+	void get_class_ids()
+	{
+		if (!done)
+		{
+			for (auto clazz = g::server_class->GetAllClasses(); clazz; clazz = clazz->m_pNext)
+			{
+				globals::class_ids.insert(std::make_pair(clazz->m_pNetworkName, clazz->m_ClassID));
+			}
+			done = true;
+		}
 	}
 
 	void initialize()
@@ -130,6 +147,7 @@ namespace g
 		localize = get_interface<ILocalize>("localize.dll", "Localize_001");
 		file_system = get_interface<IFileSystem>("filesystem_stdio.dll", "VFileSystem017");
 		g_studiorender = get_interface<IStudioRender>("studiorender.dll", "VStudioRender026");
+		server_class = get_interface<ServerClassDLL>("server.dll", "ServerGameDLL005");
 
 		mem_alloc = *(IMemAlloc**)GetProcAddress(utils::get_module("tier0.dll"), "g_pMemAlloc");
 
@@ -144,6 +162,8 @@ namespace g
 		steam_utils = steam_client->GetISteamUtils(_steam_pipe, "SteamUtils009");
 
 		hud_chat = hud_system->FindHudElement<CHudChat>("CHudChat");
+
+		done = false;
 
 #ifdef _DEBUG
 		PRINT_INTERFACE(global_vars);
@@ -191,6 +211,7 @@ namespace g
 		PRINT_INTERFACE(view_render_beams);
 		PRINT_INTERFACE(hud_chat);
 		PRINT_INTERFACE(demo_player);
+		PRINT_INTERFACE(server_class);
 #endif
 	}
 }

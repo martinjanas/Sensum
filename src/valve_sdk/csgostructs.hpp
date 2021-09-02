@@ -483,6 +483,8 @@ public:
 	NETVAR(char[MAX_PLAYERS][16], GetClanTag, "CCSPlayerResource", "m_szClan");
 	NETVAR(unsigned[MAX_PLAYERS], GetCoin, "CCSPlayerResource", "m_nActiveCoinRank");
 	NETVAR(unsigned[MAX_PLAYERS], GetMusicKit, "CCSPlayerResource", "m_nMusicID");
+	NETVAR(Vector, m_bombsiteCenterA, "CCSPlayerResource", "m_bombsiteCenterA");
+	NETVAR(Vector, m_bombsiteCenterB, "CCSPlayerResource", "m_bombsiteCenterB");
 };
 
 class c_cs_game_rules_proxy

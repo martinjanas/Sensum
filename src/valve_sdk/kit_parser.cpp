@@ -43,8 +43,8 @@ auto game_data::initialize_kits() -> void
 
 			V_UCS2ToUTF8(wide_name, name, sizeof(name));
 
-			if(paint_kit->id < 10000)
-				game_data::skin_kits.push_back({ paint_kit->id, name });
+			if (paint_kit->id < 10000)
+				game_data::skin_kits.push_back({ paint_kit->id, name, paint_kit->rarity });
 			else
 				game_data::glove_kits.push_back({ paint_kit->id, name });
 		}

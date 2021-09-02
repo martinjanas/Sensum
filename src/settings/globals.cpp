@@ -25,6 +25,7 @@ namespace globals
 	float fov;
 
 	int teamkills = 0;
+	int bombsite_index;
 
 	std::string settings;
 	std::string playername;
@@ -36,6 +37,8 @@ namespace globals
 	std::map<int, int> team_kill = { };
 	std::map<int, bool> is_visible = { };
 	std::map<int, bool> in_smoke = { };
+
+	std::map<std::string, int> class_ids = { };
 
 	QAngle aim_punch = QAngle();
 	QAngle viewangles = QAngle();

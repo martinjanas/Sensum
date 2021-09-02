@@ -19,6 +19,7 @@ namespace globals
 	extern float fov;
 
 	extern int teamkills;
+	extern int bombsite_index;
 
 	extern QAngle angles;
 	extern ImDrawList* draw_list;
@@ -30,6 +31,7 @@ namespace globals
 	extern std::map<int, int> team_kill;
 	extern std::map<int, bool> is_visible;
 	extern std::map<int, bool> in_smoke;
+	extern std::map<std::string, int> class_ids;
 
 	extern QAngle aim_punch;
 	extern QAngle viewangles;

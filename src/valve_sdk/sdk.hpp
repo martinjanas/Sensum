@@ -5,6 +5,7 @@
 
 #define NOMINMAX
 #include <Windows.h>
+#include <map>
 
 #include "misc/vfunc.hpp"
 
@@ -59,6 +60,25 @@
 #include "steam.h"
 
 struct IDirect3DDevice9;
+
+class SendTable;
+
+struct ServerClass
+{
+	char* m_pNetworkName;
+	SendTable* m_pTable;
+	ServerClass* m_pNext;
+	EClassId m_ClassID;
+	int m_InstanceBaselineIndex;
+};
+
+struct ServerClassDLL
+{
+	ServerClass* GetAllClasses()
+	{
+		return CallVFunction<ServerClass* (__thiscall*)(void*)>(this, 10)(this);
+	}
+};
 
 class CLocalPlayer
 {
@@ -287,6 +307,7 @@ namespace g
 	extern CGlowManager* glow_manager;
 	extern IStudioRender* g_studiorender;
 	extern IDemoPlayer* demo_player;
+	extern ServerClassDLL* server_class;
 
 	extern ISteamUser* steam_user;
 	extern ISteamHTTP* steam_http;
@@ -296,6 +317,7 @@ namespace g
 	extern ISteamUtils* steam_utils;
 
 	void initialize();
+	void get_class_ids();
 }
 
 #pragma pack(push, 1)

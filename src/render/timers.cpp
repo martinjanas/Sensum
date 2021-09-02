@@ -85,6 +85,8 @@ namespace render
 				char defuse_time[16];
 				sprintf_s(defuse_time, "%.2f", m_local.defuse_time);
 
+				globals::bombsite_index = m_local.bombsite_index;
+
 				char bomb_location[256];
 				sprintf_s(bomb_location, "%s", m_local.bombsite_index ? "BOMB: B" : "BOMB: A");
 

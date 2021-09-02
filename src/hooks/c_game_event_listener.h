@@ -225,6 +225,34 @@ class c_game_event_listener final : public IGameEventListener2
 			if (settings::esp::buylog && utils::IsPlayingMM())
 				WeaponCheck(context->GetString("weapon"), enemy);
 		}
+		else if ((name == FNV("bomb_beginplant") || name == FNV("bomb_abortplant") || name == FNV("bomb_begindefuse") || name == FNV("bomb_abortdefuse") || name == FNV("bomb_planted")))
+		{
+			auto entity = c_base_player::GetPlayerByUserId(context->GetInt("userid"));
+			if (!entity || !g::local_player || entity == g::local_player)
+				return;
+
+			auto pinfo = *g::player_resource;
+
+			const auto dist_to_a = entity->m_vecOrigin().DistTo(pinfo->m_bombsiteCenterA());
+			const auto dist_to_b = entity->m_vecOrigin().DistTo(pinfo->m_bombsiteCenterB());
+
+			char buf[256];
+			sprintf_s(buf, "Bomb planted on %s", dist_to_a < dist_to_b ?  "A" : "B");
+
+
+			if (name == FNV("bomb_planted"))
+			{
+				notifies::push(buf);
+			}
+
+			if (name == FNV("bomb_abortplant") || name == FNV("bomb_abortdefuse"))
+				notifies::push(name == FNV("bomb_abortplant") ? "Planting aborted" : "Defusing aborted");
+
+			char message[256];
+			sprintf_s(message, "%s on %s", name == FNV("bomb_beginplant") ? "Planting" : context->GetBool("haskit") ? "Defusing (kit)" : "Defusing", dist_to_a < dist_to_b ? "A" : "B");
+
+			notifies::push(message);
+		}
 		else if (name == FNV("round_start"))
 		{
 			decltype(entities::m_local) m_local;

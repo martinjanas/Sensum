@@ -10,6 +10,20 @@ namespace game_data
 	{
 		int id;
 		std::string name;
+		int rarity;
+
+		paint_kit(int id, const std::string& name)
+		{
+			this->id = id;
+			this->name = name;
+		}
+
+		paint_kit(int id, const std::string& name, int rarity)
+		{
+			this->id = id;
+			this->name = name;
+			this->rarity = rarity;
+		}
 
 		auto operator < (const paint_kit& other) const -> bool
 		{
@@ -61,16 +75,19 @@ struct String_t
 
 struct CPaintKit
 {
-	int id;						//0x0000
+	int id;
 
-	String_t name;				//0x0004
-	String_t description;		//0x0014
-	String_t item_name;			//0x0024
-	String_t material_name;		//0x0034
-	String_t image_inventory;	//0x0044
+	String_t name;
+	String_t description_string;
+	String_t item_name;
+	String_t sameNameFamilyAggregate;
+	String_t pattern;
+	String_t normal;
+	String_t logo_material;
 
-	char pad_0x0054[0x8C];		//0x0054
-}; //Size=0x00E0
+	bool base_diffuse;
+	int rarity;
+};
 
 struct CStickerKit
 {

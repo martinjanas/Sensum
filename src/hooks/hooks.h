@@ -251,6 +251,16 @@ namespace hooks
 		inline static void* setup;
 	};
 
+	struct level_init_post_entities
+	{
+		static const int index = 6;
+		using fn = void(__thiscall*)(IBaseClientDLL* _this);
+		static void __stdcall hooked();
+
+		inline static fn original;
+		inline static void* setup;
+	};
+
 	/*struct dispatch_user_message
 	{
 		static const int index = 38;
