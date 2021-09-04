@@ -212,8 +212,8 @@ namespace chams
 					break;
 				}
 
-				if (client_class->m_ClassID == globals::class_ids.at("CAK47") || client_class->m_ClassID == globals::class_ids.at("CDeagle") || client_class->m_ClassID == globals::class_ids.at("CC4") ||
-					client_class->m_ClassID >= globals::class_ids.at("CWeaponAug") && client_class->m_ClassID <= globals::class_ids.at("CWeaponXM1014")) {
+				if (client_class->m_ClassID == globals::class_ids["CAK47"] || client_class->m_ClassID == globals::class_ids["CDEagle"] || client_class->m_ClassID == globals::class_ids["CC4"] ||
+					client_class->m_ClassID >= globals::class_ids["CWeaponAug"] && client_class->m_ClassID <= globals::class_ids["CWeaponXM1014"]) {
 					if (settings::chams::misc::dropped_weapons) {
 						g::render_view->SetColorModulation(settings::chams::misc::color_dropped_weapons_chams.r() / 255.f, settings::chams::misc::color_dropped_weapons_chams.g() / 255.f, settings::chams::misc::color_dropped_weapons_chams.b() / 255.f);
 						mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, true);
@@ -224,7 +224,7 @@ namespace chams
 				g::mdl_render->ForcedMaterialOverride(nullptr);
 				mat->IncrementReferenceCount();
 
-				if (client_class->m_ClassID == globals::class_ids.at("CEconEntity")) {
+				if (client_class->m_ClassID == globals::class_ids["CEconEntity"]) { //CEconEntity
 					if (settings::chams::misc::dropped_defusekit_chams) {
 						g::render_view->SetColorModulation(settings::chams::misc::color_dropped_defusekit_chams.r() / 255.f, settings::chams::misc::color_dropped_defusekit_chams.g() / 255.f, settings::chams::misc::color_dropped_defusekit_chams.b() / 255.f);
 						mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, true);

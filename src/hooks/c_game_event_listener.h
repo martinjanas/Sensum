@@ -105,6 +105,8 @@ class c_game_event_listener final : public IGameEventListener2
 				color_modulation::GetMapOriginalSkybox();
 			}
 
+			g::get_class_ids();
+
 			no_smoke::event();
 			color_modulation::event();
 			globals::team_damage.clear();

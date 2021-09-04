@@ -56,8 +56,7 @@ namespace hooks
 		hud_update::setup = reinterpret_cast<void*>(utils::GetVirtual(g::base_client, hooks::hud_update::index));
 		is_playing_demo::setup = reinterpret_cast<void*>(utils::GetVirtual(g::engine_client, hooks::is_playing_demo::index));
 		console_color_printf::setup = reinterpret_cast<void*>(utils::GetVirtual(g::cvar, hooks::console_color_printf::index));
-		level_init_post_entities::setup = reinterpret_cast<void*>(utils::GetVirtual(g::base_client, hooks::level_init_post_entities::index));
-
+		
 		if (MH_Initialize() != MH_OK) {
 			MessageBoxA(NULL, "Failed to initialize Minhook.", MB_OK, MB_ICONERROR);
 		}
@@ -134,11 +133,6 @@ namespace hooks
 			MessageBoxA(NULL, "Outdated index - ConsoleColorPrintf", MB_OK, MB_ICONERROR);
 		}
 
-		if (MH_CreateHook(level_init_post_entities::setup, &hooks::level_init_post_entities::hooked, reinterpret_cast<void**>(&level_init_post_entities::original)) != MH_OK) {
-			MessageBoxA(NULL, "Outdated index - Level Init Post Entities", MB_OK, MB_ICONERROR);
-		}
-
-
 		if (MH_EnableHook(MH_ALL_HOOKS) != MH_OK) {
 			MessageBoxA(NULL, "Failed to enable hooks.", MB_OK, MB_ICONERROR);
 		}
@@ -174,13 +168,6 @@ namespace hooks
 		sequence::hook->~recv_prop_hook();
 	}
 
-	void __stdcall level_init_post_entities::hooked()
-	{
-		g::get_class_ids();
-
-		original(g::base_client);
-	}
-
 	bool __stdcall is_playing_demo::hooked()
 	{
 		if (*static_cast<uintptr_t*>(_ReturnAddress()) == 0x0975C084 // client.dll : 84 C0 75 09 38 05
@@ -190,7 +177,7 @@ namespace hooks
 		return original();
 	}
 
-	netpacket_t* __fastcall read_packet::hooked(IDemoPlayer* player)
+	netpacket_t* __fastcall read_packet::hooked(IDemoPlayer* player, void* edx)
 	{
 		if (settings::misc::ow_reveal)
 		{

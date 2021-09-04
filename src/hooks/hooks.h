@@ -215,7 +215,7 @@ namespace hooks
 	{
 		static const int index = 17;
 		using fn = netpacket_t * (__thiscall*)(IDemoPlayer*);
-		static netpacket_t* __fastcall hooked(IDemoPlayer* player);
+		static netpacket_t* __fastcall hooked(IDemoPlayer* player, void* edx);
 
 		inline static fn original;
 		inline static void* setup;
@@ -246,16 +246,6 @@ namespace hooks
 		static const int index = 25;
 		using fn = void(__cdecl*)(ICvar*, const Color&, const char*, ...);
 		static void __stdcall hooked(ICvar* ecx, const Color& clr, const char* text, std::size_t args...);
-
-		inline static fn original;
-		inline static void* setup;
-	};
-
-	struct level_init_post_entities
-	{
-		static const int index = 6;
-		using fn = void(__thiscall*)(IBaseClientDLL* _this);
-		static void __stdcall hooked();
 
 		inline static fn original;
 		inline static void* setup;

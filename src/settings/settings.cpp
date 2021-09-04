@@ -320,8 +320,6 @@ namespace settings
 				Option::Load(root["visuals.sky"], visuals::sky, ImVec4(0.25, 0.25, 0.25, 1.0));
 				Option::Load(root["visuals.night_mode"], visuals::night_mode);
 
-				imdraw::apply_style(visuals::night_mode);
-
 				Option::Load(root["chams.list_mode"], chams::chams_list_mode, 0);
 				Option::Load(root["chams.enemy_enabled"], chams::enemy::enabled, false);
 				Option::Load(root["chams.enemy_visible_only"], chams::enemy::visible_only, true);
@@ -434,6 +432,8 @@ namespace settings
 				Option::Load(root["desync.enabled"], desync::enabled);
 				Option::Load(root["desync.yaw_flip"], desync::yaw_flip);
 				Option::Load(root["desync.resolver"], desync::resolver);
+
+				imdraw::apply_style(visuals::newstyle);
 
 				Option::Load(root["legitbot.setting_type"], aimbot::setting_type);
 
