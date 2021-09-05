@@ -104,6 +104,17 @@ namespace g
 		}
 	}
 
+	void get_class_ids_inject_on_map()
+	{
+		if (g::engine_client && !g::engine_client->IsInGame() || !g::engine_client->IsConnected())
+			return;
+
+		for (auto clazz = g::server_class->GetAllClasses(); clazz; clazz = clazz->m_pNext)
+		{
+			globals::class_ids.insert(std::make_pair(clazz->m_pNetworkName, clazz->m_ClassID));
+		}
+	}
+
 	void initialize()
 	{
 		global_vars = **(CGlobalVarsBase***)(utils::pattern_scan(GLOBAL_VARS) + 1);

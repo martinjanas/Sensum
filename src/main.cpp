@@ -76,6 +76,7 @@ DWORD __stdcall on_attach(LPVOID base)
 	input_system::initialize();
 	render::initialize();
 	hooks::init();
+	g::get_class_ids_inject_on_map();
 	skins::load();
 	globals::load();
 	game_data::initialize_kits();

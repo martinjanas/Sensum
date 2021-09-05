@@ -318,6 +318,7 @@ namespace g
 
 	void initialize();
 	void get_class_ids();
+	void get_class_ids_inject_on_map();
 }
 
 #pragma pack(push, 1)
