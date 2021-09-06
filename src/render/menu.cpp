@@ -8,16 +8,16 @@
 #include "../helpers/notifies.h"
 #include "../features/features.h"
 
-#define VERSION "1.13.6"
+#define VERSION "1.13.7"
 
-const char* const KeyNames[] = {
+static const char* const KeyNames[] = {
 	"Unknown",
 	"LBUTTON",
 	"RBUTTON",
 	"VK_CANCEL",
 	"MBUTTON",
-	"VK_XBUTTON1",
-	"VK_XBUTTON2",
+	"MOUSE4",
+	"MOUSE5",
 	"Unknown",
 	"BACKSPACE",
 	"TAB",
@@ -179,7 +179,6 @@ const char* const KeyNames[] = {
 	"R-ALT"
 };
 
-
 bool Hotkey(const char* label, int* k, const ImVec2& size_arg)
 {
 	ImGuiWindow* window = ImGui::GetCurrentWindow();
@@ -257,7 +256,7 @@ bool Hotkey(const char* label, int* k, const ImVec2& size_arg)
 			}
 		}
 		if (!value_changed) {
-			for (auto i = VK_BACK; i <= VK_RMENU; i++) {
+			for (auto i = VK_BACK; i <= VK_OEM_8; i++) {
 				if (io.KeysDown[i]) {
 					key = i;
 					value_changed = true;
