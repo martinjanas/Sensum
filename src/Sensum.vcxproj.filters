@@ -310,6 +310,9 @@
     <ClCompile Include="valve_sdk\kit_parser.cpp">
       <Filter>valve_sdk</Filter>
     </ClCompile>
+    <ClCompile Include="classids.cpp">
+      <Filter>valve_sdk</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\directx9\imgui_impl_dx9.h">
@@ -649,6 +652,9 @@
       <Filter>features\misc</Filter>
     </ClInclude>
     <ClInclude Include="valve_sdk\kit_parser.hpp">
+      <Filter>valve_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="classids.h">
       <Filter>valve_sdk</Filter>
     </ClInclude>
   </ItemGroup>

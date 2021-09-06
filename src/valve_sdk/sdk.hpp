@@ -110,12 +110,6 @@ class IVEngineVGui;
 class IVDebugOverlay
 {
 public:
-	/*bool ScreenPosition(const Vector& vIn, Vector& vOut)
-	{
-		typedef bool(__thiscall * oScreenPosition)(void*, const Vector&, Vector&);
-		return CallVFunction<oScreenPosition>(this, 13)(this, vIn, vOut);
-	}*/
-
 	virtual void AddEntityTextOverlay(int ent_index, int line_offset, float duration, int r, int g, int b, int a, const char* format, ...) = 0;
 	virtual void AddBoxOverlay(const Vector& origin, const Vector& mins, const Vector& max, QAngle const& orientation, int r, int g, int b, int a, float duration) = 0;
 	virtual void AddSphereOverlay(const Vector& vOrigin, float flRadius, int nTheta, int nPhi, int r, int g, int b, int a, float flDuration) = 0;
@@ -320,64 +314,5 @@ namespace g
 	void get_class_ids();
 	void get_class_ids_inject_on_map();
 }
-
-#pragma pack(push, 1)
-struct mat_vide_mode_t
-{
-	int m_Width;
-	int m_Height;
-	int m_Format;
-	int m_RefreshRate;
-};
-#pragma pack(pop)
-
-#pragma pack(push, 1)
-struct matsystem_config_t
-{
-	mat_vide_mode_t m_VideoMode;
-	float m_fMonitorGamma;
-	float m_fGammaTVRangeMin;
-	float m_fGammaTVRangeMax;
-	float m_fGammaTVExponent;
-	bool m_bGammaTVEnabled;
-	bool m_bTripleBuffered;
-	int m_nAASamples;
-	int m_nForceAnisotropicLevel;
-	int m_nSkipMipLevels;
-	int m_nDxSupportLevel;
-	int m_nFlags;
-	bool m_bEditMode;
-	char m_nProxiesTestMode;
-	bool m_bCompressedTextures;
-	bool m_bFilterLightmaps;
-	bool m_bFilterTextures;
-	bool m_bReverseDepth;
-	bool m_bBufferPrimitives;
-	bool m_bDrawFlat;
-	bool m_bMeasureFillRate;
-	bool m_bVisualizeFillRate;
-	bool m_bNoTransparency;
-	bool m_bSoftwareLighting;
-	bool m_bAllowCheats;
-	char m_nShowMipLevels;
-	bool m_bShowLowResImage;
-	bool m_bShowNormalMap;
-	bool m_bMipMapTextures;
-	char m_nFullbright;
-	bool m_bFastNoBump;
-	bool m_bSuppressRendering;
-	bool m_bDrawGray;
-	bool m_bShowSpecular;
-	bool m_bShowDiffuse;
-	int m_nWindowedSizeLimitWidth;
-	int m_nWindowedSizeLimitHeight;
-	int m_nAAQuality;
-	bool m_bShadowDepthTexture;
-	bool m_bMotionBlur;
-	bool m_bSupportFlashlight;
-	bool m_bPaintEnabled;
-	char pad[0xC];
-};
-#pragma pack(pop)
 
 #include "misc/EHandle.hpp"

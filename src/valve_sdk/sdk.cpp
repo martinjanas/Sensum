@@ -3,6 +3,7 @@
 #include "../helpers/console.h"
 #include "../valve_sdk/interfaces/CGlowObjectManager.h"
 #include "../settings/globals.h"
+#include "../classids.h"
 
 #include <optional>
 #include <map>
@@ -100,6 +101,9 @@ namespace g
 			{
 				globals::class_ids.insert(std::make_pair(clazz->m_pNetworkName, clazz->m_ClassID));
 			}
+
+			classids::initialize();
+
 			done = true;
 		}
 	}
@@ -113,6 +117,8 @@ namespace g
 		{
 			globals::class_ids.insert(std::make_pair(clazz->m_pNetworkName, clazz->m_ClassID));
 		}
+
+		classids::initialize();
 	}
 
 	void initialize()

@@ -118,6 +118,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="classids.cpp" />
     <ClCompile Include="features\aimbot.cpp" />
     <ClCompile Include="features\aimlines.cpp" />
     <ClCompile Include="features\auto_strafe.cpp" />
@@ -203,6 +204,7 @@
     <ClCompile Include="valve_sdk\netvars.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="classids.h" />
     <ClInclude Include="features\esp.hpp" />
     <ClInclude Include="features\hegrenade_helper.h" />
     <ClInclude Include="features\molotov_helper.h" />

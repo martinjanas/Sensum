@@ -3,6 +3,7 @@
 #include "../hooks/hooks.h"
 
 #include "../settings/globals.h"
+#include "../classids.h"
 
 namespace chams
 {
@@ -179,7 +180,7 @@ namespace chams
 
 				if (settings::chams::misc::planted_bomb_chams)
 				{
-					if (client_class->m_ClassID == globals::class_ids.at("CPlantedC4") || client_class->m_ClassID == globals::class_ids.at("CBaseAnimating"))
+					if (client_class->m_ClassID == classids::CPlantedC4 || client_class->m_ClassID == classids::CBaseAnimating)
 					{
 						g::render_view->SetColorModulation(settings::chams::misc::color_planted_bomb_chams.r() / 255.f, settings::chams::misc::color_planted_bomb_chams.g() / 255.f, settings::chams::misc::color_planted_bomb_chams.b() / 255.f);
 						mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, true);
@@ -190,14 +191,14 @@ namespace chams
 
 				if (settings::chams::misc::nade_chams && grenade && grenade->m_nExplodeEffectTickBegin() < 1)
 				{
-					if (client_class->m_ClassID == globals::class_ids.at("CHEGrenade") || client_class->m_ClassID == globals::class_ids.at("CFlashbang")
-						|| client_class->m_ClassID == globals::class_ids.at("CMolotovGrenade") || client_class->m_ClassID == globals::class_ids.at("CMolotovProjectile")
-						|| client_class->m_ClassID == globals::class_ids.at("CIncendiaryGrenade") || client_class->m_ClassID == globals::class_ids.at("CDecoyGrenade")
-						|| client_class->m_ClassID == globals::class_ids.at("CDecoyProjectile") || client_class->m_ClassID == globals::class_ids.at("CSmokeGrenade")
-						|| client_class->m_ClassID == globals::class_ids.at("CSmokeGrenadeProjectile") || client_class->m_ClassID == globals::class_ids.at("ParticleSmokeGrenade")
-						|| client_class->m_ClassID == globals::class_ids.at("CBaseCSGrenade") || client_class->m_ClassID == globals::class_ids.at("CBaseCSGrenadeProjectile")
-						|| client_class->m_ClassID == globals::class_ids.at("CBaseGrenade") || client_class->m_ClassID == globals::class_ids.at("CBaseParticleEntity")
-						|| client_class->m_ClassID == globals::class_ids.at("CSensorGrenade") || client_class->m_ClassID == globals::class_ids.at("CSensorGrenadeProjectile"))
+					if (client_class->m_ClassID == classids::CHEGrenade || client_class->m_ClassID == classids::CFlashbang
+						|| client_class->m_ClassID == classids::CMolotovGrenade || client_class->m_ClassID == classids::CMolotovProjectile
+						|| client_class->m_ClassID == classids::CIncendiaryGrenade || client_class->m_ClassID == classids::CDecoyGrenade
+						|| client_class->m_ClassID == classids::CDecoyProjectile || client_class->m_ClassID == classids::CSmokeGrenade
+						|| client_class->m_ClassID == classids::CSmokeGrenadeProjectile || client_class->m_ClassID == classids::ParticleSmokeGrenade
+						|| client_class->m_ClassID == classids::CBaseCSGrenade || client_class->m_ClassID == classids::CBaseCSGrenadeProjectile
+						|| client_class->m_ClassID == classids::CBaseGrenade || client_class->m_ClassID == classids::CBaseParticleEntity
+						|| client_class->m_ClassID == classids::CSensorGrenade || client_class->m_ClassID == classids::CSensorGrenadeProjectile)
 					{
 						g::render_view->SetColorModulation(settings::chams::misc::color_nade_chams.r() / 255.f, settings::chams::misc::color_nade_chams.g() / 255.f, settings::chams::misc::color_nade_chams.b() / 255.f);
 						mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, true);
@@ -208,8 +209,8 @@ namespace chams
 
 				if (settings::chams::misc::dropped_weapons)
 				{
-					if (client_class->m_ClassID == globals::class_ids.at("CAK47") || client_class->m_ClassID == globals::class_ids.at("CDEagle") || client_class->m_ClassID == globals::class_ids.at("CC4") ||
-						client_class->m_ClassID >= globals::class_ids.at("CWeaponAug") && client_class->m_ClassID <= globals::class_ids.at("CWeaponXM1014"))
+					if (client_class->m_ClassID == classids::CAK47 || client_class->m_ClassID == classids::CDEagle || client_class->m_ClassID == classids::CC4 ||
+						client_class->m_ClassID >= classids::CWeaponAug && client_class->m_ClassID <= classids::CWeaponXM1014)
 					{
 						g::render_view->SetColorModulation(settings::chams::misc::color_dropped_weapons_chams.r() / 255.f, settings::chams::misc::color_dropped_weapons_chams.g() / 255.f, settings::chams::misc::color_dropped_weapons_chams.b() / 255.f);
 						//g::render_view->SetBlend(settings::chams::misc::color_dropped_bomb_chams.a() / 255.f);
@@ -221,7 +222,7 @@ namespace chams
 
 				if (settings::chams::misc::dropped_defusekit_chams)
 				{
-					if (client_class->m_ClassID == globals::class_ids.at("CEconEntity"))
+					if (client_class->m_ClassID == classids::CEconEntity)
 					{
 						g::render_view->SetColorModulation(settings::chams::misc::color_dropped_defusekit_chams.r() / 255.f, settings::chams::misc::color_dropped_defusekit_chams.g() / 255.f, settings::chams::misc::color_dropped_defusekit_chams.b() / 255.f);
 						mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, true);
