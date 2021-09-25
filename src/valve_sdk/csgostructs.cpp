@@ -133,22 +133,22 @@ bool c_base_player::DrawSpecificEntity()
 
 float c_base_combat_weapon::GetInaccuracy()
 {
-	return CallVFunction<float(__thiscall*)(void*)>(this, 482)(this);
+	return CallVFunction<float(__thiscall*)(void*)>(this, 483)(this);
 }
 
 float c_base_combat_weapon::GetSpread()
 {
-	return CallVFunction<float(__thiscall*)(void*)>(this, 452)(this);
+	return CallVFunction<float(__thiscall*)(void*)>(this, 453)(this);
 }
 
 const char* c_base_combat_weapon::GetWeaponName()
 {
-	return CallVFunction<const char* (__thiscall*)(void*)>(this, 385)(this);
+	return CallVFunction<const char* (__thiscall*)(void*)>(this, 386)(this);
 }
 
 void c_base_combat_weapon::UpdateAccuracyPenalty()
 {
-	CallVFunction<void(__thiscall*)(void*)>(this, 483)(this);
+	CallVFunction<void(__thiscall*)(void*)>(this, 484)(this);
 }
 
 void c_base_player::PVSFix()
@@ -219,17 +219,17 @@ char* c_base_player::GetArmorIcon()
 
 void c_base_player::UpdateClientSideAnimation()
 {
-	CallVFunction<void(__thiscall*)(void*)>(this, 223)(this);
+	CallVFunction<void(__thiscall*)(void*)>(this, 224)(this);
 }
 
 bool c_base_entity::IsPlayer()
 {
-	return CallVFunction<bool(__thiscall*)(void*)>(this, 157)(this);
+	return CallVFunction<bool(__thiscall*)(void*)>(this, 158)(this);
 }
 
 bool c_base_entity::IsWeapon()
 {
-	return CallVFunction<bool(__thiscall*)(c_base_entity*)>(this, 165)(this);
+	return CallVFunction<bool(__thiscall*)(c_base_entity*)>(this, 166)(this);
 }
 
 bool c_base_entity::IsPlantedC4()
@@ -244,7 +244,7 @@ bool c_base_entity::IsDefuseKit()
 
 CCSWeaponInfo* c_base_combat_weapon::get_weapon_data()
 {
-	return CallVFunction<CCSWeaponInfo* (__thiscall*)(void*)>(this, 460)(this);
+	return CallVFunction<CCSWeaponInfo* (__thiscall*)(void*)>(this, 461)(this);
 }
 
 bool c_base_combat_weapon::HasBullets()
