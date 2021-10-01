@@ -32,8 +32,6 @@ namespace aimbot
 	CCSWeaponInfo* weapon_data;
 	c_base_combat_weapon* weapon = nullptr;
 
-	matrix3x4_t bt_matrix[MAXSTUDIOBONES];
-
 	struct entity_pos_t
 	{
 		int id;
@@ -572,8 +570,11 @@ namespace aimbot
 
 				for (const auto& hitbox_id : hitbox_ids)
 				{
+					//TODO: hitbox not switching properly - get_backtrack_data() is fucking up aimbot.
+
 					//const auto& hitbox = player_data.hitboxes[hitbox_id][0];
 					const auto& hitbox = _data.count(player_data.index) > 0 ? !(_data.at(player_data.index).front().is_moving) ? _data.at(player_data.index).front().hitboxes : player_data.hitboxes[hitbox_id][0] : player_data.hitboxes[hitbox_id][0];
+
 					if (!hitbox.IsValid())
 						continue;
 
@@ -761,7 +762,7 @@ namespace aimbot
 	void get_backtrack_data(CUserCmd* cmd)
 	{
 		if(!a_settings.enabled || a_settings.backtrack.ticks <= 0)
-		   return;
+		  return;
 
 		if (!settings::chams::enemy::backtrack_chams && !settings::chams::teammates::backtrack_chams)
 			return;

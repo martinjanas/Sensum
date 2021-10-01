@@ -36,7 +36,8 @@ namespace visuals
 
 				bool visible = (settings::glow::enemy::visible_only && is_vis);
 
-				objects.set(color, visible ? false : true, !visible ? true : false, settings::glow::enemy::style);
+				//objects.set(color, visible ? false : true, !visible ? true : false, settings::glow::enemy::style);
+				objects.set(color, visible ? false : true, false, settings::glow::enemy::style);
 				objects.full_bloom_render(false);
 			}
 
@@ -48,7 +49,8 @@ namespace visuals
 
 				bool visible = (settings::glow::teammates::visible_only && is_vis);
 
-				objects.set(color, visible ? false : true, !visible ? true : false, settings::glow::teammates::style);
+				//objects.set(color, visible ? false : true, !visible ? true : false, settings::glow::teammates::style);
+				objects.set(color, visible ? false : true, false, settings::glow::teammates::style);
 				objects.full_bloom_render(false);
 			}
 		}

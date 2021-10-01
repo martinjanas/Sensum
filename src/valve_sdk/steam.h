@@ -20,6 +20,26 @@ public:
 	virtual EGCResults RetrieveMessage(int* punMsgType, void* pubDest, int cubDest, int* pcubMsgSize) = 0;
 };
 
+enum EUniverse
+{
+	k_EUniverseInvalid = 0,
+	k_EUniversePublic = 1,
+	k_EUniverseTestPublic = 2,
+	k_EUniverseInternal = 3,
+
+	k_EUniverseMax
+};
+
+enum EAccountType
+{
+	k_EAccountTypeInvalid = 0,
+	k_EAccountTypeIndividual = 1,		// single user account
+	k_EAccountTypeMultiseat = 2,		// multiseat (e.g. cybercafe) account
+	k_EAccountTypeGameServer = 3,		// game server account
+	k_EAccountTypeAnonGameServer = 4,	// anonomous game server account
+	k_EAccountTypePending = 5			// pending
+};
+
 class CSteamID
 {
 public:
@@ -30,7 +50,22 @@ public:
 		m_steamid.m_comp.m_EUniverse = 0;
 		m_steamid.m_comp.m_unAccountInstance = 0;
 	}
+
+	CSteamID(uint64_t ulSteamID)
+	{
+		SetFromUint64(ulSteamID);
+	}
+
 	uint32_t GetAccountID() const { return m_steamid.m_comp.m_unAccountID; }
+
+	void SetFromUint64(uint64_t ulSteamID)
+	{
+		m_steamid.m_comp.m_unAccountID = (ulSteamID & 0xFFFFFFFF);							// account ID is low 32 bits
+		m_steamid.m_comp.m_unAccountInstance = ((ulSteamID >> 32) & 0xFFFFF);			// account instance is next 20 bits
+
+		m_steamid.m_comp.m_EAccountType = (EAccountType)((ulSteamID >> 52) & 0xF);	// type is next 4 bits
+		m_steamid.m_comp.m_EUniverse = (EUniverse)((ulSteamID >> 56) & 0xFF);			// universe is next 8 bits
+	}
 
 private:
 	union SteamID_t

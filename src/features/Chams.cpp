@@ -187,6 +187,7 @@ namespace chams
 						g::mdl_render->ForcedMaterialOverride(mat);
 						entity->DrawModel(1, 255);
 					}
+					g::mdl_render->ForcedMaterialOverride(nullptr);
 				}
 
 				if (settings::chams::misc::nade_chams && grenade && grenade->m_nExplodeEffectTickBegin() < 1)
@@ -205,6 +206,7 @@ namespace chams
 						g::mdl_render->ForcedMaterialOverride(mat);
 						entity->DrawModel(1, 255);
 					}
+					g::mdl_render->ForcedMaterialOverride(nullptr);
 				}
 
 				if (settings::chams::misc::dropped_weapons)
@@ -218,6 +220,7 @@ namespace chams
 						g::mdl_render->ForcedMaterialOverride(mat);
 						entity->DrawModel(1, 255);
 					}
+					g::mdl_render->ForcedMaterialOverride(nullptr);
 				}
 
 				if (settings::chams::misc::dropped_defusekit_chams)
@@ -229,6 +232,7 @@ namespace chams
 						g::mdl_render->ForcedMaterialOverride(mat);
 						entity->DrawModel(1, 255);
 					}
+					g::mdl_render->ForcedMaterialOverride(nullptr);
 				}
 			}
 		}

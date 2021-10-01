@@ -6,6 +6,8 @@
 #include "../helpers/entities.h"
 
 #include <vector>
+#include <map>
+#include <deque>
 
 namespace features
 {
@@ -73,7 +75,7 @@ namespace aimbot
 	float GetFov();
 	void backtrack_chams(IMatRenderContext* context, const DrawModelState_t& state, const ModelRenderInfo_t& info, matrix3x4_t* bone);
 	void get_backtrack_data(CUserCmd* cmd);
-	
+
 	namespace punches
 	{
 		extern QAngle current;

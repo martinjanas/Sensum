@@ -29,7 +29,7 @@ public:
 	float_t flArmorRatio;
 	int32_t iBullets;
 	float_t flPenetration;
-	char pad_0100[8]; //0x0100
+	char pad_7[12]; //0x0100
 	float flRange; //0x0108
 	float flRangeModifier; //0x010C
 }; //Size: 0x1040
