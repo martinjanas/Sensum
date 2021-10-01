@@ -298,8 +298,6 @@ namespace render
 					{
 						checkbox("Distance Based FOV", &settings->dynamic_fov);
 						checkbox("Legit Backtrack", &settings->backtrack.legit);
-						checkbox("Aim At Backtrack", &settings->aim_at_backtrack);
-
 						ImGui::SliderFloatLeftAligned("FOV:", &settings->fov, 0, 15.f, "%.1f");
 
 						ImGui::SliderFloatLeftAligned("Smooth:", &settings->smooth, 1, 15.f, "%.1f");
