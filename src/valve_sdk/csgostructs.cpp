@@ -159,7 +159,7 @@ void c_base_player::PVSFix()
 
 CAnimationLayer* c_base_player::GetAnimOverlays()
 {
-	return *(CAnimationLayer**)(DWORD(this) + 0x2980);
+	return *(CAnimationLayer**)(DWORD(this) + 0x2990);
 }
 
 CAnimationLayer* c_base_player::GetAnimOverlay(int i)
@@ -195,13 +195,13 @@ void c_base_player::InvalidateBoneCache()
 	if (invalidate_bone_cache)
 	{
 		const auto model_bone_counter = **reinterpret_cast<unsigned long**>(invalidate_bone_cache + 10);
-		*reinterpret_cast<unsigned int*>(DWORD(this) + 0x2924) = 0xFF7FFFFF; // m_flLastBoneSetupTime = -FLT_MAX;
+		*reinterpret_cast<unsigned int*>(DWORD(this) + 0x2928) = 0xFF7FFFFF; // m_flLastBoneSetupTime = -FLT_MAX;
 		*reinterpret_cast<unsigned int*>(DWORD(this) + 0x2690) = model_bone_counter - 1; // m_iMostRecentModelBoneCounter = g_iModelBoneCounter - 1;
 	}
 }
 
 float c_base_player::m_flSpawnTime() {
-	return *(float*)((uintptr_t)this + 0xA370);
+	return *(float*)((uintptr_t)this + 0x103C0);
 }
 
 char* c_base_player::GetArmorIcon()
@@ -713,7 +713,7 @@ void c_base_attributable_item::SetModelIndex(int modelIndex)
 
 void c_base_view_model::SendViewModelMatchingSequence(int sequence)
 {
-	return CallVFunction<void(__thiscall*)(void*, int)>(this, 246)(this, sequence); //was 214
+	return CallVFunction<void(__thiscall*)(void*, int)>(this, 247)(this, sequence); //was 214
 }
 
 void c_base_view_model::SetModelIndex(int sequence)
