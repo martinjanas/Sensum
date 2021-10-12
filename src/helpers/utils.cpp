@@ -339,7 +339,7 @@ namespace utils
 		if (!weapon)
 			return "";
 
-		const auto wide_name = g::localize->Find(((c_base_combat_weapon*)weapon)->get_weapon_data()->szHudName);
+		const auto wide_name = g::localize->Find(((c_base_combat_weapon*)weapon)->GetWeaponData()->szHudName);
 
 		char weapon_name[256];
 		V_UCS2ToUTF8(wide_name, weapon_name, sizeof(weapon_name));
@@ -412,7 +412,7 @@ namespace utils
 			math::angle2vectors(viewAnglesSpread, viewForward);
 			viewForward.NormalizeInPlace();
 
-			viewForward = src + (viewForward * weapon->get_weapon_data()->flRange);
+			viewForward = src + (viewForward * weapon->GetWeaponData()->flRange);
 
 			ray.Init(src, viewForward);
 			g::engine_trace->trace_ray(ray, MASK_SHOT | CONTENTS_GRATE, &filter, &tr);

@@ -29,7 +29,7 @@ namespace zeusbot
 		if (!is_enabled(cmd))
 			return;
 
-		const auto weapon_data = weapon->get_weapon_data();
+		const auto weapon_data = weapon->GetWeaponData();
 
 		auto best_fov = -1.f;
 		auto best_time = 0.f;

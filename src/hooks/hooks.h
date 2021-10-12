@@ -251,6 +251,15 @@ namespace hooks
 		inline static void* setup;
 	};
 
+	struct fire_event_intern
+	{
+		using fn = void(__thiscall*)(void*, IGameEvent*, bool, bool);
+		static void __fastcall hooked(void* ecx, void* edx, IGameEvent* event, bool bServerSide, bool bClientSide);
+
+		inline static fn original;
+		inline static void* setup;
+	};
+
 	/*struct dispatch_user_message
 	{
 		static const int index = 38;

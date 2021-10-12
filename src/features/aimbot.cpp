@@ -202,7 +202,7 @@ namespace aimbot
 				index = 200 + weapon->m_iItemDefinitionIndex();
 				break;
 			default:
-				index = weapon->get_weapon_data()->WeaponType;
+				index = weapon->GetWeaponData()->WeaponType;
 			}
 		}
 		else if (settings::aimbot::setting_type == settings_type_t::groups)
@@ -874,7 +874,7 @@ namespace aimbot
 					if (!active_wpn)
 						continue;
 
-					auto wpn_data = active_wpn->get_weapon_data();
+					auto wpn_data = active_wpn->GetWeaponData();
 
 					if (!wpn_data)
 						continue;
@@ -932,7 +932,7 @@ namespace aimbot
 			return;
 		}
 
-		weapon_data = weapon->get_weapon_data();
+		weapon_data = weapon->GetWeaponData();
 
 		target_t result;
 		QAngle silent_angles;
@@ -1075,7 +1075,7 @@ namespace aimbot
 
 					Vector range;
 					math::angle2vectors(angles, range);
-					range *= weapon->get_weapon_data()->flRange;
+					range *= weapon->GetWeaponData()->flRange;
 
 					if (result.is_visible)
 					{

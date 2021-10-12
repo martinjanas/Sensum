@@ -219,7 +219,7 @@ namespace autowall
 
 	bool simulate_fire_bullet(c_base_player* ignore, c_base_combat_weapon* weapon, fire_bullet_data& data)
 	{
-		auto weapon_data = weapon->get_weapon_data();
+		auto weapon_data = weapon->GetWeaponData();
 
 		data.penetrate_count = 4;
 		data.trace_length = 0.0f;

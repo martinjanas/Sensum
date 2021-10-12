@@ -56,6 +56,7 @@ namespace hooks
 		hud_update::setup = reinterpret_cast<void*>(utils::GetVirtual(g::base_client, hooks::hud_update::index));
 		is_playing_demo::setup = reinterpret_cast<void*>(utils::GetVirtual(g::engine_client, hooks::is_playing_demo::index));
 		console_color_printf::setup = reinterpret_cast<void*>(utils::GetVirtual(g::cvar, hooks::console_color_printf::index));
+		fire_event_intern::setup = reinterpret_cast<void*>(utils::pattern_scan(GetModuleHandleA(xorstr_("engine.dll")), xorstr_("55 8B EC 83 E4 F8 83 EC 0C 53 8B D9 56 57 89 5C 24 0C")));
 		
 		if (MH_Initialize() != MH_OK) {
 			MessageBoxA(NULL, "Failed to initialize Minhook.", MB_OK, MB_ICONERROR);
@@ -133,6 +134,10 @@ namespace hooks
 			MessageBoxA(NULL, "Outdated index - ConsoleColorPrintf", MB_OK, MB_ICONERROR);
 		}
 
+		if (MH_CreateHook(fire_event_intern::setup, &hooks::fire_event_intern::hooked, reinterpret_cast<void**>(&fire_event_intern::original)) != MH_OK) {
+			MessageBoxA(NULL, "Outdated index - FireEventIntern", MB_OK, MB_ICONERROR);
+		}
+
 		if (MH_EnableHook(MH_ALL_HOOKS) != MH_OK) {
 			MessageBoxA(NULL, "Failed to enable hooks.", MB_OK, MB_ICONERROR);
 		}
@@ -166,6 +171,24 @@ namespace hooks
 		g::game_events->remove_listener(event_listener);
 
 		sequence::hook->~recv_prop_hook();
+	}
+
+	void __fastcall fire_event_intern::hooked(void* ecx, void* edx, IGameEvent* event, bool bServerSide, bool bClientOnly)
+	{
+		
+		if (event) //Work in Progress
+		{
+			/*const auto name = fnv::hash_runtime(event->GetName());
+
+			if (bClientOnly && name == FNV("player_hurt"))
+			{
+				char buf[256];
+				sprintf_s(buf, "player_hurt");
+				g::hud_chat->ChatPrintf(0, 0, buf);
+			}*/
+		}
+
+		original(ecx, event, bServerSide, bClientOnly);
 	}
 
 	bool __stdcall is_playing_demo::hooked()

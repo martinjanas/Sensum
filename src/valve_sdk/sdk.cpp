@@ -12,8 +12,6 @@
 #define STRINGIFY(s)      STRINGIFY_IMPL(s)
 #define PRINT_INTERFACE(name) console::print("%-20s: %p", STRINGIFY(name), name)
 
-static bool done = true;
-
 namespace g
 {
 	CLocalPlayer local_player;
@@ -27,7 +25,6 @@ namespace g
 	IClientMode* client_mode = nullptr;
 	IMoveHelper* move_helper = nullptr;
 	IPrediction* prediction = nullptr;
-	IViewRender* view_render = nullptr;
 	IVModelRender* mdl_render = nullptr;
 	IVRenderView* render_view = nullptr;
 	IEngineTrace* engine_trace = nullptr;
@@ -44,19 +41,19 @@ namespace g
 	IDirect3DDevice9* d3_device = nullptr;
 	IClientEntityList* entity_list = nullptr;
 	IPhysicsSurfaceProps* physics_surface = nullptr;
-	IVEngineVGui* engine_vgui = nullptr;
-	CRender* render = nullptr;
-	c_cs_player_resource** player_resource = nullptr;
+	CSPlayerResource** player_resource = nullptr;
 	CHud* hud_system = nullptr;
 	ILocalize* localize = nullptr;
 	IMemAlloc* mem_alloc = nullptr;
-	IWeaponSystem* weapon_system = nullptr;
 	IFileSystem* file_system = nullptr;
 	IViewRenderBeams* view_render_beams = nullptr;
 	CGlowManager* glow_manager = nullptr;
 	IStudioRender* g_studiorender = nullptr;
 	IDemoPlayer* demo_player = nullptr;
 	ServerClassDLL* server_class = nullptr;
+	CHudChat* hud_chat = nullptr;
+	CFireBullets* fire_bullets = nullptr;
+	CSGameRulesProxy* game_rules_proxy = nullptr;
 
 	ISteamUser* steam_user = nullptr;
 	ISteamHTTP* steam_http = nullptr;
@@ -64,10 +61,6 @@ namespace g
 	ISteamFriends* steam_friends = nullptr;
 	ISteamGameCoordinator* game_coordinator = nullptr;
 	ISteamUtils* steam_utils = nullptr;
-
-	CHudChat* hud_chat = nullptr;
-	C_TEFireBullets* fire_bullets = nullptr;
-	c_cs_game_rules_proxy* game_rules_proxy = nullptr;
 
 	CreateInterfaceFn get_module_factory(HMODULE module)
 	{
@@ -93,9 +86,11 @@ namespace g
 		return reinterpret_cast<T(__cdecl*)(void)>(GetProcAddress(steam_api, version))();
 	}
 
+	static bool class_ids_inited = true;
+
 	void get_class_ids()
 	{
-		if (!done)
+		if (!class_ids_inited)
 		{
 			for (auto clazz = g::server_class->GetAllClasses(); clazz; clazz = clazz->m_pNext)
 			{
@@ -104,7 +99,7 @@ namespace g
 
 			classids::initialize();
 
-			done = true;
+			class_ids_inited = true;
 		}
 	}
 
@@ -127,17 +122,14 @@ namespace g
 		client_mode = *(IClientMode**)(utils::pattern_scan(CLIENT_MODE) + 1);
 		input = *(CInput**)(utils::pattern_scan(CINPUT) + 1);
 		move_helper = **(IMoveHelper***)(utils::pattern_scan(MOVE_HELPER) + 2);
-		view_render = *(IViewRender**)(utils::pattern_scan(VIEW_RENDER) + 1);
 		d3_device = **(IDirect3DDevice9***)(utils::pattern_scan(D3D_DEVICE) + 1);
 		client_state = **(CClientState***)(utils::pattern_scan(CLIENT_STATE) + 1);
 		local_player = *(CLocalPlayer*)(utils::pattern_scan(LOCAL_PLAYER) + 2);
-		render = *(CRender**)(utils::pattern_scan(CRENDER) + 7);
 		hud_system = *reinterpret_cast<CHud**>(utils::pattern_scan(CHUD) + 1);
-		player_resource = *reinterpret_cast<c_cs_player_resource***>(utils::pattern_scan(PLAYER_RESOURCE) + 2);
-		weapon_system = *(IWeaponSystem**)(utils::pattern_scan(WEAPON_SYSTEM) + 2);
+		player_resource = *reinterpret_cast<CSPlayerResource***>(utils::pattern_scan(PLAYER_RESOURCE) + 2);
 		view_render_beams = *(IViewRenderBeams**)(utils::pattern_scan(VIEW_RENDER_BEAMS) + 1);
-		fire_bullets = *(C_TEFireBullets**)(utils::pattern_scan(FIRE_BULLETS) + 0x131);
-		game_rules_proxy = **(c_cs_game_rules_proxy***)(utils::pattern_scan(GAME_RULES_PROXY) + 1);
+		fire_bullets = *(CFireBullets**)(utils::pattern_scan(FIRE_BULLETS) + 0x131);
+		game_rules_proxy = **(CSGameRulesProxy***)(utils::pattern_scan(GAME_RULES_PROXY) + 1);
 		glow_manager = (CGlowManager*)(*(uintptr_t*)(utils::pattern_scan(GetModuleHandleA("client.dll"), "0F 11 05 ? ? ? ? 83 C8 01 C7 05 ? ? ? ? 00 00 00 00") + 3));
 		demo_player = **reinterpret_cast<IDemoPlayer***>(utils::pattern_scan("engine.dll", "8B 0D ? ? ? ? 8B 01 8B 40 1C FF D0 84 C0 74 0A") + 0x2);
 
@@ -159,7 +151,6 @@ namespace g
 		surface = get_interface<ISurface>("vguimatsurface.dll", "VGUI_Surface031");
 		physics_surface = get_interface<IPhysicsSurfaceProps>("vphysics.dll", "VPhysicsSurfaceProps001");
 		engine_sound = get_interface<IEngineSound>("engine.dll", "IEngineSoundClient003");
-		engine_vgui = get_interface<IVEngineVGui>("engine.dll", "VEngineVGui001");
 		input_system = get_interface<IInputSystem>("inputsystem.dll", "InputSystemVersion001");
 		localize = get_interface<ILocalize>("localize.dll", "Localize_001");
 		file_system = get_interface<IFileSystem>("filesystem_stdio.dll", "VFileSystem017");
@@ -180,14 +171,13 @@ namespace g
 
 		hud_chat = hud_system->FindHudElement<CHudChat>("CHudChat");
 
-		done = false;
+		class_ids_inited = false;
 
 #ifdef _DEBUG
 		PRINT_INTERFACE(global_vars);
 		PRINT_INTERFACE(client_mode);
 		PRINT_INTERFACE(input);
 		PRINT_INTERFACE(move_helper);
-		PRINT_INTERFACE(view_render);
 		PRINT_INTERFACE(d3_device);
 		PRINT_INTERFACE(client_state);
 		PRINT_INTERFACE(base_client);
@@ -216,14 +206,10 @@ namespace g
 		PRINT_INTERFACE(steam_friends);
 		PRINT_INTERFACE(steam_http);
 		PRINT_INTERFACE(steam_utils);
-		PRINT_INTERFACE(engine_vgui);
-		PRINT_INTERFACE(render);
-		PRINT_INTERFACE(player_resource);
 		PRINT_INTERFACE(hud_system);
 		PRINT_INTERFACE(g_studiorender);
 		PRINT_INTERFACE(localize);
 		PRINT_INTERFACE(mem_alloc);
-		PRINT_INTERFACE(weapon_system);
 		PRINT_INTERFACE(file_system);
 		PRINT_INTERFACE(view_render_beams);
 		PRINT_INTERFACE(hud_chat);

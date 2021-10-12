@@ -6,30 +6,12 @@
 #include "../helpers/entities.h"
 #include "../features/features.h"
 
-int c_base_entity::GetSequenceActivity(const int& sequence)
-{
-	auto hdr = g::mdl_info->GetStudiomodel(GetModel());
-	if (!hdr)
-		return -1;
-
-	static const auto offset = utils::pattern_scan(GET_SEQUENCE_ACTIVITY);
-	assert(offset);
-	static auto get_sequence_activity = reinterpret_cast<int(__fastcall*)(void*, studiohdr_t*, int)>(offset);
-
-	return get_sequence_activity(this, hdr, sequence);
-}
-
 int c_base_entity::GetSequenceActivity(studiohdr_t* hdr, const int& sequence)
 {
 	static const auto offset = utils::pattern_scan(GET_SEQUENCE_ACTIVITY);
 	static auto get_sequence_activity = reinterpret_cast<int(__fastcall*)(void*, studiohdr_t*, int)>(offset);
 
 	return get_sequence_activity(this, hdr, sequence);
-}
-
-int filterException(int code, PEXCEPTION_POINTERS ex)
-{
-	return EXCEPTION_EXECUTE_HANDLER;
 }
 
 uint8_t* UpdateVisibilityAllEntitiesOffset = nullptr;
@@ -39,18 +21,9 @@ void c_base_entity::UpdateVisibilityAllEntities()
 	if (!UpdateVisibilityAllEntitiesOffset)
 		UpdateVisibilityAllEntitiesOffset = utils::pattern_scan(UPDATE_VISIBILITY_ENTITIES);
 
-	__try
-	{
-		auto fn_offset = reinterpret_cast<void(__thiscall*)(void*)>(UpdateVisibilityAllEntitiesOffset);
+	auto fn_offset = reinterpret_cast<void(__thiscall*)(void*)>(UpdateVisibilityAllEntitiesOffset);
 
-		fn_offset(this);
-	}
-	__except (filterException(GetExceptionCode(), GetExceptionInformation()))
-	{
-#ifdef _DEBUG
-		console::print("[error] UpdateVisibilityAllEntities");
-#endif
-	}
+	fn_offset(this);
 }
 
 const matrix3x4_t& c_base_entity::m_rgflCoordinateFrame()
@@ -79,24 +52,6 @@ QAngle& c_base_player::GetAbsAngles()
 	return CallVFunction<QAngle& (__thiscall*)(void*)>(this, 11)(this);
 }
 
-bool c_base_player::IsNotTarget()
-{
-	if (!this || this == g::local_player)
-		return true;
-
-	if (m_iHealth() <= 0)
-		return true;
-
-	if (m_bGunGameImmunity())
-		return true;
-
-	if (m_fFlags() & FL_FROZEN)
-		return true;
-
-	int entIndex = EntIndex();
-	return entIndex > g::global_vars->maxClients;
-}
-
 void c_base_player::SetAbsAngles(const QAngle& angles)
 {
 	static const auto offset = utils::pattern_scan(SET_ABS_ANGLE);
@@ -114,21 +69,9 @@ int c_base_player::GetFOV() {
 	return m_iDefaultFOV();
 }
 
-void c_base_player::SetAngle2(QAngle angle)
-{
-	typedef void(__thiscall* SetAngleFn)(void*, const QAngle&);
-	static SetAngleFn SetAngle = (SetAngleFn)((DWORD)utils::pattern_scan("client.dll", "55 8B EC 83 E4 F8 83 EC 64 53 56 57 8B F1"));
-	SetAngle(this, angle);
-}
-
 bool c_base_entity::is_dormant()
 {
 	return GetClientNetworkable()->IsDormant();
-}
-
-bool c_base_player::DrawSpecificEntity()
-{
-	return globals::sound;
 }
 
 float c_base_combat_weapon::GetInaccuracy()
@@ -139,11 +82,6 @@ float c_base_combat_weapon::GetInaccuracy()
 float c_base_combat_weapon::GetSpread()
 {
 	return CallVFunction<float(__thiscall*)(void*)>(this, 453)(this);
-}
-
-const char* c_base_combat_weapon::GetWeaponName()
-{
-	return CallVFunction<const char* (__thiscall*)(void*)>(this, 386)(this);
 }
 
 void c_base_combat_weapon::UpdateAccuracyPenalty()
@@ -168,11 +106,6 @@ CAnimationLayer* c_base_player::GetAnimOverlay(int i)
 		return &GetAnimOverlays()[i];
 
 	return nullptr;
-}
-
-QAngle* c_base_player::GetVAngles2() {
-	static auto deadflag = netvar_manager::get().get_offset(fnv::hash_runtime("CBasePlayer->deadflag"));
-	return (QAngle*)((uintptr_t)this + deadflag + 0x4);
 }
 
 CCSGOPlayerAnimState* c_base_player::GetPlayerAnimState()
@@ -229,7 +162,8 @@ bool c_base_entity::IsPlayer()
 
 bool c_base_entity::IsWeapon()
 {
-	return CallVFunction<bool(__thiscall*)(c_base_entity*)>(this, 166)(this);
+	//return CallVFunction<bool(__thiscall*)(c_base_entity*)>(this, 166)(this);
+	return call_virtual<166, bool>(this);
 }
 
 bool c_base_entity::IsPlantedC4()
@@ -242,7 +176,7 @@ bool c_base_entity::IsDefuseKit()
 	return GetClientClass()->m_ClassID == CBaseAnimating;
 }
 
-CCSWeaponInfo* c_base_combat_weapon::get_weapon_data()
+CCSWeaponInfo* c_base_combat_weapon::GetWeaponData()
 {
 	return CallVFunction<CCSWeaponInfo* (__thiscall*)(void*)>(this, 461)(this);
 }
@@ -511,7 +445,7 @@ bool c_base_combat_weapon::CanFire()
 
 bool c_base_combat_weapon::IsGrenade()
 {
-	return get_weapon_data()->WeaponType == WEAPONTYPE_GRENADE;
+	return GetWeaponData()->WeaponType == WEAPONTYPE_GRENADE;
 }
 
 bool c_base_combat_weapon::IsZeus()
@@ -521,7 +455,7 @@ bool c_base_combat_weapon::IsZeus()
 
 bool c_base_combat_weapon::IsGun()
 {
-	switch (get_weapon_data()->WeaponType)
+	switch (GetWeaponData()->WeaponType)
 	{
 	case WEAPONTYPE_C4:
 	case WEAPONTYPE_GRENADE:
@@ -535,12 +469,12 @@ bool c_base_combat_weapon::IsGun()
 
 bool c_base_combat_weapon::IsKnife()
 {
-	return m_iItemDefinitionIndex() != WEAPON_TASER && get_weapon_data()->WeaponType == WEAPONTYPE_KNIFE;
+	return m_iItemDefinitionIndex() != WEAPON_TASER && GetWeaponData()->WeaponType == WEAPONTYPE_KNIFE;
 }
 
 bool c_base_combat_weapon::IsRifle()
 {
-	switch (get_weapon_data()->WeaponType)
+	switch (GetWeaponData()->WeaponType)
 	{
 	case WEAPONTYPE_RIFLE:
 	case WEAPONTYPE_SUBMACHINEGUN:
@@ -554,7 +488,7 @@ bool c_base_combat_weapon::IsRifle()
 
 bool c_base_combat_weapon::IsPistol()
 {
-	return get_weapon_data()->WeaponType == WEAPONTYPE_PISTOL;
+	return GetWeaponData()->WeaponType == WEAPONTYPE_PISTOL;
 }
 
 bool c_base_combat_weapon::IsSniper()
@@ -563,7 +497,7 @@ bool c_base_combat_weapon::IsSniper()
 
 	return index == WEAPON_AWP || index == WEAPON_SSG08 || index == WEAPON_SCAR20 || index == WEAPON_G3SG1;
 
-	return get_weapon_data()->WeaponType == WEAPONTYPE_SNIPER_RIFLE;
+	return GetWeaponData()->WeaponType == WEAPONTYPE_SNIPER_RIFLE;
 }
 
 bool c_base_combat_weapon::IsSmoke()
@@ -604,6 +538,34 @@ bool c_base_combat_weapon::IsIncendiary()
 	return index == WEAPON_INCGRENADE;
 }
 
+std::array<float, 24> c_base_player::m_flPoseParameter() const
+{
+	static int _m_flPoseParameter = netvar_manager::get().get_offset(fnv::hash_runtime("CBaseAnimating->m_flPoseParameter"));
+
+	return *(std::array<float, 24>*)((uintptr_t)this + _m_flPoseParameter);
+}
+
+Vector c_base_player::get_bone_position(int bone) {
+	matrix3x4_t bone_matrices[128];
+
+	if (this->SetupBones(bone_matrices, 128, BONE_USED_BY_HITBOX, g::global_vars->curtime))
+		return Vector(bone_matrices[bone][0][3], bone_matrices[bone][1][3], bone_matrices[bone][2][3]);
+}
+
+bool c_base_player::IsEnemy()
+{
+	static auto game_type = g::cvar->find("game_type");
+	
+	if (game_type->GetInt() == 6)
+	{
+		return this->m_nSurvivalTeam() != g::local_player->m_nSurvivalTeam() || g::local_player->m_nSurvivalTeam() == -1;
+	}
+	else
+	{
+		return this->m_iTeamNum() != g::local_player->m_iTeamNum();
+	}
+}
+
 bool c_base_combat_weapon::HasScope()
 {
 	auto index = m_iItemDefinitionIndex();
@@ -625,7 +587,6 @@ CUserCmd*& c_base_player::m_pCurrentCommand()
 
 Vector c_base_player::GetEyePos()
 {
-	//return CallVFunction<Vector(__thiscall*)(void*)>(this, 279)(this);
 	return m_vecOrigin() + m_vecViewOffset();
 }
 
@@ -669,11 +630,6 @@ bool c_base_player::IsDead()
 bool c_base_player::IsDying()
 {
 	return m_lifeState() == LIFE_DYING;
-}
-
-bool c_base_player::IsUnknown()
-{
-	return !IsPlayer() || is_dormant() || this == g::local_player || m_iHealth() <= 0 || !IsAlive() || m_bGunGameImmunity() || (m_fFlags() & FL_FROZEN);
 }
 
 bool c_base_player::IsFlashed()

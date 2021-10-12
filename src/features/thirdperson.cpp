@@ -12,7 +12,7 @@ void features::thirdperson()
 
 	auto& weapon = g::local_player->m_hActiveWeapon();
 
-	const auto weapon_type = weapon->get_weapon_data()->WeaponType;
+	const auto weapon_type = weapon->GetWeaponData()->WeaponType;
 
 	if (weapon_type == WEAPONTYPE_GRENADE)
 		g::input->m_fCameraInThirdPerson = false;

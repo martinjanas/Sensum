@@ -103,9 +103,7 @@ private:
 	c_base_player** m_local;
 };
 
-class c_cs_player_resource;
-class CRender;
-class IVEngineVGui;
+class CSPlayerResource;
 
 class IVDebugOverlay
 {
@@ -244,7 +242,7 @@ public:
 	}
 };
 
-class C_TEFireBullets
+class CFireBullets
 {
 public:
 	char pad_0000[8]; //0x0000
@@ -255,7 +253,7 @@ public:
 	QAngle m_absAngles; //0x0020
 };
 
-class c_cs_game_rules_proxy;
+class CSGameRulesProxy;
 
 namespace g
 {
@@ -266,7 +264,6 @@ namespace g
 	extern IClientMode* client_mode;
 	extern CGlobalVarsBase* global_vars;
 	extern IMoveHelper* move_helper;
-	extern IViewRender* view_render;
 	extern IBaseClientDLL* base_client;
 	extern IClientEntityList* entity_list;
 	extern CClientState* client_state;
@@ -286,18 +283,15 @@ namespace g
 	extern CLocalPlayer local_player;
 	extern IEngineSound* engine_sound;
 	extern IInputSystem* input_system;
-	extern IVEngineVGui* engine_vgui;
-	extern CRender* render;
-	extern c_cs_player_resource** player_resource;
+	extern CSPlayerResource** player_resource;
 	extern CHud* hud_system;
 	extern ILocalize* localize;
 	extern IMemAlloc* mem_alloc;
-	extern IWeaponSystem* weapon_system;
 	extern IFileSystem* file_system;
 	extern IViewRenderBeams* view_render_beams;
 	extern CHudChat* hud_chat;
-	extern C_TEFireBullets* fire_bullets;
-	extern c_cs_game_rules_proxy* game_rules_proxy;
+	extern CFireBullets* fire_bullets;
+	extern CSGameRulesProxy* game_rules_proxy;
 	extern CGlowManager* glow_manager;
 	extern IStudioRender* g_studiorender;
 	extern IDemoPlayer* demo_player;

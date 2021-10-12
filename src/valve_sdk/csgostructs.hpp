@@ -150,7 +150,6 @@ public:
 	NETVAR(Vector, m_vecMaxs, "CBaseEntity", "m_vecMaxs");
 
 	bool IsPlayer();
-	bool IsEnemy();
 	bool IsWeapon();
 	bool IsPlantedC4();
 	bool IsDefuseKit();
@@ -159,7 +158,6 @@ public:
 	void SetAbsOrigin(const Vector& origin);
 	const matrix3x4_t& m_rgflCoordinateFrame();
 	void UpdateVisibilityAllEntities();
-	int GetSequenceActivity(const int& sequence);
 	int GetSequenceActivity(studiohdr_t* hdr, const int& sequence);
 
 	static __forceinline c_base_entity* GetEntityByIndex(int index)
@@ -283,7 +281,7 @@ public:
 	NETVAR(CHandle<c_base_weapon_world_model>, m_hWeaponWorldModel, "CBaseCombatWeapon", "m_hWeaponWorldModel");
 	NETVAR(int32_t, m_zoomLevel, "CWeaponCSBaseGun", "m_zoomLevel");
 
-	CCSWeaponInfo* get_weapon_data();
+	CCSWeaponInfo* GetWeaponData();
 	bool HasBullets();
 	char* GetGunIcon();
 	float GetGunStringSize();
@@ -305,7 +303,6 @@ public:
 
 	float GetInaccuracy();
 	float GetSpread();
-	const char* GetWeaponName();
 	void UpdateAccuracyPenalty();
 	bool check_detonate(const Vector& vecThrow, const trace_t& tr, int tick, float interval);
 };
@@ -364,46 +361,6 @@ public:
 	NETVAR(int, m_iMoney, "CCSPlayer", "m_iAccount");
 	NETVAR(int32_t, m_iFOV, "CBasePlayer", "m_iFOV");
 	NETVAR(int32_t, m_iDefaultFOV, "CBasePlayer", "m_iDefaultFOV");
-
-	bool InDangerzone()
-	{
-		static auto game_type = g::cvar->find("game_type");
-		return game_type->GetInt() == 6;
-	}
-
-	Vector get_bone_position(int bone) {
-		matrix3x4_t bone_matrices[128];
-		if (this->SetupBones(bone_matrices, 128, BONE_USED_BY_HITBOX, g::global_vars->curtime))
-			return Vector(bone_matrices[bone][0][3], bone_matrices[bone][1][3], bone_matrices[bone][2][3]);
-		else
-			return Vector(0.f, 0.f, 0.f);
-	}
-
-	bool IsEnemy()
-	{
-		if (InDangerzone())
-		{
-			return this->m_nSurvivalTeam() != g::local_player->m_nSurvivalTeam() || g::local_player->m_nSurvivalTeam() == -1;
-		}
-		else
-		{
-			return this->m_iTeamNum() != g::local_player->m_iTeamNum();
-		}
-	}
-
-	bool IsLocalPlayerEnemy()
-	{
-		return g::local_player->m_iTeamNum() != this->m_iTeamNum();
-	}
-
-	std::array<float, 24> m_flPoseParameter() const
-	{
-		static int _m_flPoseParameter = netvar_manager::get().get_offset(fnv::hash_runtime("CBaseAnimating->m_flPoseParameter"));
-
-		return *(std::array<float, 24>*)((uintptr_t)this + _m_flPoseParameter);
-	}
-
-	//NETVAR(float, m_flPoseParameter, "CBaseAnimating", "m_flPoseParameter");
 	PNETVAR(CHandle<c_base_combat_weapon>, m_hMyWeapons, "CBaseCombatCharacter", "m_hMyWeapons");
 	NETVAR(int[48], weapons, "CBaseCombatCharacter", "m_hMyWeapons");
 	PNETVAR(CBaseHandle, m_hMyWearables, "CBaseCombatCharacter", "m_hMyWearables");
@@ -412,30 +369,28 @@ public:
 	CUserCmd*& m_pCurrentCommand();
 	Vector        GetEyePos();
 	Vector		  get_hitbox_position(c_base_player* entity, int hitbox_id);
+	Vector        get_bone_position(int bone);
 	player_info_t GetPlayerInfo();
-	bool		  IsNotTarget();
 	bool          IsAlive();
 	bool		  IsDead();
 	bool		  IsDying();
-	bool          IsUnknown();
 	bool		  IsFlashed();
-	bool          DrawSpecificEntity();
+	bool          IsEnemy();
 	bool          HasC4();
 	bool          CanSeePlayer(c_base_player* player, const Vector& pos);
 	int& m_nMoveType();
 	QAngle& GetAbsAngles();
 	void SetAbsAngles(const QAngle& wantedang);
-	void SetAngle2(QAngle angle);
 	void UpdateClientSideAnimation();
 	void InvalidateBoneCache();
 	char* GetArmorIcon();
 	void PVSFix();
 	float m_flSpawnTime();
+	std::array<float, 24> m_flPoseParameter() const;
 
 	CAnimationLayer* GetAnimOverlay(int i);
 	CAnimationLayer* GetAnimOverlays();
 
-	QAngle* GetVAngles2();
 	int GetFOV();
 
 	CCSGOPlayerAnimState* GetPlayerAnimState();
@@ -473,7 +428,7 @@ public:
 	NETVAR(int[MAX_PLAYERS], GetPing, "CPlayerResource", "m_iPing");
 };
 
-class c_cs_player_resource : public c_player_resource
+class CSPlayerResource : public c_player_resource
 {
 public:
 	NETVAR(int[MAX_PLAYERS], GetRank, "CCSPlayerResource", "m_iCompetitiveRanking");
@@ -487,7 +442,7 @@ public:
 	NETVAR(Vector, m_bombsiteCenterB, "CCSPlayerResource", "m_bombsiteCenterB");
 };
 
-class c_cs_game_rules_proxy
+class CSGameRulesProxy
 {
 public:
 	NETVAR(bool, m_bBombPlanted, "CCSGameRulesProxy", "m_bBombPlanted");

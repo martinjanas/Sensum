@@ -39,7 +39,7 @@ namespace slow_walk
 
 		Vector source = forward * -speed;
 
-		auto weapon_data = uintptr_t(g::local_player->m_hActiveWeapon()->get_weapon_data());
+		auto weapon_data = uintptr_t(g::local_player->m_hActiveWeapon()->GetWeaponData());
 		const auto max_weapon_speed = /**reinterpret_cast<float*>(weapon_data + 0x0134)*/ 250.f;
 		if (speed >= max_weapon_speed * amount)
 		{

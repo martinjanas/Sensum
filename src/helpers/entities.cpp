@@ -457,7 +457,7 @@ namespace entities
 			player_data.icon = player->m_hActiveWeapon()->GetGunIcon();
 			player_data.kevlar_icon = player->GetArmorIcon();
 			player_data.wep_str_size = player->m_hActiveWeapon()->GetGunStringSize();
-			player_data.has_knife = (player->m_hActiveWeapon() && player->m_hActiveWeapon()->get_weapon_data() && player->m_hActiveWeapon()->get_weapon_data()->WeaponType == WEAPONTYPE_KNIFE);
+			player_data.has_knife = (player->m_hActiveWeapon() && player->m_hActiveWeapon()->GetWeaponData() && player->m_hActiveWeapon()->GetWeaponData()->WeaponType == WEAPONTYPE_KNIFE);
 
 			player_data.is_dormant = false;
 			player_data.is_scoped = player->m_bIsScoped();
@@ -468,7 +468,6 @@ namespace entities
 			player_data.is_c4_carrier = player->HasC4();
 			player_data.has_defkit = player->m_bHasDefuser();
 			player_data.is_desyncing = IsDesyncing(player);
-			player_data.draw_entity = player->DrawSpecificEntity();
 			player_data.player = player;
 			player_data.model = player->GetModel();
 			player_data.is_player = player->IsPlayer();
@@ -546,7 +545,7 @@ namespace entities
 				if (!settings::esp::enabled || !on_screen || !is_hitbox_for_visible_check(k))
 					continue;
 
-				if (!is_visible && !player_data.draw_entity)
+				if (!is_visible)
 				{
 					ray.Init(eye_pos, player_data.hitboxes[k][0]);
 					g::engine_trace->trace_ray(ray, CONTENTS_SOLID | CONTENTS_MOVEABLE | CONTENTS_MONSTER | CONTENTS_DEBRIS | CONTENTS_HITBOX, &filter, &tr);

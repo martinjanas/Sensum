@@ -33,11 +33,3 @@ public:
 	float flRange; //0x0108
 	float flRangeModifier; //0x010C
 }; //Size: 0x1040
-
-class IWeaponSystem
-{
-	virtual void unused0() = 0;
-	virtual void unused1() = 0;
-public:
-	virtual CCSWeaponInfo* GetWpnData(unsigned ItemDefinitionIndex) = 0;
-};
