@@ -1,6 +1,7 @@
-# Sensum - Internal legit cheat
+# Sensum - Internal legit cheat - Broken
 
-## Anybody posting issues in the ***Discussion tab*** will be blocked!
+## 25th October 2021: Due to recent CSGO update (Operation Riptide), The whole Legitbot and Visible Check is broken, since I tried to<br>
+## do all the things I could think of, I still didnt manage to fix that.
 
 [**List of features**](https://pastebin.com/twMkYr0q) | ***Check the Discussions tab to request a feature.***
 
