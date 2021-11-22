@@ -160,11 +160,15 @@ namespace render
 						"Sasha - LNOE", "Skog - Metal", "Midnight Riders - All I want for Christmas", "Matt Lange - IsoRhythm",
 						"Mateo Messina - For Not Mankind", "Various Artists - Hotline Miami", "Daniel Sadowski - Total Domination",
 						"Damjan Mravunac - The Talos Principle", "Proxy - Battlepack", "Ki:Theory - MOLOTOV", "Troels Folmann - Uber Blasto Phone",
-						"Kelly Bailey - Hazardous Environments", "Skog - II-Headshot", "Daniel Sadowski - The 8-Bit Kit", "Awolnation - I Am", 
+						"Kelly Bailey - Hazardous Environments", "Skog - II-Headshot", "Daniel Sadowski - The 8-Bit Kit", "Awolnation - I Am",
 						"Mord Fustang - Diamonds", "Michael Bross - Invasion!", "Ian Hultquist - Lion's Mouth", "New Beat Fund - Sponge Fingerz",
-						"Beartooth - Disgusting", "Lennie Moore - Java Havana Funkaloo", "Darude - Sandstorm", "The Verkkars - EZ4ENCE", "Halo - Halo",
-						"Scarlxrd - King", "Valve - Halflife Alyx", "Amon Tobin - All for Dust", "Darren Korb - Hades", "Neckdeep - The Lowlife Pack",
-						"Scarlxrd - CHAIN$AW.LXADXUT"
+						"Beartooth - Disgusting", "Lennie Moore - Java Havana Funkaloo", "Darude - Sandstorm", "Beartooth - Aggresive", "Blitz Kids - The Good Youth",
+						"Hundreth - FREE", "Neck Deep - Life's Not Out to Get You", "Roam - Backbone", "Twin Atlantic - GLA", "Skog - III-Arena",
+						"The Verkkars - EZ4ENCE", "Halo - Master Chief Edition", "Scarlxrd - KING", "Half Life Alyx", "Austin Wintory - Bachram", "Dren - Gunman Taco Truck", 
+						"Daniel Sadowski - Eye of Dragon", "Tree Adams and Ben Bromfield - M.U.D.D. Force", "Tim Huling - Neo Noir", "Sam Marshall - Bodacious", "Matt Levine - Drifter", 
+						"Amon Tobin - All of Dust", "Darren Korb - Hades", "Neckdeep - Lowlife Pack", "Scarlxrd - CHAIN$AW", "Austin Wintory - Mocha Petal", "Chipzel - Yellow Magic", 
+						"Freaky DNA - Vici", "Jesse Harlin - Astro Bellum", "Laura Shigihara - Word Hard, Play Hard", "Sarah Schachner - KOLIBRI", "bbno$ - u mad!", 
+						"The Verkkars & n0thing - Flashbang Dance"
 					};
 
 					checkbox("Engine Prediction", &settings::movement::engine_prediction);
