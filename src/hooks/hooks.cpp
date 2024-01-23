@@ -1,86 +1,97 @@
-#pragma warning(disable : 26812)
-
-#include <format>
-
 #include "hooks.h"
-#include "../settings/globals.h"
-#include "../helpers/console.h"
-#include "../hooks/hooked_functions/game_event_listener.h"
+#include "../settings/settings.h"
+#include "../sdk/helpers/entity_data.h"
+#include <algorithm>
 
-namespace hooks
-{	
-	CGameEventListener event_listener = CGameEventListener();
+bool hooks::init()
+{
+	if (MH_Initialize() != MH_STATUS::MH_OK)
+		return false;
 
-	bool init()
-	{
-		sequence::hook = new recv_prop_hook(c_base_view_model::m_nSequence(), sequence::hooked);
-		end_scene::setup = reinterpret_cast<void*>(utils::get_virtual(g::d3_device, end_scene::index));
-		create_move::setup = reinterpret_cast<void*>(utils::get_virtual(g::client_mode, create_move::index));
-		reset::setup = reinterpret_cast<void*>(utils::get_virtual(g::d3_device, reset::index));
-		paint_traverse::setup = reinterpret_cast<void*>(utils::get_virtual(g::vgui_panel, paint_traverse::index));
-		override_view::setup = reinterpret_cast<void*>(utils::get_virtual(g::client_mode, override_view::index));
-		frame_stage_notify::setup = reinterpret_cast<void*>(utils::get_virtual(g::base_client, frame_stage_notify::index));
-		draw_model_execute::setup = reinterpret_cast<void*>(utils::get_virtual(g::mdl_render, draw_model_execute::index));
+	if (MH_CreateHookVirtual(g::entity_system, on_add_entity::index, &on_add_entity::hooked, reinterpret_cast<void**>(&on_add_entity::original_fn)) != MH_STATUS::MH_OK)
+		return false;
 
-		//One of those causes crashing: OUTDATED!
+	if (MH_CreateHookVirtual(g::entity_system, on_remove_entity::index, &on_remove_entity::hooked, reinterpret_cast<void**>(&on_remove_entity::original_fn)) != MH_STATUS::MH_OK)
+		return false;
 
-		//get_color_modulation::setup = reinterpret_cast<void*>(utils::pattern_scan("materialsystem.dll", "55 8B EC 83 EC ? 56 8B F1 8A 46"));
-		//is_using_static_prop_debug_modes::setup = reinterpret_cast<void*>(utils::pattern_scan("engine.dll", "8B 0D ? ? ? ? 81 F9 ? ? ? ? 75 ? A1 ? ? ? ? 35 ? ? ? ? EB ? 8B 01 FF 50 ? 83 F8 ? 0F 85 ? ? ? ? 8B 0D"));
-		
-		//if (MH_CreateHook(get_color_modulation::setup, &get_color_modulation::hooked, reinterpret_cast<void**>(&get_color_modulation::original)) != MH_OK)
-			//return false;
+	if (MH_CreateHookVirtual(g::csgo_input, create_move::index, &create_move::hooked, reinterpret_cast<void**>(&create_move::original_fn)) != MH_STATUS::MH_OK)
+		return false;
 
-		//if (MH_CreateHook(is_using_static_prop_debug_modes::setup, &is_using_static_prop_debug_modes::hooked, reinterpret_cast<void**>(&is_using_static_prop_debug_modes::original)) != MH_OK)
-			//return false;
-		
-		if (MH_CreateHook(end_scene::setup, &end_scene::hooked, reinterpret_cast<void**>(&end_scene::original)) != MH_OK)
-			return false;
-			
-		if (MH_CreateHook(create_move::setup, &create_move::hooked, reinterpret_cast<void**>(&create_move::original)) != MH_OK)
-			return false;
+	if (MH_CreateHook(modules::client.pattern_scanner.scan("48 89 5C 24 ? 56 48 83 EC ? 8B 05 ? ? ? ? 8D 5A").as(), &frame_stage_notify::hooked, reinterpret_cast<void**>(&frame_stage_notify::original_fn)) != MH_STATUS::MH_OK)
+		return false;
 
-		if (MH_CreateHook(reset::setup, &reset::hooked, reinterpret_cast<void**>(&reset::original)) != MH_OK)
-			return false;
-		
-		if (MH_CreateHook(paint_traverse::setup, &paint_traverse::hooked, reinterpret_cast<void**>(&paint_traverse::original)) != MH_OK)
-			return false;
-		
-		if (MH_CreateHook(override_view::setup, &override_view::hooked, reinterpret_cast<void**>(&override_view::original)) != MH_OK)
-			return false;
-			
-		if (MH_CreateHook(frame_stage_notify::setup, &frame_stage_notify::hooked, reinterpret_cast<void**>(&frame_stage_notify::original)) != MH_OK)
-			return false;
-		
-		if (MH_CreateHook(draw_model_execute::setup, &draw_model_execute::hooked, reinterpret_cast<void**>(&draw_model_execute::original)) != MH_OK)
-			return false;
+	if (MH_CreateHook(modules::client.pattern_scanner.scan("E8 ? ? ? ? F3 0F 11 45 ? 48 8B 5C 24 ?").add(0x1).abs().as(), &fov_changer_test::hooked, reinterpret_cast<void**>(&fov_changer_test::original_fn)) != MH_STATUS::MH_OK)
+		return false;
 
-		if (MH_EnableHook(MH_ALL_HOOKS) != MH_OK)
-			return false;
+	if (MH_CreateHookVirtual(g::swap_chain, present::index, &present::hooked, reinterpret_cast<void**>(&present::original_fn)) != MH_STATUS::MH_OK)
+		return false;
 
-		g::game_events->add_listener(&event_listener, xorstr_("game_newmap"), false);
-		g::game_events->add_listener(&event_listener, xorstr_("player_hurt"), false);
-		g::game_events->add_listener(&event_listener, xorstr_("bomb_begindefuse"), false);
-		g::game_events->add_listener(&event_listener, xorstr_("item_purchase"), false);
-		
-		
-		return true;
-	}
+	if (MH_CreateHookVirtual(g::swap_chain, resize_buffers::index, &resize_buffers::hooked, reinterpret_cast<void**>(&resize_buffers::original_fn)) != MH_STATUS::MH_OK)
+		return false;
 
-	void destroy()
-	{
-		//static auto weapon_debug_spread_show = g::cvar->find(xorstr_("weapon_debug_spread_show"));
-		//weapon_debug_spread_show->SetValue(0);
+	if (MH_CreateHook(modules::client.pattern_scanner.scan("40 53 48 81 EC ? ? ? ? 49 8B C1").as(), get_matrices_for_view::hooked, reinterpret_cast<void**>(&get_matrices_for_view::original_fn)) != MH_STATUS::MH_OK)
+		return false;
 
-		//static auto engine_no_focus_sleep = g::cvar->find(xorstr_("engine_no_focus_sleep"));
-		//engine_no_focus_sleep->SetValue(50);
+	MH_EnableHook(MH_ALL_HOOKS);
 
-		g::game_events->remove_listener(&event_listener);
-		
-		MH_DisableHook(MH_ALL_HOOKS);
-		MH_RemoveHook(MH_ALL_HOOKS);
-
-		MH_Uninitialize();
-
-		sequence::hook->~recv_prop_hook();
-	}
+	return true;
 }
+
+bool hooks::detach()
+{
+	SetWindowLongPtrA(globals::hwnd, GWLP_WNDPROC, LONG_PTR(hooks::wndproc::original));
+
+	if (MH_Uninitialize() != MH_STATUS::MH_OK)
+		return false;
+
+	return true;
+}
+
+float __fastcall hooks::fov_changer_test::hooked(void* camera)
+{
+	if (g::engine_client->IsInGame() && settings::visuals::m_bFovChanger)
+		return static_cast<float>(settings::visuals::m_iFov);
+
+    return original_fn(camera);
+}
+
+//Temp placement, move later
+void __fastcall hooks::get_matrices_for_view::hooked(void* rcx, void* rdx, VMatrix* world_to_view, VMatrix* view_to_projection, VMatrix* world_to_projection, VMatrix* world_to_pixels)
+{
+	if (!globals::viewmatrix)
+		globals::viewmatrix = world_to_projection;
+
+	original_fn(rcx, rdx, world_to_view, view_to_projection, world_to_projection, world_to_pixels);
+}
+
+long __stdcall hooks::resize_buffers::hooked(IDXGISwapChain* swap_chain, uint32_t buffer_count, uint32_t width, uint32_t height, DXGI_FORMAT new_format, uint32_t swap_chain_flags)
+{
+	const auto hr = original_fn(swap_chain, buffer_count, width, height, new_format, swap_chain_flags);
+	
+	if (hr >= 0)
+	{
+		ImGui_ImplDX11_CreateDeviceObjects();
+		ImGui_ImplDX11_InvalidateDeviceObjects();
+		ImGui::CreateContext();
+
+		DXGI_SWAP_CHAIN_DESC desc;
+		swap_chain->GetDesc(&desc);
+
+		globals::hwnd = desc.OutputWindow;
+		globals::width = desc.BufferDesc.Width;
+		globals::height = desc.BufferDesc.Height;
+
+		swap_chain->GetDevice(__uuidof(ID3D11Device), reinterpret_cast<void**>(&globals::device));
+		globals::device->GetImmediateContext(&globals::context);
+
+		ImGui_ImplWin32_Init(globals::hwnd);
+		ImGui_ImplDX11_Init(globals::device, globals::context);
+
+		swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&globals::back_buffer));
+
+		globals::device->CreateRenderTargetView(globals::back_buffer, nullptr, &globals::render_target_view);
+	}
+
+	return hr;
+}
+

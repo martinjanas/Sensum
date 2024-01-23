@@ -1,125 +1,49 @@
-#define NOMINMAX
-#include <Windows.h>
-#include <chrono>
-#include <thread>
-#include <functional>
-#include <fstream>
-
-#include "settings/config.h"
-#include "settings/globals.h"
-#include "settings/options.hpp"
-
-#include "helpers/input.h"
-#include "helpers/utils.h"
-#include "helpers/console.h"
-#include "helpers/notifies.h"
-
+#include <memory>
+#include "sdk/sdk.h"
 #include "hooks/hooks.h"
-#include "render/render.h"
-#include "valve_sdk/sdk.hpp"
-#include "features/features.h"
-#include "helpers/imdraw.h"
-#include "valve_sdk/netvars.hpp"
+#include "sdk/helpers/netvars.h"
+#include "sdk/helpers/console.h"
 
-#include "valve_sdk/interfaces/ICvar.h"
-
-#include "valve_sdk/kit_parser.hpp"
-
-void setup_hotkeys(void* base)
-{
-	input_system::register_hotkey(VK_INSERT, []()
-	{
-			render::menu::toggle();
-
-			render::switch_hwnd();
-	});
-	
-	bool is_active = true;
-	input_system::register_hotkey(VK_DELETE, [&is_active]()
-	{
-		hooks::destroy();
-		if (render::menu::is_visible())
-		{
-			render::menu::toggle();
-			render::switch_hwnd();
-		}
-		is_active = false;
-	});
-
-	while (is_active)
-		Sleep(500);
-
-	FreeLibraryAndExitThread(static_cast<HMODULE>(base), 1);
-}
-
+//Notice: This project is WORK IN PROGRESS!
 DWORD __stdcall on_attach(void* base)
 {
-	while (!utils::get_module("serverbrowser.dll"))
-		Sleep(10);
+    while (!modules::nav_system.base)
+       Sleep(50);
+    
+    console::attach();
 
-//#ifdef _DEBUG
-	console::attach();
-//#endif
+    sdk::init_modules();
+    sdk::init_interfaces();
 
-	patterns::initialize();
-	g::initialize();
-	input_system::initialize();
-	render::initialize();
+    netvars::init();
+    hooks::init();
 
-	if (MH_Initialize() != MH_OK)
-	{
-		MessageBoxA(NULL, xorstr_("Unable to initialize Minhook."), MB_OK, MB_ICONERROR);
-		Sleep(2000);
+    //MJ: TODO: Implement getting localplayer by sig, probably use dwPlayerController, since every player is controller
+    //Also implement team & entity == localplayer check in esp
 
-		return 0;
-	}
+    if (GetAsyncKeyState(VK_END) & 1)
+    {
+        hooks::detach();
+        console::detach();
 
-	if (!hooks::init())
-	{
-		MessageBoxA(NULL, xorstr_("One or more hooks failed to initialize."), MB_OK, MB_ICONERROR); 
-		Sleep(2000);
+        FreeLibraryAndExitThread(reinterpret_cast<HMODULE>(base), EXIT_SUCCESS);
+    }
 
-		return 0;
-	}
-
-	skins::load();
-	globals::load();
-	game_data::initialize_kits();
-	
-	config::cache("configs");
-
-	notifies::push("Hello!");
-
-	setup_hotkeys(base);
-
-	return TRUE;
+    return TRUE;
 }
 
-void on_detach()
+BOOL APIENTRY DllMain(HMODULE module, DWORD reason, void* reserved)
 {
-//#ifdef _DEBUG
-	console::detach();
-//#endif
+    if (reason != DLL_PROCESS_ATTACH)
+        return false;
+    
+    DisableThreadLibraryCalls(module);
 
-	render::destroy();
-	hooks::destroy();
-	input_system::destroy();
+    auto thread = LI_FN(CreateThread)(nullptr, 0, on_attach, module, 0, nullptr);
+
+    if (thread)
+        LI_FN(CloseHandle)(thread);
+
+    return TRUE;
 }
 
-BOOL __stdcall DllMain(HINSTANCE instance, DWORD fdwReason, void* lpvReserved)
-{
-	if (fdwReason == DLL_PROCESS_ATTACH)
-	{
-		if (instance)
-			LI_FN(DisableThreadLibraryCalls)(instance);
-
-		auto handle = LI_FN(CreateThread)(nullptr, 0, on_attach, instance, 0, nullptr);
-
-		LI_FN(CloseHandle)(handle);
-		
-	}
-	else if (fdwReason == DLL_PROCESS_DETACH)
-		on_detach();
-
-	return TRUE;
-}

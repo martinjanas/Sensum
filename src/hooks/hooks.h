@@ -1,111 +1,87 @@
 #pragma once
-
-#include "../valve_sdk/csgostructs.hpp"
-#include "../minhook/minhook.h"
-#include "../valve_sdk/interfaces/IStudioRender.h"
-
-#include <d3dx9.h>
-#include <type_traits>
-
-#pragma comment(lib, "d3dx9.lib")
+#include "../sdk/sdk.h"
+#include "../sdk/helpers/globals.h"
+#include "../sdk/classes/CHandle.h"
+#include "../sdk/hooking/minhook/MinHook.h"
+#include "../sdk/classes/CEntityInstance.h"
 
 namespace hooks
 {
 	bool init();
-	void destroy();
+	bool detach();
 
-	struct end_scene
+	namespace wndproc
 	{
-		static const int index = 42;
-		using fn = long(__stdcall*)(IDirect3DDevice9*);
-		static long __stdcall hooked(IDirect3DDevice9*);
-
-		inline static fn original;
-		inline static void* setup;
-	};
+		inline WNDPROC original;
+		LRESULT __stdcall hooked(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	}
 
 	struct create_move
 	{
-		static const int index = 24;
-		using fn = bool(__thiscall*)(void*, float, CUserCmd*);
-		static bool __fastcall hooked(void* ecx, void* edx, float input_sample_frametime, CUserCmd* cmd);
+		static const int index = 14;
+		using fn = void(__fastcall*)(CSGOInput*, unsigned int, void*, unsigned __int8);
+		static void __fastcall hooked(CSGOInput* input, unsigned int a2, void* a3, unsigned __int8 unk);
 
-		inline static fn original;
-		inline static void* setup;
+		inline static fn original_fn;
 	};
 
-	struct reset
+	struct on_add_entity
 	{
-		static const int index = 16;
-		using fn = long(__stdcall*)(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
-		static long __stdcall hooked(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
+		static const int index = 14;
+		using fn = CEntityInstance*(__thiscall*)(void*, CEntityInstance*, CHandle);
+		static CEntityInstance* __fastcall hooked(void* rcx, CEntityInstance* instance, CHandle handle);
 
-		inline static fn original;
-		inline static void* setup;
+		inline static fn original_fn;
 	};
 
-	struct paint_traverse
+	struct on_remove_entity
 	{
-		static const int index = 41;
-		using fn = void(__thiscall*)(IPanel*, vgui::VPANEL, bool, bool);
-		static void __stdcall hooked(vgui::VPANEL, bool forceRepaint, bool allowForce);
+		static const int index = 15;
+		using fn = CEntityInstance * (__thiscall*)(void*, CEntityInstance*, CHandle);
+		static CEntityInstance* __fastcall hooked(void* rcx, CEntityInstance* instance, CHandle handle);
 
-		inline static fn original;
-		inline static void* setup;
+		inline static fn original_fn;
 	};
 
-	struct override_view
+	struct present
 	{
-		static const int index = 18;
-		using fn = void(__thiscall*)(IClientMode*, CViewSetup*);
-		static void __stdcall hooked(CViewSetup*);
+		static const int index = 8;
+		using fn = long(__stdcall*)(void*, uint32_t, uint32_t);
+		static long __stdcall hooked(IDXGISwapChain* swap_chain, uint32_t sync_interval, uint32_t flags);
 
-		inline static fn original;
-		inline static void* setup;
+		inline static fn original_fn;
 	};
 
-	struct draw_model_execute
+	struct resize_buffers
 	{
-		static const int index = 21;
-		using fn = void(__thiscall*)(IVModelRender*, IMatRenderContext*, const DrawModelState_t*, const ModelRenderInfo_t*, matrix3x4_t*);
-		static void __stdcall hooked(IMatRenderContext* context, const DrawModelState_t& state, const ModelRenderInfo_t& info, matrix3x4_t* bone);
+		static const int index = 13;
+		using fn = long(__stdcall*)(void*, uint32_t, uint32_t, uint32_t, DXGI_FORMAT, uint32_t);
+		static long __stdcall hooked(IDXGISwapChain* swap_chain, uint32_t buffer_count, uint32_t width, uint32_t height, DXGI_FORMAT new_format, uint32_t swap_chain_flags);
 
-		inline static fn original;
-		inline static void* setup;
+		inline static fn original_fn;
 	};
 
 	struct frame_stage_notify
 	{
-		static const int index = 37;
-		using fn = void(__thiscall*)(IBaseClientDLL*, EClientFrameStage);
-		static void __stdcall hooked(EClientFrameStage stage);
+		using fn = void(__fastcall*)(void*, int);
+		static void __fastcall hooked(void* a1, int stage);
 
-		inline static fn original;
-		inline static void* setup;
+		inline static fn original_fn;
 	};
 
-	struct sequence
+	struct fov_changer_test
 	{
-		static recv_prop_hook* hook;
-		using fn = void(__thiscall*)(const CRecvProxyData* data, void* entity, void* output);
-		static void hooked(const CRecvProxyData* data, void* entity, void* output);
-	};
+		using fn = float(__fastcall*)(void*);
+		static float __fastcall hooked(void* camera);
 
-	struct get_color_modulation
+		inline static fn original_fn;
+	};
+	
+	struct get_matrices_for_view
 	{
-		using fn = void(__thiscall*)(void*, float*, float*, float*);
-		static void __fastcall hooked(IMaterial* ecx, void* edx, float* r, float* g, float* b);
+		using fn = void(__fastcall*)(void*, void* rdx, VMatrix* world_to_view, VMatrix* view_to_projection, VMatrix* world_to_projection, VMatrix* world_to_pixels);
+		static void __fastcall hooked(void* rcx, void* rdx, VMatrix* world_to_view, VMatrix* view_to_projection, VMatrix* world_to_projection, VMatrix* world_to_pixels);
 
-		inline static fn original;
-		inline static void* setup;
+		inline static fn original_fn;
 	};
-
-	struct is_using_static_prop_debug_modes
-	{
-		using fn = bool(__thiscall*)();
-		static bool __stdcall hooked();
-
-		inline static fn original;
-		inline static void* setup;
-	};
-};
+}
