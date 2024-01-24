@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <optional>
+#define NOMINMAX
 #include <Windows.h>
 #include <cstdint>
 #include <map>

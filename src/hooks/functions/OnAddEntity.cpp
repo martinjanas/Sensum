@@ -9,12 +9,10 @@ void add_players(CEntityInstance* instance, CHandle handle)
     if (!instance || !instance->IsController())
         return;
 
-    CCSPlayerController* player = reinterpret_cast<CCSPlayerController*>(instance);
-
-    bool exists = std::any_of(entity_data::player_instances.begin(), entity_data::player_instances.end(), [&](const entity_data::instance_t& e) { return e.entity->m_pEntity() == instance->m_pEntity(); });
+    bool exists = std::any_of(entity_data::player_instances.begin(), entity_data::player_instances.end(), [&](const entity_data::instance_t& e) { return e.handle.GetEntryIndex() == handle.GetEntryIndex(); });
 
     if (!exists)
-        entity_data::player_instances.emplace_back(player, handle);
+        entity_data::player_instances.emplace_back(instance, handle);
 }
 
 void on_add_entity_fn(CEntityInstance* instance, CHandle handle)

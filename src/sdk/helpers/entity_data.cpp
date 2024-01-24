@@ -1,6 +1,8 @@
 #include "entity_data.h"
 #include "globals.h"
 
+#include "../helpers/Hitbox_t.h"
+
 namespace entity_data
 {
 	std::list<instance_t> player_instances;
@@ -18,80 +20,67 @@ namespace entity_data
 		locker.unlock();
 	}
 
+	std::vector<Vector> matrixToVector(const Vector& min, const Vector& max) {
+		std::vector<Vector> points;
+
+		points.push_back(Vector(min.x, min.y, min.z));
+		points.push_back(Vector(min.x, max.y, min.z));
+		points.push_back(Vector(max.x, max.y, min.z));
+		points.push_back(Vector(max.x, min.y, min.z));
+		points.push_back(Vector(max.x, max.y, max.z));
+		points.push_back(Vector(min.x, max.y, max.z));
+		points.push_back(Vector(min.x, min.y, max.z));
+		points.push_back(Vector(max.x, min.y, max.z));
+
+		return points;
+	}
+
 	//https://github.com/nezu-cc/BakaWare4/blob/f82a60479287926b9fa105ea053851da9a7d040e/cheat/src/valve/cs/entity.cpp
-	/*bool cs::base_entity::get_bounding_box(bbox& out, bool hitbox) noexcept {
-		collision_property* collision = m_pCollision();
+	bool GetBBox(CCSPlayerPawn* pawn, BBox_t& bbox) //THIS NEEDS FIXING
+	{
+		auto collision = pawn->m_pCollision();
 		if (!collision)
 			return false;
 
-		game_scene_node* scene_node = m_pGameSceneNode();
-		if (!scene_node)
-			return false;
+		Vector vecMax = pawn->m_pGameSceneNode()->m_vecAbsOrigin() + collision->m_vecMaxs();
+		Vector vecMin = pawn->m_pGameSceneNode()->m_vecAbsOrigin() + collision->m_vecMins();
 
-		const se::transform node_to_world = scene_node->m_nodeToWorld();
-		mat3x4 trans;
-		node_to_world.to_matrix(trans);
+		Vector arrPoints[8] =
+		{
+			Vector(vecMin.x, vecMin.y, vecMin.z),
+			Vector(vecMin.x, vecMax.y, vecMin.z),
+			Vector(vecMax.x, vecMax.y, vecMin.z),
+			Vector(vecMax.x, vecMin.y, vecMin.z),
+			Vector(vecMax.x, vecMax.y, vecMax.z),
+			Vector(vecMin.x, vecMax.y, vecMax.z),
+			Vector(vecMin.x, vecMin.y, vecMax.z),
+			Vector(vecMax.x, vecMin.y, vecMax.z)
+		};
 
-		vec3 min, max;
-		if (hitbox) {
-			if (!collision->outer)
+		float flLeft = std::numeric_limits<float>::max();
+		float flTop = std::numeric_limits<float>::max();
+		float flRight = std::numeric_limits<float>::lowest();
+		float flBottom = std::numeric_limits<float>::lowest();
+
+		// get screen points position
+		Vector arrScreen[8] = { };
+		for (std::size_t i = 0U; i < 8U; i++) {
+			if (!globals::world_to_screen(arrPoints[i], arrScreen[i]))
 				return false;
 
-			cs::base_animating* base_animating = collision->outer->get_base_animating();
-			if (!base_animating)
-				return false;
-
-			se::hitbox_set* hb_set = base_animating->get_hitbox_set(0);
-			if (!hb_set || hb_set->hit_boxes.size == 0)
-				return false;
-
-			ASSERT(hb_set->hit_boxes.size == 1);
-
-			auto& hitbox = hb_set->hit_boxes[0];
-			min = hitbox.mins;
-			max = hitbox.maxs;
-		}
-		else {
-			min = collision->m_vecMins();
-			max = collision->m_vecMaxs();
+			flLeft = std::min(flLeft, arrScreen[i].x);
+			flTop = std::min(flTop, arrScreen[i].y);
+			flRight = std::max(flRight, arrScreen[i].x);
+			flBottom = std::max(flBottom, arrScreen[i].y);
 		}
 
-		out.x = out.y = std::numeric_limits<float>::max();
-		out.w = out.h = -std::numeric_limits<float>::max();
 
-		for (size_t i = 0; i < 8; ++i) {
-			const vec3 point = vec3(
-				i & 1 ? max.x : min.x,
-				i & 2 ? max.y : min.y,
-				i & 4 ? max.z : min.z
-			).transform(trans);
-
-			vec2 screen;
-			if (!math::world_to_screen(point, screen))
-				return false;
-
-			out.x = std::floor(std::min(out.x, screen.x));
-			out.y = std::floor(std::min(out.y, screen.y));
-			out.w = std::floor(std::max(out.w, screen.x));
-			out.h = std::floor(std::max(out.h, screen.y));
-		}
-
-		const float width = out.w - out.x;
-		if (width < 4.f) {
-			const float half = (4.f - width) * 0.5f;
-			out.x -= std::floor(half);
-			out.w += std::ceil(half);
-		}
-
-		const float height = out.h - out.y;
-		if (height < 4.f) {
-			const float half = (4.f - height) * 0.5f;
-			out.y -= std::floor(half);
-			out.h += std::ceil(half);
-		}
-
+		bbox.top = flTop;
+		bbox.left = flLeft;
+		bbox.right = flRight;
+		bbox.bottom = flBottom;
 		return true;
-	}*/
+	}
 
 	void fetch_player_data()
 	{
@@ -106,9 +95,14 @@ namespace entity_data
 
 		for (const auto& instance : player_instances)
 		{
-			auto controller = instance.entity;
+			auto entity = instance.entity;
 
-			if (!controller || !instance.handle.IsValid())
+			if (!entity || !instance.handle.IsValid())
+				continue;
+
+			auto controller = reinterpret_cast<CCSPlayerController*>(entity);
+
+			if (!controller)
 				continue;
 
 			if (controller->m_bIsLocalPlayerController())
@@ -116,12 +110,12 @@ namespace entity_data
 
 			uint32_t index = instance.handle.GetEntryIndex();
 
-			auto pawn = controller->m_hPawn().Get<CCSPlayerPawnBase>();
+			auto pawn = controller->m_hPawn().Get<CCSPlayerPawn>();
 
 			if (!pawn)
 				continue;
 			
-			auto localplayer_pawn = localplayer->m_hPawn().Get();
+			auto localplayer_pawn = localplayer->m_hPawn().Get<CCSPlayerPawn>();
 
 			if (!localplayer_pawn)
 				continue;
@@ -167,6 +161,8 @@ namespace entity_data
 			player_data.model_state = &model_state;
 			player_data.model = model;
 			player_data.index = index;
+
+			GetBBox(pawn, player_data.bbox);
 
 			entry_data.player_data.push_back(std::move(player_data));
 		}

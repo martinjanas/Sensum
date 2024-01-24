@@ -8,7 +8,7 @@ void remove_players(CEntityInstance* instance, CHandle handle)
     if (!instance || !instance->IsController())
         return;
     
-   auto it = std::remove_if(entity_data::player_instances.begin(), entity_data::player_instances.end(), [&](const entity_data::instance_t& e) { return e.entity->m_pEntity() == instance->m_pEntity(); });
+   auto it = std::remove_if(entity_data::player_instances.begin(), entity_data::player_instances.end(), [&](const entity_data::instance_t& e) { return e.handle.GetEntryIndex() == handle.GetEntryIndex(); });
 
    entity_data::player_instances.erase(it, entity_data::player_instances.end());
 }

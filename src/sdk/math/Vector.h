@@ -1,8 +1,8 @@
 #pragma once
 #include <iostream>
 #include <format>
-
 #include "../../thirdparty/ImGui/imgui.h"
+#include "../helpers/matrix.h"
 
 class Vector
 {
@@ -31,6 +31,18 @@ public:
 		auto str = std::format("x: {:.2f}, y: {:.2f}, z: {:.2f}", x, y, z);
 
 		return str;
+	}
+
+	float dot_product(const Vector& v) const noexcept
+	{
+		return (x * v.x + y * v.y + z * v.z);
+	}
+
+	Vector transform(const mat3x4_t& mat) noexcept
+	{
+		return Vector(dot_product({ mat[0][0], mat[0][1], mat[0][2] }) + mat[0][3],
+			dot_product({ mat[1][0], mat[1][1], mat[1][2] }) + mat[1][3],
+			dot_product({ mat[2][0], mat[2][1], mat[2][2] }) + mat[2][3]);
 	}
 
 	float operator[](const size_t& index)

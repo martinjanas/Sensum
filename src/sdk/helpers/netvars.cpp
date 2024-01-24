@@ -7,7 +7,7 @@ namespace netvars
 {
     void init()
     {
-        std::vector<const char*> netvar_modules = { "client.dll", "engine2.dll", "schemasystem.dll" };
+        std::vector<const char*> netvar_modules = { "client.dll", "engine2.dll", "schemasystem.dll", "animationsystem.dll"};
 
         for (const auto& module : netvar_modules)
         {

@@ -43,9 +43,9 @@ namespace features::esp
 
 			esp::bone_esp(data);
 
-			printf("x: %f, y: %f, z: %f, w: %f\n", data.bbox.x, data.bbox.y, data.bbox.z, data.bbox.w);
+			printf("l: %f, t: %f, r: %f, b: %f, w: %f, h: %f\n", data.bbox.left, data.bbox.top, data.bbox.right, data.bbox.bottom, data.bbox.width(), data.bbox.height());
 
-			globals::draw_list->AddRect(ImVec2(data.bbox.x, data.bbox.y), ImVec2(data.bbox.z, data.bbox.w), IM_COL32_WHITE, 1.f, 15, 1.5f);
+			globals::draw_list->AddRect(ImVec2(data.bbox.left, data.bbox.top), ImVec2(data.bbox.right, data.bbox.bottom), IM_COL32_WHITE, 1.f, 15, 1.5f);
 		}
 	}
 

@@ -74,6 +74,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <OmitFramePointers>false</OmitFramePointers>
       <MinimalRebuild>false</MinimalRebuild>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -97,7 +98,7 @@
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OmitFramePointers>false</OmitFramePointers>
       <ExceptionHandling>Async</ExceptionHandling>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
@@ -114,20 +115,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="features\features.h" />
+    <ClInclude Include="sdk\helpers\BBox_t.h" />
     <ClInclude Include="sdk\helpers\globals.h" />
-    <ClInclude Include="sdk\classes\CBasePlayer.h" />
     <ClInclude Include="sdk\classes\CBoneSystem.h" />
     <ClInclude Include="sdk\classes\CCSPlayerPawn.h" />
     <ClInclude Include="sdk\classes\CPlayerCameraServices.h" />
     <ClInclude Include="sdk\classes\CPlayerGlowProperty.h" />
     <ClInclude Include="sdk\classes\CPlayerMoneyServices.h" />
-    <ClInclude Include="sdk\classes\CPlayerController.h" />
-    <ClInclude Include="sdk\classes\CPlayerPawn.h" />
+    <ClInclude Include="sdk\classes\CCSPlayerController.h" />
     <ClInclude Include="sdk\classes\CSkeletonInstance.h" />
     <ClInclude Include="sdk\classes\CStrongHandle.h" />
     <ClInclude Include="sdk\helpers\BitFlag.h" />
     <ClInclude Include="sdk\helpers\entity_data.h" />
     <ClInclude Include="render\menu\main_window.h" />
+    <ClInclude Include="sdk\helpers\Hitbox_t.h" />
+    <ClInclude Include="sdk\helpers\matrix.h" />
+    <ClInclude Include="sdk\math\Transform.h" />
     <ClInclude Include="settings\settings.h" />
     <ClInclude Include="sdk\interfaces\CSGOInput.h" />
     <ClInclude Include="hooks\hooks.h" />
@@ -182,10 +185,8 @@
     <ClCompile Include="sdk\helpers\globals.cpp" />
     <ClCompile Include="hooks\functions\Present.cpp" />
     <ClCompile Include="hooks\functions\WinProc.cpp" />
-    <ClCompile Include="sdk\classes\CBasePlayer.cpp" />
     <ClCompile Include="sdk\classes\CCSPlayerPawn.cpp" />
-    <ClCompile Include="sdk\classes\CPlayerController.cpp" />
-    <ClCompile Include="sdk\classes\CPlayerPawn.cpp" />
+    <ClCompile Include="sdk\classes\CCSPlayerController.cpp" />
     <ClCompile Include="sdk\helpers\entity_data.cpp" />
     <ClCompile Include="render\menu\main_window.cpp" />
     <ClCompile Include="hooks\functions\CreateMove.cpp" />

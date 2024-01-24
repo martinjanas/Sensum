@@ -1,8 +1,8 @@
 #include "../hooks.h"
 #include "../../sdk/sdk.h"
 
-#include "../../sdk/classes/CPlayerPawn.h"
-#include "../../sdk/classes/CPlayerController.h"
+#include "../../sdk/classes/CCSPlayerPawn.h"
+#include "../../sdk/classes/CCSPlayerController.h"
 
 void __fastcall hooks::create_move::hooked(CSGOInput* input, unsigned int a2, void* a3, unsigned __int8 unk)
 {

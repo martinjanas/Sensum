@@ -207,16 +207,13 @@
     <ClInclude Include="sdk\classes\CPlayerCameraServices.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\classes\CPlayerController.h">
+    <ClInclude Include="sdk\classes\CCSPlayerController.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
     <ClInclude Include="sdk\classes\CPlayerGlowProperty.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
     <ClInclude Include="sdk\classes\CPlayerMoneyServices.h">
-      <Filter>sdk\classes</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\classes\CPlayerPawn.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
     <ClInclude Include="sdk\classes\CSkeletonInstance.h">
@@ -230,7 +227,10 @@
     </ClInclude>
     <ClInclude Include="sdk\helpers\globals.h" />
     <ClInclude Include="sdk\classes\CCSPlayerPawn.h" />
-    <ClInclude Include="sdk\classes\CBasePlayer.h" />
+    <ClInclude Include="sdk\helpers\matrix.h" />
+    <ClInclude Include="sdk\math\Transform.h" />
+    <ClInclude Include="sdk\helpers\Hitbox_t.h" />
+    <ClInclude Include="sdk\helpers\BBox_t.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\classes\CBaseEntity.cpp">
@@ -333,10 +333,7 @@
     <ClCompile Include="sdk\helpers\entity_data.cpp">
       <Filter>sdk\helpers</Filter>
     </ClCompile>
-    <ClCompile Include="sdk\classes\CPlayerController.cpp">
-      <Filter>sdk\classes</Filter>
-    </ClCompile>
-    <ClCompile Include="sdk\classes\CPlayerPawn.cpp">
+    <ClCompile Include="sdk\classes\CCSPlayerController.cpp">
       <Filter>sdk\classes</Filter>
     </ClCompile>
     <ClCompile Include="features\esp.cpp">
@@ -344,6 +341,5 @@
     </ClCompile>
     <ClCompile Include="sdk\helpers\globals.cpp" />
     <ClCompile Include="sdk\classes\CCSPlayerPawn.cpp" />
-    <ClCompile Include="sdk\classes\CBasePlayer.cpp" />
   </ItemGroup>
 </Project>

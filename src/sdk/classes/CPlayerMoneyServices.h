@@ -1,5 +1,4 @@
 #pragma once
-#include "CPlayerController.h"
 
 class CCSPlayerController_InGameMoneyServices
 {

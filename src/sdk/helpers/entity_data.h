@@ -1,8 +1,9 @@
 #pragma once
 #include <list>
 #include <mutex>
-#include "../classes/CPlayerController.h"
-#include "../classes/CPlayerPawn.h"
+#include "../classes/CCSPlayerController.h"
+#include "../classes/CCSPlayerPawn.h"
+#include "../helpers/BBox_t.h"
 
 namespace entity_data
 {
@@ -18,7 +19,7 @@ namespace entity_data
 		Vector m_vOldOrigin;
 		CModelState* model_state;
 		CStrongHandle<CModel> model;
-		ImVec4 bbox;
+		BBox_t bbox;
 	};
 
 	struct entry_data_t
@@ -28,7 +29,7 @@ namespace entity_data
 
 	struct instance_t
 	{
-		CCSPlayerController* entity;
+		CEntityInstance* entity;
 		CHandle handle;
 	};
 

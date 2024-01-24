@@ -7,9 +7,11 @@
 //Notice: This project is WORK IN PROGRESS!
 DWORD __stdcall on_attach(void* base)
 {
-    while (!modules::nav_system.base)
-       Sleep(50);
+   /* while (!modules::nav_system.base)
+       Sleep(50);*/
     
+    Sleep(5000);
+
     console::attach();
 
     sdk::init_modules();
@@ -21,7 +23,7 @@ DWORD __stdcall on_attach(void* base)
     //MJ: TODO: Implement getting localplayer by sig, probably use dwPlayerController, since every player is controller
     //Also implement team & entity == localplayer check in esp
 
-    if (GetAsyncKeyState(VK_END) & 1)
+    if (globals::can_unhook)
     {
         hooks::detach();
         console::detach();
