@@ -36,25 +36,22 @@ namespace entity_data
 	}
 
 	//https://github.com/nezu-cc/BakaWare4/blob/f82a60479287926b9fa105ea053851da9a7d040e/cheat/src/valve/cs/entity.cpp
-	bool GetBBox(CCSPlayerPawn* pawn, BBox_t& bbox) //THIS NEEDS FIXING
+	bool GetBBox(CCSPlayerPawn* pawn, RECT& bbox) //THIS NEEDS FIXING
 	{
-		auto collision = pawn->m_pCollision();
-		if (!collision)
-			return false;
+		Vector mins, maxs;
 
-		Vector vecMax = pawn->m_pGameSceneNode()->m_vecAbsOrigin() + collision->m_vecMaxs();
-		Vector vecMin = pawn->m_pGameSceneNode()->m_vecAbsOrigin() + collision->m_vecMins();
+		pawn->ComputeSurroundingBox(&mins, &maxs);
 
 		Vector arrPoints[8] =
 		{
-			Vector(vecMin.x, vecMin.y, vecMin.z),
-			Vector(vecMin.x, vecMax.y, vecMin.z),
-			Vector(vecMax.x, vecMax.y, vecMin.z),
-			Vector(vecMax.x, vecMin.y, vecMin.z),
-			Vector(vecMax.x, vecMax.y, vecMax.z),
-			Vector(vecMin.x, vecMax.y, vecMax.z),
-			Vector(vecMin.x, vecMin.y, vecMax.z),
-			Vector(vecMax.x, vecMin.y, vecMax.z)
+			Vector(mins.x, mins.y, mins.z),
+			Vector(mins.x, maxs.y, mins.z),
+			Vector(maxs.x, maxs.y, mins.z),
+			Vector(maxs.x, mins.y, mins.z),
+			Vector(maxs.x, maxs.y, maxs.z),
+			Vector(mins.x, maxs.y, maxs.z),
+			Vector(mins.x, mins.y, maxs.z),
+			Vector(maxs.x, mins.y, maxs.z)
 		};
 
 		float flLeft = std::numeric_limits<float>::max();
@@ -65,7 +62,7 @@ namespace entity_data
 		// get screen points position
 		Vector arrScreen[8] = { };
 		for (std::size_t i = 0U; i < 8U; i++) {
-			if (!globals::world_to_screen(arrPoints[i], arrScreen[i]))
+			if (!globals::world2screen(arrPoints[i], arrScreen[i]))
 				return false;
 
 			flLeft = std::min(flLeft, arrScreen[i].x);
@@ -74,11 +71,11 @@ namespace entity_data
 			flBottom = std::max(flBottom, arrScreen[i].y);
 		}
 
+		bbox.top = (LONG)flTop;
+		bbox.left = (LONG)flLeft;
+		bbox.right = (LONG)flRight;
+		bbox.bottom = (LONG)flBottom;
 
-		bbox.top = flTop;
-		bbox.left = flLeft;
-		bbox.right = flRight;
-		bbox.bottom = flBottom;
 		return true;
 	}
 

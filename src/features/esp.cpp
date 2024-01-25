@@ -31,9 +31,9 @@ namespace features::esp
 			Vector head_pos = data.m_vOldOrigin;
 			head_pos.z += 75.f;
 
-			bool got_origin = globals::world_to_screen(data.m_vecOrigin, origin_out);
-			bool got_old_origin = globals::world_to_screen(data.m_vOldOrigin, player_pos_out);
-			bool got_head_pos = globals::world_to_screen(head_pos, head_pos_out);
+			bool got_origin = globals::world2screen(data.m_vecOrigin, origin_out);
+			bool got_old_origin = globals::world2screen(data.m_vOldOrigin, player_pos_out);
+			bool got_head_pos = globals::world2screen(head_pos, head_pos_out);
 
 			if (got_origin && got_head_pos)
 				esp::name_esp(data, origin_out, head_pos_out);
@@ -43,7 +43,7 @@ namespace features::esp
 
 			esp::bone_esp(data);
 
-			printf("l: %f, t: %f, r: %f, b: %f, w: %f, h: %f\n", data.bbox.left, data.bbox.top, data.bbox.right, data.bbox.bottom, data.bbox.width(), data.bbox.height());
+			//printf("l: %f, t: %f, r: %f, b: %f, w: %f, h: %f\n", data.bbox.left, data.bbox.top, data.bbox.right, data.bbox.bottom, data.bbox.width(), data.bbox.height());
 
 			globals::draw_list->AddRect(ImVec2(data.bbox.left, data.bbox.top), ImVec2(data.bbox.right, data.bbox.bottom), IM_COL32_WHITE, 1.f, 15, 1.5f);
 		}
@@ -75,8 +75,8 @@ namespace features::esp
 			if (bone_parent_index == -1)
 				continue;
 
-			bool got_bones = globals::world_to_screen(data.model_state->bones[i].position, bone_pos_out);
-			bool got_parents = globals::world_to_screen(data.model_state->bones[bone_parent_index].position, bone_parent_pos_out);
+			bool got_bones = globals::world2screen(data.model_state->bones[i].position, bone_pos_out);
+			bool got_parents = globals::world2screen(data.model_state->bones[bone_parent_index].position, bone_parent_pos_out);
 
 			if (got_bones && got_parents)
 				globals::draw_list->AddLine(bone_pos_out.AsVec2(), bone_parent_pos_out.AsVec2(), ImColor(settings::visuals::m_fBoneColor.x, settings::visuals::m_fBoneColor.y, settings::visuals::m_fBoneColor.z, settings::visuals::m_fBoneColor.w));

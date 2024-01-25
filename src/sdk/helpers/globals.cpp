@@ -72,4 +72,51 @@ namespace globals
 
 		return true;
 	}
+
+	bool screen_transform(const Vector& in, Vector& out)
+	{
+		auto result = viewmatrix;
+		if (!result)
+		{
+			out.x *= 100000;
+			out.y *= 100000;
+			return false;
+		}
+
+		const auto& world_matrix = result;
+
+		const auto w = world_matrix->m[3][0] * in.x + world_matrix->m[3][1] * in.y + world_matrix->m[3][2] * in.z + world_matrix->m[3][3];
+		if (w < 0.001f)
+		{
+			out.x *= 100000;
+			out.y *= 100000;
+			return false;
+		}
+
+		out.x = world_matrix->m[0][0] * in.x + world_matrix->m[0][1] * in.y + world_matrix->m[0][2] * in.z + world_matrix->m[0][3];
+		out.y = world_matrix->m[1][0] * in.x + world_matrix->m[1][1] * in.y + world_matrix->m[1][2] * in.z + world_matrix->m[1][3];
+		out.z = 0.0f;
+
+		out.x /= w;
+		out.y /= w;
+
+		return true;
+	}
+
+	bool world2screen(const Vector& in, Vector& out)
+	{
+		if (!viewmatrix)
+			return false;
+
+		if (!screen_transform(in, out))
+			return false;
+
+		int w, h;
+		g::engine_client->GetScreenSize(w, h);
+
+		out.x = (w / 2.0f) + (out.x * w) / 2.0f;
+		out.y = (h / 2.0f) - (out.y * h) / 2.0f;
+
+		return true;
+	}
 }

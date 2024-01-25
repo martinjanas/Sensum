@@ -19,7 +19,7 @@ namespace entity_data
 		Vector m_vOldOrigin;
 		CModelState* model_state;
 		CStrongHandle<CModel> model;
-		BBox_t bbox;
+		RECT bbox;
 	};
 
 	struct entry_data_t

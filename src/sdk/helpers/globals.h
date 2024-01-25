@@ -26,5 +26,6 @@ namespace globals
 
 	void setup_imgui_and_dx11(IDXGISwapChain* swap_chain);
 	bool world_to_screen(const Vector& pos, Vector& out);
+	bool world2screen(const Vector& in, Vector& out);
 }
 
