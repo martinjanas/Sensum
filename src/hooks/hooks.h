@@ -69,7 +69,7 @@ namespace hooks
 		inline static fn original_fn;
 	};
 
-	struct fov_changer_test
+	struct get_fov
 	{
 		using fn = float(__fastcall*)(void*);
 		static float __fastcall hooked(void* camera);

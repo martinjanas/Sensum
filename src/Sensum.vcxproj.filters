@@ -231,6 +231,8 @@
     <ClInclude Include="sdk\math\Transform.h" />
     <ClInclude Include="sdk\helpers\Hitbox_t.h" />
     <ClInclude Include="sdk\helpers\BBox_t.h" />
+    <ClInclude Include="sdk\interfaces\CSource2Client.h" />
+    <ClInclude Include="sdk\math\QAngle.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\classes\CBaseEntity.cpp">

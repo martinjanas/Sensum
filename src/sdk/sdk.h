@@ -7,6 +7,7 @@
 #include "../sdk/interfaces/IMemAlloc.h"
 #include "../sdk/interfaces/CGameResourceService.h"
 #include "../sdk/interfaces/CSGOInput.h"
+#include "../sdk/interfaces/CSource2Client.h"
 
 #include "../thirdparty/ImGui/imgui_internal.h"
 #include "../thirdparty/ImGui/backends/imgui_impl_win32.h"
@@ -33,6 +34,7 @@ public:
 namespace interfaces
 {
 	extern IVEngineClient* engine_client;
+	extern CSource2Client* client;
 	extern CSchemaSystem* schema_system;
 	extern IMemAlloc* mem_alloc;
 	extern CGameResourceService* game_resource_service;

@@ -95,10 +95,15 @@ public:
 
         static auto addr = modules::client.pattern_scanner.scan("E9 ? ? ? ? F6 43 5B FD").add(0x1).abs().as();
 
+        if (!addr)
+            return false;
+
         const auto compute_surrounding_box = reinterpret_cast<fn>(addr);
 
         if (compute_surrounding_box)
             return compute_surrounding_box(this, mins, maxs);
+
+        return false;
     }
 };
 

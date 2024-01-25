@@ -23,13 +23,13 @@ DWORD __stdcall on_attach(void* base)
     //MJ: TODO: Implement getting localplayer by sig, probably use dwPlayerController, since every player is controller
     //Also implement team & entity == localplayer check in esp
 
-    if (globals::can_unhook)
-    {
-        hooks::detach();
-        console::detach();
+    while (!GetAsyncKeyState(VK_END) & 1)
+        Sleep(50);
 
-        FreeLibraryAndExitThread(reinterpret_cast<HMODULE>(base), EXIT_SUCCESS);
-    }
+    hooks::detach();
+    console::detach();
+
+    FreeLibraryAndExitThread(reinterpret_cast<HMODULE>(base), EXIT_SUCCESS);
 
     return TRUE;
 }

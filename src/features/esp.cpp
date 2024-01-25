@@ -75,8 +75,11 @@ namespace features::esp
 			if (bone_parent_index == -1)
 				continue;
 
-			bool got_bones = globals::world2screen(data.model_state->bones[i].position, bone_pos_out);
-			bool got_parents = globals::world2screen(data.model_state->bones[bone_parent_index].position, bone_parent_pos_out);
+			Vector in_child = data.model_state->bones[i].position;
+			Vector in_parent = data.model_state->bones[bone_parent_index].position;
+
+			bool got_bones = globals::world2screen(in_child, bone_pos_out);
+			bool got_parents = globals::world2screen(in_parent, bone_parent_pos_out);
 
 			if (got_bones && got_parents)
 				globals::draw_list->AddLine(bone_pos_out.AsVec2(), bone_parent_pos_out.AsVec2(), ImColor(settings::visuals::m_fBoneColor.x, settings::visuals::m_fBoneColor.y, settings::visuals::m_fBoneColor.z, settings::visuals::m_fBoneColor.w));

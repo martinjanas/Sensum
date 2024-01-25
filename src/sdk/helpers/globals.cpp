@@ -25,7 +25,11 @@ namespace globals
 		globals::device->GetImmediateContext(&globals::context);
 		swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&globals::back_buffer));
 
-		globals::device->CreateRenderTargetView(globals::back_buffer, nullptr, &globals::render_target_view);
+		D3D11_RENDER_TARGET_VIEW_DESC rtv_desc = {};
+		rtv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		rtv_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+
+		globals::device->CreateRenderTargetView(globals::back_buffer, &rtv_desc, &globals::render_target_view);
 
 		if (globals::back_buffer)
 			globals::back_buffer->Release();

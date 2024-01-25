@@ -15,9 +15,9 @@ public:
 
     void ToMatrix(mat3x4_t& matrix) const
     {
-        matrix[0][0] = 1.0 - 2.0 * rot.y * rot.y - 2.0 * rot.z * rot.z;
-        matrix[1][0] = 2.0 * rot.x * rot.y + 2.0 * rot.w * rot.z;
-        matrix[2][0] = 2.0 * rot.x * rot.z - 2.0 * rot.w * rot.y;
+        matrix[0][0] = 1.0f - 2.0f * rot.y * rot.y - 2.0f * rot.z * rot.z;
+        matrix[1][0] = 2.0f * rot.x * rot.y + 2.0f * rot.w * rot.z;
+        matrix[2][0] = 2.0f * rot.x * rot.z - 2.0f * rot.w * rot.y;
 
         matrix[0][1] = 2.0f * rot.x * rot.y - 2.0f * rot.w * rot.z;
         matrix[1][1] = 1.0f - 2.0f * rot.x * rot.x - 2.0f * rot.z * rot.z;

@@ -23,11 +23,11 @@ namespace hooks
 		ImGui::NewFrame();
 		{
 			globals::draw_list = ImGui::GetBackgroundDrawList();
-
+			
 			if (main_window::is_open)
 				main_window::Draw();
 			
-			features::esp::render();
+			//features::esp::render();
 		}
 		ImGui::Render();
 

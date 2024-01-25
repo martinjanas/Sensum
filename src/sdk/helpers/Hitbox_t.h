@@ -5,7 +5,7 @@
 class Hitbox_t
 {
 public:
-    NETVAR(const char*, m_name, "CHitBox", "m_name");
+    /*NETVAR(const char*, m_name, "CHitBox", "m_name");
     NETVAR(const char*, m_sSurfaceProperty, "CHitBox", "m_sSurfaceProperty");
     NETVAR(const char*, m_sBoneName, "CHitBox", "m_sBoneName");
     NETVAR(Vector, m_vMinBounds, "CHitBox", "m_vMinBounds");
@@ -17,7 +17,12 @@ public:
     NETVAR(bool, m_bTranslationOnly, "CHitBox", "m_bTranslationOnly");
     NETVAR(void*, m_CRC, "CHitBox", "m_CRC");
     NETVAR(void*, m_cRenderColor, "CHitBox", "m_cRenderColor");
-    NETVAR(uint16_t, m_nHitBoxIndex, "CHitBox", "m_nHitBoxIndex");
+    NETVAR(uint16_t, m_nHitBoxIndex, "CHitBox", "m_nHitBoxIndex");*/
+
+    NETVAR(Vector, m_vMinBounds, "CHitBox", "m_vMinBounds");
+    NETVAR(Vector, m_vMaxBounds, "CHitBox", "m_vMaxBounds");
+
+    char pad[0x70];
 };
 
 template <class T>

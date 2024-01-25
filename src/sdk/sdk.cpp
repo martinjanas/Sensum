@@ -42,6 +42,7 @@ namespace sdk
 	void init_interfaces()
 	{
 		g::engine_client = modules::engine.GetInterfaceFromList<IVEngineClient*>("Source2EngineToClient001");
+		g::client = modules::client.GetInterfaceFromList<CSource2Client*>("Source2Client002");
 		g::schema_system = modules::schema.GetInterfaceFromList<CSchemaSystem*>("SchemaSystem_001");
 		g::game_resource_service = modules::engine.GetInterfaceFromList<CGameResourceService*>("GameResourceServiceClientV001");
 
@@ -55,6 +56,7 @@ namespace sdk
 		g::mem_alloc = *reinterpret_cast<IMemAlloc**>(modules::tier0.GetExport("g_pMemAlloc"));
 
 		print_status(g::engine_client);
+		print_status(g::client);
 		print_status(g::schema_system);
 		print_status(g::mem_alloc);
 		print_status(g::game_resource_service);
@@ -68,6 +70,7 @@ namespace sdk
 namespace interfaces
 {
 	IVEngineClient* engine_client{};
+	CSource2Client* client{};
 	CSchemaSystem* schema_system{};
 	IMemAlloc* mem_alloc{};
 	CGameResourceService* game_resource_service{};

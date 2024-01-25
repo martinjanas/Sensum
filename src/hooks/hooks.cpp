@@ -20,7 +20,7 @@ bool hooks::init()
 	if (MH_CreateHook(modules::client.pattern_scanner.scan("48 89 5C 24 ? 56 48 83 EC ? 8B 05 ? ? ? ? 8D 5A").as(), &frame_stage_notify::hooked, reinterpret_cast<void**>(&frame_stage_notify::original_fn)) != MH_STATUS::MH_OK)
 		return false;
 
-	if (MH_CreateHook(modules::client.pattern_scanner.scan("E8 ? ? ? ? F3 0F 11 45 ? 48 8B 5C 24 ?").add(0x1).abs().as(), &fov_changer_test::hooked, reinterpret_cast<void**>(&fov_changer_test::original_fn)) != MH_STATUS::MH_OK)
+	if (MH_CreateHook(modules::client.pattern_scanner.scan("E8 ? ? ? ? F3 0F 11 45 ? 48 8B 5C 24 ?").add(0x1).abs().as(), &get_fov::hooked, reinterpret_cast<void**>(&get_fov::original_fn)) != MH_STATUS::MH_OK)
 		return false;
 
 	if (MH_CreateHookVirtual(g::swap_chain, present::index, &present::hooked, reinterpret_cast<void**>(&present::original_fn)) != MH_STATUS::MH_OK)
@@ -47,7 +47,7 @@ bool hooks::detach()
 	return true;
 }
 
-float __fastcall hooks::fov_changer_test::hooked(void* camera)
+float __fastcall hooks::get_fov::hooked(void* camera)
 {
 	if (g::engine_client->IsInGame() && settings::visuals::m_bFovChanger)
 		return static_cast<float>(settings::visuals::m_iFov);
@@ -89,7 +89,12 @@ long __stdcall hooks::resize_buffers::hooked(IDXGISwapChain* swap_chain, uint32_
 
 		swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&globals::back_buffer));
 
-		globals::device->CreateRenderTargetView(globals::back_buffer, nullptr, &globals::render_target_view);
+
+		D3D11_RENDER_TARGET_VIEW_DESC rtv_desc = {};
+		rtv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		rtv_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+
+		globals::device->CreateRenderTargetView(globals::back_buffer, &rtv_desc, &globals::render_target_view);
 	}
 
 	return hr;

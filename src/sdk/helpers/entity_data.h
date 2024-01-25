@@ -4,6 +4,7 @@
 #include "../classes/CCSPlayerController.h"
 #include "../classes/CCSPlayerPawn.h"
 #include "../helpers/BBox_t.h"
+#include "../math/QAngle.h"
 
 namespace entity_data
 {
@@ -19,7 +20,8 @@ namespace entity_data
 		Vector m_vOldOrigin;
 		CModelState* model_state;
 		CStrongHandle<CModel> model;
-		RECT bbox;
+		BBox_t bbox;
+		QAngle aimpos;
 	};
 
 	struct entry_data_t

@@ -97,7 +97,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OmitFramePointers>false</OmitFramePointers>
-      <ExceptionHandling>Async</ExceptionHandling>
+      <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <MinimalRebuild>false</MinimalRebuild>
@@ -130,6 +130,8 @@
     <ClInclude Include="render\menu\main_window.h" />
     <ClInclude Include="sdk\helpers\Hitbox_t.h" />
     <ClInclude Include="sdk\helpers\matrix.h" />
+    <ClInclude Include="sdk\interfaces\CSource2Client.h" />
+    <ClInclude Include="sdk\math\QAngle.h" />
     <ClInclude Include="sdk\math\Transform.h" />
     <ClInclude Include="settings\settings.h" />
     <ClInclude Include="sdk\interfaces\CSGOInput.h" />

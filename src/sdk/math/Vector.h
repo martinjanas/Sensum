@@ -45,7 +45,23 @@ public:
 			dot_product({ mat[2][0], mat[2][1], mat[2][2] }) + mat[2][3]);
 	}
 
-	float operator[](const size_t& index)
+	float operator[](const size_t& index) const
+	{
+		switch (index)
+		{
+		case 0:
+			return x;
+			break;
+		case 1:
+			return y;
+			break;
+		case 2:
+			return z;
+			break;
+		}
+	}
+
+	float& operator[](const size_t& index)
 	{
 		switch (index)
 		{
@@ -125,6 +141,15 @@ public:
 		Vector& temp = *this;
 
 		temp = Vector(temp.x * other.x, temp.y * other.y, temp.z * other.z);
+
+		return temp;
+	}
+
+	Vector operator*(const float& value)
+	{
+		Vector& temp = *this;
+
+		temp = Vector(temp.x * value, temp.y * value, temp.z * value);
 
 		return temp;
 	}
