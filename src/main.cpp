@@ -1,8 +1,4 @@
-#include <memory>
-#include "sdk/sdk.h"
 #include "hooks/hooks.h"
-#include "sdk/helpers/netvars.h"
-#include "sdk/helpers/console.h"
 
 //Notice: This project is WORK IN PROGRESS!
 DWORD __stdcall on_attach(void* base)
@@ -23,7 +19,7 @@ DWORD __stdcall on_attach(void* base)
     //MJ: TODO: Implement getting localplayer by sig, probably use dwPlayerController, since every player is controller
     //Also implement team & entity == localplayer check in esp
 
-    while (!GetAsyncKeyState(VK_END) & 1)
+    while (!(GetAsyncKeyState(VK_END) & 1))
         Sleep(50);
 
     hooks::detach();

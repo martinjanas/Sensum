@@ -1,21 +1,12 @@
 #pragma once
-#include <memory>
-#include <list>
 #include <dxgi.h>
+#include <d3d11.h>
 #include "../sdk/interfaces/IVEngineClient.h"
 #include "../sdk/interfaces/SchemaSystem.h"
 #include "../sdk/interfaces/IMemAlloc.h"
 #include "../sdk/interfaces/CGameResourceService.h"
 #include "../sdk/interfaces/CSGOInput.h"
 #include "../sdk/interfaces/CSource2Client.h"
-
-#include "../thirdparty/ImGui/imgui_internal.h"
-#include "../thirdparty/ImGui/backends/imgui_impl_win32.h"
-#include "../thirdparty/ImGui/backends/imgui_impl_dx11.h"
-
-#include <dxgi.h>
-#include <d3d11.h>
-
 #include "../sdk/math/Viewmatrix.h"
 
 namespace sdk
@@ -24,10 +15,10 @@ namespace sdk
 	void init_interfaces();
 }
 
-class CRenderSystem
+class CRenderSystem //TODO: Move this into its own file
 {
 public:
-	std::byte pad001[0x178];
+	std::byte pad001[0x170];
 	IDXGISwapChain* swap_chain;
 };
 

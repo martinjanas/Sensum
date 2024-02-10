@@ -15,7 +15,8 @@ public:
     NETVAR(CPlayer_CameraServices*, m_pCameraServices, "C_BasePlayerPawn", "m_pCameraServices");
     NETVAR(Vector, m_vOldOrigin, "C_BasePlayerPawn", "m_vOldOrigin"); //Returns 0 0 0
     NETVAR(CPlayerWeaponServices*, m_pWeaponServices, "C_BasePlayerPawn", "m_pWeaponServices");
-    NETVAR(Vector, m_angEyeAngles, "C_CSPlayerPawnBase", "m_angEyeAngles");
+    NETVAR(QAngle, m_angEyeAngles, "C_CSPlayerPawnBase", "m_angEyeAngles");
+    NETVAR(QAngle, v_angle, "C_BasePlayerPawn", "v_angle");
 
     Vector GetEyePos();
     bool InAir();

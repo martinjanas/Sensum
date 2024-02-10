@@ -47,6 +47,8 @@ public:
 
         if (get_hitbox_set)
             return reinterpret_cast<HitboxSet_t*>(get_hitbox_set(this, i));
+
+        return nullptr;
     }
 
     /*uint32_t HitboxToWorldTransform(const HitboxSet_t* hitbox_set, mat3x4_t hitbox_to_world, int size)
@@ -61,15 +63,53 @@ public:
     }*/
 };
 
-class CBaseEntity;
+enum Collision_Group_t
+{
+    COLLISION_GROUP_NONE = 0,
+    COLLISION_GROUP_DEBRIS,			// Collides with nothing but world and static stuff
+    COLLISION_GROUP_DEBRIS_TRIGGER, // Same as debris, but hits triggers
+    COLLISION_GROUP_INTERACTIVE_DEBRIS,	// Collides with everything except other interactive debris or debris
+    COLLISION_GROUP_INTERACTIVE,	// Collides with everything except interactive debris or debris
+    COLLISION_GROUP_PLAYER,
+    COLLISION_GROUP_BREAKABLE_GLASS,
+    COLLISION_GROUP_VEHICLE,
+    COLLISION_GROUP_PLAYER_MOVEMENT, // For HL2, same as Collision_Group_Player, for TF2, this filters out other players and CBaseObjects
+    COLLISION_GROUP_NPC,			// Generic NPC group
+    COLLISION_GROUP_IN_VEHICLE,		// for any entity inside a vehicle
+    COLLISION_GROUP_WEAPON,			// for any weapons that need collision detection
+    COLLISION_GROUP_VEHICLE_CLIP,	// vehicle clip brush to restrict vehicle movement
+    COLLISION_GROUP_PROJECTILE,		// Projectiles!
+    COLLISION_GROUP_DOOR_BLOCKER,	// Blocks entities not permitted to get near moving doors
+    COLLISION_GROUP_PASSABLE_DOOR,	// Doors that the player shouldn't collide with
+    COLLISION_GROUP_DISSOLVING,		// Things that are dissolving are in this group
+    COLLISION_GROUP_PUSHAWAY,		// Nonsolid on client and server, pushaway in player code
+
+    COLLISION_GROUP_NPC_ACTOR,		// Used so NPCs in scripts ignore the player.
+    COLLISION_GROUP_NPC_SCRIPTED,	// USed for NPCs in scripts that should not collide with each other
+
+    LAST_SHARED_COLLISION_GROUP
+};
+
+
+class VPhysicsCollisionAttribute_t
+{
+    NETVAR(int, m_nInteractsAs, "VPhysicsCollisionAttribute_t", "m_nInteractsAs");
+    NETVAR(int, m_nInteractsWith, "VPhysicsCollisionAttribute_t", "m_nInteractsWith");
+    NETVAR(int, m_nInteractsExclude, "VPhysicsCollisionAttribute_t", "m_nInteractsExclude");
+    NETVAR(int, m_nEntityId, "VPhysicsCollisionAttribute_t", "m_nEntityId");
+    NETVAR(int, m_nOwnerId, "VPhysicsCollisionAttribute_t", "m_nOwnerId");
+    NETVAR(int, m_nHierarchyId, "VPhysicsCollisionAttribute_t", "m_nHierarchyId");
+    NETVAR(int, m_nCollisionGroup, "VPhysicsCollisionAttribute_t", "m_nCollisionGroup");
+    NETVAR(int, m_nCollisionFunctionMask, "VPhysicsCollisionAttribute_t", "m_nCollisionFunctionMask");
+};
+
 class CCollisionProperty //TODO: Add more members later
 {
 public:
-    std::byte pad001[sizeof(uintptr_t)];
-    CBaseEntity* outer;
-
+    //NETVAR(VPhysicsCollisionAttribute_t, m_collisionAttribute, "CCollisionProperty", "m_collisionAttribute");
     NETVAR(Vector, m_vecMins, "CCollisionProperty", "m_vecMins");
     NETVAR(Vector, m_vecMaxs, "CCollisionProperty", "m_vecMaxs");
+    NETVAR(float, m_flBoundingRadius, "CCollisionProperty", "m_flBoundingRadius");
 };
 
 class CBaseEntity : public CEntityInstance
@@ -106,6 +146,7 @@ public:
         return false;
     }
 };
+
 
 
 

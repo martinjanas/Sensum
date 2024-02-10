@@ -3,13 +3,45 @@
 namespace features::esp
 {
 	std::list<entity_data::player_data_t> m_player_data;
+	
+	void Draw3DBox(ABBox_t& bbox)
+	{
+		const int BOTTOM_RIGHT_BACK = 0;
+		const int BOTTOM_RIGHT_FRONT = 1;
+		const int BOTTOM_LEFT_BACK = 2;
+		const int BOTTOM_LEFT_FRONT = 3;
+		const int TOP_RIGHT_BACK = 4;
+		const int TOP_RIGHT_FRONT = 5;
+		const int TOP_LEFT_BACK = 6;
+		const int TOP_LEFT_FRONT = 7;
+
+		//Top face
+		globals::draw_list->AddLine(bbox.m_Vertices[TOP_LEFT_FRONT].AsVec2(), bbox.m_Vertices[TOP_LEFT_BACK].AsVec2(), IM_COL32_WHITE);
+		globals::draw_list->AddLine(bbox.m_Vertices[TOP_RIGHT_FRONT].AsVec2(), bbox.m_Vertices[TOP_RIGHT_BACK].AsVec2(), IM_COL32_WHITE);
+		globals::draw_list->AddLine(bbox.m_Vertices[TOP_LEFT_FRONT].AsVec2(), bbox.m_Vertices[TOP_RIGHT_FRONT].AsVec2(), IM_COL32_WHITE);
+		globals::draw_list->AddLine(bbox.m_Vertices[TOP_LEFT_BACK].AsVec2(), bbox.m_Vertices[TOP_RIGHT_BACK].AsVec2(), IM_COL32_WHITE);
+
+		//Bottom face
+		globals::draw_list->AddLine(bbox.m_Vertices[BOTTOM_LEFT_FRONT].AsVec2(), bbox.m_Vertices[BOTTOM_LEFT_BACK].AsVec2(), IM_COL32_WHITE);
+		globals::draw_list->AddLine(bbox.m_Vertices[BOTTOM_RIGHT_FRONT].AsVec2(), bbox.m_Vertices[BOTTOM_RIGHT_BACK].AsVec2(), IM_COL32_WHITE);
+		globals::draw_list->AddLine(bbox.m_Vertices[BOTTOM_LEFT_FRONT].AsVec2(), bbox.m_Vertices[BOTTOM_RIGHT_FRONT].AsVec2(), IM_COL32_WHITE);
+		globals::draw_list->AddLine(bbox.m_Vertices[BOTTOM_LEFT_BACK].AsVec2(), bbox.m_Vertices[BOTTOM_RIGHT_BACK].AsVec2(), IM_COL32_WHITE);
+
+		//Left face
+		globals::draw_list->AddLine(bbox.m_Vertices[TOP_LEFT_FRONT].AsVec2(), bbox.m_Vertices[BOTTOM_LEFT_FRONT].AsVec2(), IM_COL32_WHITE);
+		globals::draw_list->AddLine(bbox.m_Vertices[TOP_LEFT_BACK].AsVec2(), bbox.m_Vertices[BOTTOM_LEFT_BACK].AsVec2(), IM_COL32_WHITE);
+
+		//Right face
+		globals::draw_list->AddLine(bbox.m_Vertices[TOP_RIGHT_FRONT].AsVec2(), bbox.m_Vertices[BOTTOM_RIGHT_FRONT].AsVec2(), IM_COL32_WHITE);
+		globals::draw_list->AddLine(bbox.m_Vertices[TOP_RIGHT_BACK].AsVec2(), bbox.m_Vertices[BOTTOM_RIGHT_BACK].AsVec2(), IM_COL32_WHITE);
+	}
 
 	void render()
 	{
 		if (!g::engine_client->IsInGame())
 			return;
 
-		if (entity_data::player_instances.empty())
+		if (entity_data::player_entry_data.empty())
 			return;
 
 		if (entity_data::locker.try_lock())
@@ -22,11 +54,13 @@ namespace features::esp
 		static Vector head_pos_out;
 		static Vector player_pos_out;
 		static Vector origin_out;
-
-		for (auto& data : m_player_data) //TODO:Compute bbox in the future
+	
+		for (auto& data : m_player_data)
 		{
 			if (data.index == 0)
 				continue;
+			
+			globals::draw_list->PushClipRectFullScreen();
 
 			Vector head_pos = data.m_vOldOrigin;
 			head_pos.z += 75.f;
@@ -38,14 +72,18 @@ namespace features::esp
 			if (got_origin && got_head_pos)
 				esp::name_esp(data, origin_out, head_pos_out);
 
-			if (got_head_pos && got_old_origin)
-				esp::box_esp(head_pos_out, player_pos_out);
+			if (settings::visuals::m_bBoxEsp)
+				globals::draw_list->AddRect(data.abbox.m_Mins.AsVec2(), data.abbox.m_Maxs.AsVec2(), IM_COL32(255, 0, 0, 255), 1.f, 15, 1.5f);
+			
+			//Draw3DBox(data.abbox);
 
 			esp::bone_esp(data);
+			//TODO: draw nodeToWorld->pos
+			/*static Vector m_pos_out;
+			if (data.scene_node && globals::world2screen(data.scene_node->m_nodeToWorld().m_pos, m_pos_out))
+				globals::draw_list->AddCircleFilled(m_pos_out.AsVec2(), 2.f, IM_COL32_WHITE);*/
 
-			//printf("l: %f, t: %f, r: %f, b: %f, w: %f, h: %f\n", data.bbox.left, data.bbox.top, data.bbox.right, data.bbox.bottom, data.bbox.width(), data.bbox.height());
-
-			globals::draw_list->AddRect(ImVec2(data.bbox.left, data.bbox.top), ImVec2(data.bbox.right, data.bbox.bottom), IM_COL32_WHITE, 1.f, 15, 1.5f);
+			globals::draw_list->PopClipRect();
 		}
 	}
 

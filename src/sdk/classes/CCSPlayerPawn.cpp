@@ -1,6 +1,5 @@
 #include "CCSPlayerPawn.h"
 
-
 Vector CCSPlayerPawn::GetEyePos()
 {
     return m_pGameSceneNode()->m_vecOrigin() + m_vecViewOffset();

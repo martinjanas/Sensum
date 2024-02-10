@@ -69,7 +69,7 @@ public:
         if (get_bone_parent)
             return get_bone_parent(this, index);
 
-        return {}; //MJ: Probably better to return -1 ?
+        return -1;
     }
 
     const char* GetBoneName(const std::int32_t index) 

@@ -7,7 +7,7 @@
 __forceinline type& function() \
 { \
     constexpr auto hash = fnv::hash_constexpr(class_name "->" var_name); \
-    auto offset = netvars::get_offset_by_hash_cached(hash);  \
+    static auto offset = netvars::get_offset_by_hash_cached(hash);  \
     return *reinterpret_cast<type*>(reinterpret_cast<uintptr_t>(this) + offset); \
 } \
 

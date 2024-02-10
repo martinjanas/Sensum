@@ -4,6 +4,8 @@
 
 #include <d3d11.h>
 
+#include "../sdk/localplayer.h"
+
 void print_status(const char* name, void* ptr)
 {
 	auto remove_leading_zeros = [](const std::string& input) -> std::string 
@@ -64,6 +66,7 @@ namespace sdk
 		print_status(g::csgo_input);
 		print_status(g::render_system);
 		print_status(g::swap_chain);
+		print_status(players::localplayer);
 	}
 }
 

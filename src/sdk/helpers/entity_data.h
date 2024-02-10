@@ -22,6 +22,9 @@ namespace entity_data
 		CStrongHandle<CModel> model;
 		BBox_t bbox;
 		QAngle aimpos;
+		BBox_t head_bbox;
+		CCSPlayerPawn* pawn;
+		ABBox_t abbox;
 	};
 
 	struct entry_data_t
@@ -40,6 +43,12 @@ namespace entity_data
 	extern std::list<entry_data_t> player_entry_data;
 
 	extern std::mutex locker;
+	
+	namespace view_matrix
+	{
+		extern VMatrix* matrix;
+		extern std::mutex mutex;
+	};
 
 	void fetch_player_data();
 	void destroy();

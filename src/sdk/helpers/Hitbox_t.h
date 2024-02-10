@@ -2,10 +2,27 @@
 #include "../math/Vector.h"
 #include "../helpers/CUtlVector.h"
 
+struct matrix4x2_t
+{
+public:
+    union
+    {
+        struct
+        {
+            float _11, _12, _13, _14;
+            float _21, _22, _23, _24;
+        };
+        float m[4][2];
+    };
+
+    float* operator[](int i) { return m[i]; }
+    const float* operator[](int i) const { return m[i]; }
+};
+
 class Hitbox_t
 {
 public:
-    /*NETVAR(const char*, m_name, "CHitBox", "m_name");
+    NETVAR(const char*, m_name, "CHitBox", "m_name");
     NETVAR(const char*, m_sSurfaceProperty, "CHitBox", "m_sSurfaceProperty");
     NETVAR(const char*, m_sBoneName, "CHitBox", "m_sBoneName");
     NETVAR(Vector, m_vMinBounds, "CHitBox", "m_vMinBounds");
@@ -17,12 +34,8 @@ public:
     NETVAR(bool, m_bTranslationOnly, "CHitBox", "m_bTranslationOnly");
     NETVAR(void*, m_CRC, "CHitBox", "m_CRC");
     NETVAR(void*, m_cRenderColor, "CHitBox", "m_cRenderColor");
-    NETVAR(uint16_t, m_nHitBoxIndex, "CHitBox", "m_nHitBoxIndex");*/
-
-    NETVAR(Vector, m_vMinBounds, "CHitBox", "m_vMinBounds");
-    NETVAR(Vector, m_vMaxBounds, "CHitBox", "m_vMaxBounds");
-
-    char pad[0x70];
+    NETVAR(uint16_t, m_nHitBoxIndex, "CHitBox", "m_nHitBoxIndex");
+    //char pad[0x70];
 };
 
 template <class T>

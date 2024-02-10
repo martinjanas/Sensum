@@ -34,8 +34,7 @@
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Label="Shared">
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -101,6 +100,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <MinimalRebuild>false</MinimalRebuild>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -112,9 +112,15 @@
     <Manifest>
       <VerboseOutput>false</VerboseOutput>
     </Manifest>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="features\features.h" />
+    <ClInclude Include="render.h" />
+    <ClInclude Include="sdk\classes\Trace.h" />
     <ClInclude Include="sdk\helpers\BBox_t.h" />
     <ClInclude Include="sdk\helpers\globals.h" />
     <ClInclude Include="sdk\classes\CBoneSystem.h" />
@@ -131,6 +137,7 @@
     <ClInclude Include="sdk\helpers\Hitbox_t.h" />
     <ClInclude Include="sdk\helpers\matrix.h" />
     <ClInclude Include="sdk\interfaces\CSource2Client.h" />
+    <ClInclude Include="sdk\localplayer.h" />
     <ClInclude Include="sdk\math\QAngle.h" />
     <ClInclude Include="sdk\math\Transform.h" />
     <ClInclude Include="settings\settings.h" />
@@ -184,6 +191,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="features\esp.cpp" />
+    <ClCompile Include="render.cpp" />
+    <ClCompile Include="sdk\classes\Trace.cpp" />
     <ClCompile Include="sdk\helpers\globals.cpp" />
     <ClCompile Include="hooks\functions\Present.cpp" />
     <ClCompile Include="hooks\functions\WinProc.cpp" />
@@ -223,6 +232,5 @@
     <ClCompile Include="thirdparty\ImGui\imgui_widgets.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>

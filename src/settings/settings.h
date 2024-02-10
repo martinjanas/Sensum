@@ -10,10 +10,13 @@ namespace settings
 		extern bool m_bBoneEsp;
 		extern bool m_bBoxEsp;
 		extern bool m_bHealthEsp;
-		extern bool m_bNameEsp;;
+		extern bool m_bNameEsp;
 
 		// int
 		extern int m_iFov;
+
+		extern float radius_min;
+		extern float radius_max;
 
 		// colors
 		extern ImVec4 m_fBoneColor;

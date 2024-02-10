@@ -17,6 +17,6 @@ namespace hooks
         if (main_window::is_open)
             ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam);
 
-        return ::CallWindowProcA(original, hwnd, msg, wparam, lparam);
+        return CallWindowProcA(original, hwnd, msg, wparam, lparam);
     }
 }

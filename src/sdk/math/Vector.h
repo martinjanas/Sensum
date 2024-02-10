@@ -38,13 +38,17 @@ public:
 		return (x * v.x + y * v.y + z * v.z);
 	}
 
-	Vector transform(const mat3x4_t& mat) noexcept
+	Vector operator-()
 	{
-		return Vector(dot_product({ mat[0][0], mat[0][1], mat[0][2] }) + mat[0][3],
-			dot_product({ mat[1][0], mat[1][1], mat[1][2] }) + mat[1][3],
-			dot_product({ mat[2][0], mat[2][1], mat[2][2] }) + mat[2][3]);
+		return Vector(-x, -y, -z);
 	}
 
+	Vector Transform(const matrix3x4_t& matrix) const 
+	{
+		return Vector{x * matrix[0][0] + y * matrix[0][1] + z * matrix[0][2] + matrix[0][3],
+					  x * matrix[1][0] + y * matrix[1][1] + z * matrix[1][2] + matrix[1][3],
+					  x * matrix[2][0] + y * matrix[2][1] + z * matrix[2][2] + matrix[2][3]};
+	}
 	float operator[](const size_t& index) const
 	{
 		switch (index)
@@ -91,6 +95,15 @@ public:
 		return temp;
 	}
 
+	Vector operator+(const float& value)
+	{
+		Vector& temp = *this;
+
+		temp = Vector(temp.x + value, temp.y + value, temp.z + value);
+
+		return temp;
+	}
+
 	Vector& operator+=(const Vector& other)
 	{
 		x += other.x;
@@ -114,6 +127,15 @@ public:
 		Vector& temp = *this;
 
 		temp = Vector(temp.x - other.x, temp.y - other.y, temp.z - other.z);
+
+		return temp;
+	}
+
+	Vector operator-(const float& value)
+	{
+		Vector& temp = *this;
+
+		temp = Vector(temp.x - value, temp.y - value, temp.z - value);
 
 		return temp;
 	}

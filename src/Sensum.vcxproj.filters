@@ -233,6 +233,9 @@
     <ClInclude Include="sdk\helpers\BBox_t.h" />
     <ClInclude Include="sdk\interfaces\CSource2Client.h" />
     <ClInclude Include="sdk\math\QAngle.h" />
+    <ClInclude Include="sdk\localplayer.h" />
+    <ClInclude Include="sdk\classes\Trace.h" />
+    <ClInclude Include="render.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\classes\CBaseEntity.cpp">
@@ -343,5 +346,7 @@
     </ClCompile>
     <ClCompile Include="sdk\helpers\globals.cpp" />
     <ClCompile Include="sdk\classes\CCSPlayerPawn.cpp" />
+    <ClCompile Include="sdk\classes\Trace.cpp" />
+    <ClCompile Include="render.cpp" />
   </ItemGroup>
 </Project>

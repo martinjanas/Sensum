@@ -15,31 +15,31 @@ namespace netvars
             if (!netvar_class)
                 continue;
 
-            auto classes = netvar_class->GetClasses();
+            auto classes = netvar_class->GetClassBindings();
 
             for (const auto& class_binding : classes.GetElements())
             {
-                const auto& class_info = netvar_class->FindDeclaredClass(class_binding->m_name);
+                const auto& class_info = netvar_class->FindDeclaredClass(class_binding->GetName());
 
-                for (auto j = 0; j < class_info->m_fields_size; j++)
+                for (auto j = 0; j < class_info->m_nFieldSize; j++)
                 {
-                    const auto& field = &class_info->m_fields[j];
+                    const auto& field = &class_info->GetFields()[j];
 
                     if (!field)
                         continue;
 
                     char name_hashed[256];
 
-                    strcpy_s(name_hashed, class_binding->m_name);
+                    strcpy_s(name_hashed, class_binding->GetName().data());
                     strcat_s(name_hashed, "->");
-                    strcat_s(name_hashed, field->m_name);
+                    strcat_s(name_hashed, field->m_pszName);
 
                     const auto hash = fnv::hash_runtime(name_hashed);
 
-                    netvars_data[hash] = field->m_single_inheritance_offset;
+                    netvars_data[hash] = field->m_nSingleInheritanceOffset;
 
                     //if (!strstr(class_binding->m_name, "CEntityInstance"));
-                        //printf("DEBUG: %s->%s: 0x%p\n", class_binding->m_name, field->m_name, (uintptr_t)field->m_single_inheritance_offset);
+                        printf("DEBUG: %s->%s: 0x%p\n", class_binding->m_pszName, field->m_pszName, (uintptr_t)field->m_nSingleInheritanceOffset);
                 }
             }
         }

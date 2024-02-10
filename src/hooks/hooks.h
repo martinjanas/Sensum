@@ -4,6 +4,11 @@
 #include "../sdk/classes/CHandle.h"
 #include "../sdk/hooking/minhook/MinHook.h"
 #include "../sdk/classes/CEntityInstance.h"
+#include "../sdk/helpers/console.h"
+#include "../thirdparty/ImGui/imgui.h"
+#include "../thirdparty/ImGui/imgui_internal.h"
+#include "../thirdparty/ImGui/backends/imgui_impl_dx11.h"
+#include "../thirdparty/ImGui/backends/imgui_impl_win32.h"
 
 namespace hooks
 {
@@ -43,23 +48,26 @@ namespace hooks
 		inline static fn original_fn;
 	};
 
-	struct present
+	namespace directx
 	{
-		static const int index = 8;
-		using fn = long(__stdcall*)(void*, uint32_t, uint32_t);
-		static long __stdcall hooked(IDXGISwapChain* swap_chain, uint32_t sync_interval, uint32_t flags);
+		struct present
+		{
+			static const int index = 8;
+			using fn = long(__stdcall*)(void*, uint32_t, uint32_t);
+			static long __stdcall hooked(IDXGISwapChain* swap_chain, uint32_t sync_interval, uint32_t flags);
 
-		inline static fn original_fn;
-	};
+			inline static fn original_fn;
+		};
 
-	struct resize_buffers
-	{
-		static const int index = 13;
-		using fn = long(__stdcall*)(void*, uint32_t, uint32_t, uint32_t, DXGI_FORMAT, uint32_t);
-		static long __stdcall hooked(IDXGISwapChain* swap_chain, uint32_t buffer_count, uint32_t width, uint32_t height, DXGI_FORMAT new_format, uint32_t swap_chain_flags);
+		struct resize_buffers
+		{
+			static const int index = 13;
+			using fn = long(__stdcall*)(void* swap_chain, uint32_t buffer_count, uint32_t width, uint32_t height, DXGI_FORMAT new_format, uint32_t swap_chain_flags);
+			static long __stdcall hooked(IDXGISwapChain* swap_chain, uint32_t buffer_count, uint32_t width, uint32_t height, DXGI_FORMAT new_format, uint32_t swap_chain_flags);
 
-		inline static fn original_fn;
-	};
+			inline static fn original_fn;
+		};
+	}
 
 	struct frame_stage_notify
 	{

@@ -1,106 +1,25 @@
 #include "entity_data.h"
-#include "globals.h"
 #include "../helpers/Hitbox_t.h"
-#include <algorithm>
+#include "../helpers/globals.h"
+#include <DirectXMath.h>
+#include "../../thirdparty/ImGui/imgui_internal.h"
 
-class matrix3x4_t
+#define DEG2RAD(x) ((x) * static_cast<float>(3.14159265358979323846) / 180.0f)
+
+CCSPlayerController* GetLocalPlayerController()
 {
-public:
-	matrix3x4_t() {}
-	matrix3x4_t(
-		float m00, float m01, float m02, float m03,
-		float m10, float m11, float m12, float m13,
-		float m20, float m21, float m22, float m23)
+	for (int i = 1; i < 65; ++i)
 	{
-		m_flMatVal[0][0] = m00; m_flMatVal[0][1] = m01; m_flMatVal[0][2] = m02; m_flMatVal[0][3] = m03;
-		m_flMatVal[1][0] = m10; m_flMatVal[1][1] = m11; m_flMatVal[1][2] = m12; m_flMatVal[1][3] = m13;
-		m_flMatVal[2][0] = m20; m_flMatVal[2][1] = m21; m_flMatVal[2][2] = m22; m_flMatVal[2][3] = m23;
+		CCSPlayerController* player = reinterpret_cast<CCSPlayerController*>(g::entity_system->GetBaseEntity(i));
+
+		if (!player || !player->IsController())
+			continue;
+
+		if (player->m_bIsLocalPlayerController())
+			return player;
 	}
-	//-----------------------------------------------------------------------------
-	// Creates a matrix where the X axis = forward
-	// the Y axis = left, and the Z axis = up
-	//-----------------------------------------------------------------------------
-	void Init(const Vector& xAxis, const Vector& yAxis, const Vector& zAxis, const Vector& vecOrigin)
-	{
-		m_flMatVal[0][0] = xAxis.x; m_flMatVal[0][1] = yAxis.x; m_flMatVal[0][2] = zAxis.x; m_flMatVal[0][3] = vecOrigin.x;
-		m_flMatVal[1][0] = xAxis.y; m_flMatVal[1][1] = yAxis.y; m_flMatVal[1][2] = zAxis.y; m_flMatVal[1][3] = vecOrigin.y;
-		m_flMatVal[2][0] = xAxis.z; m_flMatVal[2][1] = yAxis.z; m_flMatVal[2][2] = zAxis.z; m_flMatVal[2][3] = vecOrigin.z;
-	}
-
-	//-----------------------------------------------------------------------------
-	// Creates a matrix where the X axis = forward
-	// the Y axis = left, and the Z axis = up
-	//-----------------------------------------------------------------------------
-	matrix3x4_t(const Vector& xAxis, const Vector& yAxis, const Vector& zAxis, const Vector& vecOrigin)
-	{
-		Init(xAxis, yAxis, zAxis, vecOrigin);
-	}
-
-	inline void SetOrigin(Vector const& p)
-	{
-		m_flMatVal[0][3] = p.x;
-		m_flMatVal[1][3] = p.y;
-		m_flMatVal[2][3] = p.z;
-	}
-
-	inline void Invalidate(void)
-	{
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 4; j++) {
-				m_flMatVal[i][j] = std::numeric_limits<float>::infinity();;
-			}
-		}
-	}
-
-	Vector GetXAxis()  const { return at(0); }
-	Vector GetYAxis()  const { return at(1); }
-	Vector GetZAxis()  const { return at(2); }
-	Vector GetOrigin() const { return at(3); }
-
-	Vector at(int i) const { return Vector{ m_flMatVal[0][i], m_flMatVal[1][i], m_flMatVal[2][i] }; }
-
-	float* operator[](int i) { return m_flMatVal[i]; }
-	const float* operator[](int i) const { return m_flMatVal[i]; }
-	float* Base() { return &m_flMatVal[0][0]; }
-	const float* Base() const { return &m_flMatVal[0][0]; }
-
-	float m_flMatVal[3][4];
-};
-
-void VectorTransform(const Vector& in1, const matrix3x4_t& in2, Vector& out)
-{
-	out.x = in1.dot_product(in2.GetXAxis()) + in2[0][3];
-	out.y = in1.dot_product(in2.GetYAxis()) + in2[1][3];
-	out.z = in1.dot_product(in2.GetZAxis()) + in2[2][3];
+	return nullptr;
 }
-
-//void vector2angles(const Vector& forward, QAngle& angles)
-//{
-//	float yaw, pitch;
-//
-//	if (forward.y == 0 && forward.x == 0) 
-//	{
-//		yaw = 0;
-//		if (forward.z > 0)
-//			pitch = 270;
-//		else
-//			pitch = 90;
-//	}
-//	else {
-//		yaw = (atan2(forward.y, forward.x) * 180 / 3.141592654f);
-//		if (yaw < 0)
-//			yaw += 360;
-//
-//		const auto tmp = sqrt(forward.x * forward.x + forward.y * forward.y);
-//		pitch = (atan2(-forward.z, tmp) * 180 / 3.141592654f);
-//		if (pitch < 0)
-//			pitch += 360;
-//	}
-//
-//	angles.pitch = pitch;
-//	angles.yaw = yaw;
-//	angles.roll = 0;
-//}
 
 void vector2angles(const Vector& forward, QAngle& angles)
 {
@@ -129,6 +48,18 @@ void vector2angles(const Vector& forward, QAngle& angles)
 	angles[2] = 0;
 }
 
+void angle2vectors(const QAngle& angles, Vector& forward)
+{
+	float	sp, sy, cp, cy;
+
+	DirectX::XMScalarSinCos(&sp, &cp, DEG2RAD(angles[0]));
+	DirectX::XMScalarSinCos(&sy, &cy, DEG2RAD(angles[1]));
+
+	forward.x = cp * cy;
+	forward.y = cp * sy;
+	forward.z = -sp;
+}
+
 namespace entity_data
 {
 	std::list<instance_t> player_instances;
@@ -136,6 +67,11 @@ namespace entity_data
 	std::list<entry_data_t> player_entry_data;
 
 	std::mutex locker;
+
+	namespace view_matrix
+	{
+		VMatrix* matrix;
+	};
 
 	void destroy() //TODO: Call this if localplayer is nullptr
 	{
@@ -147,11 +83,56 @@ namespace entity_data
 	}
 
 	//https://github.com/nezu-cc/BakaWare4/blob/f82a60479287926b9fa105ea053851da9a7d040e/cheat/src/valve/cs/entity.cpp
-	bool GetBBox(CCSPlayerPawn* pawn, BBox_t& bbox) //THIS NEEDS FIXING
+	bool GetBBox(CGameSceneNode* scene_node, CCollisionProperty* collision, ABBox_t& out)
 	{
-		Vector mins, maxs;
+		Vector mins = collision->m_vecMins();
+		Vector maxs = collision->m_vecMaxs();
+		
+		//printf("mins: %s, maxs: %s\n", mins.ToString().c_str(), maxs.ToString().c_str());
+		//mins: -16, -16, 0
+		//maxs:  16, 16, 72 (54 crouching)
 
-		pawn->ComputeSurroundingBox(&mins, &maxs);
+		out.Invalidate();
+
+		for (int i = 0; i < 8; ++i) 
+		{
+			Vector worldPoint = Vector{ i & 1 ? maxs.x : mins.x, i & 2 ? maxs.y : mins.y, i & 4 ? maxs.z : mins.z };
+
+			if (!globals::world2screen(worldPoint.Transform(scene_node->m_nodeToWorld().ToMatrix3x4()), out.m_Vertices[i]))
+				return false;
+
+			out.m_Mins = ImMin(out.m_Mins, out.m_Vertices[i]);
+			out.m_Maxs = ImMax(out.m_Maxs, out.m_Vertices[i]);
+		}
+
+		return true;
+	}
+
+	void get_head_bbox(CCSPlayerPawn* pawn, CCSPlayerPawn* localplayer_pawn, BBox_t& out)
+	{
+		if (pawn == localplayer_pawn)
+			return;
+
+		auto base_animating = pawn->GetBaseAnimating();
+		if (!base_animating)
+			return;
+
+		HitboxSet_t* hitbox_set = base_animating->GetHitboxSet(0);
+
+		if (!hitbox_set)
+			return;
+
+		Hitbox_t* hitbox = &hitbox_set->m_HitBoxes()[0];
+	
+		auto skeleton_instance = pawn->m_pGameSceneNode()->GetSkeletonInstance();
+
+		if (!skeleton_instance)
+			return;
+
+		auto head_bone = skeleton_instance->m_modelState().bones[6].position;
+
+		Vector mins = (head_bone + hitbox->m_vMinBounds());
+		Vector maxs = (head_bone + hitbox->m_vMaxBounds());
 
 		Vector points[8] =
 		{
@@ -165,38 +146,39 @@ namespace entity_data
 			Vector(maxs.x, mins.y, maxs.z)
 		};
 
-		float left = std::numeric_limits<float>::max();
-		float top = std::numeric_limits<float>::max();
+		float left = (std::numeric_limits<float>::max)();
+		float top = (std::numeric_limits<float>::max)();
 		float right = std::numeric_limits<float>::lowest();
 		float bottom = std::numeric_limits<float>::lowest();
 
 		Vector screen_points[8] = { };
-		for (int i = 0; i < 8; i++) 
+		for (int i = 0; i < 8; i++)
 		{
 			if (!globals::world2screen(points[i], screen_points[i]))
-				return false;
+				return;
 
-			left = std::min(left, screen_points[i].x);
-			top = std::min(top, screen_points[i].y);
-			right = std::max(right, screen_points[i].x);
-			bottom = std::max(bottom, screen_points[i].y);
+			left = std::min<float>(left, screen_points[i].x);
+			top = std::min<float>(top, screen_points[i].y);
+			right = std::max<float>(right, screen_points[i].x);
+			bottom = std::max<float>(bottom, screen_points[i].y);
 		}
 
-		bbox.top = top;
-		bbox.left = left;
-		bbox.right = right;
-		bbox.bottom = bottom;
-
-		return true;
+		out.top = top;
+		out.left = left;
+		out.right = right;
+		out.bottom = bottom;
 	}
 
-	void hitbox(Vector eye_pos, CCSPlayerPawn* pawn, QAngle& out)
+	void hitbox(Vector eye_pos, CCSPlayerPawn* pawn, CCSPlayerPawn* localplayer_pawn, QAngle& out)
 	{
+		if (pawn == localplayer_pawn)
+			return;
+
 		auto base_animating = pawn->GetBaseAnimating();
 		if (!base_animating)
 			return;
 
-		auto hitbox_set = base_animating->GetHitboxSet(0);
+		HitboxSet_t* hitbox_set = base_animating->GetHitboxSet(0);
 
 		if (!hitbox_set)
 			return;
@@ -206,17 +188,36 @@ namespace entity_data
 		if (!hitbox)
 			return;
 
-		Vector min = hitbox->m_vMinBounds();
-		Vector max = hitbox->m_vMaxBounds();
+		auto skeleton_instance = pawn->m_pGameSceneNode()->GetSkeletonInstance();
 
-		Vector hitbox_center = (min + max) * 0.5f;
-		
-		Vector hitbox_pos = (pawn->GetEyePos() + hitbox_center);
-		
+		if (!skeleton_instance)
+			return;
+
+	/*	auto* model_state = &skeleton_instance->m_modelState();
+
+		if (!model_state)
+			return;*/
+
+		//auto head_bone = model_state->bones[6].position; 
+
+		//Vector min = (head_bone + hitbox->m_vMinBounds()); //TODO: Map bones to hitboxes
+		//Vector max = (head_bone + hitbox->m_vMaxBounds());
+
+		//Vector hitbox_pos = (min + max) * 0.5f;
+		//vector2angles(hitbox_pos - eye_pos, out);
+
+		/*if (!bone_cache)
+		{
+			printf("bonecache nullptr\n");
+			return;
+		}*/
+
+		Vector min, max; //TODO:
+		auto hitbox_pos = (min + max) * 0.5f;
 		vector2angles(hitbox_pos - eye_pos, out);
-		out.ClampNormalize(); //broken
+		out.ClampNormalize();
 
-		printf("out: %.1f, %.1f\n", out.pitch, out.yaw);
+		printf("hitbox_pos: %s, pawn_eyepos: %s\n", hitbox_pos.ToString().c_str(), pawn->GetEyePos().ToString().c_str());
 	}
 
 	void fetch_player_data()
@@ -224,15 +225,14 @@ namespace entity_data
 		if (!g::engine_client->IsInGame())
 			return;
 
+		if (player_instances.empty())
+			return;
+
 		std::lock_guard<std::mutex> lock(locker);
 
 		entry_data_t entry_data;
-	
-		CCSPlayerController* localplayer = nullptr;
-
-		matrix3x4_t bonematrix;
-
-		for (const auto& instance : player_instances)
+		
+		for (const auto& instance : player_instances) //TODO: Refactor this in the future
 		{
 			auto entity = instance.entity;
 
@@ -244,17 +244,19 @@ namespace entity_data
 			if (!controller)
 				continue;
 
-			if (controller->m_bIsLocalPlayerController())
-				localplayer = reinterpret_cast<CCSPlayerController*>(controller);
+			auto localplayer = GetLocalPlayerController();
+
+			if (!localplayer)
+				continue;
 
 			uint32_t index = instance.handle.GetEntryIndex();
 
-			auto pawn = controller->m_hPawn().Get<CCSPlayerPawn>();
+			auto pawn = controller->m_hPlayerPawn().Get<CCSPlayerPawn>();
 
 			if (!pawn)
 				continue;
 			
-			auto localplayer_pawn = localplayer->m_hPawn().Get<CCSPlayerPawn>();
+			auto localplayer_pawn = localplayer->m_hPlayerPawn().Get<CCSPlayerPawn>();
 
 			if (!localplayer_pawn)
 				continue;
@@ -307,15 +309,13 @@ namespace entity_data
 			player_data.model_state = &model_state;
 			player_data.model = model;
 			player_data.index = index;
+			player_data.pawn = pawn;
 
-			GetBBox(pawn, player_data.bbox);
+			//get_head_bbox(pawn, localplayer_pawn, player_data.head_bbox);
 
-			QAngle angles;
-			g::client->GetViewAngles(0, &angles);
+			GetBBox(scene_node, collision, player_data.abbox);
 
-			//printf("pitch: %.1f, yaw: %.1f, roll: %.1f\n", angles.pitch, angles.yaw, angles.roll);
-
-			hitbox(eye_pos, pawn, player_data.aimpos);
+			//hitbox(eye_pos, pawn, localplayer_pawn, player_data.aimpos);
 
 			entry_data.player_data.push_back(std::move(player_data));
 		}
