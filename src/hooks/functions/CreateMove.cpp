@@ -7,12 +7,24 @@
 
 namespace Aimbot
 {
+    std::list<entity_data::player_data_t> m_player_data;
+
     void Aim()
     {
         if (!g::engine_client->IsInGame())
             return;
 
-        for (auto& data : entity_data::player_entry_data.front().player_data)
+        if (entity_data::player_entry_data.empty())
+            return;
+
+        if (entity_data::locker.try_lock())
+        {
+            m_player_data.clear();
+            std::copy(entity_data::player_entry_data.front().player_data.begin(), entity_data::player_entry_data.front().player_data.end(), std::back_inserter(m_player_data));
+            entity_data::locker.unlock();
+        }
+
+        for (auto& data : m_player_data)
         {
             if (data.index == 0)
                 continue;
@@ -23,28 +35,26 @@ namespace Aimbot
             QAngle viewangles;
             g::client->GetViewAngles(0, &viewangles);
 
-            auto delta_x = viewangles.pitch - data.aimpos.pitch;
+            /*auto delta_x = viewangles.pitch - data.aimpos.pitch;
             auto delta_y = viewangles.yaw - data.aimpos.yaw;
 
-            float fov = std::hypotf(delta_x, delta_y);
+            float fov = std::hypotf(delta_x, delta_y);*/
 
-            if (GetAsyncKeyState(VK_LBUTTON) && (fov < 3.f))
+            if (GetAsyncKeyState(VK_LBUTTON)) //&& (fov < 3.f)
                 g::client->SetViewAngles(0, data.aimpos);
         }
 
     }
 }
 
-void __fastcall hooks::create_move::hooked(CSGOInput* input, unsigned int a2, void* a3, unsigned __int8 unk)
+bool __fastcall hooks::create_move::hooked(CSGOInput* input, int slot, bool active, std::byte unk)
 {
-    static auto gadget_address = modules::client.pattern_scanner.scan("FF 23").as();
+    const auto result = original_fn(input, slot, active, unk);
 
     if (!g::engine_client->IsConnected() || !g::engine_client->IsInGame())
-        original_fn(input, a2, a3, unk);
+        return result;
        
-    //Aimbot::Aim();
+    Aimbot::Aim();
 
-    entity_data::fetch_player_data();
-
-    original_fn(input, a2, a3, unk);
+    return result;
 }

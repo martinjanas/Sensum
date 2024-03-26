@@ -108,6 +108,25 @@ namespace entity_data
 		return true;
 	}
 
+	bool GetBBoxByHitbox(CCSPlayerPawn* pawn, ABBox_t& out)
+	{
+		auto base_animating = pawn->GetBaseAnimating();
+
+		if (!base_animating)
+			return false;
+
+		auto hitbox_set = base_animating->GetHitboxSet(0);
+
+		if (!hitbox_set)
+			return false;
+
+		const auto& hitboxes = hitbox_set->m_HitBoxes();
+
+		Transform_t hitbox_trans[64];
+
+		//TODO: https://github.com/alza54/opensource2/blob/ff7c27a072f059597277b2eeacaf012683d4ff74/OpenSource2-SDK/src/sdk/source-sdk/classes/entity/c_baseentity.cpp#L97
+	}
+
 	void get_head_bbox(CCSPlayerPawn* pawn, CCSPlayerPawn* localplayer_pawn, BBox_t& out)
 	{
 		if (pawn == localplayer_pawn)
@@ -183,41 +202,28 @@ namespace entity_data
 		if (!hitbox_set)
 			return;
 
+		Transform_t hitbox_trans[65];
+
+		pawn->HitboxToWorldTransform(hitbox_set, hitbox_trans);
+		
 		Hitbox_t* hitbox = &hitbox_set->m_HitBoxes()[0];
 
 		if (!hitbox)
 			return;
 
-		auto skeleton_instance = pawn->m_pGameSceneNode()->GetSkeletonInstance();
-
-		if (!skeleton_instance)
-			return;
-
-	/*	auto* model_state = &skeleton_instance->m_modelState();
-
-		if (!model_state)
-			return;*/
-
-		//auto head_bone = model_state->bones[6].position; 
-
-		//Vector min = (head_bone + hitbox->m_vMinBounds()); //TODO: Map bones to hitboxes
-		//Vector max = (head_bone + hitbox->m_vMaxBounds());
-
-		//Vector hitbox_pos = (min + max) * 0.5f;
-		//vector2angles(hitbox_pos - eye_pos, out);
-
-		/*if (!bone_cache)
+		if (hitbox->m_nHitBoxIndex() == 0)
 		{
-			printf("bonecache nullptr\n");
-			return;
-		}*/
+			Vector mins = hitbox->m_vMinBounds();
+			Vector maxs = hitbox->m_vMaxBounds();
 
-		Vector min, max; //TODO:
-		auto hitbox_pos = (min + max) * 0.5f;
-		vector2angles(hitbox_pos - eye_pos, out);
-		out.ClampNormalize();
+			Vector center = (mins + maxs) * 0.5f;
 
-		printf("hitbox_pos: %s, pawn_eyepos: %s\n", hitbox_pos.ToString().c_str(), pawn->GetEyePos().ToString().c_str());
+			Vector hitbox_pos = (hitbox_trans->m_pos - center);
+			vector2angles(hitbox_pos - eye_pos, out);
+			out.ClampNormalize();
+
+			printf("hitbox_pos: %s, pawn_eyepos: %s\n", hitbox_pos.ToString().c_str(), pawn->GetEyePos().ToString().c_str());
+		}
 	}
 
 	void fetch_player_data()
@@ -315,7 +321,7 @@ namespace entity_data
 
 			GetBBox(scene_node, collision, player_data.abbox);
 
-			//hitbox(eye_pos, pawn, localplayer_pawn, player_data.aimpos);
+			hitbox(eye_pos, pawn, localplayer_pawn, player_data.aimpos);
 
 			entry_data.player_data.push_back(std::move(player_data));
 		}

@@ -60,8 +60,6 @@ namespace features::esp
 			if (data.index == 0)
 				continue;
 			
-			globals::draw_list->PushClipRectFullScreen();
-
 			Vector head_pos = data.m_vOldOrigin;
 			head_pos.z += 75.f;
 
@@ -82,8 +80,6 @@ namespace features::esp
 			/*static Vector m_pos_out;
 			if (data.scene_node && globals::world2screen(data.scene_node->m_nodeToWorld().m_pos, m_pos_out))
 				globals::draw_list->AddCircleFilled(m_pos_out.AsVec2(), 2.f, IM_COL32_WHITE);*/
-
-			globals::draw_list->PopClipRect();
 		}
 	}
 

@@ -46,7 +46,7 @@ public:
         const auto get_hitbox_set = reinterpret_cast<fn>(addr);
 
         if (get_hitbox_set)
-            return reinterpret_cast<HitboxSet_t*>(get_hitbox_set(this, i));
+            return get_hitbox_set(this, i);
 
         return nullptr;
     }
@@ -144,6 +144,23 @@ public:
             return compute_surrounding_box(this, mins, maxs);
 
         return false;
+    }
+
+    int HitboxToWorldTransform(HitboxSet_t* hitbox_set, Transform_t* out_transform)
+    {
+        using fn = int(__thiscall*)(void*, HitboxSet_t*, Transform_t*, int);
+
+        static auto addr = modules::client.pattern_scanner.scan("E8 ? ? ? ? 45 33 F6 4C 63 E0").add(0x1).abs().as();
+
+        if (!addr)
+            return -1;
+
+        const auto hitbox_to_world_transform = reinterpret_cast<fn>(addr);
+
+        if (hitbox_to_world_transform)
+            return hitbox_to_world_transform(this, hitbox_set, out_transform, 1024); //MJ: I wonder what could be this 1024?
+
+        return -1;
     }
 };
 

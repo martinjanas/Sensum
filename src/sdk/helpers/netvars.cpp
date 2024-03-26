@@ -23,14 +23,14 @@ namespace netvars
 
                 for (auto j = 0; j < class_info->m_nFieldSize; j++)
                 {
-                    const auto& field = &class_info->GetFields()[j];
+                    const auto& field = &class_info->m_pFields[j];//&class_info->GetFields()[j];
 
                     if (!field)
                         continue;
 
                     char name_hashed[256];
 
-                    strcpy_s(name_hashed, class_binding->GetName().data());
+                    strcpy_s(name_hashed, class_binding->m_pszName);
                     strcat_s(name_hashed, "->");
                     strcat_s(name_hashed, field->m_pszName);
 
@@ -39,7 +39,7 @@ namespace netvars
                     netvars_data[hash] = field->m_nSingleInheritanceOffset;
 
                     //if (!strstr(class_binding->m_name, "CEntityInstance"));
-                        printf("DEBUG: %s->%s: 0x%p\n", class_binding->m_pszName, field->m_pszName, (uintptr_t)field->m_nSingleInheritanceOffset);
+                        //printf("DEBUG: %s->%s: 0x%p\n", class_binding->m_pszName, field->m_pszName, (uintptr_t)field->m_nSingleInheritanceOffset);
                 }
             }
         }

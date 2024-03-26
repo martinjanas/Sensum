@@ -14,7 +14,7 @@ void __fastcall hooks::frame_stage_notify::hooked(void* a1, int stage)
 		break;
 
 	case FRAME_NET_UPDATE_START:
-		//entity_data::fetch_player_data(); //TODO: Move this later to cmove
+		entity_data::fetch_player_data();
 		break;
 
 	case FRAME_NET_UPDATE_POSTDATAUPDATE_START:

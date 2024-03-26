@@ -236,6 +236,7 @@
     <ClInclude Include="sdk\localplayer.h" />
     <ClInclude Include="sdk\classes\Trace.h" />
     <ClInclude Include="render.h" />
+    <ClInclude Include="ShadowVMT.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\classes\CBaseEntity.cpp">
@@ -348,5 +349,6 @@
     <ClCompile Include="sdk\classes\CCSPlayerPawn.cpp" />
     <ClCompile Include="sdk\classes\Trace.cpp" />
     <ClCompile Include="render.cpp" />
+    <ClCompile Include="ShadowVMT.cpp" />
   </ItemGroup>
 </Project>

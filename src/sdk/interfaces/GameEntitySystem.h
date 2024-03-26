@@ -29,7 +29,7 @@ public:
 			entity = *(uint64_t*)temp_entity;
 		else entity = 0;
 
-		/*if (entity && reinterpret_cast<CBaseEntity*>(entity)->IsBasePlayerController())
+		/*if (entity && reinterpret_cast<CBaseEntity*>(entity)->IsController())
 			printf("entity_index: %d\n", entity_index);*/
 
 		return reinterpret_cast<CBaseEntity*>(entity);

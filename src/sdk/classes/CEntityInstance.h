@@ -14,7 +14,7 @@ public:
     SchemaClassInfoData_t* GetSchemaClassInfo()
     {
         SchemaClassInfoData_t* pClassInfo = nullptr;
-        GetVirtual<void(__thiscall*)(void*, SchemaClassInfoData_t**)>(this, 34)(this, &pClassInfo);
+        GetVirtual<void(__thiscall*)(void*, SchemaClassInfoData_t**)>(this, 36)(this, &pClassInfo);
 
         return pClassInfo;
     }

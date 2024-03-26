@@ -45,23 +45,21 @@ namespace hooks
 
 		back_buffer->Release();
 
-		/*auto ctx = ImGui::CreateContext();
-		ImGui::SetCurrentContext(ctx);
-
+		ImGui::CreateContext();
 		ImGui_ImplWin32_Init(globals::hwnd);
-		ImGui_ImplDX11_Init(device, context);*/
-		//ImGui_ImplDX11_CreateDeviceObjects();
-/*
+		ImGui_ImplDX11_Init(device, context);
+		ImGui_ImplDX11_CreateDeviceObjects();
+
 		ImGuiIO& io = ImGui::GetIO();
 		io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
-		ImGui::GetStyle().WindowMinSize = ImVec2(500, 350);*/ //MJ: Gonna remove this soon probably, because I will be working on menu basics
+		ImGui::GetStyle().WindowMinSize = ImVec2(500, 350); //MJ: Gonna remove this soon probably, because I will be working on menu basics
 
 		//ImGui::GetIO().ImeWindowHandle = globals::hwnd; //Obsolete?
-		//ImGui::GetMainViewport()->PlatformHandleRaw = globals::hwnd;
+		ImGui::GetMainViewport()->PlatformHandleRaw = globals::hwnd;
 
-		//hooks::wndproc::original = reinterpret_cast<WNDPROC>(SetWindowLongPtr(globals::hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(hooks::wndproc::hooked)));
+		hooks::wndproc::original = reinterpret_cast<WNDPROC>(SetWindowLongPtr(globals::hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(hooks::wndproc::hooked)));
 
-		device->Release();
+		//device->Release();
 
 		init_imgui_done = true;
 	}
@@ -120,7 +118,7 @@ namespace hooks
 		if (!init_imgui_done)
 			setup_dx11_and_imgui(swap_chain);
 
-		/*ImGui_ImplDX11_NewFrame();
+		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 
 		ImGui::NewFrame();
@@ -133,10 +131,10 @@ namespace hooks
 			features::esp::render();
 		}
 		ImGui::EndFrame();
-		ImGui::Render();*/
+		ImGui::Render();
 
-		//context->OMSetRenderTargets(1, &rtv, nullptr);
-		//ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+		context->OMSetRenderTargets(1, &rtv, nullptr);
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	}
 
 	long __stdcall directx::present::hooked(IDXGISwapChain* swap_chain, uint32_t sync_interval, uint32_t flags)
