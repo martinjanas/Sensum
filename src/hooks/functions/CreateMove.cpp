@@ -7,7 +7,7 @@
 
 namespace Aimbot
 {
-    std::list<entity_data::player_data_t> m_player_data;
+    static std::list<entity_data::player_data_t> m_player_data;
 
     void Aim()
     {
@@ -47,9 +47,9 @@ namespace Aimbot
     }
 }
 
-bool __fastcall hooks::create_move::hooked(CSGOInput* input, int slot, bool active, std::byte unk)
+bool __fastcall hooks::create_move::hooked(CSGOInput* input, int slot, bool active, std::byte unk) //unk maybe removed?
 {
-    const auto result = original_fn(input, slot, active, unk);
+    auto result = original_fn(input, slot, active, unk);
 
     if (!g::engine_client->IsConnected() || !g::engine_client->IsInGame())
         return result;

@@ -6,7 +6,7 @@ DWORD __stdcall on_attach(void* base)
    /* while (!modules::nav_system.base)
        Sleep(50);*/
     
-    Sleep(5000);
+    //Sleep(5000);
 
     console::attach();
 
@@ -14,7 +14,10 @@ DWORD __stdcall on_attach(void* base)
     sdk::init_interfaces();
 
     netvars::init();
-    hooks::init();
+    if (!hooks::init())
+    {
+        MessageBoxA(NULL, "Something is outdated!", "Error", MB_OK | MB_ICONERROR);
+    }
 
     //MJ: TODO: Implement getting localplayer by sig, probably use dwPlayerController, since every player is controller
     //Also implement team & entity == localplayer check in esp

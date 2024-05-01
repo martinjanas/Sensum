@@ -6,7 +6,7 @@
 
 void add_players(CEntityInstance* instance, CHandle handle)
 {
-    if (!instance || !instance->IsController())
+    if (!instance || !instance->IsController()) //CCSPlayerController inherits from CBasePlayerController, which inherits from C_BaseEntity
         return;
 
     bool exists = std::any_of(entity_data::player_instances.begin(), entity_data::player_instances.end(), [&](const entity_data::instance_t& e) { return e.handle.GetEntryIndex() == handle.GetEntryIndex(); });

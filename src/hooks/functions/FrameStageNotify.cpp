@@ -6,10 +6,12 @@
 #include "../../sdk/helpers/entity_data.h"
 
 
-void __fastcall hooks::frame_stage_notify::hooked(void* a1, int stage)
+void __fastcall hooks::frame_stage_notify::hooked(void* a1, EClientFrameStage stage)
 {
-	switch (stage) 
+	switch (stage)
 	{
+
+		//printf("%s", "fsn is running\n");
 	case FRAME_START:
 		break;
 
@@ -36,4 +38,5 @@ void __fastcall hooks::frame_stage_notify::hooked(void* a1, int stage)
 	}
 
 	original_fn(a1, stage);
+	;
 }

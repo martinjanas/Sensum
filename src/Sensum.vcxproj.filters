@@ -75,22 +75,7 @@
     <ClInclude Include="sdk\helpers\console.h">
       <Filter>sdk\helpers</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\helpers\CUtlMap.h">
-      <Filter>sdk\helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\helpers\CUtlMemory.h">
-      <Filter>sdk\helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\helpers\CUtlString.h">
-      <Filter>sdk\helpers</Filter>
-    </ClInclude>
     <ClInclude Include="sdk\helpers\CUtlSymbolLarge.hpp">
-      <Filter>sdk\helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\helpers\CUtlTSHash.h">
-      <Filter>sdk\helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\helpers\CUtlVector.h">
       <Filter>sdk\helpers</Filter>
     </ClInclude>
     <ClInclude Include="sdk\helpers\dynamic_module.h">
@@ -237,6 +222,19 @@
     <ClInclude Include="sdk\classes\Trace.h" />
     <ClInclude Include="render.h" />
     <ClInclude Include="ShadowVMT.h" />
+    <ClInclude Include="sdk\helpers\CBufferString.h" />
+    <ClInclude Include="sdk\helpers\CInterlockedInt.h" />
+    <ClInclude Include="sdk\helpers\CThreadMutex.h" />
+    <ClInclude Include="sdk\helpers\CThreadSpinMutex.h" />
+    <ClInclude Include="sdk\helpers\CThreadSpinRWLock.h" />
+    <ClInclude Include="sdk\helpers\CTSList.h" />
+    <ClInclude Include="sdk\helpers\CUtlMap.h" />
+    <ClInclude Include="sdk\helpers\CUtlMemory.h" />
+    <ClInclude Include="sdk\helpers\CUtlMemoryPoolBase.h" />
+    <ClInclude Include="sdk\helpers\CUtlRBTree.h" />
+    <ClInclude Include="sdk\helpers\CUtlString.h" />
+    <ClInclude Include="sdk\helpers\CUtlTSHash.h" />
+    <ClInclude Include="sdk\helpers\CUtlVector.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\classes\CBaseEntity.cpp">
@@ -249,9 +247,6 @@
       <Filter>sdk\helpers</Filter>
     </ClCompile>
     <ClCompile Include="sdk\helpers\dynamic_module.cpp">
-      <Filter>sdk\helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="sdk\helpers\CUtlVector.cpp">
       <Filter>sdk\helpers</Filter>
     </ClCompile>
     <ClCompile Include="sdk\helpers\console.cpp">
@@ -280,12 +275,6 @@
     </ClCompile>
     <ClCompile Include="hooks\hooks.cpp">
       <Filter>hooks</Filter>
-    </ClCompile>
-    <ClCompile Include="sdk\helpers\CUtlMap.cpp">
-      <Filter>sdk\helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="sdk\helpers\CUtlMemory.cpp">
-      <Filter>sdk\helpers</Filter>
     </ClCompile>
     <ClCompile Include="sdk\math\Vector.cpp">
       <Filter>sdk\math</Filter>
@@ -350,5 +339,6 @@
     <ClCompile Include="sdk\classes\Trace.cpp" />
     <ClCompile Include="render.cpp" />
     <ClCompile Include="ShadowVMT.cpp" />
+    <ClCompile Include="sdk\helpers\CUtlVector.cpp" />
   </ItemGroup>
 </Project>

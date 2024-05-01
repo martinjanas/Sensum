@@ -34,22 +34,7 @@ class CBaseAnimating
 {
 public:
 
-    HitboxSet_t* GetHitboxSet(int i)
-    {
-        using fn = HitboxSet_t*(__thiscall*)(void*, int);
-
-        static auto addr = modules::client.pattern_scanner.scan("E8 ? ? ? ? 48 85 C0 0F 85 ? ? ? ? 44 8D 48 07").add(0x1).abs().as();
-
-        if (!addr)
-            return nullptr;
-
-        const auto get_hitbox_set = reinterpret_cast<fn>(addr);
-
-        if (get_hitbox_set)
-            return get_hitbox_set(this, i);
-
-        return nullptr;
-    }
+    
 
     /*uint32_t HitboxToWorldTransform(const HitboxSet_t* hitbox_set, mat3x4_t hitbox_to_world, int size)
     {
@@ -126,10 +111,27 @@ public:
 
     CBaseAnimating* GetBaseAnimating()
     {
-        return GetVirtual<CBaseAnimating*(__thiscall*)(void*)>(this, 44)(this);
+        return GetVirtual<CBaseAnimating * (__thiscall*)(void*)>(this, 44)(this);
     }
 
-    bool ComputeSurroundingBox(Vector* mins, Vector* maxs)
+    HitboxSet_t* GetHitboxSet(int i) //Crashing
+    {
+        using fn = HitboxSet_t * (__thiscall*)(void*, int);
+
+        static auto addr = modules::client.pattern_scanner.scan("E8 ? ? ? ? 48 85 C0 0F 85 ? ? ? ? 44 8D 48 07").add(0x1).abs().as();
+
+        if (!addr)
+            return nullptr;
+
+        const auto get_hitbox_set = reinterpret_cast<fn>(addr);
+
+        if (get_hitbox_set)
+            return get_hitbox_set(this, i);
+
+        return nullptr;
+    }
+
+    bool ComputeSurroundingBox(Vector* mins, Vector* maxs) //Crashing?
     {
         using fn = bool(__thiscall*)(void*, Vector*, Vector*);
 
@@ -146,7 +148,7 @@ public:
         return false;
     }
 
-    int HitboxToWorldTransform(HitboxSet_t* hitbox_set, Transform_t* out_transform)
+    int HitboxToWorldTransform(HitboxSet_t* hitbox_set, Transform_t* out_transform) //Crashing?
     {
         using fn = int(__thiscall*)(void*, HitboxSet_t*, Transform_t*, int);
 

@@ -2,15 +2,27 @@
 // See end of file for extended copyright information.
 #pragma once
 
-class CUtlString {
-public:
-    [[nodiscard]] const char* Get() const {
-        return reinterpret_cast<const char*>(m_Memory.m_pMemory);
-    }
+#include <cstddef>
 
-    CUtlMemory<std::uint8_t> m_Memory;
-    int m_nActualLength;
+#ifdef _WIN32
+typedef std::uint32_t ThreadId_t;
+#else
+typedef std::uint64_t ThreadId_t;
+#endif
+
+constexpr auto kTtSizeofCriticalsection = 40;
+
+class CThreadMutex {
+public:
+    std::byte m_CriticalSection[kTtSizeofCriticalsection];
+
+    // Debugging (always herge to allow mixed debug/release builds w/o changing size)
+    ThreadId_t m_currentOwnerID;
+    std::uint16_t m_lockCount;
+    bool m_bTrace;
+    const char* m_pDebugName;
 };
+static_assert(sizeof(CThreadMutex) == 0x38);
 
 // source2gen - Source2 games SDK generator
 // Copyright 2023 neverlosecc

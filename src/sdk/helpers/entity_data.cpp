@@ -110,12 +110,7 @@ namespace entity_data
 
 	bool GetBBoxByHitbox(CCSPlayerPawn* pawn, ABBox_t& out)
 	{
-		auto base_animating = pawn->GetBaseAnimating();
-
-		if (!base_animating)
-			return false;
-
-		auto hitbox_set = base_animating->GetHitboxSet(0);
+		auto hitbox_set = pawn->GetHitboxSet(0);
 
 		if (!hitbox_set)
 			return false;
@@ -132,11 +127,7 @@ namespace entity_data
 		if (pawn == localplayer_pawn)
 			return;
 
-		auto base_animating = pawn->GetBaseAnimating();
-		if (!base_animating)
-			return;
-
-		HitboxSet_t* hitbox_set = base_animating->GetHitboxSet(0);
+		HitboxSet_t* hitbox_set = pawn->GetHitboxSet(0);
 
 		if (!hitbox_set)
 			return;
@@ -193,37 +184,36 @@ namespace entity_data
 		if (pawn == localplayer_pawn)
 			return;
 
-		auto base_animating = pawn->GetBaseAnimating();
-		if (!base_animating)
-			return;
-
-		HitboxSet_t* hitbox_set = base_animating->GetHitboxSet(0);
+		HitboxSet_t* hitbox_set = pawn->GetHitboxSet(0);
 
 		if (!hitbox_set)
 			return;
 
 		Transform_t hitbox_trans[65];
 
-		pawn->HitboxToWorldTransform(hitbox_set, hitbox_trans);
+		int hitbox_count = pawn->HitboxToWorldTransform(hitbox_set, hitbox_trans);
+
+		if (!hitbox_count)
+			return;
 		
 		Hitbox_t* hitbox = &hitbox_set->m_HitBoxes()[0];
 
 		if (!hitbox)
 			return;
 
-		if (hitbox->m_nHitBoxIndex() == 0)
-		{
-			Vector mins = hitbox->m_vMinBounds();
-			Vector maxs = hitbox->m_vMaxBounds();
+		if (hitbox->m_nHitBoxIndex() != 0)
+			return;
 
-			Vector center = (mins + maxs) * 0.5f;
+		Vector mins = hitbox->m_vMinBounds();
+		Vector maxs = hitbox->m_vMaxBounds();
 
-			Vector hitbox_pos = (hitbox_trans->m_pos - center);
-			vector2angles(hitbox_pos - eye_pos, out);
-			out.ClampNormalize();
+		Vector center = (mins + maxs) * 0.5f;
 
-			printf("hitbox_pos: %s, pawn_eyepos: %s\n", hitbox_pos.ToString().c_str(), pawn->GetEyePos().ToString().c_str());
-		}
+		Vector hitbox_pos = (center + hitbox_trans->m_pos); 
+		vector2angles(hitbox_pos - eye_pos, out);
+		out.ClampNormalize();
+
+		printf("out: %1.f, %1.f\n", out.pitch, out.yaw);
 	}
 
 	void fetch_player_data()
@@ -231,13 +221,9 @@ namespace entity_data
 		if (!g::engine_client->IsInGame())
 			return;
 
-		if (player_instances.empty())
-			return;
-
 		std::lock_guard<std::mutex> lock(locker);
 
 		entry_data_t entry_data;
-		
 		for (const auto& instance : player_instances) //TODO: Refactor this in the future
 		{
 			auto entity = instance.entity;

@@ -1,11 +1,11 @@
 #pragma once
 
+#include <cassert>
+
 template <class T>
-class CUtlVector 
-{
+class CUtlVector {
 public:
-    CUtlVector() 
-    {
+    CUtlVector() {
         m_Size = 0;
         m_pElements = nullptr;
     }
@@ -13,13 +13,11 @@ public:
     T& Element(int i);
     const T& Element(int i) const;
 
-    T& operator[](int i) 
-    {
+    T& operator[](int i) {
         return m_pElements[i];
     }
 
-    [[nodiscard]] int Count() const 
-    {
+    [[nodiscard]] int Count() const {
         return m_Size;
     }
 
@@ -53,5 +51,4 @@ public:
     // Finds an element (element needs operator== defined)
     int GetOffset(const T& src) const;
 };
-
 

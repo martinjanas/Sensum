@@ -22,7 +22,7 @@ public:
 	IDXGISwapChain* swap_chain;
 };
 
-namespace interfaces
+namespace interfaces //move to interfaces.h ?
 {
 	extern IVEngineClient* engine_client;
 	extern CSource2Client* client;

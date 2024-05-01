@@ -1,16 +1,21 @@
 // Copyright (C) 2023 neverlosecc
 // See end of file for extended copyright information.
 #pragma once
+#include <cstdint>
 
-class CUtlString {
+class CThreadSpinRWLock {
 public:
-    [[nodiscard]] const char* Get() const {
-        return reinterpret_cast<const char*>(m_Memory.m_pMemory);
-    }
+    struct LockInfo_t {
+        std::uint32_t m_writerId;
+        std::int32_t m_nReaders;
+    };
 
-    CUtlMemory<std::uint8_t> m_Memory;
-    int m_nActualLength;
+public:
+    void* m_pThreadSpin;
+    LockInfo_t m_lockInfo;
+    const char* m_pszDebugName;
 };
+static_assert(sizeof(CThreadSpinRWLock) == 0x18);
 
 // source2gen - Source2 games SDK generator
 // Copyright 2023 neverlosecc

@@ -9,11 +9,11 @@ class CSource2Client
 public:
 	void GetViewAngles(int slot, QAngle* vec)
 	{
-		GetVirtual<void(__thiscall*)(void*, int, QAngle*)>(this, 72)(this, slot, vec);
+		GetVirtual<void(__thiscall*)(void*, int, QAngle*)>(this, 74)(this, slot, vec);
 	}
 
 	void SetViewAngles(int slot, const QAngle& vec)
 	{
-		GetVirtual<void(__thiscall*)(void*, int, const QAngle&)>(this, 73)(this, slot, vec);
+		GetVirtual<void(__thiscall*)(void*, int, const QAngle&)>(this, 75)(this, slot, vec);
 	}
 };

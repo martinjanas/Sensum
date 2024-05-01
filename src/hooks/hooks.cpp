@@ -13,13 +13,16 @@ bool hooks::init()
 	if (MH_CreateHookVirtual(g::entity_system, on_remove_entity::index, &on_remove_entity::hooked, reinterpret_cast<void**>(&on_remove_entity::original_fn)) != MH_STATUS::MH_OK)
 		return false;
 	
+	//CMove - outdated
 	if (MH_CreateHookVirtual(g::csgo_input, create_move::index, &create_move::hooked, reinterpret_cast<void**>(&create_move::original_fn)) != MH_STATUS::MH_OK)
 		return false;
+		
+
 	//MJ: Update FSN
-	if (MH_CreateHookVirtual(g::client, 33, &frame_stage_notify::hooked, reinterpret_cast<void**>(&frame_stage_notify::original_fn)) != MH_STATUS::MH_OK)
+	if (MH_CreateHookVirtual(g::client, 35, &frame_stage_notify::hooked, reinterpret_cast<void**>(&frame_stage_notify::original_fn)) != MH_STATUS::MH_OK)
 		return false;
 
-	/*if (MH_CreateHook(modules::client.pattern_scanner.scan("48 89 5C 24 ? 56 48 83 EC ? 8B 05 ? ? ? ? 8D 5A").as(), &frame_stage_notify::hooked, reinterpret_cast<void**>(&frame_stage_notify::original_fn)) != MH_STATUS::MH_OK)
+	/*if (MH_CreateHook(modules::client.pattern_scanner.scan("48 89 5C 24 10 56 48 83 EC 30 8B 05").as(), &frame_stage_notify::hooked, reinterpret_cast<void**>(&frame_stage_notify::original_fn)) != MH_STATUS::MH_OK)
 		return false;*/
 
 	if (MH_CreateHook(modules::client.pattern_scanner.scan("E8 ? ? ? ? F3 0F 11 45 ? 48 8B 5C 24 ?").add(0x1).abs().as(), &get_fov::hooked, reinterpret_cast<void**>(&get_fov::original_fn)) != MH_STATUS::MH_OK)
@@ -93,7 +96,7 @@ float __fastcall hooks::get_fov::hooked(void* camera)
 
 void get_viewmatrix(VMatrix* world_to_projection)
 {
-	if (!entity_data::view_matrix::matrix)
+	if (!entity_data::view_matrix::matrix) //entity_data::view_matrix::matrix - Simplífy?
 		entity_data::view_matrix::matrix = world_to_projection;
 }
 

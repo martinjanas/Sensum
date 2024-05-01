@@ -50,7 +50,8 @@ public:
 
 	PatternScanner& add(const uintptr_t& offset)
 	{
-		this->addr += offset;
+		if (this->addr) //Questionable
+			this->addr += offset;
 
 		return *this;
 	}
@@ -59,7 +60,7 @@ public:
 	T* as()
 	{
 		if (!addr)
-			return {};
+			return nullptr;
 
 		return reinterpret_cast<T*>(addr);
 	}

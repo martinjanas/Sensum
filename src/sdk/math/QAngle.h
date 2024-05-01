@@ -52,11 +52,11 @@ public:
 		}
 	}
 
-	void Clamp()
+	/*void Clamp()
 	{
 		pitch = std::clamp(pitch, -89.0f, 89.0f);
 		yaw = std::clamp(yaw, -180.0f, 180.0f);
-		roll = std::clamp(roll, 0.0f, 0.0f);  // Roll clamped to 0, as per your specification
+		roll = std::clamp(roll, 0.0f, 0.0f); 
 	}
 
 	void Normalize()
@@ -75,6 +75,52 @@ public:
 	{
 		this->Normalize();
 		this->Clamp();
+	}*/
+
+	void Normalize()
+	{
+		QAngle angles = *this;
+
+		for (auto i = 0; i < 3; i++)
+		{
+			while (angles[i] < -180.0f)
+				angles[i] += 360.0f;
+
+			while (angles[i] > 180.0f)
+				angles[i] -= 360.0f;
+		}
+
+		*this = angles;
+	}
+
+	void Clamp()
+	{
+		QAngle angle = *this;
+
+		if (!std::isfinite(angle.pitch))
+			angle.pitch = 0.f;
+
+		if (!std::isfinite(angle.yaw))
+			angle.yaw = 0.f;
+
+		if (!std::isfinite(angle.roll))
+			angle.roll = 0.f;
+
+		angle.pitch = std::clamp(angle.pitch, -89.f, 89.f);
+		angle.yaw = std::clamp(std::remainder(angle.yaw, 360.f), -180.f, 180.f);
+		angle.roll = 0.f;
+
+		*this = angle;
+	}
+
+	void ClampNormalize()
+	{
+		QAngle angles = *this;
+
+		angles.Normalize();
+		angles.Clamp();
+
+		*this = angles;
 	}
 };
 

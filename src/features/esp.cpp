@@ -1,4 +1,20 @@
 #include "features.h"
+#include <DirectXMath.h>
+
+#define DEG2RAD(x) ((x) * static_cast<float>(3.14159265358979323846) / 180.0f)
+
+void angle2vectors2(const QAngle& angles, Vector& forward)
+{
+	float	sp, sy, cp, cy;
+
+	DirectX::XMScalarSinCos(&sp, &cp, DEG2RAD(angles[0]));
+	DirectX::XMScalarSinCos(&sy, &cy, DEG2RAD(angles[1]));
+
+	forward.x = cp * cy;
+	forward.y = cp * sy;
+	forward.z = -sp;
+}
+
 
 namespace features::esp
 {
@@ -54,6 +70,8 @@ namespace features::esp
 		static Vector head_pos_out;
 		static Vector player_pos_out;
 		static Vector origin_out;
+		static Vector aimpos_out;
+		static Vector aimpos;
 	
 		for (auto& data : m_player_data)
 		{
@@ -73,6 +91,13 @@ namespace features::esp
 			if (settings::visuals::m_bBoxEsp)
 				globals::draw_list->AddRect(data.abbox.m_Mins.AsVec2(), data.abbox.m_Maxs.AsVec2(), IM_COL32(255, 0, 0, 255), 1.f, 15, 1.5f);
 			
+			angle2vectors2(data.aimpos, aimpos);
+
+			if (globals::world2screen(aimpos, aimpos_out))
+			{
+				globals::draw_list->AddCircle({ aimpos_out.x, aimpos_out.y }, 5.f, IM_COL32(255, 0, 0, 255));
+			}
+
 			//Draw3DBox(data.abbox);
 
 			esp::bone_esp(data);
