@@ -66,40 +66,40 @@ namespace hooks
 
 	long __stdcall directx::resize_buffers::hooked(IDXGISwapChain* swap_chain, uint32_t buffer_count, uint32_t width, uint32_t height, DXGI_FORMAT new_format, uint32_t swap_chain_flags)
 	{
-		//ImGui::CreateContext();
+		/*ImGui::CreateContext();
 
-		//if (FAILED(swap_chain->GetDevice(__uuidof(ID3D11Device), reinterpret_cast<void**>(&device))))
-		//	return S_FALSE;
+		if (FAILED(swap_chain->GetDevice(__uuidof(ID3D11Device), reinterpret_cast<void**>(&device))))
+			return S_FALSE;
 
-		//device->GetImmediateContext(&context);
+		device->GetImmediateContext(&context);
 
-		//swap_chain->GetDesc(&swap_desc);
+		swap_chain->GetDesc(&swap_desc);
 
-		//globals::hwnd = swap_desc.OutputWindow;
-		//globals::width = swap_desc.BufferDesc.Width;
-		//globals::height = swap_desc.BufferDesc.Height;
+		globals::hwnd = swap_desc.OutputWindow;
+		globals::width = swap_desc.BufferDesc.Width;
+		globals::height = swap_desc.BufferDesc.Height;
 
-		///*ImGui_ImplWin32_Init(globals::hwnd);
-		//ImGui_ImplDX11_Init(device, context);
-		//ImGui_ImplDX11_CreateDeviceObjects();*/
+		ImGui_ImplWin32_Init(globals::hwnd);
+		ImGui_ImplDX11_Init(device, context);
+		ImGui_ImplDX11_CreateDeviceObjects();
 
-		//ID3D11Texture2D* back_buffer{};
+		ID3D11Texture2D* back_buffer{};
 
-		//if (FAILED(swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&back_buffer))))
-		//	return S_FALSE;
+		if (FAILED(swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&back_buffer))))
+			return S_FALSE;
 
-		//rtv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		//rtv_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+		rtv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		rtv_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 
-		//if (FAILED(device->CreateRenderTargetView(back_buffer, &rtv_desc, &rtv)))
-		//	return S_FALSE;
-		//		
-		//back_buffer->Release();
+		if (FAILED(device->CreateRenderTargetView(back_buffer, &rtv_desc, &rtv)))
+			return S_FALSE;
+				
+		back_buffer->Release();
 
-		//context->OMSetRenderTargets(1, &rtv, nullptr);
+		context->OMSetRenderTargets(1, &rtv, nullptr);
 
-		//context->Release();
-		//device->Release();
+		context->Release();
+		device->Release();*/
 
 		return original_fn(swap_chain, buffer_count, width, height, new_format, swap_chain_flags);
 	}

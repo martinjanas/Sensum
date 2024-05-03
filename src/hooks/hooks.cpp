@@ -12,8 +12,7 @@ bool hooks::init()
 
 	if (MH_CreateHookVirtual(g::entity_system, on_remove_entity::index, &on_remove_entity::hooked, reinterpret_cast<void**>(&on_remove_entity::original_fn)) != MH_STATUS::MH_OK)
 		return false;
-	
-	//CMove - outdated
+
 	if (MH_CreateHookVirtual(g::csgo_input, create_move::index, &create_move::hooked, reinterpret_cast<void**>(&create_move::original_fn)) != MH_STATUS::MH_OK)
 		return false;
 		

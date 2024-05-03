@@ -10,8 +10,6 @@ void __fastcall hooks::frame_stage_notify::hooked(void* a1, EClientFrameStage st
 {
 	switch (stage)
 	{
-
-		//printf("%s", "fsn is running\n");
 	case FRAME_START:
 		break;
 
@@ -38,5 +36,4 @@ void __fastcall hooks::frame_stage_notify::hooked(void* a1, EClientFrameStage st
 	}
 
 	original_fn(a1, stage);
-	;
 }

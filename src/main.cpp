@@ -14,10 +14,7 @@ DWORD __stdcall on_attach(void* base)
     sdk::init_interfaces();
 
     netvars::init();
-    if (!hooks::init())
-    {
-        MessageBoxA(NULL, "Something is outdated!", "Error", MB_OK | MB_ICONERROR);
-    }
+    hooks::init();
 
     //MJ: TODO: Implement getting localplayer by sig, probably use dwPlayerController, since every player is controller
     //Also implement team & entity == localplayer check in esp

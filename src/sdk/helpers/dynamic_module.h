@@ -6,7 +6,11 @@
 #include <cstdint>
 #include <map>
 #include <vector>
+#include <stdexcept>
+#include <format>
 #include "../helpers/importer.h"
+
+#pragma warning(disable:26495)
 
 using fn = void* (__cdecl*)();
 
@@ -39,18 +43,30 @@ public:
 		return *this;
 	}
 
+	PatternScanner& scan(const char* signature, const char* sig_name)
+	{
+		this->addr = pattern_scan(signature);
+
+		if (!this->addr)
+		{
+			printf_s("PatternScanner: %s not found\n", sig_name);
+		}
+
+		return *this;
+	}
+
 	PatternScanner& abs()
 	{
 		const int relative = *reinterpret_cast<int*>(this->addr);
 
-		this->addr += relative + sizeof(int);
+		this->addr += relative + sizeof(relative);
 
 		return *this;
 	}
 
 	PatternScanner& add(const uintptr_t& offset)
 	{
-		if (this->addr) //Questionable
+		if (this->addr)
 			this->addr += offset;
 
 		return *this;
@@ -123,24 +139,15 @@ private:
 	const char* pattern;
 	HMODULE base;
 	uint8_t* addr;
+	//std::optional<uint8_t*> addr;
 };
 
 class DynamicModule
 {
 public:
-	std::map<std::string, HMODULE> modules = {};
-
-	HMODULE get_module(const std::string& name)
-	{
-		if (modules.count(name) == 0 || !modules[name])
-			modules[name] = LI_FN(GetModuleHandleA).cached()(name.c_str());
-
-		return modules[name];
-	}
-
 	DynamicModule(const std::string_view& dll_name)
 	{
-		this->base = get_module(dll_name.data());
+		this->base = LI_FN(GetModuleHandleA).cached()(dll_name.data());
 		this->base_addr = reinterpret_cast<uintptr_t>(this->base);
 		this->dll_name = dll_name.data();
 
@@ -154,7 +161,7 @@ public:
 
 	~DynamicModule()
 	{
-		//FreeLibrary(dll);
+		//FreeLibrary(this->base);
 	}
 
 	void* GetExport(const std::string_view& func_name)
@@ -251,7 +258,7 @@ public:
 	HMODULE base;
 	uintptr_t base_addr;
 	const char* dll_name;
-	PatternScanner pattern_scanner{};
+	PatternScanner pattern_scanner;
 };
 
 

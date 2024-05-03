@@ -213,7 +213,7 @@ namespace entity_data
 		vector2angles(hitbox_pos - eye_pos, out);
 		out.ClampNormalize();
 
-		printf("out: %1.f, %1.f\n", out.pitch, out.yaw);
+		//printf("out: %1.f, %1.f\n", out.pitch, out.yaw);
 	}
 
 	void fetch_player_data()
@@ -307,7 +307,7 @@ namespace entity_data
 
 			GetBBox(scene_node, collision, player_data.abbox);
 
-			hitbox(eye_pos, pawn, localplayer_pawn, player_data.aimpos);
+			//hitbox(eye_pos, pawn, localplayer_pawn, player_data.aimpos);
 
 			entry_data.player_data.push_back(std::move(player_data));
 		}

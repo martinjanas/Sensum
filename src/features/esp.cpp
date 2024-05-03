@@ -57,32 +57,31 @@ namespace features::esp
 		if (!g::engine_client->IsInGame())
 			return;
 
-		if (entity_data::player_entry_data.empty())
-			return;
-
 		if (entity_data::locker.try_lock())
 		{
 			m_player_data.clear();
-			std::copy(entity_data::player_entry_data.front().player_data.begin(), entity_data::player_entry_data.front().player_data.end(), std::back_inserter(m_player_data));
+
+			if (!entity_data::player_entry_data.empty())
+				std::copy(entity_data::player_entry_data.front().player_data.begin(), entity_data::player_entry_data.front().player_data.end(), std::back_inserter(m_player_data));
+			
 			entity_data::locker.unlock();
 		}
 
 		static Vector head_pos_out;
-		static Vector player_pos_out;
 		static Vector origin_out;
-		static Vector aimpos_out;
-		static Vector aimpos;
-	
+
+		/*if (m_player_data.empty())
+			return;*/
+
 		for (auto& data : m_player_data)
 		{
 			if (data.index == 0)
 				continue;
 			
-			Vector head_pos = data.m_vOldOrigin;
+			Vector head_pos = data.m_vecOrigin;
 			head_pos.z += 75.f;
 
 			bool got_origin = globals::world2screen(data.m_vecOrigin, origin_out);
-			bool got_old_origin = globals::world2screen(data.m_vOldOrigin, player_pos_out);
 			bool got_head_pos = globals::world2screen(head_pos, head_pos_out);
 
 			if (got_origin && got_head_pos)
@@ -91,20 +90,9 @@ namespace features::esp
 			if (settings::visuals::m_bBoxEsp)
 				globals::draw_list->AddRect(data.abbox.m_Mins.AsVec2(), data.abbox.m_Maxs.AsVec2(), IM_COL32(255, 0, 0, 255), 1.f, 15, 1.5f);
 			
-			angle2vectors2(data.aimpos, aimpos);
-
-			if (globals::world2screen(aimpos, aimpos_out))
-			{
-				globals::draw_list->AddCircle({ aimpos_out.x, aimpos_out.y }, 5.f, IM_COL32(255, 0, 0, 255));
-			}
-
-			//Draw3DBox(data.abbox);
+			Draw3DBox(data.abbox);
 
 			esp::bone_esp(data);
-			//TODO: draw nodeToWorld->pos
-			/*static Vector m_pos_out;
-			if (data.scene_node && globals::world2screen(data.scene_node->m_nodeToWorld().m_pos, m_pos_out))
-				globals::draw_list->AddCircleFilled(m_pos_out.AsVec2(), 2.f, IM_COL32_WHITE);*/
 		}
 	}
 
@@ -119,10 +107,10 @@ namespace features::esp
 		if (!data.model.IsValid())
 			return;
 
-		static Vector bone_pos_out;
-		static Vector bone_parent_pos_out;
+		Vector bone_pos_out;
+		Vector bone_parent_pos_out;
 
-		for (int i = 0; i <= data.model->BoneCount; ++i)
+		for (int i = 0; i < data.model->BoneCount; ++i)
 		{
 			const auto flag = data.model->GetBoneFlags(i);
 
@@ -140,22 +128,12 @@ namespace features::esp
 			bool got_bones = globals::world2screen(in_child, bone_pos_out);
 			bool got_parents = globals::world2screen(in_parent, bone_parent_pos_out);
 
+			auto p_out_v2 = bone_pos_out.AsVec2();
+			auto bp_p_out_v2 = bone_parent_pos_out.AsVec2();
+
 			if (got_bones && got_parents)
-				globals::draw_list->AddLine(bone_pos_out.AsVec2(), bone_parent_pos_out.AsVec2(), ImColor(settings::visuals::m_fBoneColor.x, settings::visuals::m_fBoneColor.y, settings::visuals::m_fBoneColor.z, settings::visuals::m_fBoneColor.w));
+				globals::draw_list->AddLine(p_out_v2, bp_p_out_v2, ImColor(settings::visuals::m_fBoneColor.x, settings::visuals::m_fBoneColor.y, settings::visuals::m_fBoneColor.z, settings::visuals::m_fBoneColor.w));
 		}
-	}
-
-	void box_esp(const Vector& head_pos_out, const Vector& player_pos_out)
-	{
-		if (!settings::visuals::m_bBoxEsp)
-			return;
-
-		float height = player_pos_out.y - head_pos_out.y;
-		float width = height * 2.5f;
-
-		width /= 10.f;
-
-		globals::draw_list->AddRect(ImVec2(head_pos_out.x - width, head_pos_out.y), ImVec2(head_pos_out.x + width, player_pos_out.y), ImColor(settings::visuals::m_fBoxColor.x, settings::visuals::m_fBoxColor.y, settings::visuals::m_fBoxColor.z, settings::visuals::m_fBoxColor.w));
 	}
 
 	void name_esp(entity_data::player_data_t& data, const Vector& origin_out, const Vector& screen_head_pos)

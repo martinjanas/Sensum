@@ -83,7 +83,10 @@ public:
 
 	ImVec2 AsVec2()
 	{
-		return ImVec2(this->x, this->y);
+		if (this->x && this->y)
+			return ImVec2(this->x, this->y);
+
+		return ImVec2(0.f, 0.f);
 	}
 
 	Vector operator+(const Vector& other)
