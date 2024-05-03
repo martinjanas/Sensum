@@ -5,6 +5,8 @@
 #include "../../sdk/classes/CCSPlayerController.h"
 #include "../../sdk/helpers/entity_data.h"
 
+#include "../../sdk/math/math.h"
+
 namespace Aimbot
 {
     static std::list<entity_data::player_data_t> m_player_data;
@@ -23,6 +25,9 @@ namespace Aimbot
             std::copy(entity_data::player_entry_data.front().player_data.begin(), entity_data::player_entry_data.front().player_data.end(), std::back_inserter(m_player_data));
             entity_data::locker.unlock();
         }
+        
+        QAngle viewangles;
+        g::client->GetViewAngles(0, &viewangles);
 
         for (auto& data : m_player_data)
         {
@@ -32,16 +37,29 @@ namespace Aimbot
             if (data.m_iHealth <= 0)
                 continue;
 
-            QAngle viewangles;
-            g::client->GetViewAngles(0, &viewangles);
+            if (entity_data::hitbox_info.empty())
+                continue;
 
-            /*auto delta_x = viewangles.pitch - data.aimpos.pitch;
-            auto delta_y = viewangles.yaw - data.aimpos.yaw;
+            const auto& eye_pos = data.localplayer_pawn->GetEyePos();
 
-            float fov = std::hypotf(delta_x, delta_y);*/
+            for (auto& hitboxes : entity_data::hitbox_info) //Redo the hitbox_info_t struct - replace hitbox_pos with Hitbox_t* ?
+            {
+                auto& hitbox_pos = hitboxes.hitbox_pos;
 
-            if (GetAsyncKeyState(VK_LBUTTON)) //&& (fov < 3.f)
-                g::client->SetViewAngles(0, data.aimpos);
+                QAngle target_angle;
+                math::vector2angles(hitbox_pos - eye_pos, target_angle);
+                target_angle.ClampNormalize();
+
+                auto delta_x = viewangles.pitch - target_angle.pitch;
+                auto delta_y = viewangles.yaw - target_angle.yaw;
+
+                float fov = std::hypotf(delta_x, delta_y);
+
+                if (GetAsyncKeyState(VK_LBUTTON) && (fov < 5.f))
+                    g::client->SetViewAngles(0, target_angle);
+
+                entity_data::hitbox_info.clear();
+            }
         }
 
     }

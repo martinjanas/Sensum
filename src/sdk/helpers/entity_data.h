@@ -1,6 +1,7 @@
 #pragma once
 #include <list>
 #include <mutex>
+#include <vector>
 #include "../classes/CCSPlayerController.h"
 #include "../classes/CCSPlayerPawn.h"
 #include "../helpers/BBox_t.h"
@@ -24,6 +25,7 @@ namespace entity_data
 		QAngle aimpos;
 		BBox_t head_bbox;
 		CCSPlayerPawn* pawn;
+		CCSPlayerPawn* localplayer_pawn;
 		ABBox_t abbox;
 	};
 
@@ -37,6 +39,13 @@ namespace entity_data
 		CEntityInstance* entity;
 		CHandle handle;
 	};
+
+	struct hitbox_info_t
+	{
+		Vector hitbox_pos;
+	};
+
+	extern std::vector<hitbox_info_t> hitbox_info;
 
 	extern std::list<instance_t> player_instances;
 	extern std::list<instance_t> entity_instances;

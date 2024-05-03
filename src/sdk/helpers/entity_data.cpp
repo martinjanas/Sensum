@@ -1,10 +1,7 @@
 #include "entity_data.h"
 #include "../helpers/Hitbox_t.h"
 #include "../helpers/globals.h"
-#include <DirectXMath.h>
 #include "../../thirdparty/ImGui/imgui_internal.h"
-
-#define DEG2RAD(x) ((x) * static_cast<float>(3.14159265358979323846) / 180.0f)
 
 CCSPlayerController* GetLocalPlayerController()
 {
@@ -21,50 +18,13 @@ CCSPlayerController* GetLocalPlayerController()
 	return nullptr;
 }
 
-void vector2angles(const Vector& forward, QAngle& angles)
-{
-	float yaw, pitch;
-
-	if (forward[1] == 0 && forward[0] == 0) {
-		yaw = 0;
-		if (forward[2] > 0)
-			pitch = 270;
-		else
-			pitch = 90;
-	}
-	else {
-		yaw = (atan2(forward[1], forward[0]) * 180 / 3.141592654f);
-		if (yaw < 0)
-			yaw += 360;
-
-		const auto tmp = sqrt(forward[0] * forward[0] + forward[1] * forward[1]);
-		pitch = (atan2(-forward[2], tmp) * 180 / 3.141592654f);
-		if (pitch < 0)
-			pitch += 360;
-	}
-
-	angles[0] = pitch;
-	angles[1] = yaw;
-	angles[2] = 0;
-}
-
-void angle2vectors(const QAngle& angles, Vector& forward)
-{
-	float	sp, sy, cp, cy;
-
-	DirectX::XMScalarSinCos(&sp, &cp, DEG2RAD(angles[0]));
-	DirectX::XMScalarSinCos(&sy, &cy, DEG2RAD(angles[1]));
-
-	forward.x = cp * cy;
-	forward.y = cp * sy;
-	forward.z = -sp;
-}
-
 namespace entity_data
 {
 	std::list<instance_t> player_instances;
 	std::list<instance_t> entity_instances;
 	std::list<entry_data_t> player_entry_data;
+
+	std::vector<hitbox_info_t> hitbox_info;
 
 	std::mutex locker;
 
@@ -179,25 +139,28 @@ namespace entity_data
 		out.bottom = bottom;
 	}
 
-	void hitbox(Vector eye_pos, CCSPlayerPawn* pawn, CCSPlayerPawn* localplayer_pawn, QAngle& out)
+	void hitbox(Vector eye_pos, CCSPlayerPawn* pawn, CCSPlayerPawn* localplayer_pawn)
 	{
 		if (pawn == localplayer_pawn)
 			return;
 
-		HitboxSet_t* hitbox_set = pawn->GetHitboxSet(0);
+		if (pawn->m_iTeamNum() == localplayer_pawn->m_iTeamNum())
+			return;
 
+		HitboxSet_t* hitbox_set = pawn->GetHitboxSet(0);
 		if (!hitbox_set)
 			return;
 
 		Transform_t hitbox_trans[65];
-
 		int hitbox_count = pawn->HitboxToWorldTransform(hitbox_set, hitbox_trans);
-
 		if (!hitbox_count)
 			return;
 		
-		Hitbox_t* hitbox = &hitbox_set->m_HitBoxes()[0];
-
+		const auto& hitboxes = hitbox_set->m_HitBoxes();
+		if (hitboxes.m_Size == 0)
+			return;
+		
+		const auto hitbox = hitboxes.m_pElements;
 		if (!hitbox)
 			return;
 
@@ -210,10 +173,8 @@ namespace entity_data
 		Vector center = (mins + maxs) * 0.5f;
 
 		Vector hitbox_pos = (center + hitbox_trans->m_pos); 
-		vector2angles(hitbox_pos - eye_pos, out);
-		out.ClampNormalize();
-
-		//printf("out: %1.f, %1.f\n", out.pitch, out.yaw);
+	
+		hitbox_info.push_back({hitbox_pos});
 	}
 
 	void fetch_player_data()
@@ -302,12 +263,13 @@ namespace entity_data
 			player_data.model = model;
 			player_data.index = index;
 			player_data.pawn = pawn;
+			player_data.localplayer_pawn = localplayer_pawn;
 
 			//get_head_bbox(pawn, localplayer_pawn, player_data.head_bbox);
 
 			GetBBox(scene_node, collision, player_data.abbox);
 
-			//hitbox(eye_pos, pawn, localplayer_pawn, player_data.aimpos);
+			hitbox(eye_pos, pawn, localplayer_pawn);
 
 			entry_data.player_data.push_back(std::move(player_data));
 		}

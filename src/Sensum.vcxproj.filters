@@ -235,6 +235,7 @@
     <ClInclude Include="sdk\helpers\CUtlString.h" />
     <ClInclude Include="sdk\helpers\CUtlTSHash.h" />
     <ClInclude Include="sdk\helpers\CUtlVector.h" />
+    <ClInclude Include="sdk\math\math.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\classes\CBaseEntity.cpp">
