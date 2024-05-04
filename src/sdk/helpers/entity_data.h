@@ -9,6 +9,11 @@
 
 namespace entity_data
 {
+	struct local_data_t
+	{
+
+	};
+
 	struct player_data_t
 	{
 		int m_iHealth;

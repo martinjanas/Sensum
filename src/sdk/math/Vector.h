@@ -3,229 +3,52 @@
 #include <format>
 #include "../../thirdparty/ImGui/imgui.h"
 #include "../helpers/matrix.h"
+#include "../math/math.h"
+#include "../math/QAngle.h"
 
 class Vector
 {
 public:
+	float x, y, z;
 
 	Vector() : x(0.f), y(0.f), z(0.f) { };
 	Vector(float _x, float _y) : x(_x), y(_y), z(0.f) { };
 	Vector(float _x, float _y, float _z) : x(_x), y(_y), z(_z) { };
 
+	//Helper functions
+	float length() const;
+	float length_sqr() const;
+	float dot_product(const Vector& v) const;
+	float dist_to(const Vector& other) const;
+	void normalize();
+	Vector transform(const matrix3x4_t& matrix) const;
+	bool is_valid() const;
+	const char* to_string() const;
+	ImVec2 as_vec2() const;
+	QAngle to_qangle();
 
-	float length() const
-	{
-		return std::sqrtf(x * x + y * y + z * z);
-	}
+	//Operator overloads
+	float operator[](const size_t& index) const;
+	float& operator[](const size_t& index);
 
-	void normalize()
-	{
-		float length = this->length();
-
-		if (length != 0)
-			*this /= length;
-	}
-
-	std::string ToString()
-	{
-		auto str = std::format("x: {:.2f}, y: {:.2f}, z: {:.2f}", x, y, z);
-
-		return str;
-	}
-
-	float dot_product(const Vector& v) const noexcept
-	{
-		return (x * v.x + y * v.y + z * v.z);
-	}
-
-	Vector operator-()
-	{
-		return Vector(-x, -y, -z);
-	}
-
-	Vector Transform(const matrix3x4_t& matrix) const 
-	{
-		return Vector{x * matrix[0][0] + y * matrix[0][1] + z * matrix[0][2] + matrix[0][3],
-					  x * matrix[1][0] + y * matrix[1][1] + z * matrix[1][2] + matrix[1][3],
-					  x * matrix[2][0] + y * matrix[2][1] + z * matrix[2][2] + matrix[2][3]};
-	}
-	float operator[](const size_t& index) const
-	{
-		switch (index)
-		{
-		case 0:
-			return x;
-			break;
-		case 1:
-			return y;
-			break;
-		case 2:
-			return z;
-			break;
-		}
-	}
-
-	float& operator[](const size_t& index)
-	{
-		switch (index)
-		{
-		case 0:
-			return x;
-			break;
-		case 1:
-			return y;
-			break;
-		case 2:
-			return z;
-			break;
-		}
-	}
-
-	ImVec2 AsVec2()
-	{
-		if (this->x && this->y)
-			return ImVec2(this->x, this->y);
-
-		return ImVec2(0.f, 0.f);
-	}
-
-	Vector operator+(const Vector& other)
-	{
-		Vector& temp = *this;
-
-		temp = Vector(temp.x + other.x, temp.y + other.y, temp.z + other.z);
-
-		return temp;
-	}
-
-	Vector operator+(const float& value)
-	{
-		Vector& temp = *this;
-
-		temp = Vector(temp.x + value, temp.y + value, temp.z + value);
-
-		return temp;
-	}
-
-	Vector& operator+=(const Vector& other)
-	{
-		x += other.x;
-		y += other.y;
-		z += other.z;
-
-		return *this;
-	}
-
-	Vector& operator+=(const float& value)
-	{
-		x += value;
-		y += value;
-		z += value;
-
-		return *this;
-	}
-
-	Vector operator-(const Vector& other)
-	{
-		Vector& temp = *this;
-
-		temp = Vector(temp.x - other.x, temp.y - other.y, temp.z - other.z);
-
-		return temp;
-	}
-
-	Vector operator-(const float& value)
-	{
-		Vector& temp = *this;
-
-		temp = Vector(temp.x - value, temp.y - value, temp.z - value);
-
-		return temp;
-	}
-
-	Vector& operator-=(const Vector& other)
-	{
-		x -= other.x;
-		y -= other.y;
-		z -= other.z;
-
-		return *this;
-	}
-
-	Vector& operator-=(const float& value)
-	{
-		x -= value;
-		y -= value;
-		z -= value;
-
-		return *this;
-	}
-
-	Vector operator*(const Vector& other)
-	{
-		Vector& temp = *this;
-
-		temp = Vector(temp.x * other.x, temp.y * other.y, temp.z * other.z);
-
-		return temp;
-	}
-
-	Vector operator*(const float& value)
-	{
-		Vector& temp = *this;
-
-		temp = Vector(temp.x * value, temp.y * value, temp.z * value);
-
-		return temp;
-	}
-
-	Vector& operator*=(const Vector& other)
-	{
-		x *= other.x;
-		y *= other.y;
-		z *= other.z;
-
-		return *this;
-	}
-
-	Vector operator*=(const float& value)
-	{
-		x *= value;
-		y *= value;
-		z *= value;
-
-		return *this;
-	}
-
-	Vector operator/(const Vector& other)
-	{
-		Vector& temp = *this;
-
-		temp = Vector(temp.x / other.x, temp.y / other.y, temp.z / other.z);
-
-		return temp;
-	}
-
-	Vector& operator/=(const Vector& other)
-	{
-		x /= other.x;
-		y /= other.y;
-		z /= other.z;
-
-		return *this;
-	}
-
-	Vector& operator/=(const float& value)
-	{
-		x /= value;
-		y /= value;
-		z /= value;
-
-		return *this;
-	}
-
-	float x;
-	float y;
-	float z;
+	Vector operator-();
+	Vector operator+(const Vector& other);
+	Vector operator+(const float& value);
+	Vector operator+(const Vector& other) const;
+	Vector operator*(float scale) const;
+	Vector operator-(const Vector& other) const;
+	Vector& operator+=(const Vector& other);
+	Vector& operator+=(const float& value);
+	Vector operator-(const Vector& other);
+	Vector operator-(const float& value);
+	Vector& operator-=(const Vector& other);
+	Vector& operator-=(const float& value);
+	Vector operator*(const Vector& other);
+	Vector operator*(const float& value);
+	Vector& operator*=(const Vector& other);
+	Vector operator*=(const float& value);
+	Vector operator/(const Vector& other);
+	Vector& operator/=(const Vector& other);
+	Vector& operator/=(const float& value);
 };
 

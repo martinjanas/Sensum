@@ -11,6 +11,6 @@ namespace features
 
 		void bone_esp(entity_data::player_data_t& data);
 		void name_esp(entity_data::player_data_t& data, const Vector& origin_out, const Vector& screen_head_pos);
-		void box_esp(const Vector& head_pos_out, const Vector& player_pos_out);
+		void barrel_esp(entity_data::player_data_t& data);
 	}
 }

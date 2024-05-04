@@ -226,6 +226,8 @@
     <ClCompile Include="sdk\hooking\minhook\hde\hde64.c" />
     <ClCompile Include="sdk\hooking\minhook\hook.c" />
     <ClCompile Include="sdk\hooking\minhook\trampoline.c" />
+    <ClCompile Include="sdk\localplayer.cpp" />
+    <ClCompile Include="sdk\math\QAngle.cpp" />
     <ClCompile Include="sdk\sdk.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="sdk\helpers\dynamic_module.cpp" />

@@ -32,24 +32,24 @@ namespace features::esp
 		const int TOP_LEFT_FRONT = 7;
 
 		//Top face
-		globals::draw_list->AddLine(bbox.m_Vertices[TOP_LEFT_FRONT].AsVec2(), bbox.m_Vertices[TOP_LEFT_BACK].AsVec2(), IM_COL32_WHITE);
-		globals::draw_list->AddLine(bbox.m_Vertices[TOP_RIGHT_FRONT].AsVec2(), bbox.m_Vertices[TOP_RIGHT_BACK].AsVec2(), IM_COL32_WHITE);
-		globals::draw_list->AddLine(bbox.m_Vertices[TOP_LEFT_FRONT].AsVec2(), bbox.m_Vertices[TOP_RIGHT_FRONT].AsVec2(), IM_COL32_WHITE);
-		globals::draw_list->AddLine(bbox.m_Vertices[TOP_LEFT_BACK].AsVec2(), bbox.m_Vertices[TOP_RIGHT_BACK].AsVec2(), IM_COL32_WHITE);
+		globals::draw_list->AddLine(bbox.m_Vertices[TOP_LEFT_FRONT].as_vec2(), bbox.m_Vertices[TOP_LEFT_BACK].as_vec2(), IM_COL32_WHITE);
+		globals::draw_list->AddLine(bbox.m_Vertices[TOP_RIGHT_FRONT].as_vec2(), bbox.m_Vertices[TOP_RIGHT_BACK].as_vec2(), IM_COL32_WHITE);
+		globals::draw_list->AddLine(bbox.m_Vertices[TOP_LEFT_FRONT].as_vec2(), bbox.m_Vertices[TOP_RIGHT_FRONT].as_vec2(), IM_COL32_WHITE);
+		globals::draw_list->AddLine(bbox.m_Vertices[TOP_LEFT_BACK].as_vec2(), bbox.m_Vertices[TOP_RIGHT_BACK].as_vec2(), IM_COL32_WHITE);
 
 		//Bottom face
-		globals::draw_list->AddLine(bbox.m_Vertices[BOTTOM_LEFT_FRONT].AsVec2(), bbox.m_Vertices[BOTTOM_LEFT_BACK].AsVec2(), IM_COL32_WHITE);
-		globals::draw_list->AddLine(bbox.m_Vertices[BOTTOM_RIGHT_FRONT].AsVec2(), bbox.m_Vertices[BOTTOM_RIGHT_BACK].AsVec2(), IM_COL32_WHITE);
-		globals::draw_list->AddLine(bbox.m_Vertices[BOTTOM_LEFT_FRONT].AsVec2(), bbox.m_Vertices[BOTTOM_RIGHT_FRONT].AsVec2(), IM_COL32_WHITE);
-		globals::draw_list->AddLine(bbox.m_Vertices[BOTTOM_LEFT_BACK].AsVec2(), bbox.m_Vertices[BOTTOM_RIGHT_BACK].AsVec2(), IM_COL32_WHITE);
+		globals::draw_list->AddLine(bbox.m_Vertices[BOTTOM_LEFT_FRONT].as_vec2(), bbox.m_Vertices[BOTTOM_LEFT_BACK].as_vec2(), IM_COL32_WHITE);
+		globals::draw_list->AddLine(bbox.m_Vertices[BOTTOM_RIGHT_FRONT].as_vec2(), bbox.m_Vertices[BOTTOM_RIGHT_BACK].as_vec2(), IM_COL32_WHITE);
+		globals::draw_list->AddLine(bbox.m_Vertices[BOTTOM_LEFT_FRONT].as_vec2(), bbox.m_Vertices[BOTTOM_RIGHT_FRONT].as_vec2(), IM_COL32_WHITE);
+		globals::draw_list->AddLine(bbox.m_Vertices[BOTTOM_LEFT_BACK].as_vec2(), bbox.m_Vertices[BOTTOM_RIGHT_BACK].as_vec2(), IM_COL32_WHITE);
 
 		//Left face
-		globals::draw_list->AddLine(bbox.m_Vertices[TOP_LEFT_FRONT].AsVec2(), bbox.m_Vertices[BOTTOM_LEFT_FRONT].AsVec2(), IM_COL32_WHITE);
-		globals::draw_list->AddLine(bbox.m_Vertices[TOP_LEFT_BACK].AsVec2(), bbox.m_Vertices[BOTTOM_LEFT_BACK].AsVec2(), IM_COL32_WHITE);
+		globals::draw_list->AddLine(bbox.m_Vertices[TOP_LEFT_FRONT].as_vec2(), bbox.m_Vertices[BOTTOM_LEFT_FRONT].as_vec2(), IM_COL32_WHITE);
+		globals::draw_list->AddLine(bbox.m_Vertices[TOP_LEFT_BACK].as_vec2(), bbox.m_Vertices[BOTTOM_LEFT_BACK].as_vec2(), IM_COL32_WHITE);
 
 		//Right face
-		globals::draw_list->AddLine(bbox.m_Vertices[TOP_RIGHT_FRONT].AsVec2(), bbox.m_Vertices[BOTTOM_RIGHT_FRONT].AsVec2(), IM_COL32_WHITE);
-		globals::draw_list->AddLine(bbox.m_Vertices[TOP_RIGHT_BACK].AsVec2(), bbox.m_Vertices[BOTTOM_RIGHT_BACK].AsVec2(), IM_COL32_WHITE);
+		globals::draw_list->AddLine(bbox.m_Vertices[TOP_RIGHT_FRONT].as_vec2(), bbox.m_Vertices[BOTTOM_RIGHT_FRONT].as_vec2(), IM_COL32_WHITE);
+		globals::draw_list->AddLine(bbox.m_Vertices[TOP_RIGHT_BACK].as_vec2(), bbox.m_Vertices[BOTTOM_RIGHT_BACK].as_vec2(), IM_COL32_WHITE);
 	}
 
 	void render()
@@ -88,7 +88,7 @@ namespace features::esp
 				esp::name_esp(data, origin_out, head_pos_out);
 
 			if (settings::visuals::m_bBoxEsp)
-				globals::draw_list->AddRect(data.abbox.m_Mins.AsVec2(), data.abbox.m_Maxs.AsVec2(), IM_COL32(255, 0, 0, 255), 1.f, 15, 1.5f);
+				globals::draw_list->AddRect(data.abbox.m_Mins.as_vec2(), data.abbox.m_Maxs.as_vec2(), IM_COL32(255, 0, 0, 255), 1.f, 15, 1.5f);
 			
 			Draw3DBox(data.abbox);
 
@@ -128,8 +128,8 @@ namespace features::esp
 			bool got_bones = globals::world2screen(in_child, bone_pos_out);
 			bool got_parents = globals::world2screen(in_parent, bone_parent_pos_out);
 
-			auto p_out_v2 = bone_pos_out.AsVec2();
-			auto bp_p_out_v2 = bone_parent_pos_out.AsVec2();
+			auto p_out_v2 = bone_pos_out.as_vec2();
+			auto bp_p_out_v2 = bone_parent_pos_out.as_vec2();
 
 			if (got_bones && got_parents)
 				globals::draw_list->AddLine(p_out_v2, bp_p_out_v2, ImColor(settings::visuals::m_fBoneColor.x, settings::visuals::m_fBoneColor.y, settings::visuals::m_fBoneColor.z, settings::visuals::m_fBoneColor.w));

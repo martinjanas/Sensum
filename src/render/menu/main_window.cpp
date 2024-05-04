@@ -17,8 +17,7 @@ namespace main_window
         ImGui::Checkbox("Bone esp", &settings::visuals::m_bBoneEsp); ImGui::SameLine();
         ImGui::ColorEdit3("###bonecolor", (float*)&settings::visuals::m_fBoneColor, ImGuiColorEditFlags_NoInputs);
 
-        ImGui::SliderFloat("Radius Min", &settings::visuals::radius_min, -5.f, 5.f);
-        ImGui::SliderFloat("Radius Max", &settings::visuals::radius_max, -5.f, 5.f);
+        ImGui::SliderInt("Aimbot FOV", &settings::visuals::aimbot_fov, 0, 360);
 
         ImGui::Checkbox("Fov changer", &settings::visuals::m_bFovChanger);
 

@@ -3,6 +3,8 @@
 #include "../helpers/globals.h"
 #include "../../thirdparty/ImGui/imgui_internal.h"
 
+#include "../localplayer.h"
+
 CCSPlayerController* GetLocalPlayerController()
 {
 	for (int i = 1; i < 65; ++i)
@@ -58,7 +60,7 @@ namespace entity_data
 		{
 			Vector worldPoint = Vector{ i & 1 ? maxs.x : mins.x, i & 2 ? maxs.y : mins.y, i & 4 ? maxs.z : mins.z };
 
-			if (!globals::world2screen(worldPoint.Transform(scene_node->m_nodeToWorld().ToMatrix3x4()), out.m_Vertices[i]))
+			if (!globals::world2screen(worldPoint.transform(scene_node->m_nodeToWorld().ToMatrix3x4()), out.m_Vertices[i]))
 				return false;
 
 			out.m_Mins = ImMin(out.m_Mins, out.m_Vertices[i]);
@@ -167,6 +169,8 @@ namespace entity_data
 		if (hitbox->m_nHitBoxIndex() != 0)
 			return;
 
+		const auto& radius = hitbox->m_flShapeRadius();
+
 		Vector mins = hitbox->m_vMinBounds();
 		Vector maxs = hitbox->m_vMaxBounds();
 
@@ -264,6 +268,8 @@ namespace entity_data
 			player_data.index = index;
 			player_data.pawn = pawn;
 			player_data.localplayer_pawn = localplayer_pawn;
+
+			players::localplayer = localplayer_pawn;
 
 			//get_head_bbox(pawn, localplayer_pawn, player_data.head_bbox);
 

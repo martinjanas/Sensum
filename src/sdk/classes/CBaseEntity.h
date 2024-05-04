@@ -108,6 +108,7 @@ public:
     NETVAR(CCollisionProperty*, m_pCollision, "C_BaseEntity", "m_pCollision");
     NETVAR(CGlowProperty*, m_GlowProperty, "C_BaseModelEntity", "m_Glow");
     NETVAR(Vector, m_vecViewOffset, "C_BaseModelEntity", "m_vecViewOffset");
+    NETVAR(uint32_t, m_fFlags, "C_BaseEntity", "m_fFlags");
 
     CBaseAnimating* GetBaseAnimating()
     {

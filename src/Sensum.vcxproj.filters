@@ -341,5 +341,7 @@
     <ClCompile Include="render.cpp" />
     <ClCompile Include="ShadowVMT.cpp" />
     <ClCompile Include="sdk\helpers\CUtlVector.cpp" />
+    <ClCompile Include="sdk\localplayer.cpp" />
+    <ClCompile Include="sdk\math\QAngle.cpp" />
   </ItemGroup>
 </Project>
