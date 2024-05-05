@@ -234,8 +234,9 @@
     <ClInclude Include="sdk\helpers\CUtlRBTree.h" />
     <ClInclude Include="sdk\helpers\CUtlString.h" />
     <ClInclude Include="sdk\helpers\CUtlTSHash.h" />
-    <ClInclude Include="sdk\helpers\CUtlVector.h" />
     <ClInclude Include="sdk\math\math.h" />
+    <ClInclude Include="interfaces.h" />
+    <ClInclude Include="sdk\helpers\CUtlVector.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\classes\CBaseEntity.cpp">
@@ -340,8 +341,8 @@
     <ClCompile Include="sdk\classes\Trace.cpp" />
     <ClCompile Include="render.cpp" />
     <ClCompile Include="ShadowVMT.cpp" />
-    <ClCompile Include="sdk\helpers\CUtlVector.cpp" />
     <ClCompile Include="sdk\localplayer.cpp" />
     <ClCompile Include="sdk\math\QAngle.cpp" />
+    <ClCompile Include="interfaces.cpp" />
   </ItemGroup>
 </Project>

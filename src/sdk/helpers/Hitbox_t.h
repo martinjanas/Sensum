@@ -2,6 +2,30 @@
 #include "../math/Vector.h"
 #include "../helpers/CUtlVector.h"
 
+enum EHitboxes
+{
+    HITBOX_HEAD = 0,
+    HITBOX_NECK,
+    HITBOX_PELVIS,
+    HITBOX_BELLY,
+    HITBOX_THORAX,
+    HITBOX_LOWER_CHEST,
+    HITBOX_UPPER_CHEST,
+    HITBOX_RIGHT_THIGH, 
+    HITBOX_LEFT_THIGH,
+    HITBOX_RIGHT_CALF,
+    HITBOX_LEFT_CALF, 
+    HITBOX_RIGHT_FOOT,
+    HITBOX_LEFT_FOOT, 
+    HITBOX_RIGHT_HAND,
+    HITBOX_LEFT_HAND,
+    HITBOX_RIGHT_UPPER_ARM,
+    HITBOX_RIGHT_FOREARM,
+    HITBOX_LEFT_UPPER_ARM,
+    HITBOX_LEFT_FOREARM,
+    HITBOX_MAX
+};
+
 struct matrix4x2_t
 {
 public:
@@ -35,28 +59,7 @@ public:
     NETVAR(void*, m_CRC, "CHitBox", "m_CRC");
     NETVAR(void*, m_cRenderColor, "CHitBox", "m_cRenderColor");
     NETVAR(uint16_t, m_nHitBoxIndex, "CHitBox", "m_nHitBoxIndex");
-    //char pad[0x70];
-};
-
-template <class T>
-class utl_memory {
-public:
-    T* memory;
-    int allocation_count;
-    int grow_size;
-
-    T& operator[](int i) noexcept { return memory[i]; }
-    const T& operator[](int i) const noexcept { return memory[i]; }
-};
-
-template <class T>
-class util_vector {
-public:
-    int size;
-    utl_memory<T> data;
-
-    T& operator[](int i) noexcept { return data.memory[i]; }
-    const T& operator[](int i) const noexcept { return data.memory[i]; }
+    char pad[0x70];
 };
 
 class HitboxSet_t

@@ -21,6 +21,16 @@ namespace Aimbot
 {
     static std::list<entity_data::player_data_t> m_player_data;
 
+    std::vector<int> get_hitboxes()
+    {
+        static std::vector<int> list;
+        list.clear();
+
+        list.emplace_back(HITBOX_UPPER_CHEST);
+
+        return list;
+    }
+
     void Aim()
     {
         if (!g::engine_client->IsInGame())
@@ -49,16 +59,21 @@ namespace Aimbot
             if (data.m_iHealth <= 0)
                 continue;
 
-            if (entity_data::hitbox_info.empty())
-                continue;
-
             const auto& eye_pos = data.localplayer_pawn->GetEyePos();
 
             float dist = data.localplayer_pawn->m_pGameSceneNode()->m_vecOrigin().dist_to(data.pawn->m_pGameSceneNode()->m_vecOrigin());
 
-            for (auto& hitboxes : entity_data::hitbox_info) //Redo the hitbox_info_t struct - replace hitbox_pos with Hitbox_t* ?
+            const auto& hitbox_ids = get_hitboxes();
+            if (hitbox_ids.empty())
+                continue;
+            
+            for (const auto& hitbox_id : hitbox_ids)
             {
-                auto& hitbox_pos = hitboxes.hitbox_pos;
+                const auto& hitbox_data = data.hitboxes[hitbox_id];
+
+                const auto& hitbox_pos = hitbox_data.hitbox_pos;
+                if (!hitbox_pos.is_valid())
+                    continue;
 
                 QAngle target_angle = (hitbox_pos - eye_pos).to_qangle();
                 target_angle.clamp_normalize();
@@ -72,11 +87,9 @@ namespace Aimbot
 
                 if (GetAsyncKeyState(VK_LBUTTON) && fabsf(fov) < settings_fov)
                     g::client->SetViewAngles(0, target_angle);
-               
+
                 if (i % 25 == 0)
                     printf("fov: %1.f\n", fov);
-
-                entity_data::hitbox_info.clear();
 
                 i++;
             }

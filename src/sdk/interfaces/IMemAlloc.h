@@ -25,7 +25,7 @@ public:
 
     std::size_t GetSize(const void* p) 
     {
-        return GetVirtual<std::size_t(__thiscall*)(IMemAlloc*, const void*)>(this, 21)(this, p);
+        return GetVirtual<std::size_t(__thiscall*)(IMemAlloc*, const void*)>(this, 17)(this, p);
     }
 };
 

@@ -26,8 +26,6 @@ namespace entity_data
 	std::list<instance_t> entity_instances;
 	std::list<entry_data_t> player_entry_data;
 
-	std::vector<hitbox_info_t> hitbox_info;
-
 	std::mutex locker;
 
 	namespace view_matrix
@@ -141,7 +139,7 @@ namespace entity_data
 		out.bottom = bottom;
 	}
 
-	void hitbox(Vector eye_pos, CCSPlayerPawn* pawn, CCSPlayerPawn* localplayer_pawn)
+	void hitbox(CCSPlayerPawn* pawn, CCSPlayerPawn* localplayer_pawn, entity_data::player_data_t& data)
 	{
 		if (pawn == localplayer_pawn)
 			return;
@@ -153,32 +151,31 @@ namespace entity_data
 		if (!hitbox_set)
 			return;
 
-		Transform_t hitbox_trans[65];
+		Transform_t hitbox_trans[HITBOX_MAX];
 		int hitbox_count = pawn->HitboxToWorldTransform(hitbox_set, hitbox_trans);
 		if (!hitbox_count)
 			return;
 		
-		const auto& hitboxes = hitbox_set->m_HitBoxes();
+		
+		auto hitboxes = hitbox_set->m_HitBoxes(); //broken, now indexes from 0 to HITBOX_MAX but something is broken related to hitbox_pos
 		if (hitboxes.m_Size == 0)
 			return;
-		
-		const auto hitbox = hitboxes.m_pElements;
-		if (!hitbox)
-			return;
 
-		if (hitbox->m_nHitBoxIndex() != 0)
-			return;
+		for (int i = 0; i < HITBOX_MAX; i++)
+		{
+			auto hitbox = *hitboxes.AtPtr(i); //hitbox cant be ptr
 
-		const auto& radius = hitbox->m_flShapeRadius();
+			const auto& radius = hitbox.m_flShapeRadius();
 
-		Vector mins = hitbox->m_vMinBounds();
-		Vector maxs = hitbox->m_vMaxBounds();
+			Vector& mins = hitbox.m_vMinBounds();
+			Vector& maxs = hitbox.m_vMaxBounds();
 
-		Vector center = (mins + maxs) * 0.5f;
+			Vector center = (mins + maxs) * 0.5f;
 
-		Vector hitbox_pos = (center + hitbox_trans->m_pos); 
-	
-		hitbox_info.push_back({hitbox_pos});
+			Vector hitbox_pos = (center + hitbox_trans->m_pos);
+
+			data.hitboxes[i] = { hitbox_pos, hitbox.m_nHitBoxIndex() };
+		}
 	}
 
 	void fetch_player_data()
@@ -256,7 +253,6 @@ namespace entity_data
 			auto eye_pos = localplayer_pawn->GetEyePos();
 
 			player_data_t player_data;
-
 			player_data.player_name = controller->m_sSanitizedPlayerName();
 			player_data.m_iHealth = pawn->m_iHealth();
 			player_data.m_iShotsFired = pawn->m_iShotsFired();
@@ -275,7 +271,7 @@ namespace entity_data
 
 			GetBBox(scene_node, collision, player_data.abbox);
 
-			hitbox(eye_pos, pawn, localplayer_pawn);
+			hitbox(pawn, localplayer_pawn, player_data);
 
 			entry_data.player_data.push_back(std::move(player_data));
 		}

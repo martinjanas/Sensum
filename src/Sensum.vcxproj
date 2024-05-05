@@ -119,6 +119,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="features\features.h" />
+    <ClInclude Include="interfaces.h" />
     <ClInclude Include="render.h" />
     <ClInclude Include="sdk\classes\Trace.h" />
     <ClInclude Include="sdk\helpers\BBox_t.h" />
@@ -201,9 +202,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="features\esp.cpp" />
+    <ClCompile Include="interfaces.cpp" />
     <ClCompile Include="render.cpp" />
     <ClCompile Include="sdk\classes\Trace.cpp" />
-    <ClCompile Include="sdk\helpers\CUtlVector.cpp" />
     <ClCompile Include="sdk\helpers\globals.cpp" />
     <ClCompile Include="hooks\functions\Present.cpp" />
     <ClCompile Include="hooks\functions\WinProc.cpp" />
