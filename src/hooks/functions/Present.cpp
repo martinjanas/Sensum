@@ -64,9 +64,10 @@ namespace hooks
 		init_imgui_done = true;
 	}
 
+	//imgui and stuff not showing after eg: changing resolution/window mode
 	long __stdcall directx::resize_buffers::hooked(IDXGISwapChain* swap_chain, uint32_t buffer_count, uint32_t width, uint32_t height, DXGI_FORMAT new_format, uint32_t swap_chain_flags)
 	{
-		/*ImGui::CreateContext();
+		ImGui::CreateContext();
 
 		if (FAILED(swap_chain->GetDevice(__uuidof(ID3D11Device), reinterpret_cast<void**>(&device))))
 			return S_FALSE;
@@ -99,7 +100,7 @@ namespace hooks
 		context->OMSetRenderTargets(1, &rtv, nullptr);
 
 		context->Release();
-		device->Release();*/
+		device->Release();
 
 		return original_fn(swap_chain, buffer_count, width, height, new_format, swap_chain_flags);
 	}

@@ -2,50 +2,26 @@
 
 #include <Windows.h>
 #include <cstdint>
+#include "sdk/helpers/importer.h"
+#include <unordered_map>
 
 #define PAGE_EXECUTABLE ( PAGE_EXECUTE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY )
 
-struct VTableInfo_t
-{
-	uintptr_t** original_vtable;
-	uintptr_t* fake_vtable;
-};
-
-class ShadowVMT
+class ShadowVMT 
 {
 public:
-	ShadowVMT(void* class_ptr)
-	{
-		this->original_vtable = *reinterpret_cast<uintptr_t**>(class_ptr);
+	ShadowVMT(void* object);
+	//~ShadowVMT();
 
-
-	}
-
-	size_t GetVTableSize()
-	{
-		MEMORY_BASIC_INFORMATION mbi{};
-
-		size_t i{};
-
-		while (VirtualQuery(reinterpret_cast<LPCVOID>(this->original_vtable[i]), &mbi, sizeof(mbi)))
-		{
-			if (mbi.State != MEM_COMMIT)
-				break;
-
-			if (mbi.Protect & (PAGE_GUARD | PAGE_NOACCESS))
-				break;
-
-			if (!(mbi.Protect & PAGE_EXECUTABLE))
-				break;
-
-			++i;
-		}
-
-		return i;
-	}
+	bool Apply(int index, uintptr_t* hook_function, void** original_fn);
+	void Remove(int index);
 
 private:
-	uintptr_t* original_vtable;
-	size_t vtable_size = 0;
-};
+	void* m_ptr_object;
+	uintptr_t* m_ptr_object_vtable;
+	size_t m_object_vtable_size;
+	uintptr_t* m_ptr_object_fake_vtable;
+	std::unordered_map<int, uintptr_t*> m_object_hooks;
 
+	size_t GetVTableSize();
+};

@@ -24,18 +24,15 @@ namespace entity_data
 
 	struct player_data_t
 	{
-		int m_iHealth;
+		const char* player_name;
+		uint32_t index;
 		Vector m_vecOrigin;
+		int m_iHealth;
 		int m_iShotsFired;
 		int clip;
-		uint32_t index;
-
-		const char* player_name;
-		Vector m_vOldOrigin;
 		CModelState* model_state;
 		CStrongHandle<CModel> model;
 		BBox_t bbox;
-		QAngle aimpos;
 		BBox_t head_bbox;
 		CCSPlayerPawn* pawn;
 		CCSPlayerPawn* localplayer_pawn;

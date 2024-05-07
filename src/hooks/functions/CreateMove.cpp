@@ -23,8 +23,8 @@ namespace Aimbot
 
     std::vector<int> get_hitboxes()
     {
-        static std::vector<int> list;
-        list.clear();
+        std::vector<int> list;
+        //list.clear();
 
         list.emplace_back(HITBOX_UPPER_CHEST);
 
@@ -48,32 +48,30 @@ namespace Aimbot
         
         QAngle viewangles;
         g::client->GetViewAngles(0, &viewangles);
-
+        
         for (auto& data : m_player_data)
         {
             static int i = 0;
 
-            if (data.index == 0)
-                continue;
-
             if (data.m_iHealth <= 0)
                 continue;
 
-            const auto& eye_pos = data.localplayer_pawn->GetEyePos();
-
-            float dist = data.localplayer_pawn->m_pGameSceneNode()->m_vecOrigin().dist_to(data.pawn->m_pGameSceneNode()->m_vecOrigin());
+            if (data.pawn == data.localplayer_pawn)
+                continue;
 
             const auto& hitbox_ids = get_hitboxes();
             if (hitbox_ids.empty())
-                continue;
-            
-            for (const auto& hitbox_id : hitbox_ids)
-            {
-                const auto& hitbox_data = data.hitboxes[hitbox_id];
+                return;
 
-                const auto& hitbox_pos = hitbox_data.hitbox_pos;
+            for (const auto& hitbox_id : hitbox_ids) //aimbot aiming at wrong position, aims either at head @ent1 or at feet @ent2, fov is also broken when not facing them
+            {
+                entity_data::hitbox_info_t* hitbox_data = &data.hitboxes[hitbox_id];
+
+                const auto hitbox_pos = hitbox_data->hitbox_pos;
                 if (!hitbox_pos.is_valid())
                     continue;
+
+                const auto& eye_pos = data.localplayer_pawn->GetEyePos();
 
                 QAngle target_angle = (hitbox_pos - eye_pos).to_qangle();
                 target_angle.clamp_normalize();
@@ -81,11 +79,13 @@ namespace Aimbot
                 auto delta = target_angle - viewangles;
                 delta.clamp_normalize();
 
+                const float dist = data.m_vecOrigin.dist_to(data.localplayer_pawn->m_pGameSceneNode()->m_vecOrigin());
+
                 float fov = distance_based_fov(delta, dist);
 
                 float settings_fov = (settings::visuals::aimbot_fov * 7.5f); //15 distance = ~2 degrees fov
 
-                if (GetAsyncKeyState(VK_LBUTTON) && fabsf(fov) < settings_fov)
+                if (GetAsyncKeyState(VK_LBUTTON) && fov < settings_fov) //fabsf(fov) < settings_fov
                     g::client->SetViewAngles(0, target_angle);
 
                 if (i % 25 == 0)

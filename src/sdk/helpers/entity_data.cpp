@@ -144,9 +144,6 @@ namespace entity_data
 		if (pawn == localplayer_pawn)
 			return;
 
-		if (pawn->m_iTeamNum() == localplayer_pawn->m_iTeamNum())
-			return;
-
 		HitboxSet_t* hitbox_set = pawn->GetHitboxSet(0);
 		if (!hitbox_set)
 			return;
@@ -156,14 +153,13 @@ namespace entity_data
 		if (!hitbox_count)
 			return;
 		
-		
-		auto hitboxes = hitbox_set->m_HitBoxes(); //broken, now indexes from 0 to HITBOX_MAX but something is broken related to hitbox_pos
+		auto& hitboxes = hitbox_set->m_HitBoxes(); //broken, now indexes from 0 to HITBOX_MAX but something is broken related to hitbox_pos
 		if (hitboxes.m_Size == 0)
 			return;
 
 		for (int i = 0; i < HITBOX_MAX; i++)
 		{
-			auto hitbox = *hitboxes.AtPtr(i); //hitbox cant be ptr
+			Hitbox_t hitbox = *hitboxes.AtPtr(i);
 
 			const auto& radius = hitbox.m_flShapeRadius();
 
@@ -254,14 +250,13 @@ namespace entity_data
 
 			player_data_t player_data;
 			player_data.player_name = controller->m_sSanitizedPlayerName();
+			player_data.index = index;
+			player_data.m_vecOrigin = scene_node->m_vecOrigin();
 			player_data.m_iHealth = pawn->m_iHealth();
 			player_data.m_iShotsFired = pawn->m_iShotsFired();
-			player_data.m_vecOrigin = scene_node->m_vecOrigin();
-			player_data.m_vOldOrigin = pawn->m_vOldOrigin();
 			player_data.clip = active_wpn->m_iClip1();
 			player_data.model_state = &model_state;
 			player_data.model = model;
-			player_data.index = index;
 			player_data.pawn = pawn;
 			player_data.localplayer_pawn = localplayer_pawn;
 

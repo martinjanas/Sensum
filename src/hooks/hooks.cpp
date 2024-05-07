@@ -1,36 +1,29 @@
 #include "hooks.h"
 #include "../settings/settings.h"
 #include "../sdk/helpers/entity_data.h"
+#include "../ShadowVMT.h"
 
 bool hooks::init()
 {
 	if (MH_Initialize() != MH_STATUS::MH_OK)
 		return false;
 
-	if (MH_CreateHookVirtual(g::entity_system, on_add_entity::index, &on_add_entity::hooked, reinterpret_cast<void**>(&on_add_entity::original_fn)) != MH_STATUS::MH_OK)
-		return false;
+	ShadowVMT entity_system = ShadowVMT(g::entity_system);
+	ShadowVMT csgo_input = ShadowVMT(g::csgo_input);
+	ShadowVMT client = ShadowVMT(g::client);
+	ShadowVMT swap_chain = ShadowVMT(g::swap_chain);
 
-	if (MH_CreateHookVirtual(g::entity_system, on_remove_entity::index, &on_remove_entity::hooked, reinterpret_cast<void**>(&on_remove_entity::original_fn)) != MH_STATUS::MH_OK)
-		return false;
+	entity_system.Apply(on_add_entity::index, reinterpret_cast<uintptr_t*>(&on_add_entity::hooked), reinterpret_cast<void**>(&on_add_entity::original_fn));
+	entity_system.Apply(on_remove_entity::index, reinterpret_cast<uintptr_t*>(&on_remove_entity::hooked), reinterpret_cast<void**>(&on_remove_entity::original_fn));
 
-	if (MH_CreateHookVirtual(g::csgo_input, create_move::index, &create_move::hooked, reinterpret_cast<void**>(&create_move::original_fn)) != MH_STATUS::MH_OK)
-		return false;
-		
+	csgo_input.Apply(create_move::index, reinterpret_cast<uintptr_t*>(&create_move::hooked), reinterpret_cast<void**>(&create_move::original_fn));
 
-	//MJ: Update FSN
-	if (MH_CreateHookVirtual(g::client, 35, &frame_stage_notify::hooked, reinterpret_cast<void**>(&frame_stage_notify::original_fn)) != MH_STATUS::MH_OK)
-		return false;
+	client.Apply(frame_stage_notify::index, reinterpret_cast<uintptr_t*>(&frame_stage_notify::hooked), reinterpret_cast<void**>(&frame_stage_notify::original_fn));
 
-	/*if (MH_CreateHook(modules::client.pattern_scanner.scan("48 89 5C 24 10 56 48 83 EC 30 8B 05").as(), &frame_stage_notify::hooked, reinterpret_cast<void**>(&frame_stage_notify::original_fn)) != MH_STATUS::MH_OK)
-		return false;*/
+	swap_chain.Apply(directx::present::index, reinterpret_cast<uintptr_t*>(&directx::present::hooked), reinterpret_cast<void**>(&directx::present::original_fn));
+	swap_chain.Apply(directx::resize_buffers::index, reinterpret_cast<uintptr_t*>(&directx::resize_buffers::hooked), reinterpret_cast<void**>(&directx::resize_buffers::original_fn));
 
 	if (MH_CreateHook(modules::client.pattern_scanner.scan("E8 ? ? ? ? F3 0F 11 45 ? 48 8B 5C 24 ?").add(0x1).abs().as(), &get_fov::hooked, reinterpret_cast<void**>(&get_fov::original_fn)) != MH_STATUS::MH_OK)
-		return false;
-
-	if (MH_CreateHookVirtual(g::swap_chain, directx::present::index, &directx::present::hooked, reinterpret_cast<void**>(&directx::present::original_fn)) != MH_STATUS::MH_OK)
-		return false;
-
-	if (MH_CreateHookVirtual(g::swap_chain, directx::resize_buffers::index, &directx::resize_buffers::hooked, reinterpret_cast<void**>(&directx::resize_buffers::original_fn)) != MH_STATUS::MH_OK)
 		return false;
 
 	if (MH_CreateHook(modules::client.pattern_scanner.scan("40 53 48 81 EC ? ? ? ? 49 8B C1").as(), get_matrices_for_view::hooked, reinterpret_cast<void**>(&get_matrices_for_view::original_fn)) != MH_STATUS::MH_OK)
