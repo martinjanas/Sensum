@@ -255,6 +255,15 @@ Vector Vector::operator/(const Vector& other)
 	return temp;
 }
 
+Vector Vector::operator/(const float& other)
+{
+	Vector& temp = *this;
+
+	temp = Vector(temp.x / other, temp.y / other, temp.z / other);
+
+	return temp;
+}
+
 Vector& Vector::operator/=(const Vector& other)
 {
 	x /= other.x;

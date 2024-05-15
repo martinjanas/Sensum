@@ -40,6 +40,17 @@ public:
 		return QAngle(this->pitch - other.pitch, this->yaw - other.yaw, this->roll - other.roll);
 	}
 
+	QAngle& operator/=(const float& other)
+	{
+		QAngle& temp = *this;
+
+		temp.pitch /= other;
+		temp.yaw /= other;
+		temp.roll /= other;
+
+		return temp;
+	}
+
 	/*void Clamp()
 	{
 		pitch = std::clamp(pitch, -89.0f, 89.0f);

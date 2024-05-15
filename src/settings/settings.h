@@ -15,6 +15,7 @@ namespace settings
 		// int
 		extern int m_iFov;
 		extern int aimbot_fov;
+		extern float smooth;
 
 		extern float radius_min;
 		extern float radius_max;

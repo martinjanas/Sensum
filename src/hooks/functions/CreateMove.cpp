@@ -12,7 +12,7 @@ float distance_based_fov(const QAngle& delta, const float& distance)
 
     float fov = sqrtf(pitch_diff * pitch_diff + yaw_diff * yaw_diff);
 
-    fov = std::clamp<float>(fov, -360, 360.f);
+    fov = std::clamp<float>(fov, -1, 360.f);
 
     return fov;
 }
@@ -33,6 +33,31 @@ namespace Aimbot
         return list;
     }
 
+    void smooth(const float& smooth, QAngle& viewangles, const QAngle& temp, QAngle& out)
+    {
+        out = temp;
+        out.clamp_normalize();
+
+        auto corrected_amount = smooth;
+        auto tickrate = (1.0f / 0.015625);
+
+        corrected_amount = tickrate * smooth / 64.f;
+
+        if (corrected_amount < 1.1f)
+            return;
+
+        auto temp_v = temp.to_vector();
+        auto viewangles_v = viewangles.to_vector();
+
+        auto delta = temp_v - viewangles_v;
+        
+        auto smoothed = viewangles_v + delta / corrected_amount;
+        auto smoothed_v = smoothed.to_qangle();
+
+        out = smoothed_v;
+        out.clamp_normalize();
+    }
+
     void Aim()
     {
         if (!g::engine_client->IsInGame())
@@ -48,7 +73,8 @@ namespace Aimbot
             entity_data::locker.unlock();
         }
         
-        static float min_fov = std::numeric_limits<float>::max();
+        float best_fov = 9999.f;
+        QAngle best_angle;
 
         QAngle viewangles;
         g::client->GetViewAngles(0, &viewangles);
@@ -64,7 +90,7 @@ namespace Aimbot
             if (data.m_iHealth <= 0)
                 continue;
 
-            auto eye_pos = data.localplayer_pawn->GetEyePos();
+            const auto& eye_pos = data.localplayer_pawn->GetEyePos();
 
             for (const auto& hitbox_id : hitbox_ids)
             {
@@ -80,18 +106,26 @@ namespace Aimbot
                 auto delta = target_angle - viewangles;
                 delta.clamp_normalize();
 
-                const float dist = data.m_vecOrigin.dist_to(eye_pos);
+                float dist = data.m_vecOrigin.dist_to(eye_pos);
 
                 float fov = distance_based_fov(delta, dist);
 
-                if (fov < min_fov)
-                    min_fov = fov;
+                if (fov < best_fov)
+                {
+                    best_fov = fov;
+                    best_angle = target_angle;
+                }
+            
+                if (fov > settings::visuals::aimbot_fov)
+                    continue;
 
-                if (GetAsyncKeyState(VK_LBUTTON) && fabsf(min_fov) < settings::visuals::aimbot_fov)
-                    g::client->SetViewAngles(0, target_angle);
+                smooth(settings::visuals::smooth, viewangles, best_angle, best_angle); //behaves weirdly @ >2 smooth 
+
+                if (GetAsyncKeyState(VK_LBUTTON))
+                    g::client->SetViewAngles(0, best_angle);
 
                 if (i % 25 == 0)
-                    printf("[%d]: fov: %1.f, min_fov: %1.f\n", hitbox_data.index, fov, min_fov);
+                    printf("[%d]: fov: %.1f, best_fov: %.1f\n", hitbox_data.index, fov, best_fov);
             }
 
             i++;

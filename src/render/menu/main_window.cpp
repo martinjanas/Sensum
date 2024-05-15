@@ -18,6 +18,7 @@ namespace main_window
         ImGui::ColorEdit3("###bonecolor", (float*)&settings::visuals::m_fBoneColor, ImGuiColorEditFlags_NoInputs);
 
         ImGui::SliderInt("Aimbot FOV", &settings::visuals::aimbot_fov, 0, 360);
+        ImGui::SliderFloat("Aimbot Smooth", &settings::visuals::smooth, 1.f, 60.f, "Smooth: %.1f");
 
         ImGui::Checkbox("Fov changer", &settings::visuals::m_bFovChanger);
 

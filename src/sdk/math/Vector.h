@@ -49,6 +49,7 @@ public:
 	Vector& operator*=(const Vector& other);
 	Vector operator*=(const float& value);
 	Vector operator/(const Vector& other);
+	Vector operator/(const float& other);
 	Vector& operator/=(const Vector& other);
 	Vector& operator/=(const float& value);
 };

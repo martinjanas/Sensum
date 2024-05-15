@@ -14,6 +14,7 @@ namespace settings
 		// int
 		int m_iFov = 90;
 		int aimbot_fov = 2;
+		float smooth = 12.f;
 		float radius_min = 1.f;
 		float radius_max = 1.f;
 		// colors
