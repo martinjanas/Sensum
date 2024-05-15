@@ -25,9 +25,11 @@ namespace Aimbot
     {
         std::vector<int> list;
         //list.clear();
-
-        list.emplace_back(HITBOX_UPPER_CHEST);
-
+    
+        list.push_back(HITBOX_HEAD);
+        list.push_back(HITBOX_LOWER_CHEST);
+        list.push_back(HITBOX_UPPER_CHEST);
+        
         return list;
     }
 
@@ -46,32 +48,31 @@ namespace Aimbot
             entity_data::locker.unlock();
         }
         
+        static float min_fov = std::numeric_limits<float>::max();
+
         QAngle viewangles;
         g::client->GetViewAngles(0, &viewangles);
         
-        for (auto& data : m_player_data)
+        const auto& hitbox_ids = get_hitboxes();
+        if (hitbox_ids.empty())
+            return;
+
+        for (const auto& data : m_player_data)
         {
             static int i = 0;
 
             if (data.m_iHealth <= 0)
                 continue;
 
-            if (data.pawn == data.localplayer_pawn)
-                continue;
+            auto eye_pos = data.localplayer_pawn->GetEyePos();
 
-            const auto& hitbox_ids = get_hitboxes();
-            if (hitbox_ids.empty())
-                return;
-
-            for (const auto& hitbox_id : hitbox_ids) //aimbot aiming at wrong position, aims either at head @ent1 or at feet @ent2, fov is also broken when not facing them
+            for (const auto& hitbox_id : hitbox_ids)
             {
-                entity_data::hitbox_info_t* hitbox_data = &data.hitboxes[hitbox_id];
+                const auto& hitbox_data = data.hitboxes[hitbox_id];
 
-                const auto hitbox_pos = hitbox_data->hitbox_pos;
+                const auto hitbox_pos = hitbox_data.hitbox_pos;
                 if (!hitbox_pos.is_valid())
                     continue;
-
-                const auto& eye_pos = data.localplayer_pawn->GetEyePos();
 
                 QAngle target_angle = (hitbox_pos - eye_pos).to_qangle();
                 target_angle.clamp_normalize();
@@ -79,22 +80,22 @@ namespace Aimbot
                 auto delta = target_angle - viewangles;
                 delta.clamp_normalize();
 
-                const float dist = data.m_vecOrigin.dist_to(data.localplayer_pawn->m_pGameSceneNode()->m_vecOrigin());
+                const float dist = data.m_vecOrigin.dist_to(eye_pos);
 
                 float fov = distance_based_fov(delta, dist);
 
-                float settings_fov = (settings::visuals::aimbot_fov * 7.5f); //15 distance = ~2 degrees fov
+                if (fov < min_fov)
+                    min_fov = fov;
 
-                if (GetAsyncKeyState(VK_LBUTTON) && fov < settings_fov) //fabsf(fov) < settings_fov
+                if (GetAsyncKeyState(VK_LBUTTON) && fabsf(min_fov) < settings::visuals::aimbot_fov)
                     g::client->SetViewAngles(0, target_angle);
 
                 if (i % 25 == 0)
-                    printf("fov: %1.f\n", fov);
-
-                i++;
+                    printf("[%d]: fov: %1.f, min_fov: %1.f\n", hitbox_data.index, fov, min_fov);
             }
-        }
 
+            i++;
+        }
     }
 }
 

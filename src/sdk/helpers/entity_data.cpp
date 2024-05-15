@@ -139,11 +139,15 @@ namespace entity_data
 		out.bottom = bottom;
 	}
 
-	void hitbox(CCSPlayerPawn* pawn, CCSPlayerPawn* localplayer_pawn, entity_data::player_data_t& data)
+	inline void transform_vector(const Vector& in1, const matrix3x4_t& in2, Vector& out)
 	{
-		if (pawn == localplayer_pawn)
-			return;
+		out[0] = in1.dot_product(in2[0]) + in2[0][3];
+		out[1] = in1.dot_product(in2[1]) + in2[1][3];
+		out[2] = in1.dot_product(in2[2]) + in2[2][3];
+	}
 
+	void hitbox(CCSPlayerPawn* pawn, const char* name, std::array<hitbox_info_t, HITBOX_MAX>& out)
+	{
 		HitboxSet_t* hitbox_set = pawn->GetHitboxSet(0);
 		if (!hitbox_set)
 			return;
@@ -153,8 +157,8 @@ namespace entity_data
 		if (!hitbox_count)
 			return;
 		
-		auto& hitboxes = hitbox_set->m_HitBoxes(); //broken, now indexes from 0 to HITBOX_MAX but something is broken related to hitbox_pos
-		if (hitboxes.m_Size == 0)
+		auto& hitboxes = hitbox_set->m_HitBoxes();
+		if (hitboxes.Count() == 0)
 			return;
 
 		for (int i = 0; i < HITBOX_MAX; i++)
@@ -163,14 +167,27 @@ namespace entity_data
 
 			const auto& radius = hitbox.m_flShapeRadius();
 
-			Vector& mins = hitbox.m_vMinBounds();
-			Vector& maxs = hitbox.m_vMaxBounds();
+			/*const Vector& mins = hitbox.m_vMinBounds();
+			const Vector& maxs = hitbox.m_vMaxBounds();
 
-			Vector center = (mins + maxs) * 0.5f;
+			Vector center = (mins + maxs) * 0.5f;*/
 
-			Vector hitbox_pos = (center + hitbox_trans->m_pos);
+			auto& trans = hitbox_trans[i];
 
-			data.hitboxes[i] = { hitbox_pos, hitbox.m_nHitBoxIndex() };
+			//auto hitbox_pos = (center + trans.m_pos);
+
+			/*Vector mins, maxs;
+			transform_vector(hitbox.m_vMinBounds() - radius, trans.ToMatrix3x4(), mins);
+			transform_vector(hitbox.m_vMaxBounds() + radius, trans.ToMatrix3x4(), maxs);
+
+			auto hitbox_pos = (mins + maxs) * 0.5f;*/
+
+			auto mins = (hitbox.m_vMinBounds() - radius).transform(trans.ToMatrix3x4());
+			auto maxs = (hitbox.m_vMaxBounds() + radius).transform(trans.ToMatrix3x4());
+
+			auto hitbox_pos = (mins + maxs) * 0.5f;
+
+			out[i] = { hitbox_pos, hitbox.m_nHitBoxIndex(), name};
 		}
 	}
 
@@ -259,6 +276,7 @@ namespace entity_data
 			player_data.model = model;
 			player_data.pawn = pawn;
 			player_data.localplayer_pawn = localplayer_pawn;
+			player_data.local_eyepos = localplayer_pawn->m_pGameSceneNode()->m_vecOrigin();
 
 			players::localplayer = localplayer_pawn;
 
@@ -266,7 +284,8 @@ namespace entity_data
 
 			GetBBox(scene_node, collision, player_data.abbox);
 
-			hitbox(pawn, localplayer_pawn, player_data);
+			if (pawn != localplayer_pawn)
+				hitbox(pawn, player_data.player_name, player_data.hitboxes);
 
 			entry_data.player_data.push_back(std::move(player_data));
 		}

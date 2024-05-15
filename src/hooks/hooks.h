@@ -48,6 +48,33 @@ namespace hooks
 		inline static fn original_fn;
 	};
 
+	//class CViewSetup
+	//{
+	//public:
+	//	char char_pad01[0x490];
+	//	float flOrthoLeft; // 0x0494
+	//	float flOrthoTop; // 0x0498
+	//	float flOrthoRight; // 0x049C
+	//	float flOrthoBottom; // 0x04A0
+	//	char char_pad02[0x38];
+	//	float flFov; // 0x04D8
+	//	float flFovViewmodel; // 0x04DC
+	//	Vector vecOrigin; // 0x04E0
+	//	char char_pad03[0xC];
+	//	Vector angView; // 0x04F8
+	//	char char_pad04[0x14];
+	//	float flAspectRatio; // 0x0518
+	//}; //Size: 0x3040
+
+	//struct override_view
+	//{
+	//	static const int index = 15;
+	//	using fn = void(__fastcall*)(void*, void*, CViewSetup*);
+	//	static void __fastcall hooked(void* rcx, void* rdx, CViewSetup* setup);
+
+	//	inline static fn original_fn;
+	//};
+
 	namespace directx
 	{
 		struct present

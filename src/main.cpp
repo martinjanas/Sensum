@@ -1,5 +1,6 @@
 #include "hooks/hooks.h"
 #include "ShadowVMT.h"
+#include "sdk/classes/CCSPlayerPawn.h"
 
 //Notice: This project is WORK IN PROGRESS!
 DWORD __stdcall on_attach(void* base)

@@ -17,6 +17,7 @@ bool hooks::init()
 	entity_system.Apply(on_remove_entity::index, reinterpret_cast<uintptr_t*>(&on_remove_entity::hooked), reinterpret_cast<void**>(&on_remove_entity::original_fn));
 
 	csgo_input.Apply(create_move::index, reinterpret_cast<uintptr_t*>(&create_move::hooked), reinterpret_cast<void**>(&create_move::original_fn));
+	//csgo_input.Apply(override_view::index, reinterpret_cast<uintptr_t*>(&override_view::hooked), reinterpret_cast<void**>(&override_view::original_fn));
 
 	client.Apply(frame_stage_notify::index, reinterpret_cast<uintptr_t*>(&frame_stage_notify::hooked), reinterpret_cast<void**>(&frame_stage_notify::original_fn));
 
@@ -101,4 +102,10 @@ void __fastcall hooks::get_matrices_for_view::hooked(void* rcx, void* rdx, VMatr
 	original_fn(rcx, rdx, world_to_view, view_to_projection, world_to_projection, world_to_pixels);
 }
 
-
+//void __fastcall hooks::override_view::hooked(void* rcx, void* rdx, CViewSetup* setup)
+//{
+//	if (g::engine_client->IsInGame())
+//		setup->flFov = 120.f;
+//
+//	original_fn(rcx, rdx, setup);
+//}

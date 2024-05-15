@@ -15,6 +15,7 @@ namespace entity_data
 	{
 		Vector hitbox_pos;
 		uint16_t index;
+		const char* entity_name;
 	};
 
 	struct local_data_t
@@ -37,8 +38,9 @@ namespace entity_data
 		CCSPlayerPawn* pawn;
 		CCSPlayerPawn* localplayer_pawn;
 		ABBox_t abbox;
+		Vector local_eyepos;
 
-		hitbox_info_t hitboxes[HITBOX_MAX];
+		std::array<hitbox_info_t, HITBOX_MAX> hitboxes;
 	};
 
 	struct entry_data_t

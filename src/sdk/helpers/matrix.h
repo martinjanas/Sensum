@@ -2,12 +2,12 @@
 
 struct matrix3x4_t 
 {
-    auto operator[](int i) const 
+    const float* operator[](int i) const 
     { 
         return data[i];
     }
 
-    auto operator[](int i) 
+    float* operator[](int i) 
     { 
         return data[i];
     }
