@@ -119,7 +119,9 @@ namespace Aimbot
                 if (fov > settings::visuals::aimbot_fov)
                     continue;
 
-                smooth(settings::visuals::smooth, viewangles, best_angle, best_angle); //behaves weirdly @ >2 smooth 
+                //smooth(settings::visuals::smooth, viewangles, best_angle, best_angle); //behaves weirdly @ >2 smooth 
+
+                //g::input_system->IsButtonDown(ButtonCode::MouseLeft) this behaves weirdly, but idc because im gonna use (buttons & IN_ATTACK) anyway
 
                 if (GetAsyncKeyState(VK_LBUTTON))
                     g::client->SetViewAngles(0, best_angle);

@@ -150,6 +150,7 @@
     <ClInclude Include="render\menu\main_window.h" />
     <ClInclude Include="sdk\helpers\Hitbox_t.h" />
     <ClInclude Include="sdk\helpers\matrix.h" />
+    <ClInclude Include="sdk\interfaces\CInputSystem.h" />
     <ClInclude Include="sdk\interfaces\CSource2Client.h" />
     <ClInclude Include="sdk\localplayer.h" />
     <ClInclude Include="sdk\math\math.h" />

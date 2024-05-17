@@ -7,6 +7,7 @@
 #include "../sdk/interfaces/CGameResourceService.h"
 #include "../sdk/interfaces/CSGOInput.h"
 #include "../sdk/interfaces/CSource2Client.h"
+#include "../sdk/interfaces/CInputSystem.h"
 #include "../sdk/math/Viewmatrix.h"
 
 namespace sdk
@@ -33,6 +34,7 @@ namespace interfaces //move to interfaces.h ?
 	extern CSGOInput* csgo_input;
 	extern CRenderSystem* render_system;
 	extern IDXGISwapChain* swap_chain;
+	extern CInputSystem* input_system;
 }
 
 namespace g = interfaces;

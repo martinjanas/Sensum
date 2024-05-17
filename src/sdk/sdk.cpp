@@ -40,6 +40,7 @@ namespace sdk
 		modules::schema = DynamicModule("schemasystem.dll");
 		modules::tier0 = DynamicModule("tier0.dll");
 		modules::render_dx11 = DynamicModule("rendersystemdx11.dll");
+		modules::input_sys = DynamicModule("inputsystem.dll");
 
 	}
 
@@ -49,6 +50,7 @@ namespace sdk
 		g::client = modules::client.GetInterfaceFromList<CSource2Client*>("Source2Client002");
 		g::schema_system = modules::schema.GetInterfaceFromList<CSchemaSystem*>("SchemaSystem_001");
 		g::game_resource_service = modules::engine.GetInterfaceFromList<CGameResourceService*>("GameResourceServiceClientV001");
+		g::input_system = modules::input_sys.GetInterfaceFromList<CInputSystem*>("InputSystemVersion001");
 
 		g::csgo_input = g::csgo_input->get();
 		g::entity_system = g::game_resource_service->GetGameEntitySystem();
@@ -71,7 +73,7 @@ namespace sdk
 		print_status(g::csgo_input);
 		print_status(g::render_system);
 		print_status(g::swap_chain);
-		print_status(players::localplayer);
+		print_status(g::input_system);
 	}
 }
 
@@ -86,5 +88,6 @@ namespace interfaces
 	CSGOInput* csgo_input{};
 	CRenderSystem* render_system{};
 	IDXGISwapChain* swap_chain{};
+	CInputSystem* input_system{};
 }
 

@@ -8,4 +8,5 @@ namespace modules
 	DynamicModule tier0;
 	DynamicModule render_dx11;
 	DynamicModule nav_system;
+	DynamicModule input_sys;
 }

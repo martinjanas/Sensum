@@ -10,5 +10,6 @@ namespace modules
 	extern DynamicModule render_dx11;
 
 	extern DynamicModule nav_system;
+	extern DynamicModule input_sys;
 }
 
