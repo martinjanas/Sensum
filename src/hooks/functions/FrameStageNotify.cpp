@@ -11,6 +11,8 @@ void __fastcall hooks::frame_stage_notify::hooked(void* a1, EClientFrameStage st
 	switch (stage)
 	{
 	case FRAME_START:
+		sdk::is_aimkey_down = GetAsyncKeyState(VK_LBUTTON);//g::input_system->IsButtonDown(ButtonCode::MouseLeft); //This somehow doesnt work properly
+		//printf("keydown: %d\n", sdk::is_aimkey_down);
 		break;
 
 	case FRAME_NET_UPDATE_START:

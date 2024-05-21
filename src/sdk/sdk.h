@@ -14,6 +14,8 @@ namespace sdk
 {
 	void init_modules();
 	void init_interfaces();
+
+	extern bool is_aimkey_down;
 }
 
 class CRenderSystem //TODO: Move this into its own file

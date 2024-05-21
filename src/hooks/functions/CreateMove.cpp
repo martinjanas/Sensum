@@ -58,7 +58,7 @@ namespace Aimbot
         out.clamp_normalize();
     }
 
-    void Aim()
+    void Aim(CUserCmd* cmd)
     {
         if (!g::engine_client->IsInGame())
             return;
@@ -123,7 +123,7 @@ namespace Aimbot
 
                 //g::input_system->IsButtonDown(ButtonCode::MouseLeft) this behaves weirdly, but idc because im gonna use (buttons & IN_ATTACK) anyway
 
-                if (GetAsyncKeyState(VK_LBUTTON))
+                if (cmd->buttonStates.m_nValue & IN_ATTACK)
                     g::client->SetViewAngles(0, best_angle);
 
                 if (i % 25 == 0)
@@ -135,16 +135,34 @@ namespace Aimbot
     }
 }
 
-bool __fastcall hooks::create_move::hooked(CSGOInput* input, int slot, bool active, std::byte unk) //unk maybe removed?
-{
-    auto result = original_fn(input, slot, active, unk);
+bool __fastcall hooks::create_move::hooked(CSGOInput* input, int slot, bool active, bool subtick) //unk maybe removed?
+{ 
+    const auto& result = original_fn(input, slot, active, subtick);
 
-    if (!g::engine_client->IsConnected() || !g::engine_client->IsInGame())
+    if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
         return result;
-       
-    //CUserCmd* cmd = input->GetUserCmd(); //CUserCmd and other classes outdated
- 
-    Aimbot::Aim();
+
+    CUserCmd* cmd = input->GetUserCmd();
+    
+    Aimbot::Aim(cmd);
+
+    //static int i = 0;
+
+    //if (cmd)
+    //{
+    //    cmd->buttonStates.m_nValue |= IN_ATTACK; //Applying buttons works
+    //    cmd->buttonStates.m_nValueChanged |= IN_ATTACK;
+    //    cmd->buttonStates.m_nValueScroll |= IN_ATTACK;
+
+    //    if (i % 50 == 0)
+    //    {
+    //        cmd->buttonStates.m_nValue &= ~IN_ATTACK;
+    //        cmd->buttonStates.m_nValueChanged &= ~IN_ATTACK;
+    //        cmd->buttonStates.m_nValueScroll &= ~IN_ATTACK;
+    //    }
+    //}
+    //
+    //i++;
 
     return result;
 }

@@ -8,7 +8,7 @@ DWORD __stdcall on_attach(void* base)
    /* while (!modules::nav_system.base)
        Sleep(50);*/
     
-    //Sleep(5000);
+    Sleep(5000);
 
     console::attach();
 

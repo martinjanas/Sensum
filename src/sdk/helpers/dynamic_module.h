@@ -8,22 +8,51 @@
 #include <vector>
 #include <stdexcept>
 #include <format>
+#include <winternl.h>
+#include <Shlwapi.h>
+#pragma comment(lib, "Shlwapi.lib")
 #include "../helpers/importer.h"
 
 #pragma warning(disable:26495)
 
-using fn = void* (__cdecl*)();
+using InstantiateInterface = void*(__cdecl*)();
 
 struct InterfaceReg
 {
-	fn func;
-	const char* name;
-	InterfaceReg* next;
+	InstantiateInterface m_pCreateFn;
+	const char* m_pName;
+	InterfaceReg* m_pNext;	
 };
 
 
-//Usage: modules::client.pattern_scan("").abs().add(0x1).as<void*>();
-class PatternScanner //TODO: Create something like PatternScanner, but for exporting functions from dlls
+class Exporter
+{
+public:
+	Exporter(HMODULE _base) : base(_base) { }
+	Exporter() { }
+
+	Exporter& get_export(const std::string_view& func_name)
+	{
+		this->addr = reinterpret_cast<uint8_t*>(LI_FN(GetProcAddress).cached()(this->base, func_name.data()));
+
+		return *this;
+	}
+
+	template <typename T = void*>
+	T* as()
+	{
+		if (!addr)
+			return nullptr;
+
+		return reinterpret_cast<T*>(addr);
+	}
+
+private:
+	HMODULE base;
+	uint8_t* addr;
+};
+
+class PatternScanner
 {
 public:
 	PatternScanner(HMODULE base)
@@ -31,10 +60,7 @@ public:
 		this->base = base;
 	}
 
-	PatternScanner()
-	{
-
-	}
+	PatternScanner() { }
 
 	PatternScanner& scan(const char* signature)
 	{
@@ -142,87 +168,73 @@ private:
 	//std::optional<uint8_t*> addr;
 };
 
+static HMODULE GetModuleBase(const char* module_name)
+{
+	PPEB peb = (PPEB)__readgsqword(0x60);
+	PPEB_LDR_DATA ldr = peb->Ldr;
+	PLIST_ENTRY list = &ldr->InMemoryOrderModuleList;
+
+	for (PLIST_ENTRY item = list->Flink; item != list; item = item->Flink)
+	{
+		PLDR_DATA_TABLE_ENTRY entry = CONTAINING_RECORD(item, LDR_DATA_TABLE_ENTRY, InMemoryOrderLinks);
+
+		char module_buffer[MAX_PATH];
+		WideCharToMultiByte(CP_ACP, 0, entry->FullDllName.Buffer, entry->FullDllName.Length / sizeof(WCHAR), module_buffer, MAX_PATH, NULL, NULL);
+		module_buffer[entry->FullDllName.Length / sizeof(WCHAR)] = '\0';
+
+		const auto& module_filename = PathFindFileNameA(module_buffer);
+		if (!strcmp(module_filename, module_name))
+			return (HMODULE)entry->DllBase;
+	}
+
+	return nullptr;
+}
+
 class DynamicModule
 {
 public:
 	DynamicModule(const std::string_view& dll_name)
 	{
-		this->base = LI_FN(GetModuleHandleA).cached()(dll_name.data());
+		this->base = GetModuleBase(dll_name.data());
 		this->base_addr = reinterpret_cast<uintptr_t>(this->base);
 		this->dll_name = dll_name.data();
 
 		pattern_scanner = PatternScanner(this->base);
+		exporter = Exporter(this->base);
 	}
 
-	DynamicModule()
-	{
-
-	}
-
-	~DynamicModule()
-	{
-		//FreeLibrary(this->base);
-	}
-
-	void* GetExport(const std::string_view& func_name)
-	{
-		if (!base)
-			return nullptr;
-
-		return LI_FN(GetProcAddress).cached()(base, func_name.data());
-	}
-
-	void* GetCreateInterface()
-	{
-		void* CreateInterface = this->GetExport("CreateInterface");
-
-		if (!CreateInterface)
-			return nullptr;
-
-		return CreateInterface;
-	}
+	DynamicModule() { }
 
 	template<typename T>
 	T GetInterface(const std::string_view& interface_name)
 	{
 		using fn = void* (*)(const char* pName, int* pReturnCode);
 
-		fn CreateInterface = reinterpret_cast<fn>(GetCreateInterface());
+		auto CreateInterface = exporter.get_export("CreateInterface").as<fn>();
 
-		if (CreateInterface)
-		{
-			T interface_val = reinterpret_cast<T>(CreateInterface(interface_name.data(), 0));
+		if (!CreateInterface)
+			return nullptr;
 
-			return interface_val;
-		}
-
-		return nullptr;
+		return reinterpret_cast<T>(CreateInterface(interface_name.data(), 0));
 	}
 
 	template<typename T>
 	T GetInterfaceFromList(const std::string_view& interface_name)
 	{
-		uint8_t* CreateInterface = reinterpret_cast<uint8_t*>(GetCreateInterface());
+		auto CreateInterface = exporter.get_export("CreateInterface").as<uint8_t>();
 
 		if (!CreateInterface)
 			return nullptr;
 
-		const auto& rip_offset = resolve_rip(CreateInterface, std::nullopt, std::nullopt);
-
-		InterfaceReg* reg = *reinterpret_cast<InterfaceReg**>(rip_offset);
+		InterfaceReg* reg = *reinterpret_cast<InterfaceReg**>(resolve_rip(CreateInterface, std::nullopt, std::nullopt));
 
 		if (!reg)
 			return nullptr;
 
-		for (InterfaceReg* it = reg; it; it = it->next)
+		for (auto& it = reg; it != nullptr; it = it->m_pNext)
 		{
-			size_t pos = interface_name.find(it->name);
-			if (pos != std::string_view::npos)
-			{
-				T interface_val = reinterpret_cast<T>(it->func());
-
-				return interface_val;
-			}
+			if (interface_name.find(it->m_pName) != std::string_view::npos)
+				return reinterpret_cast<T>(it->m_pCreateFn());
 		}
 
 		return nullptr;
@@ -230,21 +242,17 @@ public:
 
 	void PrintAllInterfaces()
 	{
-		uint8_t* CreateInterface = reinterpret_cast<uint8_t*>(GetCreateInterface());
-
+		auto CreateInterface = exporter.get_export("CreateInterface").as<uint8_t>();
 		if (!CreateInterface)
 			return;
-
+		
 		InterfaceReg* reg = *reinterpret_cast<InterfaceReg**>(resolve_rip(CreateInterface, std::nullopt, std::nullopt));
+		if (!reg)
+			return;
 
-		if (reg)
+		for (auto& it = reg; it != nullptr; it = it->m_pNext)
 		{
-			printf("reg: 0x%p", reg);
-
-			for (InterfaceReg* it = reg; it; it = it->next)
-			{
-				printf("name: %s\n", it->name);
-			}
+			printf("name: %s\n", it->m_pName);
 		}
 	}
 
@@ -259,6 +267,7 @@ public:
 	uintptr_t base_addr;
 	const char* dll_name;
 	PatternScanner pattern_scanner;
+	Exporter exporter;
 };
 
 

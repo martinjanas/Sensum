@@ -32,6 +32,8 @@ void print_status(const char* name, void* ptr)
 
 namespace sdk
 {
+	extern bool is_aimkey_down = false;
+
 	void init_modules()
 	{
 		modules::client = DynamicModule("client.dll");
@@ -61,13 +63,14 @@ namespace sdk
 		if (g::render_system)
 			g::swap_chain = g::render_system->swap_chain;
 
-		g::mem_alloc = *reinterpret_cast<IMemAlloc**>(modules::tier0.GetExport("g_pMemAlloc"));
-		mem_alloc_in::mem_alloc = *reinterpret_cast<IMemAlloc**>(modules::tier0.GetExport("g_pMemAlloc"));
+		g::mem_alloc = modules::tier0.exporter.get_export("g_pMemAlloc").as<IMemAlloc>();
+		mem_alloc_in::mem_alloc = modules::tier0.exporter.get_export("g_pMemAlloc").as<IMemAlloc>();
 
 		print_status(g::engine_client);
 		print_status(g::client);
 		print_status(g::schema_system);
 		print_status(g::mem_alloc);
+		print_status(mem_alloc_in::mem_alloc);
 		print_status(g::game_resource_service);
 		print_status(g::entity_system);
 		print_status(g::csgo_input);

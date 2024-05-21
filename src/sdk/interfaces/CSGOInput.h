@@ -74,93 +74,100 @@ public:
 	void* vecValue; // Vector4D_t 0x18
 };
 
-class CCSGOInterpolationInfo : public CBasePB
+class CCSGOInterpolationInfoPB : public CBasePB
 {
 public:
-	float flFraction; // 0x18
-	int nSrcTick; // 0x1C
-	int nDstTick; // 0x20
+	float m_flFraction; // 0x18
+	int m_nSrcTick; // 0x1C
+	int m_nDstTick; // 0x20
 };
+static_assert(sizeof(CCSGOInterpolationInfoPB) == 0x28);
 
 // credits: @patoke [uc:3872928-post1311]
 class CCSGOInputHistoryEntryPB : public CBasePB
 {
 public:
-	CMsgQAngle* pViewCmd; // 0x18
-	CMsgVector* pShootOriginCmd; // 0x20
-	CMsgVector* pTargetHeadOriginCmd; // 0x28
-	CMsgVector* pTargetAbsOriginCmd; // 0x30
-	CMsgQAngle* pTargetViewCmd; // 0x38
-	CCSGOInterpolationInfo* cl_interp; // 0x40
-	CCSGOInterpolationInfo* sv_interp0; // 0x48
-	CCSGOInterpolationInfo* sv_interp1; // 0x50	
-	CCSGOInterpolationInfo* player_interp; // 0x58
-	int nRenderTickCount; // 0x60
-	float flRenderTickFraction; // 0x64
-	int nPlayerTickCount; // 0x68
-	float flPlayerTickFraction; // 0x6C
-	int nFrameNumber; // 0x70
-	int nTargetEntIndex; // 0x74
+	CMsgQAngle* m_pViewAngles; // 0x18
+	CMsgVector* m_pShootPosition; // 0x20
+	CMsgVector* m_pTargetHeadPositionCheck; // 0x28
+	CMsgVector* m_pTargetAbsPositionCheck; // 0x30
+	CMsgQAngle* m_pTargetAngPositionCheck; // 0x38
+	CCSGOInterpolationInfoPB* m_cl_interp; // 0x40
+	CCSGOInterpolationInfoPB* m_sv_interp0; // 0x48
+	CCSGOInterpolationInfoPB* m_sv_interp1; // 0x50
+	CCSGOInterpolationInfoPB* m_player_interp; // 0x58
+	int m_nRenderTickCount; // 0x60
+	float m_flRenderTickFraction; // 0x64
+	int m_nPlayerTickCount; // 0x68
+	float m_flPlayerTickFraction; // 0x6C
+	int m_nFrameNumber; // 0x70
+	int m_nTargetEntIndex; // 0x74
 };
+static_assert(sizeof(CCSGOInputHistoryEntryPB) == 0x78);
 
 struct CSubtickMoveStep : CBasePB
 {
-	uint64_t nButton;
-	bool bPressed;
-	float flWhen;
+public:
+	uint64_t m_nButton;
+	bool m_bPressed;
+	float m_flWhen;
+	float m_flAnalogForwardDelta;
+	float m_flAnalogLeftDelta;
 };
+static_assert(sizeof(CSubtickMoveStep) == 0x30);
 
 struct CInButtonStatePB : CBasePB
 {
-	std::uint64_t State1;
-	std::uint64_t State2;
-	std::uint64_t State3;
+	uint64_t m_nValue;
+	uint64_t m_nValueChanged;
+	uint64_t m_nValueScroll;
 };
+static_assert(sizeof(CInButtonStatePB) == 0x30);
 
 class CBaseUserCmdPB : public CBasePB
 {
 public:
-	RepeatedPtrField_t<CSubtickMoveStep> subtickMovesField;
-	const char* szMoveCrc;
-	CInButtonStatePB* pInButtonState;
-	CMsgQAngle* pViewangles;
-	int32_t nCommandNumber;
-	int32_t nTickCount;
-	float flForwardMove;
-	float flSideMove;
-	float flUpMove;
-	int32_t nImpulse;
-	int32_t nWeaponSelect;
-	int32_t nRandomSeed;
-	int32_t nMousedX;
-	int32_t nMousedY;
-	//bool bHasBeenPredicted;
-	uint32_t nConsumedServerAngleChanges;
-	int32_t nCmdFlags;
-	uint32_t nPawnEntityHandle;
+	RepeatedPtrField_t<CSubtickMoveStep> m_subtickMovesField;
+	const char* m_szMoveCrc;
+	CInButtonStatePB* m_pInButtonState;
+	CMsgQAngle* m_pViewAngles;
+	int32_t m_nCommandNumber;
+	int32_t m_nTickCount;
+	float m_flForwardMove;
+	float m_flSideMove;
+	float m_flUpMove;
+	int32_t m_nImpulse;
+	int32_t m_nWeaponSelect;
+	int32_t m_nRandomSeed;
+	int32_t m_nMousedX;
+	int32_t m_nMousedY;
+	uint32_t m_nConsumedServerAngleChanges;
+	int32_t m_nCmdFlags;
+	uint32_t m_nPawnEntityHandle;
 };
+static_assert(sizeof(CBaseUserCmdPB) == 0x80);
 
 class CCSGOUserCmdPB
 {
 public:
-	std::uint32_t nHasBits;
-	std::uint64_t nCachedSize;
-	RepeatedPtrField_t<CCSGOInputHistoryEntryPB> inputHistoryField;
-	CBaseUserCmdPB* pBase;
-	int32_t nWeaponDecision;
-	int32_t nWeaponDecisionWeapon;
-	int32_t nAttack3StartHhistoryIndex;
-	int32_t nAttack1StartHhistoryIndex;
-	int32_t nAttack2StartHhistoryIndex;
+	std::uint32_t m_nHasBits;
+	std::uint64_t m_nCachedSize;
+	RepeatedPtrField_t<CCSGOInputHistoryEntryPB> m_inputHistoryField;
+	CBaseUserCmdPB* m_pBaseCmd;
+	bool m_bLeftHandDesired; // new var
+	int32_t m_nAttack3StartHistoryIndex;
+	int32_t m_nAttack1StartHistoryIndex;
+	int32_t m_nAttack2StartHistoryIndex;
 };
+static_assert(sizeof(CCSGOUserCmdPB) == 0x40);
 
 // not protobufs
 struct CInButtonState
 {
-	void* pVTable;
-	uint64_t nButtonState1;
-	uint64_t nButtonState2;
-	uint64_t nButtonState3;
+	void* pVTable; // 0x0
+	uint64_t m_nValue; // 0x8
+	uint64_t m_nValueChanged; // 0x10
+	uint64_t m_nValueScroll; // 0x18
 };
 
 class CUserCmd
@@ -169,7 +176,7 @@ public:
 	void* pVTable;
 	CCSGOUserCmdPB cmd;
 	CInButtonState buttonStates;
-	std::byte pad[48];
+	std::byte pad[0x20]; //pad[0x20] //was pad[48]
 };
 
 class CSGOInput
