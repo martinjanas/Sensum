@@ -119,8 +119,6 @@ public:
     {
         using fn = HitboxSet_t * (__thiscall*)(void*, int);
 
-        //static auto addr = modules::client.pattern_scanner.scan("E8 ? ? ? ? 48 85 C0 0F 85 ? ? ? ? 44 8D 48 07", "GetHitboxSet()").abs().add(0x1).as();
-
         static auto addr = modules::client.pattern_scanner.scan("E8 ?? ?? ?? ?? 48 8B F0 48 85 C0 0F 84 35 02 00 00", "GetHitboxSet()").add(0x1).abs().as();
 
         if (!addr)
