@@ -134,7 +134,7 @@ public:
 
         int depthright = Depth(RightChild(node));
         int depthleft = Depth(LeftChild(node));
-        return std::max(depthright, depthleft) + 1;
+        return (std::max)(depthright, depthleft) + 1;
     }
 
     int Depth() const {

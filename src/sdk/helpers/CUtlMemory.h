@@ -1,8 +1,9 @@
 // Copyright (C) 2023 neverlosecc
 // See end of file for extended copyright information.
 #pragma once
-#include "tools/virtual.h"
-#include <sdk/interfaces/tier0/IMemAlloc.h>
+
+#include "../helpers/vfunc.h"
+#include "../../interfaces.h"
 
 template <class T>
 inline T* Construct(T* pMemory) {
@@ -152,7 +153,7 @@ CUtlMemory<T, I>::CUtlMemory(int nGrowSize, int nInitAllocationCount): m_pMemory
     ValidateGrowSize();
     assert(nGrowSize >= 0);
     if (m_nAllocationCount) {
-        m_pMemory = (T*)GetMemAlloc()->Alloc(m_nAllocationCount * sizeof(T));
+        m_pMemory = (T*)mem_alloc_in::mem_alloc->Alloc(m_nAllocationCount * sizeof(T));
     }
 }
 
@@ -182,7 +183,7 @@ void CUtlMemory<T, I>::Init(int nGrowSize /*= 0*/, int nInitSize /*= 0*/) {
     ValidateGrowSize();
     assert(nGrowSize >= 0);
     if (m_nAllocationCount) {
-        m_pMemory = (T*)GetMemAlloc()->Alloc(m_nAllocationCount * sizeof(T));
+        m_pMemory = (T*)mem_alloc_in::mem_alloc->Alloc(m_nAllocationCount * sizeof(T));
     }
 }
 
@@ -214,7 +215,7 @@ void CUtlMemory<T, I>::ConvertToGrowableMemory(int nGrowSize) {
     m_nGrowSize = nGrowSize;
     if (m_nAllocationCount) {
         int nNumBytes = m_nAllocationCount * sizeof(T);
-        T* pMemory = (T*)GetMemAlloc()->Alloc(nNumBytes);
+        T* pMemory = (T*)mem_alloc_in::mem_alloc->Alloc(nNumBytes);
         memcpy(pMemory, m_pMemory, nNumBytes);
         m_pMemory = pMemory;
     } else {
@@ -430,12 +431,12 @@ void CUtlMemory<T, I>::Grow(int num) {
     m_nAllocationCount = nNewAllocationCount;
 
     if (m_pMemory) {
-        auto ptr = GetMemAlloc()->Alloc(m_nAllocationCount * sizeof(T));
+        auto ptr = mem_alloc_in::mem_alloc->Alloc(m_nAllocationCount * sizeof(T));
 
         memcpy(ptr, m_pMemory, oldAllocationCount * sizeof(T));
         m_pMemory = (T*)ptr;
     } else {
-        m_pMemory = (T*)GetMemAlloc()->Alloc(m_nAllocationCount * sizeof(T));
+        m_pMemory = (T*)mem_alloc_in::mem_alloc->Alloc(m_nAllocationCount * sizeof(T));
     }
 }
 
@@ -455,9 +456,9 @@ inline void CUtlMemory<T, I>::EnsureCapacity(int num) {
     m_nAllocationCount = num;
 
     if (m_pMemory) {
-        m_pMemory = (T*)GetMemAlloc()->ReAlloc(m_pMemory, m_nAllocationCount * sizeof(T));
+        m_pMemory = (T*)mem_alloc_in::mem_alloc->ReAlloc(m_pMemory, m_nAllocationCount * sizeof(T));
     } else {
-        m_pMemory = (T*)GetMemAlloc()->Alloc(m_nAllocationCount * sizeof(T));
+        m_pMemory = (T*)mem_alloc_in::mem_alloc->Alloc(m_nAllocationCount * sizeof(T));
     }
 }
 
@@ -468,7 +469,7 @@ template <class T, class I>
 void CUtlMemory<T, I>::Purge() {
     if (!IsExternallyAllocated()) {
         if (m_pMemory) {
-            GetMemAlloc()->Free((void*)m_pMemory);
+            mem_alloc_in::mem_alloc->Free((void*)m_pMemory);
             m_pMemory = 0;
         }
         m_nAllocationCount = 0;
@@ -507,7 +508,7 @@ void CUtlMemory<T, I>::Purge(int numElements) {
         return;
     }
     m_nAllocationCount = numElements;
-    m_pMemory = (T*)GetMemAlloc()->ReAlloc(m_pMemory, m_nAllocationCount * sizeof(T));
+    m_pMemory = (T*)mem_alloc_in::mem_alloc->ReAlloc(m_pMemory, m_nAllocationCount * sizeof(T));
 }
 
 // source2gen - Source2 games SDK generator

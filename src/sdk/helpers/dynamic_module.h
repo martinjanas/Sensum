@@ -98,13 +98,13 @@ public:
 		return *this;
 	}
 
-	template <typename T = void>
-	T* as()
+	template <typename T = void*>
+	T as()
 	{
 		if (!addr)
-			return nullptr;
+			return {};
 
-		return reinterpret_cast<T*>(addr);
+		return reinterpret_cast<T>(addr);
 	}
 private:
 	std::uint8_t* pattern_scan(const char* signature) const

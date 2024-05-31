@@ -14,7 +14,7 @@ public:
     SchemaClassInfoData_t* GetSchemaClassInfo()
     {
         SchemaClassInfoData_t* pClassInfo = nullptr;
-        GetVirtual<void(__thiscall*)(void*, SchemaClassInfoData_t**)>(this, 36)(this, &pClassInfo);
+        GetVirtual<void(__thiscall*)(void*, SchemaClassInfoData_t**)>(this, 38)(this, &pClassInfo);
 
         return pClassInfo;
     }
@@ -85,23 +85,4 @@ public:
 
         return class_name_hash == FNV("C_CSPlayerPawn") && prev_class_hash == FNV("C_CSPlayerPawnBase") && prev_prev_hash == FNV("C_BasePlayerPawn");
     }
-
-   /* bool InheritsFrom(const std::string_view& name)
-    {
-        const auto& class_info = GetSchemaClassInfo();
-
-        if (!class_info)
-            return false;
-
-        if (!class_info->m_has_base_class)
-            return false;
-
-        auto base_classes = class_info->m_base_classes;
-
-        if (!base_classes)
-            return false;
-
-        if (base_classes->m_prev_by_class->GetName() == name)
-            return true;
-    }*/
 };

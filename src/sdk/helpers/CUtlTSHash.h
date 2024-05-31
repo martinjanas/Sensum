@@ -8,7 +8,6 @@
 #include "CUtlMemoryPoolBase.h"
 
 constexpr auto kUtlTsHashVersion = 2;
-
 //=============================================================================
 //
 // Threadsafe Hash
@@ -257,7 +256,7 @@ bool ptr_compare(const T& item1, const T& item2) {
 template <class T, class Keytype, int BucketCount, class HashFuncs>
 template <typename Predicate>
 inline std::vector<T> CUtlTSHashV2<T, Keytype, BucketCount, HashFuncs>::merge_without_duplicates(const std::vector<T>& allocated_list,
-                                                                                                 const std::vector<T>& un_allocated_list, Predicate pred) {
+    const std::vector<T>& un_allocated_list, Predicate pred) {
     std::vector<T> merged_list = allocated_list;
 
     for (const auto& item : un_allocated_list) {
@@ -294,7 +293,8 @@ std::vector<T> CUtlTSHashV2<T, Keytype, BucketCount, HashFuncs>::GetElements(int
     }
 
     /// @note: @og: basically, its hacky-way to obtain first-time commited information to memory
-    n_count = PeakAlloc();
+    n_count = PeakAlloc() - BlocksAllocated();
+
     std::vector<T> unAllocatedList;
     if (n_count > 0) {
         int nIndex = 0;
@@ -311,7 +311,7 @@ std::vector<T> CUtlTSHashV2<T, Keytype, BucketCount, HashFuncs>::GetElements(int
         }
     }
 
-    return unAllocatedList.size() > AllocatedList.size() ? unAllocatedList : AllocatedList;
+    return merge_without_duplicates(AllocatedList, unAllocatedList, ptr_compare<T>);
 }
 
 template <class Ty>

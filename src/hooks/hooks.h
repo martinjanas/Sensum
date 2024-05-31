@@ -98,7 +98,7 @@ namespace hooks
 
 	struct frame_stage_notify
 	{
-		static const int index = 35;
+		static const int index = 36;
 		using fn = void(__fastcall*)(void*, EClientFrameStage);
 		static void __fastcall hooked(void* a1, EClientFrameStage stage);
 

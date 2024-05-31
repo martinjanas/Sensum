@@ -56,9 +56,7 @@ namespace sdk
 
 		g::csgo_input = g::csgo_input->get();
 		g::entity_system = g::game_resource_service->GetGameEntitySystem();
-		g::render_system = **reinterpret_cast<CRenderSystem***>(modules::render_dx11.pattern_scanner.scan("66 0F 7F 05 ? ? ? ? 66 0F 7F 0D ? ? ? ? 48 89 2D ? ? ? ? 0F 1F 80").add(4).abs().as<uint8_t>());
-
-
+		g::render_system = **reinterpret_cast<CRenderSystem***>(modules::render_dx11.pattern_scanner.scan("66 0F 7F 0D ? ? ? ? 66 0F 7F 05 ? ? ? ? 0F 1F 40", "GetRenderSystemDX11").add(4).abs().as<uint8_t*>());
 
 		if (g::render_system)
 			g::swap_chain = g::render_system->swap_chain;

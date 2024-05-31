@@ -3,11 +3,7 @@
 
 #pragma once
 
-#if defined(CS2) || defined(DOTA2)
 constexpr auto kThreadSpinMutex = 2;
-#else
-constexpr auto kThreadSpinMutex = 1;
-#endif
 
 class CThreadSpinMutexV1 {
 public:

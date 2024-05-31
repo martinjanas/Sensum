@@ -9,19 +9,27 @@
 
 #include "../helpers/CUtlTSHash.h"
 #include "../helpers/CUtlVector.h"
+#include "../helpers/CUtlMap.h"
 #include "../helpers/vfunc.h"
+#include "../helpers/CThreadSpinRWLock.h"
 
-#define SCHEMASYSTEM_TYPE 2
-constexpr auto kSchemaSystem_PAD0 = 0x190;
-constexpr auto kSchemaSystemTypeScope_PAD1 = 0x4B0;
-constexpr auto kSchemaSystemTypeScope_PAD2 = 0x2808;
+// Copyright (C) 2023 neverlosecc
+// See end of file for extended copyright information.
+constexpr auto kSchemaSystemVersion = 2;
+constexpr auto kSchemaSystem_PAD0 = 0x188;
+constexpr auto kSchemaSystem_PAD1 = 0x120;
+constexpr auto kSchemaSystemTypeScope_PAD0 = 0x7;
 
 enum {
     kSchemaType_GetSizeWithAlignOf = 3,
     kSchemaSystem_ValidateClasses = 35,
+    kSchemaSystem_GetClassInfoBinaryName = 22,
+    kSchemaSystem_GetClassProjectName = kSchemaSystem_GetClassInfoBinaryName + 1,
+    kSchemaSystem_GetEnumBinaryName = kSchemaSystem_GetClassProjectName + 1,
+    kSchemaSystem_GetEnumProjectName = kSchemaSystem_GetEnumBinaryName + 1,
     kSchemaSystemTypeScope_DeclaredClass = 14,
     kSchemaSystemTypeScope_DeclaredEnum = kSchemaSystemTypeScope_DeclaredClass + 1,
-    kSchemaSystemTypeScope_GetScopeName = 32,
+    kSchemaSystemTypeScope_GetScopeName = 28,
     kSchemaSystemTypeScope_IsGlobalScope = kSchemaSystemTypeScope_GetScopeName + 1,
 };
 
@@ -42,15 +50,25 @@ using CSchemaClassBinding = CSchemaClassInfo;
 using CSchemaEnumBinding = CSchemaEnumInfo;
 
 enum SchemaClassFlags_t {
-    SCHEMA_CF1_HAS_VIRTUAL_MEMBERS = 1,
-    SCHEMA_CF1_IS_ABSTRACT = 2,
-    SCHEMA_CF1_HAS_TRIVIAL_CONSTRUCTOR = 4,
-    SCHEMA_CF1_HAS_TRIVIAL_DESTRUCTOR = 8,
-    SCHEMA_CF1_HAS_NOSCHEMA_MEMBERS = 16,
-    SCHEMA_CF1_IS_PARENT_CLASSES_PARSED = 32,
-    SCHEMA_CF1_IS_LOCAL_TYPE_SCOPE = 64,
-    SCHEMA_CF1_IS_GLOBAL_TYPE_SCOPE = 128,
-    SCHEMA_CF1_IS_SCHEMA_VALIDATED = 2048
+    SCHEMA_CF1_HAS_VIRTUAL_MEMBERS = (1 << 0),
+    SCHEMA_CF1_IS_ABSTRACT = (1 << 1),
+    SCHEMA_CF1_HAS_TRIVIAL_CONSTRUCTOR = (1 << 2),
+    SCHEMA_CF1_HAS_TRIVIAL_DESTRUCTOR = (1 << 3),
+    SCHEMA_CF1_LIMITED_METADATA = (1 << 4),
+    SCHEMA_CF1_INHERITANCE_DEPTH_CALCULATED = (1 << 5),
+    SCHEMA_CF1_MODULE_LOCAL_TYPE_SCOPE = (1 << 6),
+    SCHEMA_CF1_GLOBAL_TYPE_SCOPE = (1 << 7),
+    SCHEMA_CF1_CONSTRUCT_ALLOWED = (1 << 8),
+    SCHEMA_CF1_CONSTRUCT_DISALLOWED = (1 << 9),
+    SCHEMA_CF1_INFO_TAG_MNetworkAssumeNotNetworkable = (1 << 10),
+    SCHEMA_CF1_INFO_TAG_MNetworkNoBase = (1 << 11),
+    SCHEMA_CF1_INFO_TAG_MIgnoreTypeScopeMetaChecks = (1 << 12),
+    SCHEMA_CF1_INFO_TAG_MDisableDataDescValidation = (1 << 13),
+    SCHEMA_CF1_INFO_TAG_MClassHasEntityLimitedDataDesc = (1 << 14),
+    SCHEMA_CF1_INFO_TAG_MClassHasCustomAlignedNewDelete = (1 << 15),
+    SCHEMA_CF1_INFO_TAG_MNonConstructibleClassBase = (1 << 16),
+    SCHEMA_CF1_INFO_TAG_MConstructibleClassBase = (1 << 17),
+    SCHEMA_CF1_INFO_TAG_MHasKV3TransferPolymorphicClassname = (1 << 18)
 };
 
 struct CSchemaVarName {
@@ -88,32 +106,37 @@ struct SchemaEnumeratorInfoData_t {
     SchemaMetadataEntryData_t* m_pMetadata;
 };
 
+enum class SchemaEnumFlags_t : std::uint16_t {
+    SCHEMA_EF_IS_REGISTERED = (1 << 0),
+    SCHEMA_EF_MODULE_LOCAL_TYPE_SCOPE = (1 << 1),
+    SCHEMA_EF_GLOBAL_TYPE_SCOPE = (1 << 2),
+};
+
 class SchemaEnumInfoData_t {
 public:
     SchemaEnumInfoData_t* m_pSelf; // 0x0000
     const char* m_pszName; // 0x0008
     const char* m_pszModule; // 0x0010
-    std::int8_t m_nAlingOf; // 0x0018
-private:
-    char pad_0x0019[0x3] = {}; // 0x0019
-public:
-    std::int16_t m_nSize; // 0x001C
+    std::uint8_t m_unSize; // 0x0018
+    std::uint8_t m_unAlignOf; // 0x0019
+    SchemaEnumFlags_t m_unFlags; // 0x001A
+    std::int16_t m_nEnumeratorCount; // 0x001C
     std::int16_t m_nStaticMetadataSize; // 0x001E
-    SchemaEnumeratorInfoData_t* m_pEnumInfo;
+    SchemaEnumeratorInfoData_t* m_pEnumerators;
     SchemaMetadataEntryData_t* m_pStaticMetadata;
     CSchemaSystemTypeScope* m_pTypeScope; // 0x0030
-private:
-    char pad_0x0038[0x8] = {}; // 0x0038
-    std::int32_t m_unknown = 0; // 0x0040
+    std::int64_t m_nMinEnumeratorValue; // 0x0038
+    std::int64_t m_nMaxEnumeratorValue; // 0x0040
 };
+static_assert(sizeof(SchemaEnumInfoData_t) == 0x48);
 
 class CSchemaEnumInfo : public SchemaEnumInfoData_t {
 public:
-    std::vector<SchemaEnumeratorInfoData_t> GetEnumeratorValues() {
-        return { m_pEnumInfo, m_pEnumInfo + m_nSize };
+    [[nodiscard]] std::vector<SchemaEnumeratorInfoData_t> GetEnumeratorValues() const {
+        return { m_pEnumerators, m_pEnumerators + m_nEnumeratorCount };
     }
 
-    std::vector<SchemaMetadataEntryData_t> GetStaticMetadata() {
+    [[nodiscard]] std::vector<SchemaMetadataEntryData_t> GetStaticMetadata() const {
         return { m_pStaticMetadata, m_pStaticMetadata + m_nStaticMetadataSize };
     }
 };
@@ -140,124 +163,224 @@ enum class EAtomicCategory : std::uint8_t {
     Atomic_None
 };
 
+enum class SchemaBuiltinType_t : std::uint32_t {
+    Schema_Builtin_none = 0,
+    Schema_Builtin_void,
+    Schema_Builtin_char,
+    Schema_Builtin_int8,
+    Schema_Builtin_uint8,
+    Schema_Builtin_int16,
+    Schema_Builtin_uint16,
+    Schema_Builtin_int32,
+    Schema_Builtin_uint32,
+    Schema_Builtin_int64,
+    Schema_Builtin_uint64,
+    Schema_Builtin_float32,
+    Schema_Builtin_float64,
+    Schema_Builtin_bool,
+    Schema_Builtin_count
+};
+
+constexpr auto kSchemaBuiltinTypeCount = static_cast<std::size_t>(SchemaBuiltinType_t::Schema_Builtin_count);
+
 class CSchemaType {
 public:
-    bool IsValid(void) {
-        return GetVirtual<bool(__thiscall*)(void*)>(this, 0)(this);
+    [[nodiscard]] bool IsValid(void) {
+        return GetVirtual<bool (*)(void*)>(this, 0)(this);
     }
 
-    // @note: @og: actually its formattes string to CBufferString (E.g. <%s, cat %d>) but for some reason I cant get it work, so need to look in to it in
-    // future
-    /*std::string_view ToString() {
+    /*[[nodiscard]] std::string ToString() {
         static CBufferStringGrowable<1024> szBuf;
-        (void)Virtual::Get<const char* (__thiscall*)(void*, CBufferString*, bool)>(this, 1)(this, &szBuf, false);
+        (void)GetVirtual<const char* (__thiscall*)(void*, CBufferString&, bool bDontClearBuff)>(this, 1)(this, szBuf, false);
         return szBuf.Get();
     }*/
 
     void SpewDescription(std::uint32_t unLogChannel, const char* szName) {
-        //Virtual::Get<void (*)(void*, std::uint32_t, const char*)>(this, 2)(this, unLogChannel, szName);
-
-        GetVirtual<void(__thiscall*)(void*, uint32_t, const char*)>(this, 2)(this, unLogChannel, szName);
+        GetVirtual<void (*)(void*, std::uint32_t, const char*)>(this, 2)(this, unLogChannel, szName);
     }
 
     // @note: @og: gets size with align
-    bool GetSizeWithAlignOf(int* nOutSize, std::uint8_t* unOutAlign) {
+    [[nodiscard]] bool GetSizeWithAlignOf(int* nOutSize, std::uint8_t* unOutAlign) {
         return reinterpret_cast<int (*)(void*, int*, std::uint8_t*)>(vftable[kSchemaType_GetSizeWithAlignOf])(this, nOutSize, unOutAlign);
     }
 
-    // @note: @og: Can be used on CSchemaClassInfo. (Uses multiple inheritance depth verify that current CSchemaType->m_pClassInfo is inherits from pType)
-    bool IsA(CSchemaType* pType) 
-    {
-        return GetVirtual<bool(__thiscall*)(void*, CSchemaType*)>(this, 7)(this, pType);
+    [[nodiscard]] bool CanReinterpretAs(CSchemaType* pType) {
+        return reinterpret_cast<bool (*)(void*, CSchemaType*)>(vftable[kSchemaType_GetSizeWithAlignOf + 1])(this, pType);
     }
+
+    // @note: @og: Can be used on CSchemaClassInfo. (Uses multiple inheritance depth verify that current CSchemaType->m_pClassInfo is inherits from pType)
+    [[nodiscard]] bool IsA(CSchemaType* pType) {
+        return GetVirtual<bool (*)(void*, CSchemaType*)>(this, 7)(this, pType);
+    }
+
 public:
     // @note: @og: wrapper around GetSizes, this one gets CSchemaClassInfo->m_nSize
-    bool GetSize(int* nOutSize) {
+    [[nodiscard]] std::optional<int> GetSize() {
         std::uint8_t align_of = 0;
-        return GetSizeWithAlignOf(nOutSize, &align_of);
+        int result = 0;
+        return GetSizeWithAlignOf(&result, &align_of) ? std::make_optional(result) : std::nullopt;
     }
+
+    // @todo: @og: find out to what class pointer points.
+    [[nodiscard]] CSchemaType* GetRefClass();
+
+    [[nodiscard]] ETypeCategory GetTypeCategory() {
+        return m_unTypeCategory;
+    }
+
+    [[nodiscard]] EAtomicCategory GetAtomicCategory() {
+        return m_unAtomicCategory;
+    }
+
 public:
     std::uintptr_t* vftable; // 0x0000
     const char* m_pszName; // 0x0008
 
     CSchemaSystemTypeScope* m_pTypeScope; // 0x0010
+
     ETypeCategory m_unTypeCategory; // 0x0018
     EAtomicCategory m_unAtomicCategory; // 0x0019
-
-    // find out to what class pointer points.
-    CSchemaType* GetRefClass() const {
-        if (m_unTypeCategory != ETypeCategory::Schema_Ptr)
-            return nullptr;
-
-        auto ptr = m_pSchemaType;
-        while (ptr && ptr->m_unTypeCategory == ETypeCategory::Schema_Ptr)
-            ptr = ptr->m_pSchemaType;
-
-        return ptr;
-    }
-
-    struct array_t {
-        std::uint32_t m_nArraySize;
-    private:
-        std::uint32_t m_unknown = 0;
-    public:
-        CSchemaType* m_pElementType;
-    };
-
-    // @note: @og: basically, 1st is unknown and second is CUtlStringToken of m_pszName
-    struct atomic_base {
-    private:
-        std::uint64_t pad0x0000[2] = {};
-    };
-
-    struct atomic_t { // same goes for CollectionOfT
-        CSchemaType* m_pElementType;
-    private:
-        std::uint64_t pad0x0029 = {};
-    public:
-        CSchemaType* m_pTemplateTypeName;
-    };
-
-    using collection_of_t = atomic_t;
-
-    struct atomic_tt : atomic_base {
-        CSchemaType* m_pTemplates[2];
-    };
-
-    struct atomic_tf : atomic_base {
-        CSchemaType* m_pTemplateTypeName;
-        std::int32_t m_nSize;
-    };
-
-    struct atomic_ttf : atomic_base {
-        CSchemaType* m_pTemplates[2];
-        std::int32_t m_nSize;
-    };
-
-    struct atomic_i : atomic_base {
-        std::uint64_t m_nInteger;
-    };
-
-    // this union depends on CSchema implementation, all members above
-    // is from base class ( CSchemaType )
-    union // 0x020
-    {
-        CSchemaType* m_pSchemaType;
-        CSchemaClassInfo* m_pClassInfo;
-        CSchemaEnumBinding* m_pEnumBinding;
-        array_t m_Array;
-        atomic_t m_Atomic_t;
-        atomic_tt m_Atomic_tt;
-        atomic_tf m_Atomic_tf;
-        atomic_ttf m_Atomic_ttf;
-        atomic_i m_Atomic_i;
-    };
 };
-static_assert(offsetof(CSchemaType, m_pSchemaType) == 0x20);
 
-using CSchemaType_DeclaredClass = CSchemaType;
-using CSchemaType_DeclaredEnum = CSchemaType;
-using CSchemaType_Builtin = CSchemaType;
+class CSchemaType_Ptr : public CSchemaType {
+public:
+    CSchemaType* m_pObjectType;
+};
+
+[[nodiscard]] inline CSchemaType* CSchemaType::GetRefClass() {
+    if (GetTypeCategory() != ETypeCategory::Schema_Ptr)
+        return nullptr;
+
+    auto ptr = reinterpret_cast<CSchemaType_Ptr*>(this)->m_pObjectType;
+    while (ptr && ptr->GetTypeCategory() == ETypeCategory::Schema_Ptr)
+        ptr = reinterpret_cast<CSchemaType_Ptr*>(ptr)->m_pObjectType;
+
+    return ptr;
+}
+
+using CSchemaType_NoschemaType = CSchemaType;
+
+class CSchemaType_Builtin : public CSchemaType {
+public:
+    SchemaBuiltinType_t m_eBuiltinType;
+    std::uint8_t m_unSize;
+};
+
+class CSchemaType_DeclaredClass : public CSchemaType {
+public:
+    CSchemaClassInfo* m_pClassInfo;
+    bool m_bGlobalPromotionRequired;
+};
+
+class CSchemaType_DeclaredEnum : public CSchemaType {
+public:
+    CSchemaEnumBinding* m_pClassInfo;
+    bool m_bGlobalPromotionRequired;
+};
+
+struct SchemaAtomicTypeInfo_t {
+    const char* m_pszName1;
+    const char* m_pszName2;
+
+    int m_nAtomicID;
+
+    int m_nStaticMetadataCount;
+    SchemaMetadataEntryData_t* m_pStaticMetadata;
+};
+
+class CSchemaType_Atomic : public CSchemaType {
+public:
+    SchemaAtomicTypeInfo_t* m_pAtomicInfo;
+    int m_nAtomicID;
+    std::uint16_t m_unSize;
+    std::uint8_t m_unAlignment;
+};
+
+class CSchemaType_Atomic_T : public CSchemaType_Atomic {
+public:
+    CSchemaType* m_pTemplateType;
+};
+
+enum class SchemaAtomicFunctionIndex : std::int32_t {
+    Schema_Atomic_Get_Count = 0,
+    Schema_Atomic_Get_Element_Const,
+    Schema_Atomic_Get_Element,
+    Schema_Atomic_Swap_Elements,
+    Schema_Atomic_Insert_Before,
+    Schema_Atomic_Remove_Multiple,
+    Schema_Atomic_Set_Count,
+};
+
+using SchemaAtomicFunction = void (*)(SchemaAtomicFunctionIndex, void*, void*, void*);
+
+class CSchemaType_Atomic_CollectionOfT : public CSchemaType_Atomic_T {
+public:
+    SchemaAtomicFunction m_pFn;
+    std::uint16_t m_unElementSize;
+};
+
+class CSchemaType_Atomic_TF : public CSchemaType_Atomic_T {
+public:
+    int m_nFuncPtrSize;
+};
+
+class CSchemaType_Atomic_TT : public CSchemaType_Atomic_T {
+public:
+    CSchemaType* m_pTemplateType2;
+};
+
+class CSchemaType_Atomic_TTF : public CSchemaType_Atomic_TT {
+public:
+    int m_nFuncPtrSize;
+};
+
+class CSchemaType_Atomic_I : public CSchemaType_Atomic {
+public:
+    int m_nInteger;
+};
+
+class CSchemaType_Bitfield : public CSchemaType {
+public:
+    int m_nSize;
+};
+
+class CSchemaType_FixedArray : public CSchemaType {
+public:
+    int m_nElementCount;
+    std::uint16_t m_unElementSize;
+    std::uint8_t m_unElementAlignment;
+    CSchemaType* m_pElementType;
+};
+
+struct AtomicTypeInfo_T_t {
+    int m_nAtomicID;
+    CSchemaType* m_pTemplateType;
+    SchemaAtomicFunction m_pfnManipulator;
+};
+
+struct AtomicTypeInfo_TF_t {
+    int m_nAtomicID;
+    CSchemaType* m_pTemplateType;
+    int m_nFuncPtrSize;
+};
+
+struct AtomicTypeInfo_TT_t {
+    int m_nAtomicID;
+    CSchemaType* m_pTemplateType;
+    CSchemaType* m_pTemplateType2;
+};
+
+struct AtomicTypeInfo_TTF_t {
+    int m_nAtomicID;
+    CSchemaType* m_pTemplateType;
+    CSchemaType* m_pTemplateType2;
+    int m_nFuncPtrSize;
+};
+
+struct AtomicTypeInfo_I_t {
+    int m_nAtomicID;
+    int m_nInteger;
+};
 
 struct SchemaClassFieldData_t {
     const char* m_pszName; // 0x0000
@@ -271,17 +394,17 @@ struct SchemaStaticFieldData_t {
     const char* m_pszName; // 0x0000
     CSchemaType* m_pSchemaType; // 0x0008
     void* m_pInstance; // 0x0010
-    char pad_0x0018[0x10]; // 0x0018
+    int m_nStaticMetadataCount; // 0x0018
+    SchemaMetadataEntryData_t* m_pStaticMetadata; // 0x0020
 };
 
 struct SchemaBaseClassInfoData_t {
-    unsigned int m_unOffset; // 0x0000
+    std::uint32_t m_unOffset; // 0x0000
     CSchemaClassInfo* m_pPrevByClass; // 0x0008
 };
 
-//MJ: TODO:
-struct datamap_t; 
-struct typedescription_t;
+class datamap_t;
+class typedescription_t;
 
 using SchemaFieldMetadataOverrideSetData_t = datamap_t;
 using SchemaFieldMetadataOverrideData_t = typedescription_t;
@@ -290,7 +413,7 @@ struct SchemaClassInfoData_t {
 public:
     enum class SchemaClassInfoFunctionIndex : std::int32_t {
         kRegisterClassSchema = 0,
-        kFillBaseClassName = 1,
+        kPreRegisterClassSchema = 1,
         kCopyInstance = 2,
         kCreateInstance = 3,
         kDestroyInstance = 4,
@@ -298,6 +421,7 @@ public:
         kDestroyInstanceWithMemory = 6,
         kSchemaDynamicBinding = 7
     };
+
 public:
     SchemaClassInfoData_t* m_pSelf; // 0x0000
     const char* m_pszName; // 0x0008
@@ -308,7 +432,7 @@ public:
     std::int16_t m_nStaticMetadataSize; // 0x0020
     std::uint8_t m_unAlignOf; // 0x0022
     std::uint8_t m_bHasBaseClass; // 0x0023
-    std::int16_t m_nTotalClassSize; // 0x0024 // @note: @og: if there no derived or base class then it will be 1 otherwise derived class size + 1.
+    std::int16_t m_nTotalClassSize; // 0x0024 // @note: @og: if there is no derived or base class, then it will be 1 otherwise derived class size + 1.
     std::int16_t m_nDerivedClassSize; // 0x0026
     SchemaClassFieldData_t* m_pFields; // 0x0028
     SchemaStaticFieldData_t* m_pStaticFields; // 0x0030
@@ -320,6 +444,12 @@ public:
     SchemaClassFlags_t m_nClassFlags : 8; // 0x0060
     std::uint32_t m_unSequence; // 0x0064 // @note: @og: idk
     void* m_pFn; // 0x0068
+
+public:
+    template <typename RetTy = void*, typename... Ty>
+    RetTy CallFunction(SchemaClassInfoFunctionIndex index, Ty... args) const {
+        return reinterpret_cast<RetTy(*)(SchemaClassInfoFunctionIndex, Ty...)>(m_pFn)(index, std::forward<Ty>(args)...);
+    }
 };
 
 class CSchemaClassInfo : public SchemaClassInfoData_t {
@@ -342,15 +472,15 @@ public:
         return std::nullopt;
     }
 
-    std::vector<SchemaClassFieldData_t> GetFields() {
+    [[nodiscard]] std::vector<SchemaClassFieldData_t> GetFields() {
         return { m_pFields, m_pFields + m_nFieldSize };
     }
 
-    std::vector<SchemaStaticFieldData_t> GetStaticFields() {
+    [[nodiscard]] std::vector<SchemaStaticFieldData_t> GetStaticFields() {
         return { m_pStaticFields, m_pStaticFields + m_nStaticFieldsSize };
     }
 
-    std::vector<SchemaMetadataEntryData_t> GetStaticMetadata() {
+    [[nodiscard]] std::vector<SchemaMetadataEntryData_t> GetStaticMetadata() {
         return { m_pStaticMetadata, m_pStaticMetadata + m_nStaticMetadataSize };
     }
 
@@ -395,182 +525,124 @@ public:
     }
 
     [[nodiscard]] std::uint8_t GetAligment() const {
-        uint8_t max_val = (std::numeric_limits<uint8_t>::max)();
-
-        return m_unAlignOf == max_val ? 8 : m_unAlignOf;
+        return m_unAlignOf == (std::numeric_limits<std::uint8_t>::max)() ? 8 : m_unAlignOf;
     }
 
     // @note: @og: Copy instance from original to new created with all data from original, returns new_instance
-    void* CopyInstance(void* instance, void* new_instance) const {
-        using Fn = void* (*)(SchemaClassInfoFunctionIndex, void*, void*);
-        return reinterpret_cast<Fn>(m_pFn)(SchemaClassInfoFunctionIndex::kCreateInstance, instance, new_instance);
+    auto CopyInstance(void* instance, void* new_instance) const {
+        return CallFunction<void*>(SchemaClassInfoFunctionIndex::kCreateInstance, instance, new_instance);
     }
 
     // @note: @og: Creates default instance with engine allocated memory (e.g. if SchemaClassInfoData_t is C_BaseEntity, then Instance will be
     // C_BaseEntity)
-    [[nodiscard]] void* CreateInstance() const {
-        using Fn = void* (*)(SchemaClassInfoFunctionIndex);
-        return reinterpret_cast<Fn>(m_pFn)(SchemaClassInfoFunctionIndex::kCreateInstance);
+    [[nodiscard]] auto CreateInstance() const {
+        return CallFunction<void*>(SchemaClassInfoFunctionIndex::kCreateInstance);
     }
 
     // @note: @og: Creates default instance with your own allocated memory (e.g. if SchemaClassInfoData_t is C_BaseEntity, then Instance will be
     // C_BaseEntity)
-    void* CreateInstance(void* memory) const {
-        using Fn = void* (*)(SchemaClassInfoFunctionIndex, void*);
-        return reinterpret_cast<Fn>(m_pFn)(SchemaClassInfoFunctionIndex::kCreateInstanceWithMemory, memory);
+    auto CreateInstance(void* memory) const {
+        return CallFunction<void*>(SchemaClassInfoFunctionIndex::kCreateInstanceWithMemory, memory);
     }
 
-    // @note: @og: Destroy instance (e.g.: C_BaseInstance 1st VT fn with 0 flag)
-    void* DestroyInstance(void* instance) const {
-        using Fn = void* (*)(SchemaClassInfoFunctionIndex, void*);
-        return reinterpret_cast<Fn>(m_pFn)(SchemaClassInfoFunctionIndex::kDestroyInstanceWithMemory, instance);
+    // @note: @og: Destroy instance (e.g.: C_BaseEntity 1st VT fn with 0 flag)
+    auto DestroyInstance(void* instance) const {
+        return CallFunction<void*>(SchemaClassInfoFunctionIndex::kDestroyInstanceWithMemory, instance);
     }
 
-    // @note: @og: Destroy instance with de-allocating memory (e.g.: C_BaseInstance 1st VT fn with 1 flag)
-    void* DestroyInstanceWithMemory(void* instance) const {
-        using Fn = void* (*)(SchemaClassInfoFunctionIndex, void*);
-        return reinterpret_cast<Fn>(m_pFn)(SchemaClassInfoFunctionIndex::kDestroyInstanceWithMemory, instance);
+    // @note: @og: Destroy instance with de-allocating memory (e.g.: C_BaseEntity 1st VT fn with 1 flag)
+    auto DestroyInstanceWithMemory(void* instance) const {
+        return CallFunction<void*>(SchemaClassInfoFunctionIndex::kDestroyInstanceWithMemory, instance);
     }
 
-    CSchemaClassBinding* SchemaClassBinding(void* entity) const {
-        using Fn = CSchemaClassBinding * (*)(SchemaClassInfoFunctionIndex, void*);
-        return reinterpret_cast<Fn>(m_pFn)(SchemaClassInfoFunctionIndex::kSchemaDynamicBinding, entity);
+    [[nodiscard]] auto SchemaClassBinding(void* entity) const {
+        return CallFunction<CSchemaClassBinding*>(SchemaClassInfoFunctionIndex::kSchemaDynamicBinding, entity);
     }
 };
 
-enum class SchemaBuiltinType_t : std::uint32_t {
-    kInvalid = 0,
-    kVoid,
-    kChar,
-    kInt8,
-    kUint8,
-    kInt16,
-    kUint16,
-    kInt32,
-    kUint32,
-    kInt64,
-    kUint64,
-    kFloat32,
-    kFloat64,
-    kBool
+struct TypeAndCountInfo_t {
+    int m_nElementCount;
+    CSchemaType* m_pElementType;
+};
+
+template <class K, class V>
+class CSchemaPtrMap {
+public:
+    CUtlMap<K, V> m_Map;
 };
 
 class CSchemaSystemTypeScope {
 public:
     void* InsertNewClassBinding(const std::string_view szName, void* a2) {
-        //return Virtual::Get<void* (*)(CSchemaSystemTypeScope*, const char*, void*)>(this, 0)(this, szName.data(), a2);
-
-        return GetVirtual<void* (__thiscall*)(CSchemaSystemTypeScope*, const char*, void*)>(this, 0)(this, szName.data(), a2);
+        return GetVirtual<void* (*)(CSchemaSystemTypeScope*, const char*, void*)>(this, 0)(this, szName.data(), a2);
     }
 
     void* InsertNewEnumBinding(const std::string_view szName, void* a2) {
-        //return Virtual::Get<void* (*)(CSchemaSystemTypeScope*, const char*, void*)>(this, 1)(this, szName.data(), a2);
-
-        return  GetVirtual<void* (__thiscall*)(CSchemaSystemTypeScope*, const char*, void*)>(this, 1)(this, szName.data(), a2);
+        return GetVirtual<void* (*)(CSchemaSystemTypeScope*, const char*, void*)>(this, 1)(this, szName.data(), a2);
     }
 
-    CSchemaClassInfo* FindDeclaredClass(const std::string_view szName) {
-#if defined(SCHEMASYSTEM_TYPE) && SCHEMASYSTEM_TYPE == 2
+    [[nodiscard]] CSchemaClassInfo* FindDeclaredClass(const std::string_view szName) {
         CSchemaClassInfo* class_info;
 
-        //Virtual::Get<void(__thiscall*)(void*, CSchemaClassInfo**, const char*)>(this, 2)(this, &class_info, szName.data());
-
         GetVirtual<void(__thiscall*)(void*, CSchemaClassInfo**, const char*)>(this, 2)(this, &class_info, szName.data());
-
         return class_info;
-#else
-        return Virtual::Get<CSchemaClassInfo * (__thiscall*)(void*, const char*)>(this, 2)(this, szName.data());
-#endif
     }
 
-    CSchemaEnumInfo* FindDeclaredEnum(const std::string_view szName) {
-#if defined(SCHEMASYSTEM_TYPE) && SCHEMASYSTEM_TYPE == 2
+    [[nodiscard]] CSchemaEnumInfo* FindDeclaredEnum(const std::string_view szName) {
         CSchemaEnumInfo* enum_info;
 
-        //Virtual::Get<void(__thiscall*)(void*, CSchemaEnumInfo**, const char*)>(this, 3)(this, &enum_info, szName.data());
-
         GetVirtual<void(__thiscall*)(void*, CSchemaEnumInfo**, const char*)>(this, 3)(this, &enum_info, szName.data());
-
         return enum_info;
-#else
-        return Virtual::Get<CSchemaEnumInfo * (__thiscall*)(void*, const char*)>(this, 3)(this, szName.data());
-#endif
     }
 
-    CSchemaType* FindSchemaTypeByName(const std::string_view szName) {
-#if defined(SCHEMASYSTEM_TYPE) && SCHEMASYSTEM_TYPE == 2
+    [[nodiscard]] CSchemaType* FindSchemaTypeByName(const std::string_view szName) {
         CSchemaType* schema_type;
 
-        //Virtual::Get<void(__thiscall*)(void*, CSchemaType**, const char*)>(this, 4)(this, &schema_type, szName.data());
-
         GetVirtual<void(__thiscall*)(void*, CSchemaType**, const char*)>(this, 4)(this, &schema_type, szName.data());
-
         return schema_type;
-#else
-        return Virtual::Get<CSchemaType * (__thiscall*)(void*, const char*)>(this, 4)(this, szName.data());
-#endif
     }
 
-    CSchemaType_Builtin* Type_Builtin(const SchemaBuiltinType_t type) {
-#if defined(SCHEMASYSTEM_TYPE) && SCHEMASYSTEM_TYPE == 2
+    [[nodiscard]] CSchemaType_Builtin* Type_Builtin(const SchemaBuiltinType_t type) {
         CSchemaType_Builtin* type_builtin;
 
-        //Virtual::Get<void(__thiscall*)(void*, CSchemaType_Builtin**, SchemaBuiltinType_t)>(this, 5)(this, &type_builtin, type);
-
         GetVirtual<void(__thiscall*)(void*, CSchemaType_Builtin**, SchemaBuiltinType_t)>(this, 5)(this, &type_builtin, type);
-
         return type_builtin;
-#else
-        return Virtual::Get<CSchemaType_Builtin * (__thiscall*)(void*, SchemaBuiltinType_t)>(this, 5)(this, type);
-#endif
     }
 
-    CSchemaType_DeclaredClass* Type_DeclaredClass(const std::string_view szName) {
-#if defined(SCHEMASYSTEM_TYPE) && SCHEMASYSTEM_TYPE == 2
+    [[nodiscard]] CSchemaType_DeclaredClass* Type_DeclaredClass(const std::string_view szName) {
         CSchemaType_DeclaredClass* declared_class;
 
-        //Virtual::Get<void(__thiscall*)(void*, CSchemaType_DeclaredClass**, const char*)>(this, kSchemaSystemTypeScope_DeclaredClass)(this, &declared_class,
-          //  szName.data());
-
-        GetVirtual<void(__thiscall*)(void*, CSchemaType_DeclaredClass**, const char*)>(this, kSchemaSystemTypeScope_DeclaredClass)(this, &declared_class,
-            szName.data());
+        GetVirtual<void(__thiscall*)(void*, CSchemaType_DeclaredClass**, const char*)>(this, kSchemaSystemTypeScope_DeclaredClass)(
+            this, &declared_class, szName.data());
 
         return declared_class;
-#else
-        return Virtual::Get<CSchemaType_DeclaredClass * (__thiscall*)(void*, const char*)>(this, kSchemaSystemTypeScope_DeclaredClass)(this, szName.data());
-#endif
     }
 
-    CSchemaType_DeclaredEnum* Type_DeclaredEnum(const std::string_view szName) {
-#if defined(SCHEMASYSTEM_TYPE) && SCHEMASYSTEM_TYPE == 2
-        CSchemaType_DeclaredEnum* declared_class;
+    [[nodiscard]] CSchemaType_DeclaredEnum* Type_DeclaredEnum(const std::string_view szName) {
+        if constexpr (kSchemaSystemVersion == 2) {
+            CSchemaType_DeclaredEnum* declared_class;
 
-        //Virtual::Get<void(__thiscall*)(void*, CSchemaType_DeclaredEnum**, const char*)>(this, kSchemaSystemTypeScope_DeclaredEnum)(this, &declared_class,
-          //  szName.data());
+            GetVirtual<void(__thiscall*)(void*, CSchemaType_DeclaredEnum**, const char*)>(this, kSchemaSystemTypeScope_DeclaredEnum)(
+                this, &declared_class, szName.data());
 
-        GetVirtual<void(__thiscall*)(void*, CSchemaType_DeclaredEnum**, const char*)>(this, kSchemaSystemTypeScope_DeclaredEnum)(this, &declared_class,
-            szName.data());
-
-        return declared_class;
-#else
-        return Virtual::Get<CSchemaType_DeclaredEnum * (__thiscall*)(void*, const char*)>(this, kSchemaSystemTypeScope_DeclaredEnum)(this, szName.data());
-#endif
+            return declared_class;
+        }
+        else {
+            return GetVirtual<CSchemaType_DeclaredEnum * (__thiscall*)(void*, const char*)>(this, kSchemaSystemTypeScope_DeclaredEnum)(this,
+                szName.data());
+        }
     }
 
-    const char* GetScopeName() {
-        //return Virtual::Get<const char* (__thiscall*)(void*)>(this, kSchemaSystemTypeScope_GetScopeName)(this);
-
+    [[nodiscard]] const char* GetScopeName() {
         return GetVirtual<const char* (__thiscall*)(void*)>(this, kSchemaSystemTypeScope_GetScopeName)(this);
     }
 
-    bool IsGlobalScope() {
-        //return Virtual::Get<bool(__thiscall*)(void*)>(this, kSchemaSystemTypeScope_IsGlobalScope)(this);
-
+    [[nodiscard]] bool IsGlobalScope() {
         return GetVirtual<bool(__thiscall*)(void*)>(this, kSchemaSystemTypeScope_IsGlobalScope)(this);
     }
 
-    std::string_view BGetScopeName() {
-        return { m_szName.data() };
+    [[nodiscard]] std::string BGetScopeName() const {
+        return m_szName.data();
     }
 
     [[nodiscard]] CUtlTSHash<CSchemaClassBinding*> GetClassBindings() const {
@@ -580,107 +652,121 @@ public:
     [[nodiscard]] CUtlTSHash<CSchemaEnumBinding*> GetEnumBindings() const {
         return m_EnumBindings;
     }
+
+    [[nodiscard]] CUtlMap<std::uint16_t, CSchemaType_DeclaredClass*>& GetDeclaredClasses() {
+        return m_DeclaredClasses.m_Map;
+    }
+
+    [[nodiscard]] CUtlMap<std::uint16_t, CSchemaType_DeclaredEnum*>& GetDeclaredEnums() {
+        return m_DeclaredEnums.m_Map;
+    }
+
 private:
     void* vftable = nullptr;
-    std::array<char, 256> m_szName = {};
-    char pad_0x0108[kSchemaSystemTypeScope_PAD1] = {}; // 0x0108
-    CUtlTSHash<CSchemaClassBinding*> m_ClassBindings; // 0x05B8
-    char pad_0x0594[kSchemaSystemTypeScope_PAD2] = {}; // 0x05F8
-    CUtlTSHash<CSchemaEnumBinding*> m_EnumBindings; // 0x2E00
+    std::array<char, 256> m_szName = {}; // 0x0008
+    CSchemaSystemTypeScope* m_pGlobalTypeScope = nullptr; // 0x0108
+    bool m_bBuiltinTypesInitialized = false; // 0x0110
+    std::array<CSchemaType_Builtin, kSchemaBuiltinTypeCount> m_BuiltinTypes = {}; // 0x0118
+    CSchemaPtrMap<CSchemaType*, CSchemaType_Ptr*> m_Ptrs; // 0x0348
+    CSchemaPtrMap<int, CSchemaType_Atomic*> m_Atomics; // 0x0378
+    CSchemaPtrMap<AtomicTypeInfo_T_t, CSchemaType_Atomic_T*> m_AtomicsT; // 0x03A8
+    CSchemaPtrMap<AtomicTypeInfo_T_t, CSchemaType_Atomic_CollectionOfT*> m_AtomicsCollectionOfT; // 0x03D8
+
+    CSchemaPtrMap<AtomicTypeInfo_TT_t, CSchemaType_Atomic_TT*> m_AtomicsTT; // 0x0438
+
+    CSchemaPtrMap<AtomicTypeInfo_I_t, CSchemaType_Atomic_I*> m_AtomicsI; // 0x0498
+    CSchemaPtrMap<std::uint16_t, CSchemaType_DeclaredClass*> m_DeclaredClasses; // 0x04C8
+    CSchemaPtrMap<std::uint16_t, CSchemaType_DeclaredEnum*> m_DeclaredEnums; // 0x04F8
+    CSchemaPtrMap<int, const SchemaAtomicTypeInfo_t*> m_AtomicInfos; // 0x0528
+    CSchemaPtrMap<TypeAndCountInfo_t, CSchemaType_FixedArray*> m_FixedArrays; // 0x0558
+    CSchemaPtrMap<int, CSchemaType_Bitfield*> m_Bitfields; // 0x0588
+
+    CUtlTSHash<CSchemaClassBinding*> m_ClassBindings = {}; // 0x05C0
+    CUtlTSHash<CSchemaEnumBinding*> m_EnumBindings = {}; // 0x2E50
+};
+
+enum SchemaTypeScope_t : std::uint8_t {
+    SCHEMA_TYPESCOPE_GLOBAL = 0,
+    SCHEMA_TYPESCOPE_LOCAL,
+    SCHEMA_TYPESCOPE_DEFAULT,
 };
 
 class CSchemaSystem {
-private:
-    /**
-     * \brief (class_info->m_class_flags & 64) != 0;
-     */
-    using SchemaTypeScope_t = std::int32_t;
 public:
-    CSchemaSystemTypeScope* GlobalTypeScope(void) {
-        //return Virtual::Get<CSchemaSystemTypeScope * (__thiscall*)(void*)>(this, 11)(this);
-
-        return GetVirtual<CSchemaSystemTypeScope*(__thiscall*)(void*)>(this, 11)(this);
+    [[nodiscard]] CSchemaSystemTypeScope* GlobalTypeScope(void) {
+        return GetVirtual<CSchemaSystemTypeScope * (__thiscall*)(void*)>(this, 11)(this);
     }
 
-    CSchemaSystemTypeScope* FindTypeScopeForModule(const std::string_view pszModuleName) {
-        //return Virtual::Get<CSchemaSystemTypeScope * (__thiscall*)(void*, const char*, void*)>(this, 13)(this, pszModuleName.data(), nullptr);
-
+    [[nodiscard]] CSchemaSystemTypeScope* FindTypeScopeForModule(const std::string_view pszModuleName) {
         return GetVirtual<CSchemaSystemTypeScope * (__thiscall*)(void*, const char*, void*)>(this, 13)(this, pszModuleName.data(), nullptr);
     }
 
-    CSchemaSystemTypeScope* GetTypeScopeForBinding(const SchemaTypeScope_t nType, const std::string_view pszBinding) {
-        //return Virtual::Get<CSchemaSystemTypeScope * (__thiscall*)(void*, SchemaTypeScope_t, const char*)>(this, 14)(this, nType, pszBinding.data());
-
+    [[nodiscard]] CSchemaSystemTypeScope* GetTypeScopeForBinding(const SchemaTypeScope_t nType, const std::string_view pszBinding) {
         return GetVirtual<CSchemaSystemTypeScope * (__thiscall*)(void*, SchemaTypeScope_t, const char*)>(this, 14)(this, nType, pszBinding.data());
     }
 
     // @note: @og: E.g: engine2.dll!CEntityComponent
-    CSchemaClassBinding* FindClassByScopedName(const std::string_view pszScopedName) {
-#if defined(SCHEMASYSTEM_TYPE) && SCHEMASYSTEM_TYPE == 2
+    [[nodiscard]] CSchemaClassBinding* FindClassByScopedName(const std::string_view pszScopedName) {
         CSchemaClassBinding* binding;
 
-        //Virtual::Get<void(__thiscall*)(void*, CSchemaClassBinding**, const char*)>(this, 16)(this, &binding, pszScopedName.data());
-
         GetVirtual<void(__thiscall*)(void*, CSchemaClassBinding**, const char*)>(this, 16)(this, &binding, pszScopedName.data());
-
         return binding;
-#else
-        return Virtual::Get<CSchemaClassBinding * (__thiscall*)(void*, const char*)>(this, 16)(this, pszScopedName.data());
-#endif
     }
 
-    /*std::string_view ScopedNameForClass(CSchemaClassBinding* pBinding) {
+    /*[[nodiscard]] std::string ScopedNameForClass(CSchemaClassBinding* pBinding) {
         static CBufferStringGrowable<1024> szBuf;
-        [[maybe_unused]] auto res = Virtual::Get<const char* (__thiscall*)(void*, CSchemaClassBinding*, CBufferString*)>(this, 17)(this, pBinding, &szBuf);
+        GetVirtual<const char* (__thiscall*)(void*, CSchemaClassBinding*, CBufferString*)>(this, 17)(this, pBinding, &szBuf);
         return szBuf.Get();
     }*/
 
     // @note: @og: E.g: engine2.dll!SpawnDebugRestrictionOverrideState_t
-    CSchemaEnumBinding* FindEnumByScopedName(const std::string_view pszScopedName) {
-#if defined(SCHEMASYSTEM_TYPE) && SCHEMASYSTEM_TYPE == 2
+    [[nodiscard]] CSchemaEnumBinding* FindEnumByScopedName(const std::string_view pszScopedName) {
         CSchemaEnumBinding* binding;
 
-        //Virtual::Get<void(__thiscall*)(void*, CSchemaEnumBinding**, const char*)>(this, 18)(this, &binding, pszScopedName.data());
-
         GetVirtual<void(__thiscall*)(void*, CSchemaEnumBinding**, const char*)>(this, 18)(this, &binding, pszScopedName.data());
-
         return binding;
-#else
-        return Virtual::Get<CSchemaEnumBinding * (__thiscall*)(void*, const char*)>(this, 18)(this, pszScopedName.data());
-#endif
     }
 
-    /*std::string_view ScopedNameForEnum(CSchemaEnumBinding* pBinding) {
+    /*[[nodiscard]] std::string GetScopedNameForEnum(CSchemaEnumBinding* pBinding) {
         static CBufferStringGrowable<1024> szBuf;
-        [[maybe_unused]] auto res = Virtual::Get<const char* (__thiscall*)(void*, CSchemaEnumBinding*, CBufferString*)>(this, 19)(this, pBinding, &szBuf);
+        GetVirtual<const char* (__thiscall*)(void*, CSchemaEnumBinding*, CBufferString*)>(this, 19)(this, pBinding, &szBuf);
         return szBuf.Get();
     }*/
 
-    const char* GetClassInfoBinaryName(CSchemaClassBinding* pBinding) {
-        return GetVirtual<const char* (__thiscall*)(void*, CSchemaClassBinding*)>(this, 22)(this, pBinding);
+    [[nodiscard]] const char* GetClassInfoBinaryName(CSchemaClassBinding* pBinding) {
+        return GetVirtual<const char* (__thiscall*)(void*, CSchemaClassBinding*)>(this, kSchemaSystem_GetClassInfoBinaryName)(this, pBinding);
     }
 
-    const char* GetClassProjectName(CSchemaClassBinding* pBinding) {
-        return GetVirtual<const char* (__thiscall*)(void*, CSchemaClassBinding*)>(this, 23)(this, pBinding);
+    [[nodiscard]] const char* GetClassProjectName(CSchemaClassBinding* pBinding) {
+        return GetVirtual<const char* (__thiscall*)(void*, CSchemaClassBinding*)>(this, kSchemaSystem_GetClassProjectName)(this, pBinding);
     }
 
-    const char* GetEnumBinaryName(CSchemaEnumBinding* pBinding) {
-        return GetVirtual<const char* (__thiscall*)(void*, CSchemaEnumBinding*)>(this, 24)(this, pBinding);
+    [[nodiscard]] const char* GetEnumBinaryName(CSchemaEnumBinding* pBinding) {
+        return GetVirtual<const char* (__thiscall*)(void*, CSchemaEnumBinding*)>(this, kSchemaSystem_GetEnumBinaryName)(this, pBinding);
     }
 
-    const char* GetEnumProjectName(CSchemaEnumBinding* pBinding) {
-        return GetVirtual<const char* (__thiscall*)(void*, CSchemaEnumBinding*)>(this, 25)(this, pBinding);
+    [[nodiscard]] const char* GetEnumProjectName(CSchemaEnumBinding* pBinding) {
+        return GetVirtual<const char* (__thiscall*)(void*, CSchemaEnumBinding*)>(this, kSchemaSystem_GetEnumProjectName)(this, pBinding);
     }
 
     CSchemaClassBinding* ValidateClasses(CSchemaClassBinding** ppBinding) {
         return GetVirtual<CSchemaClassBinding * (__thiscall*)(void*, CSchemaClassBinding**)>(this, kSchemaSystem_ValidateClasses)(this, ppBinding);
     }
 
-    bool SchemaSystemIsReady() {
+    [[nodiscard]] bool IsSchemaSystemReady() {
         return GetVirtual<bool(__thiscall*)(void*)>(this, 26)(this);
     }
 
-    [[nodiscard]] CUtlVector<CSchemaSystemTypeScope*> GetTypeScopes(void) const {
+    [[nodiscard]] void PrintSchemaStats() {
+        GetVirtual<void(__thiscall*)(void*)>(this, 30)(this);
+    }
+
+    // @note: @og: there 2 options, "enum" or "class"
+    [[nodiscard]] void PrintSchemaMetaStats(const char* pszOptions) {
+        GetVirtual<void(__thiscall*)(void*, const char*)>(this, 31)(this, pszOptions);
+    }
+
+    [[nodiscard]] CUtlVector<CSchemaSystemTypeScope*> GetTypeScopes() const {
         return m_TypeScopes;
     }
 
@@ -699,14 +785,29 @@ public:
     [[nodiscard]] std::int32_t GetIgnoredBytes() const {
         return m_nIgnoredBytes;
     }
+
 private:
     char pad_0x0000[kSchemaSystem_PAD0] = {}; // 0x0000
     CUtlVector<CSchemaSystemTypeScope*> m_TypeScopes = {}; // SCHEMASYSTEM_TYPE_SCOPES_OFFSET
-    char pad_01A0[288] = {}; // 0x01A0
+    char pad_01A0[kSchemaSystem_PAD1] = {}; // 0x01A0
     std::int32_t m_nRegistrations = 0; // 0x02C0
     std::int32_t m_nIgnored = 0; // 0x02C4
     std::int32_t m_nRedundant = 0; // 0x02C8
-    char pad_02CC[4] = {}; // 0x02CC
-    std::int32_t m_nIgnoredBytes = 0; // 0x02D0
+    std::size_t m_nIgnoredBytes = 0; // 0x02CC
 };
 
+// source2gen - Source2 games SDK generator
+// Copyright 2023 neverlosecc
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//

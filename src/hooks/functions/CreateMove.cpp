@@ -21,15 +21,10 @@ namespace Aimbot
 {
     static std::list<entity_data::player_data_t> m_player_data;
 
-    std::vector<int> get_hitboxes()
+    static std::vector<int>& get_hitboxes()
     {
-        std::vector<int> list;
-        //list.clear();
+        static std::vector<int> list{ HITBOX_HEAD, HITBOX_UPPER_CHEST, HITBOX_PELVIS };
     
-        list.push_back(HITBOX_HEAD);
-        list.push_back(HITBOX_LOWER_CHEST);
-        list.push_back(HITBOX_UPPER_CHEST);
-        
         return list;
     }
 
@@ -76,58 +71,60 @@ namespace Aimbot
         float best_fov = 9999.f;
         QAngle best_angle;
 
-        QAngle viewangles;
-        g::client->GetViewAngles(0, &viewangles);
-        
-        const auto& hitbox_ids = get_hitboxes();
-        if (hitbox_ids.empty())
-            return;
-
         for (const auto& data : m_player_data)
         {
             static int i = 0;
 
-            if (data.m_iHealth <= 0)
+            QAngle viewangles;
+            g::client->GetViewAngles(0, &viewangles);
+
+            const auto& hitbox_ids = get_hitboxes();
+            if (hitbox_ids.empty())
+                continue;
+
+            if (!data.pawn || data.m_iHealth <= 0 || data.hitboxes.empty())
                 continue;
 
             const auto& eye_pos = data.localplayer_pawn->GetEyePos();
 
             for (const auto& hitbox_id : hitbox_ids)
             {
-                const auto& hitbox_data = data.hitboxes[hitbox_id];
-
-                const auto hitbox_pos = hitbox_data.hitbox_pos;
-                if (!hitbox_pos.is_valid())
-                    continue;
-
-                QAngle target_angle = (hitbox_pos - eye_pos).to_qangle();
-                target_angle.clamp_normalize();
-
-                auto delta = target_angle - viewangles;
-                delta.clamp_normalize();
-
-                float dist = data.m_vecOrigin.dist_to(eye_pos);
-
-                float fov = distance_based_fov(delta, dist);
-
-                if (fov < best_fov)
+                for (auto& hitbox_data : data.hitboxes)
                 {
-                    best_fov = fov;
-                    best_angle = target_angle;
+                    if (hitbox_data.index != hitbox_id)
+                        continue;
+
+                    QAngle target_angle = (hitbox_data.hitbox_pos - eye_pos).to_qangle();
+                    target_angle.clamp_normalize();
+
+                    auto delta = target_angle - viewangles;
+                    delta.clamp_normalize();
+
+                    float dist = data.m_vecOrigin.dist_to(eye_pos);
+
+                    float fov = distance_based_fov(delta, dist);
+
+                    if (fov < best_fov)
+                    {
+                        best_fov = fov;
+                        best_angle = target_angle;
+                    }
+
+                    if (fov > settings::visuals::aimbot_fov)
+                        continue;
+
+                    //smooth(settings::visuals::smooth, viewangles, best_angle, best_angle); //behaves weirdly @ >2 smooth 
+
+                    //g::input_system->IsButtonDown(ButtonCode::MouseLeft) this behaves weirdly, but idc because im gonna use (buttons & IN_ATTACK) anyway
+
+                    if (cmd->buttonStates.m_nValue & IN_ATTACK && best_angle.to_vector().is_valid())
+                        g::client->SetViewAngles(0, best_angle);
+
+                    if (i % 25 == 0)
+                        printf("[%d]: fov: %.1f, best_fov: %.1f\n", hitbox_data.index, fov, best_fov);
                 }
-            
-                if (fov > settings::visuals::aimbot_fov)
-                    continue;
 
-                //smooth(settings::visuals::smooth, viewangles, best_angle, best_angle); //behaves weirdly @ >2 smooth 
-
-                //g::input_system->IsButtonDown(ButtonCode::MouseLeft) this behaves weirdly, but idc because im gonna use (buttons & IN_ATTACK) anyway
-
-                if (cmd->buttonStates.m_nValue & IN_ATTACK)
-                    g::client->SetViewAngles(0, best_angle);
-
-                if (i % 25 == 0)
-                    printf("[%d]: fov: %.1f, best_fov: %.1f\n", hitbox_data.index, fov, best_fov);
+                //const auto& hitbox_data = data.hitboxes[hitbox_id];
             }
 
             i++;
@@ -135,7 +132,7 @@ namespace Aimbot
     }
 }
 
-bool __fastcall hooks::create_move::hooked(CSGOInput* input, int slot, bool active, bool subtick) //unk maybe removed?
+bool __fastcall hooks::create_move::hooked(CSGOInput* input, int slot, bool active, bool subtick)
 { 
     const auto& result = original_fn(input, slot, active, subtick);
 
