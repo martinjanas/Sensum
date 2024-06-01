@@ -1,20 +1,22 @@
 #include "hooks.h"
 #include "../settings/settings.h"
 #include "../sdk/helpers/entity_data.h"
-#include "../ShadowVMT.h"
 
 bool hooks::init()
 {
 	if (MH_Initialize() != MH_STATUS::MH_OK)
 		return false;
 
-	ShadowVMT entity_system = ShadowVMT(g::entity_system);
-	ShadowVMT csgo_input = ShadowVMT(g::csgo_input);
-	ShadowVMT client = ShadowVMT(g::client);
-	ShadowVMT swap_chain = ShadowVMT(g::swap_chain);
+	entity_system = ShadowVMT(g::entity_system);
+	csgo_input = ShadowVMT(g::csgo_input);
+	client = ShadowVMT(g::client);
+	swap_chain = ShadowVMT(g::swap_chain);
+	//client_mode = ShadowVMT(g::client_mode);
 
 	entity_system.Apply(on_add_entity::index, reinterpret_cast<uintptr_t*>(&on_add_entity::hooked), reinterpret_cast<void**>(&on_add_entity::original_fn));
 	entity_system.Apply(on_remove_entity::index, reinterpret_cast<uintptr_t*>(&on_remove_entity::hooked), reinterpret_cast<void**>(&on_remove_entity::original_fn));
+
+	//client_mode.Apply(clientmode_createmove::index, reinterpret_cast<uintptr_t*>(&clientmode_createmove::hooked), reinterpret_cast<void**>(&clientmode_createmove::original_fn));
 
 	csgo_input.Apply(create_move::index, reinterpret_cast<uintptr_t*>(&create_move::hooked), reinterpret_cast<void**>(&create_move::original_fn));
 	//csgo_input.Apply(override_view::index, reinterpret_cast<uintptr_t*>(&override_view::hooked), reinterpret_cast<void**>(&override_view::original_fn));
@@ -39,6 +41,14 @@ bool hooks::detach()
 {
 	SetWindowLongPtrA(globals::hwnd, GWLP_WNDPROC, LONG_PTR(hooks::wndproc::original));
 
+	entity_system.Remove(on_add_entity::index);
+	entity_system.Remove(on_remove_entity::index);
+	csgo_input.Remove(create_move::index);
+	client.Remove(frame_stage_notify::index);
+	swap_chain.Remove(directx::present::index);
+	swap_chain.Remove(directx::resize_buffers::index);
+
+	MH_DisableHook(MH_ALL_HOOKS);
 	if (MH_Uninitialize() != MH_STATUS::MH_OK)
 		return false;
 
@@ -108,4 +118,20 @@ void __fastcall hooks::get_matrices_for_view::hooked(void* rcx, void* rdx, VMatr
 //		setup->flFov = 120.f;
 //
 //	original_fn(rcx, rdx, setup);
+//}
+
+
+//bool __fastcall hooks::clientmode_createmove::hooked(void* rcx, CUserCmd* cmd) // + float frametime ? //Not working properly, crashing at IN_ATTACK
+//{
+//	const auto& result = original_fn(rcx, cmd);
+//
+//	if (!cmd)
+//		return result;
+//
+//	if (g::engine_client->IsInGame() && cmd)
+//	{
+//		cmd->buttonStates.m_nValue |= IN_ATTACK;
+//	}
+//
+//	return result;
 //}

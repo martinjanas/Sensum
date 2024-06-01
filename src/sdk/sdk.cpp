@@ -61,6 +61,8 @@ namespace sdk
 		if (g::render_system)
 			g::swap_chain = g::render_system->swap_chain;
 
+		g::client_mode = modules::client.pattern_scanner.scan("48 8D 3D ? ? ? ? 48 8D 35 ? ? ? ? 90").add(0x3).abs().as();
+
 		g::mem_alloc = modules::tier0.exporter.get_export("g_pMemAlloc").as<IMemAlloc>();
 		mem_alloc_in::mem_alloc = modules::tier0.exporter.get_export("g_pMemAlloc").as<IMemAlloc>();
 
@@ -75,6 +77,7 @@ namespace sdk
 		print_status(g::render_system);
 		print_status(g::swap_chain);
 		print_status(g::input_system);
+		print_status(g::client_mode);
 	}
 }
 
@@ -90,5 +93,6 @@ namespace interfaces
 	CRenderSystem* render_system{};
 	IDXGISwapChain* swap_chain{};
 	CInputSystem* input_system{};
+	void* client_mode{};
 }
 

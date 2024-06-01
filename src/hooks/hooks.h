@@ -10,8 +10,15 @@
 #include "../thirdparty/ImGui/backends/imgui_impl_dx11.h"
 #include "../thirdparty/ImGui/backends/imgui_impl_win32.h"
 
+#include "../ShadowVMT.h"
 namespace hooks
 {
+	inline static ShadowVMT entity_system;
+	inline static ShadowVMT csgo_input;
+	inline static ShadowVMT client;
+	inline static ShadowVMT swap_chain;
+	inline static ShadowVMT client_mode;
+
 	bool init();
 	bool detach();
 
@@ -117,6 +124,15 @@ namespace hooks
 	{
 		using fn = void(__fastcall*)(void*, void* rdx, VMatrix* world_to_view, VMatrix* view_to_projection, VMatrix* world_to_projection, VMatrix* world_to_pixels);
 		static void __fastcall hooked(void* rcx, void* rdx, VMatrix* world_to_view, VMatrix* view_to_projection, VMatrix* world_to_projection, VMatrix* world_to_pixels);
+
+		inline static fn original_fn;
+	};
+
+	struct clientmode_createmove
+	{
+		static const int index = 15;
+		using fn = bool(__fastcall*)(void* rcx, CUserCmd* cmd);
+		static bool __fastcall hooked(void* rcx, CUserCmd* cmd);
 
 		inline static fn original_fn;
 	};

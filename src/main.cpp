@@ -2,14 +2,8 @@
 #include "ShadowVMT.h"
 #include "sdk/classes/CCSPlayerPawn.h"
 
-//Notice: This project is WORK IN PROGRESS!
 DWORD __stdcall on_attach(void* base)
 {
-   /* while (!modules::nav_system.base)
-       Sleep(50);*/
-    
-    Sleep(5000);
-
     console::attach();
 
     sdk::init_modules();

@@ -37,6 +37,7 @@ namespace interfaces //move to interfaces.h ?
 	extern CRenderSystem* render_system;
 	extern IDXGISwapChain* swap_chain;
 	extern CInputSystem* input_system;
+	extern void* client_mode;
 }
 
 namespace g = interfaces;

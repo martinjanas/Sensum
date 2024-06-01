@@ -11,6 +11,7 @@ class ShadowVMT
 {
 public:
 	ShadowVMT(void* object);
+	ShadowVMT() {};
 	//~ShadowVMT();
 
 	bool Apply(int index, uintptr_t* hook_function, void** original_fn);
