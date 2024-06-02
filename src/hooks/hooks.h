@@ -2,7 +2,6 @@
 #include "../sdk/sdk.h"
 #include "../sdk/helpers/globals.h"
 #include "../sdk/classes/CHandle.h"
-#include "../sdk/hooking/minhook/MinHook.h"
 #include "../sdk/classes/CEntityInstance.h"
 #include "../sdk/helpers/console.h"
 #include "../thirdparty/ImGui/imgui.h"
@@ -10,7 +9,9 @@
 #include "../thirdparty/ImGui/backends/imgui_impl_dx11.h"
 #include "../thirdparty/ImGui/backends/imgui_impl_win32.h"
 
-#include "../ShadowVMT.h"
+#include "../sdk/hooking/safetyhook/safetyhook.hpp"
+#include "../sdk/hooking/shadow_vmt/ShadowVMT.h"
+
 namespace hooks
 {
 	inline static ShadowVMT entity_system;
@@ -112,12 +113,12 @@ namespace hooks
 		inline static fn original_fn;
 	};
 
-	struct get_fov
+	struct get_fov //probably not safe to hook
 	{
 		using fn = float(__fastcall*)(void*);
 		static float __fastcall hooked(void* camera);
 
-		inline static fn original_fn;
+		inline static SafetyHookInline safetyhook;
 	};
 	
 	struct get_matrices_for_view
@@ -125,14 +126,14 @@ namespace hooks
 		using fn = void(__fastcall*)(void*, void* rdx, VMatrix* world_to_view, VMatrix* view_to_projection, VMatrix* world_to_projection, VMatrix* world_to_pixels);
 		static void __fastcall hooked(void* rcx, void* rdx, VMatrix* world_to_view, VMatrix* view_to_projection, VMatrix* world_to_projection, VMatrix* world_to_pixels);
 
-		inline static fn original_fn;
+		inline static SafetyHookInline safetyhook;
 	};
 
 	struct clientmode_createmove
 	{
 		static const int index = 15;
-		using fn = bool(__fastcall*)(void* rcx, CUserCmd* cmd);
-		static bool __fastcall hooked(void* rcx, CUserCmd* cmd);
+		using fn = bool(__fastcall*)(void* rcx, void* rdx, float frametime, CUserCmd* cmd);
+		static bool __fastcall hooked(void* rcx, void* rdx, float frametime, CUserCmd* cmd);
 
 		inline static fn original_fn;
 	};

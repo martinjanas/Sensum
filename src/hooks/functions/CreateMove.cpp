@@ -73,7 +73,7 @@ namespace Aimbot
 
         for (const auto& data : m_player_data)
         {
-            static int i = 0;
+            //static int i = 0;
 
             QAngle viewangles;
             g::client->GetViewAngles(0, &viewangles);
@@ -110,38 +110,42 @@ namespace Aimbot
                         best_angle = target_angle;
                     }
 
-                    if (fov > settings::visuals::aimbot_fov)
-                        continue;
+                    //if (i % 25 == 0)
+                      //  printf("[%d]: fov: %.1f, best_fov: %.1f\n", hitbox_data.index, fov, best_fov);
 
                     //smooth(settings::visuals::smooth, viewangles, best_angle, best_angle); //behaves weirdly @ >2 smooth 
 
-                    //g::input_system->IsButtonDown(ButtonCode::MouseLeft) this behaves weirdly, but idc because im gonna use (buttons & IN_ATTACK) anyway
+                    if (!cmd->buttonStates.m_nValue.HasFlag(IN_ATTACK))
+                        continue;
 
-                    if (cmd->buttonStates.m_nValue & IN_ATTACK && best_angle.to_vector().is_valid())
-                        g::client->SetViewAngles(0, best_angle);
+                    const auto& best_angle_vec = best_angle.to_vector();
+                    if (!best_angle_vec.is_valid())
+                        continue;
 
-                    if (i % 25 == 0)
-                        printf("[%d]: fov: %.1f, best_fov: %.1f\n", hitbox_data.index, fov, best_fov);
+                    if (best_fov > settings::visuals::aimbot_fov)
+                        continue;
+
+                    g::client->SetViewAngles(0, best_angle);
                 }
-
-                //const auto& hitbox_data = data.hitboxes[hitbox_id];
             }
 
-            i++;
+            //i++;
         }
     }
 }
 
 bool __fastcall hooks::create_move::hooked(CSGOInput* input, int slot, bool active, bool subtick)
 { 
-    const auto& result = original_fn(input, slot, active, subtick);
-
     if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
-        return result;
+        return original_fn(input, slot, active, subtick);
 
-    CUserCmd* cmd = input->GetUserCmd();
-    
-    Aimbot::Aim(cmd);
+    CUserCmd* cmd = input->GetUserCmd();   
+    if (!cmd)
+        return original_fn(input, slot, active, subtick);
+
+    //Aimbot::Aim(cmd);
+
+    //printf("nValue: %d, nValueChanged: %d\n", cmd->buttonStates.m_nValue.get_flag(), cmd->buttonStates.m_nValueChanged.get_flag());
 
     //static int i = 0;
 
@@ -160,6 +164,25 @@ bool __fastcall hooks::create_move::hooked(CSGOInput* input, int slot, bool acti
     //}
     //
     //i++;
+
+    return original_fn(input, slot, active, subtick);
+}
+
+bool __fastcall hooks::clientmode_createmove::hooked(void* rcx, void* rdx, float frametime, CUserCmd* cmd) //cmd is nullptr?
+{
+    const auto& result = original_fn(rcx, rdx, frametime, cmd);
+
+    if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
+        return result;
+
+    if (!cmd)
+        return result;
+
+    auto ccmd = g::csgo_input->GetUserCmd(); //for now
+    if (!ccmd)
+        return result;
+
+    Aimbot::Aim(ccmd);
 
     return result;
 }

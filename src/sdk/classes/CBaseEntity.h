@@ -14,40 +14,6 @@ enum LifeState_t : uint8_t
     LIFE_RESPAWNING
 };
 
-//class entity_instance {
-//public:
-//    NETVAR(m_pEntity, "CEntityInstance", "m_pEntity", entity_identity*);
-//
-//    template<typename T> requires std::derived_from<T, entity_instance>
-//    VIRTUAL_FUNCTION(get_ref_handle, void, 2, (this, handle), handle<T>* handle)
-//
-//        template<typename T> requires std::derived_from<T, entity_instance>
-//    auto get_ref_handle() noexcept {
-//        handle<T> handle;
-//        get_ref_handle(&handle);
-//        return handle;
-//    }
-//
-//};
-
-class CBaseAnimating
-{
-public:
-
-    
-
-    /*uint32_t HitboxToWorldTransform(const HitboxSet_t* hitbox_set, mat3x4_t hitbox_to_world, int size)
-    {
-        using fn = uint32_t(__thiscall*)(void*, const HitboxSet_t*, mat3x4_t, int);
-        static auto addr = modules::client.pattern_scanner.scan("E8 ? ? ? ? 33 F6 4C 63 E0").add(0x1).abs().as();
-
-        const auto hitbox_to_world_transform = reinterpret_cast<fn>(addr);
-
-        if (hitbox_to_world_transform)
-            return hitbox_to_world_transform(this, hitbox_set, hitbox_to_world, size);
-    }*/
-};
-
 enum Collision_Group_t
 {
     COLLISION_GROUP_NONE = 0,
@@ -75,7 +41,6 @@ enum Collision_Group_t
     LAST_SHARED_COLLISION_GROUP
 };
 
-
 class VPhysicsCollisionAttribute_t
 {
     NETVAR(int, m_nInteractsAs, "VPhysicsCollisionAttribute_t", "m_nInteractsAs");
@@ -97,10 +62,31 @@ public:
     NETVAR(float, m_flBoundingRadius, "CCollisionProperty", "m_flBoundingRadius");
 };
 
+struct EmitSound_t
+{
+    int							m_nChannel;
+    char const*                 m_pSoundName;
+    float						m_flVolume;
+    void*				        m_SoundLevel;
+    int							m_nFlags;
+    int							m_nPitch;
+    const Vector* m_pOrigin;
+    float						m_flSoundTime; ///< NOT DURATION, but rather, some absolute time in the future until which this sound should be delayed
+    float*                      m_pflSoundDuration;
+    bool						m_bEmitCloseCaption;
+    bool						m_bWarnOnMissingCloseCaption;
+    bool						m_bWarnOnDirectWaveReference;
+    int							m_nSpeakerEntity;
+    CUtlVector<Vector>	        m_UtlVecSoundOrigin;  ///< Actual sound origin(s) (can be multiple if sound routed through speaker entity(ies) )
+    void*	                    m_hSoundScriptHash;
+    int							m_nSoundEntryVersion;
+};
+
+class CHandle;
 class CBaseEntity : public CEntityInstance
 {
 public:
-    NETVAR(void*, m_hGroundEntity, "C_BaseEntity", "m_hGroundEntity");
+    NETVAR(CHandle, m_hGroundEntity, "C_BaseEntity", "m_hGroundEntity");
 	NETVAR(int, m_iHealth, "C_BaseEntity", "m_iHealth");
 	NETVAR(LifeState_t, m_lifeState, "C_BaseEntity", "m_lifeState");
     NETVAR(uint8_t, m_iTeamNum, "C_BaseEntity", "m_iTeamNum");
@@ -110,12 +96,21 @@ public:
     NETVAR(Vector, m_vecViewOffset, "C_BaseModelEntity", "m_vecViewOffset");
     NETVAR(uint32_t, m_fFlags, "C_BaseEntity", "m_fFlags");
 
-    CBaseAnimating* GetBaseAnimating()
-    {
-        return GetVirtual<CBaseAnimating * (__thiscall*)(void*)>(this, 44)(this);
-    }
+    //int EmitSound(EmitSound_t& params, const char* sound_name, float sound_time) //crashing/throwing exceptions
+    //{
+    //    using fn = int (__thiscall*)(void*, EmitSound_t&, const char*, float);
 
-    HitboxSet_t* GetHitboxSet(int i) //Crashing
+    //    static auto addr = modules::client.pattern_scanner.scan("E8 ? ? ? ? 41 2B FE", "EmitSound()").as();
+
+    //    auto emit_sound = reinterpret_cast<fn>(addr);
+
+    //    if (emit_sound)
+    //        return emit_sound(this, params, sound_name, 0.0f);
+
+    //    return -1;
+    //}
+
+    HitboxSet_t* GetHitboxSet(int i)
     {
         using fn = HitboxSet_t * (__thiscall*)(void*, int);
 
@@ -132,7 +127,7 @@ public:
         return nullptr;
     }
 
-    bool ComputeSurroundingBox(Vector* mins, Vector* maxs) //Crashing?
+    bool ComputeSurroundingBox(Vector* mins, Vector* maxs)
     {
         using fn = bool(__thiscall*)(void*, Vector*, Vector*);
 

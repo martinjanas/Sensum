@@ -2,9 +2,6 @@
 #include "../sdk.h"
 #include "../../sdk/classes/CBaseEntity.h"
 
-#define INVALID_EHANDLE_INDEX 0xFFFFFFFF
-#define ENT_ENTRY_MASK 0x7FFF
-
 class CHandle
 {
 public:
@@ -15,20 +12,20 @@ public:
 
     bool IsValid() const
     {
-        return entity_index != INVALID_EHANDLE_INDEX;
+        return entity_index != 0xFFFFFFFF;
     }
 
-    int GetEntryIndex() const
+    uint32_t GetIndex() const
     {
-        return entity_index & ENT_ENTRY_MASK;
+        return entity_index & 0x7FFF;
     }
 
-    template <typename T = CBaseEntity>
-    T* Get() const
+    template <typename T = CBaseEntity*>
+    T Get() const
     {
-        auto base_entity = g::entity_system->GetBaseEntity(GetEntryIndex());
+        auto base_entity = g::entity_system->GetBaseEntity(GetIndex());
 
-        return reinterpret_cast<T*>(base_entity);
+        return reinterpret_cast<T>(base_entity);
     }
 
     uint32_t entity_index;

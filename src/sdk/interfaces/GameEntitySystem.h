@@ -4,7 +4,6 @@
 #include "../classes/CBaseEntity.h"
 
 #include <WinDNS.h>
-//#include "../classes/CHandle.h"
 
 class CGameEntitySystem
 {
@@ -29,10 +28,22 @@ public:
 			entity = *(uint64_t*)temp_entity;
 		else entity = 0;
 
-		/*if (entity && reinterpret_cast<CBaseEntity*>(entity)->IsController())
-			printf("entity_index: %d\n", entity_index);*/
-
 		return reinterpret_cast<CBaseEntity*>(entity);
+	}
+	template <typename T = CBaseEntity*>
+	T GetLocalPlayerController()
+	{
+		for (int i = 1; i < 65; ++i)
+		{
+			T player = reinterpret_cast<T>(GetBaseEntity(i));
+
+			if (!player || !player->IsController())
+				continue;
+
+			if (player->m_bIsLocalPlayerController())
+				return player;
+		}
+		return nullptr;
 	}
 
 	/*CBaseEntity* GetBaseEntity(int index)

@@ -1,20 +1,4 @@
 #include "features.h"
-#include <DirectXMath.h>
-
-#define DEG2RAD(x) ((x) * static_cast<float>(3.14159265358979323846) / 180.0f)
-
-void angle2vectors2(const QAngle& angles, Vector& forward)
-{
-	float	sp, sy, cp, cy;
-
-	DirectX::XMScalarSinCos(&sp, &cp, DEG2RAD(angles[0]));
-	DirectX::XMScalarSinCos(&sy, &cy, DEG2RAD(angles[1]));
-
-	forward.x = cp * cy;
-	forward.y = cp * sy;
-	forward.z = -sp;
-}
-
 
 namespace features::esp
 {
@@ -100,30 +84,32 @@ namespace features::esp
 	{
 		if (!settings::visuals::m_bBoneEsp)
 			return;
-
-		if (!data.model_state)
-			return;
-
-		if (!data.model.IsValid())
-			return;
-
+		
 		Vector bone_pos_out;
 		Vector bone_parent_pos_out;
 
-		for (int i = 0; i < data.model->BoneCount; ++i)
-		{
-			const auto flag = data.model->GetBoneFlags(i);
+		const auto& model = data.model;
+		if (!model.IsValid())
+			return;
 
+		const auto& model_state = data.model_state;
+
+		static const auto& bone_count = model->BoneCount;
+		for (int i = 0; i < bone_count; ++i)
+		{
+			const auto& flag = model->GetBoneFlags(i);
 			if (!flag.HasFlag(static_cast<uint32_t>(FLAG_HITBOX)))
 				continue;
 
-			auto bone_parent_index = data.model->GetBoneParent(i);
-
+			const auto& bone_parent_index = model->GetBoneParent(i);
 			if (bone_parent_index == -1)
 				continue;
 
-			Vector in_child = data.model_state->bones[i].position;
-			Vector in_parent = data.model_state->bones[bone_parent_index].position;
+			const auto& bones = model_state.bones[i];
+			const auto& parent_bones = model_state.bones[bone_parent_index];
+
+			const Vector& in_child = bones.position;
+			const Vector& in_parent = parent_bones.position;
 
 			bool got_bones = globals::world2screen(in_child, bone_pos_out);
 			bool got_parents = globals::world2screen(in_parent, bone_parent_pos_out);

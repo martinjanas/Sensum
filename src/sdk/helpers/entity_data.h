@@ -31,7 +31,7 @@ namespace entity_data
 		int m_iHealth;
 		int m_iShotsFired;
 		int clip;
-		CModelState* model_state;
+		CModelState model_state;
 		CStrongHandle<CModel> model;
 		BBox_t bbox;
 		BBox_t head_bbox;

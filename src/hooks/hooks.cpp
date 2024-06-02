@@ -4,36 +4,27 @@
 
 bool hooks::init()
 {
-	if (MH_Initialize() != MH_STATUS::MH_OK)
-		return false;
-
 	entity_system = ShadowVMT(g::entity_system);
 	csgo_input = ShadowVMT(g::csgo_input);
 	client = ShadowVMT(g::client);
 	swap_chain = ShadowVMT(g::swap_chain);
-	//client_mode = ShadowVMT(g::client_mode);
+	client_mode = ShadowVMT(g::client_mode);
 
 	entity_system.Apply(on_add_entity::index, reinterpret_cast<uintptr_t*>(&on_add_entity::hooked), reinterpret_cast<void**>(&on_add_entity::original_fn));
 	entity_system.Apply(on_remove_entity::index, reinterpret_cast<uintptr_t*>(&on_remove_entity::hooked), reinterpret_cast<void**>(&on_remove_entity::original_fn));
 
-	//client_mode.Apply(clientmode_createmove::index, reinterpret_cast<uintptr_t*>(&clientmode_createmove::hooked), reinterpret_cast<void**>(&clientmode_createmove::original_fn));
-
 	csgo_input.Apply(create_move::index, reinterpret_cast<uintptr_t*>(&create_move::hooked), reinterpret_cast<void**>(&create_move::original_fn));
-	//csgo_input.Apply(override_view::index, reinterpret_cast<uintptr_t*>(&override_view::hooked), reinterpret_cast<void**>(&override_view::original_fn));
-
 	client.Apply(frame_stage_notify::index, reinterpret_cast<uintptr_t*>(&frame_stage_notify::hooked), reinterpret_cast<void**>(&frame_stage_notify::original_fn));
 
 	swap_chain.Apply(directx::present::index, reinterpret_cast<uintptr_t*>(&directx::present::hooked), reinterpret_cast<void**>(&directx::present::original_fn));
 	swap_chain.Apply(directx::resize_buffers::index, reinterpret_cast<uintptr_t*>(&directx::resize_buffers::hooked), reinterpret_cast<void**>(&directx::resize_buffers::original_fn));
 
-	if (MH_CreateHook(modules::client.pattern_scanner.scan("E8 ? ? ? ? F3 0F 11 45 ? 48 8B 5C 24 ?").add(0x1).abs().as(), &get_fov::hooked, reinterpret_cast<void**>(&get_fov::original_fn)) != MH_STATUS::MH_OK)
-		return false;
+	client_mode.Apply(clientmode_createmove::index, reinterpret_cast<uintptr_t*>(&clientmode_createmove::hooked), reinterpret_cast<void**>(&clientmode_createmove::original_fn));
+	//csgo_input.Apply(override_view::index, reinterpret_cast<uintptr_t*>(&override_view::hooked), reinterpret_cast<void**>(&override_view::original_fn));
 
-	if (MH_CreateHook(modules::client.pattern_scanner.scan("40 53 48 81 EC ? ? ? ? 49 8B C1").as(), get_matrices_for_view::hooked, reinterpret_cast<void**>(&get_matrices_for_view::original_fn)) != MH_STATUS::MH_OK)
-		return false;
-
-	MH_EnableHook(MH_ALL_HOOKS);
-
+	get_fov::safetyhook = safetyhook::create_inline(modules::client.pattern_scanner.scan("E8 ? ? ? ? F3 0F 11 45 ? 48 8B 5C 24 ?").add(0x1).abs().as(), reinterpret_cast<void*>(get_fov::hooked));
+	get_matrices_for_view::safetyhook = safetyhook::create_inline(modules::client.pattern_scanner.scan("40 53 48 81 EC ? ? ? ? 49 8B C1").as(), reinterpret_cast<void*>(get_matrices_for_view::hooked));
+	
 	return true;
 }
 
@@ -47,10 +38,6 @@ bool hooks::detach()
 	client.Remove(frame_stage_notify::index);
 	swap_chain.Remove(directx::present::index);
 	swap_chain.Remove(directx::resize_buffers::index);
-
-	MH_DisableHook(MH_ALL_HOOKS);
-	if (MH_Uninitialize() != MH_STATUS::MH_OK)
-		return false;
 
 	return true;
 }
@@ -89,29 +76,6 @@ public:
 	//constexpr std::ptrdiff_t m_pNext = 0x598; // C_PointCamera*
 };
 
-float __fastcall hooks::get_fov::hooked(void* camera)
-{
-	if (g::engine_client->IsInGame() && settings::visuals::m_bFovChanger)
-		return static_cast<float>(settings::visuals::m_iFov);
-
-    return original_fn(camera);
-}
-
-void get_viewmatrix(VMatrix* world_to_projection)
-{
-	if (!entity_data::view_matrix::matrix) //entity_data::view_matrix::matrix - Simplífy?
-		entity_data::view_matrix::matrix = world_to_projection;
-}
-
-//Temp placement, move later
-void __fastcall hooks::get_matrices_for_view::hooked(void* rcx, void* rdx, VMatrix* world_to_view, VMatrix* view_to_projection, VMatrix* world_to_projection, VMatrix* world_to_pixels)
-{
-	if (g::engine_client->IsInGame() && world_to_projection)
-		get_viewmatrix(world_to_projection);
-
-	original_fn(rcx, rdx, world_to_view, view_to_projection, world_to_projection, world_to_pixels);
-}
-
 //void __fastcall hooks::override_view::hooked(void* rcx, void* rdx, CViewSetup* setup)
 //{
 //	if (g::engine_client->IsInGame())
@@ -120,18 +84,3 @@ void __fastcall hooks::get_matrices_for_view::hooked(void* rcx, void* rdx, VMatr
 //	original_fn(rcx, rdx, setup);
 //}
 
-
-//bool __fastcall hooks::clientmode_createmove::hooked(void* rcx, CUserCmd* cmd) // + float frametime ? //Not working properly, crashing at IN_ATTACK
-//{
-//	const auto& result = original_fn(rcx, cmd);
-//
-//	if (!cmd)
-//		return result;
-//
-//	if (g::engine_client->IsInGame() && cmd)
-//	{
-//		cmd->buttonStates.m_nValue |= IN_ATTACK;
-//	}
-//
-//	return result;
-//}

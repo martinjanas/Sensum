@@ -11,10 +11,12 @@ class Vector
 public:
 	float x, y, z;
 
-	Vector() : x(0.f), y(0.f), z(0.f) { };
+	Vector() { invalidate(); }
 	Vector(float _x, float _y) : x(_x), y(_y), z(0.f) { };
 	Vector(float _x, float _y, float _z) : x(_x), y(_y), z(_z) { };
 	Vector(const float* clr) : x(clr[0]), y(clr[1]), z(clr[2]) { };
+
+	void invalidate();
 
 	//Helper functions
 	float length() const;

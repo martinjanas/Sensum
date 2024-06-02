@@ -106,3 +106,4 @@ float& QAngle::operator[](size_t index)
 		break;
 	}
 }
+

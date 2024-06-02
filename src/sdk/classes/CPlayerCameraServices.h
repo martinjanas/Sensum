@@ -20,4 +20,9 @@ class CPlayer_CameraServices
 public:
 
     NETVAR(C_PostProcessingVolume*, m_PostProcessingVolumes, "CPlayer_CameraServices", "m_PostProcessingVolumes");
+
+    float GetFov()
+    {
+        return GetVirtual<float(__thiscall*)(void*)>(this, 27)(this);
+    }
 };

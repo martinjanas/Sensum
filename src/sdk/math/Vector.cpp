@@ -1,4 +1,10 @@
 #include "Vector.h"
+#include <limits>
+
+void Vector::invalidate()
+{
+	x = y = z = std::numeric_limits<float>::infinity();
+}
 
 float Vector::length() const
 {

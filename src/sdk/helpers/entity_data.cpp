@@ -5,21 +5,6 @@
 
 #include "../localplayer.h"
 
-CCSPlayerController* GetLocalPlayerController()
-{
-	for (int i = 1; i < 65; ++i)
-	{
-		CCSPlayerController* player = reinterpret_cast<CCSPlayerController*>(g::entity_system->GetBaseEntity(i));
-
-		if (!player || !player->IsController())
-			continue;
-
-		if (player->m_bIsLocalPlayerController())
-			return player;
-	}
-	return nullptr;
-}
-
 namespace entity_data
 {
 	std::list<instance_t> player_instances;
@@ -195,75 +180,78 @@ namespace entity_data
 	{
 		if (!g::engine_client->IsInGame())
 			return;
+		
+		const auto& localplayer = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
+		if (!localplayer)
+			return;
+
+		const auto& localplayer_pawn = localplayer->m_hPlayerPawn().Get<CCSPlayerPawn*>();
+		if (!localplayer_pawn)
+			return;
 
 		std::lock_guard<std::mutex> lock(locker);
 
 		entry_data_t entry_data;
 		for (const auto& instance : player_instances) //TODO: Refactor this in the future
 		{
-			auto entity = instance.entity;
-
-			if (!entity || !instance.handle.IsValid())
+			if (!instance.entity || !instance.handle.IsValid())
 				continue;
 
-			auto controller = reinterpret_cast<CCSPlayerController*>(entity);
-
+			const auto& controller = reinterpret_cast<CCSPlayerController*>(instance.entity);
 			if (!controller)
 				continue;
 
-			auto localplayer = GetLocalPlayerController();
-
-			if (!localplayer)
+			const uint32_t& index = instance.handle.GetIndex();
+			if (index <= 0 || index > 0x7FFF)
 				continue;
 
-			uint32_t index = instance.handle.GetEntryIndex();
-
-			auto pawn = controller->m_hPlayerPawn().Get<CCSPlayerPawn>();
-
+			const auto& pawn = controller->m_hPlayerPawn().Get<CCSPlayerPawn*>();
 			if (!pawn)
 				continue;
-			
-			auto localplayer_pawn = localplayer->m_hPlayerPawn().Get<CCSPlayerPawn>();
-
-			if (!localplayer_pawn)
+		
+			if (!pawn->IsAlive())
 				continue;
 
-			if (pawn == localplayer_pawn || pawn->m_pEntity() == localplayer_pawn->m_pEntity())
+			if (pawn == localplayer_pawn)
 				continue;
 
-			if (pawn->m_iHealth() <= 0 || !(pawn->m_lifeState() == LIFE_ALIVE))
+			if (pawn->m_iTeamNum() == localplayer_pawn->m_iTeamNum())
 				continue;
 
-			auto scene_node = pawn->m_pGameSceneNode();
+			if (pawn->InAir())
+				continue;
 
+			/*EmitSound_t params; //crashing/throwing exceptions:
+			const auto& emit_sound = pawn->EmitSound(params, "BaseCombatCharacter.AmmoPickup", 0.f);
+			printf("emit_sound: %d\n", emit_sound);*/
+
+			const auto& scene_node = pawn->m_pGameSceneNode();
 			if (!scene_node)
 				continue;
 
-			auto weapon_services = pawn->m_pWeaponServices();
-
+			const auto& weapon_services = pawn->m_pWeaponServices();
 			if (!weapon_services)
 				continue;
 
-			auto active_wpn = weapon_services->m_hActiveWeapon().Get<CBasePlayerWeapon>();
-
+			const auto& active_wpn = weapon_services->m_hActiveWeapon().Get<CBasePlayerWeapon*>();
 			if (!active_wpn)
 				continue;
 
-			auto collision = pawn->m_pCollision();
-
+			const auto& collision = pawn->m_pCollision();
 			if (!collision)
 				continue;
 
-			auto skeleton_instance = scene_node->GetSkeletonInstance();
-
+			const auto& skeleton_instance = scene_node->GetSkeletonInstance();
 			if (!skeleton_instance)
 				continue;
 
-			auto& model_state = skeleton_instance->m_modelState();
+			const auto& model_state = skeleton_instance->m_modelState();
 
-			auto model = model_state.modelHandle;
+			const auto& model = model_state.modelHandle;
+			if (!model.IsValid())
+				continue;
 
-			auto eye_pos = localplayer_pawn->GetEyePos();
+			const auto& eye_pos = localplayer_pawn->GetEyePos();
 
 			player_data_t player_data;
 			player_data.player_name = controller->m_sSanitizedPlayerName();
@@ -272,20 +260,16 @@ namespace entity_data
 			player_data.m_iHealth = pawn->m_iHealth();
 			player_data.m_iShotsFired = pawn->m_iShotsFired();
 			player_data.clip = active_wpn->m_iClip1();
-			player_data.model_state = &model_state;
+			player_data.model_state = model_state;
 			player_data.model = model;
 			player_data.pawn = pawn;
 			player_data.localplayer_pawn = localplayer_pawn;
-			player_data.local_eyepos = localplayer_pawn->m_pGameSceneNode()->m_vecOrigin();
-
-			players::localplayer = localplayer_pawn;
-
-			//get_head_bbox(pawn, localplayer_pawn, player_data.head_bbox);
+			player_data.local_eyepos = localplayer_pawn->GetEyePos();
 
 			GetBBox(scene_node, collision, player_data.abbox);
+			hitbox(pawn, player_data.player_name, player_data.hitboxes);
 
-			if (pawn != localplayer_pawn)
-				hitbox(pawn, player_data.player_name, player_data.hitboxes);
+			//get_head_bbox(pawn, localplayer_pawn, player_data.head_bbox);
 
 			entry_data.player_data.push_back(std::move(player_data));
 		}
