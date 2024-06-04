@@ -11,11 +11,14 @@ namespace hooks
         if (msg == WM_KEYDOWN && wparam == VK_INSERT)
             main_window::is_open = !main_window::is_open;
 
+        // Set flag to unhook
         if (msg == WM_KEYDOWN && (wparam == VK_END || wparam == VK_DELETE))
             globals::can_unhook = true;
 
-        if (main_window::is_open)
-            ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam);
+        //main_window::is_open && 
+        // Process ImGui messages if the main window is open
+        if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
+            return true;
 
         return CallWindowProcA(original, hwnd, msg, wparam, lparam);
     }

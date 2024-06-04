@@ -19,6 +19,7 @@ namespace hooks
 	inline static ShadowVMT client;
 	inline static ShadowVMT swap_chain;
 	inline static ShadowVMT client_mode;
+	inline static ShadowVMT dxgi;
 
 	bool init();
 	bool detach();
@@ -29,11 +30,11 @@ namespace hooks
 		LRESULT __stdcall hooked(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 	}
 
-	struct create_move
+	struct clientmode_createmove
 	{
-		static const int index = 7;
-		using fn = bool(__fastcall*)(CSGOInput* input, int slot, bool active, bool subtick);
-		static bool __fastcall hooked(CSGOInput* input, int slot, bool active, bool subtick);
+		static const int index = 15;
+		using fn = bool(__fastcall*)(void* rcx, CUserCmd* cmd);
+		static bool __fastcall hooked(void* rcx, CUserCmd* cmd);
 
 		inline static fn original_fn;
 	};
@@ -102,6 +103,15 @@ namespace hooks
 
 			inline static fn original_fn;
 		};
+
+		struct create_swapchain
+		{
+			static const int index = 10;
+			using fn = long(__stdcall*)(IDXGIFactory* factory, IUnknown* device, DXGI_SWAP_CHAIN_DESC* swap_desc, IDXGISwapChain** swap_chain);
+			static long __stdcall hooked(IDXGIFactory* factory, IUnknown* device, DXGI_SWAP_CHAIN_DESC* swap_desc, IDXGISwapChain** swap_chain);
+
+			inline static fn original_fn;
+		};
 	}
 
 	struct frame_stage_notify
@@ -127,14 +137,5 @@ namespace hooks
 		static void __fastcall hooked(void* rcx, void* rdx, VMatrix* world_to_view, VMatrix* view_to_projection, VMatrix* world_to_projection, VMatrix* world_to_pixels);
 
 		inline static SafetyHookInline safetyhook;
-	};
-
-	struct clientmode_createmove
-	{
-		static const int index = 15;
-		using fn = bool(__fastcall*)(void* rcx, void* rdx, float frametime, CUserCmd* cmd);
-		static bool __fastcall hooked(void* rcx, void* rdx, float frametime, CUserCmd* cmd);
-
-		inline static fn original_fn;
 	};
 }

@@ -12,10 +12,10 @@ class ShadowVMT
 public:
 	ShadowVMT(void* object);
 	ShadowVMT() {};
-	//~ShadowVMT();
 
 	bool Apply(int index, uintptr_t* hook_function, void** original_fn);
 	void Remove(int index);
+	void RestoreTable();
 
 private:
 	void* m_ptr_object;

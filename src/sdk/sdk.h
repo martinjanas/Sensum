@@ -10,6 +10,25 @@
 #include "../sdk/interfaces/CInputSystem.h"
 #include "../sdk/math/Viewmatrix.h"
 
+class CGlobalVarsBase
+{
+public:
+    float m_realtime; //0x0000
+    __int32 m_framecount; //0x0004
+    float m_frametime; //0x0008
+    float m_abs_frametime; //0x000C
+    __int32 m_maxclients; //0x0010
+    char pad_0014[28]; //0x0014
+    float m_frametime2; //0x0030
+    float m_curtime; //0x0034
+    float m_curtime2; //0x0038
+    char pad_003C[20]; //0x003C
+    __int32 m_tickcount; //0x0050
+    char pad_0054[348]; //0x0054
+    DWORD64 m_current_map; //0x01B0
+    DWORD64 m_current_mapname; //0x01B8
+};
+
 namespace sdk
 {
 	void init_modules();
@@ -38,6 +57,7 @@ namespace interfaces //move to interfaces.h ?
 	extern IDXGISwapChain* swap_chain;
 	extern CInputSystem* input_system;
 	extern void* client_mode;
+    extern CGlobalVarsBase* global_vars;
 }
 
 namespace g = interfaces;

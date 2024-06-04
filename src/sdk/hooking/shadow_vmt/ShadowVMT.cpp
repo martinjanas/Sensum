@@ -16,12 +16,6 @@ ShadowVMT::ShadowVMT(void* object)
 	*reinterpret_cast<uintptr_t**>(m_ptr_object) = m_ptr_object_fake_vtable;
 }
 
-//ShadowVMT::~ShadowVMT() {
-//	// Restore the original VMT pointer
-//	*reinterpret_cast<uintptr_t**>(m_ptr_object) = m_ptr_object_vtable;
-//	delete[] m_ptr_object_fake_vtable;
-//}
-
 size_t ShadowVMT::GetVTableSize()
 {
 	MEMORY_BASIC_INFORMATION mbi{};
@@ -44,7 +38,8 @@ size_t ShadowVMT::GetVTableSize()
 	return size;
 }
 
-bool ShadowVMT::Apply(int index, uintptr_t* hook_function, void** original_fn) {
+bool ShadowVMT::Apply(int index, uintptr_t* hook_function, void** original_fn) 
+{
 	// Get the Pointer to Original Func
 	*original_fn = reinterpret_cast<void*>(m_ptr_object_fake_vtable[index]);
 
@@ -57,10 +52,16 @@ bool ShadowVMT::Apply(int index, uintptr_t* hook_function, void** original_fn) {
 	return true;
 }
 
-void ShadowVMT::Remove(int index) {
-	// Swap the pointer from hook function to original function using the hook list
-	*reinterpret_cast<uintptr_t**>(m_ptr_object_fake_vtable[index]) = m_object_hooks[index];
+void ShadowVMT::Remove(int index) 
+{
+	*reinterpret_cast<uintptr_t**>(&m_ptr_object_fake_vtable[index]) = m_object_hooks[index];
 
-	// Removes the hook function from hook list
 	m_object_hooks.erase(index);
+}
+
+void ShadowVMT::RestoreTable()
+{
+	// Restore the original VMT pointer
+	*reinterpret_cast<uintptr_t**>(m_ptr_object) = m_ptr_object_vtable;
+	delete[] m_ptr_object_fake_vtable;
 }

@@ -58,6 +58,13 @@ namespace sdk
 		g::entity_system = g::game_resource_service->GetGameEntitySystem();
 		g::render_system = **reinterpret_cast<CRenderSystem***>(modules::render_dx11.pattern_scanner.scan("66 0F 7F 0D ? ? ? ? 66 0F 7F 05 ? ? ? ? 0F 1F 40", "GetRenderSystemDX11").add(4).abs().as<uint8_t*>());
 
+		/*g::global_vars = modules::client.pattern_scanner.scan("48 89 0D ? ? ? ? 48 89 41").as<CGlobalVarsBase*>(); //Not working properly
+
+		if (g::global_vars)
+		{
+			printf("frametime: %f, maxclients: %d\n", g::global_vars->m_frametime, g::global_vars->m_maxclients);
+		}*/
+
 		if (g::render_system)
 			g::swap_chain = g::render_system->swap_chain;
 
@@ -78,6 +85,7 @@ namespace sdk
 		print_status(g::swap_chain);
 		print_status(g::input_system);
 		print_status(g::client_mode);
+		print_status(g::global_vars);
 	}
 }
 
@@ -94,5 +102,6 @@ namespace interfaces
 	IDXGISwapChain* swap_chain{};
 	CInputSystem* input_system{};
 	void* client_mode{};
+	CGlobalVarsBase* global_vars{};
 }
 

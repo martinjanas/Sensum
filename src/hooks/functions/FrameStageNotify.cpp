@@ -5,21 +5,18 @@
 
 void __fastcall hooks::frame_stage_notify::hooked(void* a1, EClientFrameStage stage)
 {
-	//sdk::is_aimkey_down = g::input_system->IsButtonDown(ButtonCode::MouseLeft);
-	//printf("keydown: %d\n", sdk::is_aimkey_down);
-
 	switch (stage)
 	{
 	case FRAME_START:
 		break;
 
 	case FRAME_NET_UPDATE_START:
-		entity_data::fetch_player_data();
 		break;
 
 	case FRAME_NET_UPDATE_POSTDATAUPDATE_START:
 		break;
 	case FRAME_NET_UPDATE_POSTDATAUPDATE_END:
+		entity_data::fetch_player_data();
 		break;
 
 	case FRAME_NET_UPDATE_END:

@@ -53,7 +53,7 @@ namespace Aimbot
         out.clamp_normalize();
     }
 
-    void Aim(CUserCmd* cmd)
+    void Aim(CUserCmd* cmd, CBaseUserCmdPB* base_cmd)
     {
         if (!g::engine_client->IsInGame())
             return;
@@ -73,7 +73,7 @@ namespace Aimbot
 
         for (const auto& data : m_player_data)
         {
-            //static int i = 0;
+            static int i = 0;
 
             QAngle viewangles;
             g::client->GetViewAngles(0, &viewangles);
@@ -104,18 +104,21 @@ namespace Aimbot
 
                     float fov = distance_based_fov(delta, dist);
 
-                    if (fov < best_fov)
+                    if (fov < best_fov) 
                     {
-                        best_fov = fov;
+                        best_fov = fov; //MJ: Is this really correct?
                         best_angle = target_angle;
                     }
 
-                    //if (i % 25 == 0)
-                      //  printf("[%d]: fov: %.1f, best_fov: %.1f\n", hitbox_data.index, fov, best_fov);
+                    if (i % 25 == 0)
+                        printf("[%d]: fov: %.1f, best_fov: %.1f\n", hitbox_data.index, fov, best_fov);
 
                     //smooth(settings::visuals::smooth, viewangles, best_angle, best_angle); //behaves weirdly @ >2 smooth 
 
-                    if (!cmd->buttonStates.m_nValue.HasFlag(IN_ATTACK))
+                   /* if (!(cmd->buttonStates.m_nValue & IN_ATTACK)) //This doesnt work properly
+                        continue;*/
+
+                    if (!GetAsyncKeyState(VK_LBUTTON))
                         continue;
 
                     const auto& best_angle_vec = best_angle.to_vector();
@@ -129,60 +132,25 @@ namespace Aimbot
                 }
             }
 
-            //i++;
+            i++;
         }
     }
 }
 
-bool __fastcall hooks::create_move::hooked(CSGOInput* input, int slot, bool active, bool subtick)
-{ 
-    if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
-        return original_fn(input, slot, active, subtick);
-
-    CUserCmd* cmd = input->GetUserCmd();   
-    if (!cmd)
-        return original_fn(input, slot, active, subtick);
-
-    //Aimbot::Aim(cmd);
-
-    //printf("nValue: %d, nValueChanged: %d\n", cmd->buttonStates.m_nValue.get_flag(), cmd->buttonStates.m_nValueChanged.get_flag());
-
-    //static int i = 0;
-
-    //if (cmd)
-    //{
-    //    cmd->buttonStates.m_nValue |= IN_ATTACK; //Applying buttons works
-    //    cmd->buttonStates.m_nValueChanged |= IN_ATTACK;
-    //    cmd->buttonStates.m_nValueScroll |= IN_ATTACK;
-
-    //    if (i % 50 == 0)
-    //    {
-    //        cmd->buttonStates.m_nValue &= ~IN_ATTACK;
-    //        cmd->buttonStates.m_nValueChanged &= ~IN_ATTACK;
-    //        cmd->buttonStates.m_nValueScroll &= ~IN_ATTACK;
-    //    }
-    //}
-    //
-    //i++;
-
-    return original_fn(input, slot, active, subtick);
-}
-
-bool __fastcall hooks::clientmode_createmove::hooked(void* rcx, void* rdx, float frametime, CUserCmd* cmd) //cmd is nullptr?
+bool __fastcall hooks::clientmode_createmove::hooked(void* rcx, CUserCmd* cmd)
 {
-    const auto& result = original_fn(rcx, rdx, frametime, cmd);
-
     if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
-        return result;
+        return original_fn(rcx, cmd);
 
     if (!cmd)
-        return result;
+        return original_fn(rcx, cmd);
 
-    auto ccmd = g::csgo_input->GetUserCmd(); //for now
-    if (!ccmd)
-        return result;
+    auto base_cmd = cmd->cmd.m_pBaseCmd;
 
-    Aimbot::Aim(ccmd);
+    if (!base_cmd)
+        return original_fn(rcx, cmd);
 
-    return result;
+    Aimbot::Aim(cmd, base_cmd);
+
+    return original_fn(rcx, cmd);
 }

@@ -165,9 +165,9 @@ static_assert(sizeof(CCSGOUserCmdPB) == 0x40);
 struct CInButtonState
 {
 	void* pVTable; // 0x0
-	BitFlag m_nValue; // 0x8
-	BitFlag m_nValueChanged; // 0x10
-	BitFlag m_nValueScroll; // 0x18
+	uint64_t m_nValue; // 0x8
+	uint64_t m_nValueChanged; // 0x10
+	uint64_t m_nValueScroll; // 0x18
 };
 
 class CUserCmd
