@@ -1,5 +1,5 @@
 #include "CCSPlayerPawn.h"
-#include "../../sdk/classes/CHandle.h"
+#include "../../../../sdk/source_engine/CHandle.h"
 
 Vector CCSPlayerPawn::GetEyePos()
 {

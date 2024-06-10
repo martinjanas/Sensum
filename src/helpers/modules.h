@@ -1,5 +1,5 @@
 #pragma once
-#include "../../sdk/helpers/dynamic_module.h"
+#include "../../../../helpers/dynamic_module.h"
 
 namespace modules
 {

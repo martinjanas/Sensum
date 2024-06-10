@@ -1,11 +1,7 @@
 #include "sdk.h"
-#include "../sdk/helpers/modules.h"
+#include "../../../../helpers/modules.h"
 #include "../hooks/hooks.h"
-
 #include <d3d11.h>
-
-#include "../sdk/localplayer.h"
-
 #include "../interfaces.h"
 
 void print_status(const char* name, void* ptr)
@@ -53,17 +49,22 @@ namespace sdk
 		g::schema_system = modules::schema.GetInterfaceFromList<CSchemaSystem*>("SchemaSystem_001");
 		g::game_resource_service = modules::engine.GetInterfaceFromList<CGameResourceService*>("GameResourceServiceClientV001");
 		g::input_system = modules::input_sys.GetInterfaceFromList<CInputSystem*>("InputSystemVersion001");
+		g::network_game_service = modules::engine.GetInterfaceFromList<CNetworkGameService*>("NetworkClientService_001");
+
+		if (g::network_game_service)
+			g::network_game_client = g::network_game_service->GetNetworkGameClient();
+
+		if (g::network_game_client)
+			g::global_vars = g::network_game_client->GetGlobalVars();
+		
+		if (g::global_vars) //Hook LevelInit and also reinit globalvars there
+		{
+			printf("%f, %d\n", g::global_vars->interval_per_ticks, g::global_vars->max_client);
+		}
 
 		g::csgo_input = g::csgo_input->get();
 		g::entity_system = g::game_resource_service->GetGameEntitySystem();
 		g::render_system = **reinterpret_cast<CRenderSystem***>(modules::render_dx11.pattern_scanner.scan("66 0F 7F 0D ? ? ? ? 66 0F 7F 05 ? ? ? ? 0F 1F 40", "GetRenderSystemDX11").add(4).abs().as<uint8_t*>());
-
-		/*g::global_vars = modules::client.pattern_scanner.scan("48 89 0D ? ? ? ? 48 89 41").as<CGlobalVarsBase*>(); //Not working properly
-
-		if (g::global_vars)
-		{
-			printf("frametime: %f, maxclients: %d\n", g::global_vars->m_frametime, g::global_vars->m_maxclients);
-		}*/
 
 		if (g::render_system)
 			g::swap_chain = g::render_system->swap_chain;
@@ -103,5 +104,7 @@ namespace interfaces
 	CInputSystem* input_system{};
 	void* client_mode{};
 	CGlobalVarsBase* global_vars{};
+	CNetworkGameService* network_game_service{};
+	CNetworkGameClient* network_game_client{};
 }
 

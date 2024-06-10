@@ -1,8 +1,7 @@
 // Copyright (C) 2023 neverlosecc
 // See end of file for extended copyright information.
 #pragma once
-
-#include "../helpers/vfunc.h"
+#include "../../helpers/vfunc.h"
 #include "../../interfaces.h"
 
 template <class T>

@@ -1,9 +1,9 @@
 #pragma once
-#include "../../sdk/helpers/netvars.h"
-#include "../../sdk/helpers/vfunc.h"
-#include "../../sdk/classes/CGameSceneNode.h"
-#include "../../sdk/classes/CEntityInstance.h"
-#include "../../sdk/classes/CPlayerGlowProperty.h"
+#include "../../../helpers/netvars.h"
+#include "../../../helpers/vfunc.h"
+#include "../../../sdk/classes/entities/components/CGameSceneNode.h"
+#include "../../../sdk/classes/entities/CEntityInstance.h"
+#include "../../../sdk/classes/entities/components/CPlayerGlowProperty.h"
 
 enum LifeState_t : uint8_t
 {
@@ -70,7 +70,7 @@ struct EmitSound_t
     void*				        m_SoundLevel;
     int							m_nFlags;
     int							m_nPitch;
-    const Vector* m_pOrigin;
+    const Vector*               m_pOrigin;
     float						m_flSoundTime; ///< NOT DURATION, but rather, some absolute time in the future until which this sound should be delayed
     float*                      m_pflSoundDuration;
     bool						m_bEmitCloseCaption;
@@ -95,6 +95,7 @@ public:
     NETVAR(CGlowProperty*, m_GlowProperty, "C_BaseModelEntity", "m_Glow");
     NETVAR(Vector, m_vecViewOffset, "C_BaseModelEntity", "m_vecViewOffset");
     NETVAR(uint32_t, m_fFlags, "C_BaseEntity", "m_fFlags");
+    NETVAR(Vector, m_vecVelocity, "C_BaseEntity", "m_vecVelocity");
 
     //int EmitSound(EmitSound_t& params, const char* sound_name, float sound_time) //crashing/throwing exceptions
     //{

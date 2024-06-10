@@ -1,12 +1,10 @@
 #pragma once
-
 #include <cstdint>
-
-#include "../../sdk/classes/CStrongHandle.h"
-#include "../../sdk/helpers/CUtlSymbolLarge.hpp"
-#include "../../sdk/helpers/BitFlag.h"
-#include "../../sdk/math/Vector.h"
-#include "../../sdk/helpers/modules.h"
+#include "../../../sdk/source_engine/CStrongHandle.h"
+#include "../../../sdk/source_engine/CUtlSymbolLarge.hpp"
+#include "../../../sdk/source_engine/BitFlag.h"
+#include "../../../sdk/math/Vector.h"
+#include "../../../helpers/modules.h"
 
 enum EBoneFlags : uint32_t 
 {

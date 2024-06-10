@@ -1,7 +1,6 @@
 #pragma once
-
-#include "../../sdk/helpers/netvars.h"
-#include "../../sdk/helpers/vfunc.h"
+#include "../../../../helpers/netvars.h"
+#include "../../../../helpers/vfunc.h"
 
 class C_PostProcessingVolume
 {

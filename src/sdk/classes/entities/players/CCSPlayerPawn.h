@@ -1,8 +1,15 @@
 #pragma once
-#include "CBaseEntity.h"
-#include "CPlayerWeaponServices.h"
-#include "CCSPlayerController.h"
-#include "CPlayerCameraServices.h"
+#include "../CBaseEntity.h"
+#include "../players/CCSPlayerController.h"
+#include "../services/CPlayerCameraServices.h"
+#include "../services/CPlayerWeaponServices.h"
+
+
+class CPlayer_MovementServices
+{
+public:
+    NETVAR(float, m_flStamina, "CCSPlayer_MovementServices", "m_flStamina");
+};
 
 class CCSPlayerPawn : public CBaseEntity
 {
@@ -17,6 +24,7 @@ public:
     NETVAR(CPlayerWeaponServices*, m_pWeaponServices, "C_BasePlayerPawn", "m_pWeaponServices");
     NETVAR(QAngle, m_angEyeAngles, "C_CSPlayerPawnBase", "m_angEyeAngles");
     NETVAR(QAngle, v_angle, "C_BasePlayerPawn", "v_angle");
+    NETVAR(CPlayer_MovementServices*, m_pMovementServices, "C_BasePlayerPawn", "m_pMovementServices");
 
     Vector GetEyePos();
     bool InAir();

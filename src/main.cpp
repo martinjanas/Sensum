@@ -1,5 +1,5 @@
 #include "hooks/hooks.h"
-#include "sdk/classes/CCSPlayerPawn.h"
+#include "../../../../sdk/classes/entities/players/CCSPlayerPawn.h"
 
 DWORD __stdcall on_attach(void* base)
 {

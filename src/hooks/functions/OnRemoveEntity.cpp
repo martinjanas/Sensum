@@ -1,7 +1,7 @@
 #include <algorithm>
 #include "../hooks.h"
 #include "../../sdk/sdk.h"
-#include "../../sdk/helpers/entity_data.h"
+#include "../../../../features/entity_data.h"
 
 CEntityInstance* __fastcall hooks::on_remove_entity::hooked(void* rcx, CEntityInstance* instance, CHandle handle)
 {

@@ -1,8 +1,7 @@
 #pragma once
-
-#include "../../sdk/helpers/netvars.h"
-#include "../../sdk/helpers/vfunc.h"
-#include "../../sdk/helpers/CUtlSymbolLarge.hpp"
+#include "../../../helpers/netvars.h"
+#include "../../../helpers/vfunc.h"
+#include "../../../sdk/source_engine/CUtlSymbolLarge.hpp"
 
 class CEntityIdentity
 {

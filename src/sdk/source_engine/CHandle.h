@@ -1,11 +1,11 @@
 #pragma once
 #include "../sdk.h"
-#include "../../sdk/classes/CBaseEntity.h"
+#include "../../sdk/classes/entities/CBaseEntity.h"
 
 class CHandle
 {
 public:
-    bool operator==(const CHandle& rhs) const
+    bool operator==(CHandle rhs) const
     {
         return entity_index == rhs.entity_index;
     }

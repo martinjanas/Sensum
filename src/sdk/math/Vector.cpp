@@ -54,9 +54,7 @@ bool Vector::is_valid() const
 
 const char* Vector::to_string() const
 {
-	auto str = std::format("x: {:.2f}, y: {:.2f}, z: {:.2f}", x, y, z);
-
-	return str.c_str();
+	return std::format("x: {:.2f}, y: {:.2f}, z: {:.2f}", x, y, z).c_str();
 }
 
 ImVec2 Vector::as_vec2() const

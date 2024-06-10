@@ -63,49 +63,49 @@
     <ClInclude Include="sdk\interfaces\CGameResourceService.h">
       <Filter>sdk\interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\classes\CBaseEntity.h">
+    <ClInclude Include="sdk\classes\entities\CBaseEntity.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
     <ClInclude Include="sdk\sdk.h">
       <Filter>sdk</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\helpers\netvars.h">
+    <ClInclude Include="helpers\netvars.h">
       <Filter>sdk\helpers</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\helpers\console.h">
+    <ClInclude Include="helpers\console.h">
       <Filter>sdk\helpers</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\helpers\CUtlSymbolLarge.hpp">
+    <ClInclude Include="sdk\source_engine\CUtlSymbolLarge.hpp">
       <Filter>sdk\helpers</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\helpers\dynamic_module.h">
+    <ClInclude Include="helpers\dynamic_module.h">
       <Filter>sdk\helpers</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\helpers\fnv.h">
+    <ClInclude Include="helpers\fnv.h">
       <Filter>sdk\helpers</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\helpers\importer.h">
+    <ClInclude Include="helpers\importer.h">
       <Filter>sdk\helpers</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\helpers\vfunc.h">
+    <ClInclude Include="helpers\vfunc.h">
       <Filter>sdk\helpers</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\classes\CBasePlayerWeapon.h">
+    <ClInclude Include="sdk\classes\entities\players\CBasePlayerWeapon.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\classes\CCSGameRulesProxy.h">
+    <ClInclude Include="sdk\classes\structs_and_classes\CCSGameRulesProxy.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\classes\CEntityIdentity.h">
+    <ClInclude Include="sdk\classes\entities\CEntityIdentity.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\classes\CEntityInstance.h">
+    <ClInclude Include="sdk\classes\entities\CEntityInstance.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\classes\CGameSceneNode.h">
+    <ClInclude Include="sdk\classes\entities\components\CGameSceneNode.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\classes\CPlayerWeaponServices.h">
+    <ClInclude Include="sdk\classes\entities\services\CPlayerWeaponServices.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
     <ClInclude Include="hooks\hooks.h">
@@ -114,10 +114,10 @@
     <ClInclude Include="sdk\math\Vector.h">
       <Filter>sdk\math</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\classes\CHandle.h">
+    <ClInclude Include="sdk\source_engine\CHandle.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\helpers\modules.h">
+    <ClInclude Include="helpers\modules.h">
       <Filter>sdk\helpers</Filter>
     </ClInclude>
     <ClInclude Include="sdk\interfaces\CSGOInput.h">
@@ -156,84 +156,82 @@
     <ClInclude Include="settings\settings.h">
       <Filter>settings</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\helpers\entity_data.h">
+    <ClInclude Include="features\entity_data.h">
       <Filter>sdk\helpers</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\classes\CBoneSystem.h">
+    <ClInclude Include="sdk\classes\structs_and_classes\CBoneSystem.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\helpers\BitFlag.h">
+    <ClInclude Include="sdk\source_engine\BitFlag.h">
       <Filter>sdk\helpers</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\classes\CPlayerCameraServices.h">
+    <ClInclude Include="sdk\classes\entities\services\CPlayerCameraServices.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\classes\CCSPlayerController.h">
+    <ClInclude Include="sdk\classes\entities\players\CCSPlayerController.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\classes\CPlayerGlowProperty.h">
+    <ClInclude Include="sdk\classes\entities\components\CPlayerGlowProperty.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\classes\CPlayerMoneyServices.h">
+    <ClInclude Include="sdk\classes\entities\services\CPlayerMoneyServices.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\classes\CSkeletonInstance.h">
+    <ClInclude Include="sdk\classes\entities\components\CSkeletonInstance.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\classes\CStrongHandle.h">
+    <ClInclude Include="sdk\source_engine\CStrongHandle.h">
       <Filter>sdk\classes</Filter>
     </ClInclude>
     <ClInclude Include="features\features.h">
       <Filter>features</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\helpers\globals.h" />
-    <ClInclude Include="sdk\classes\CCSPlayerPawn.h" />
-    <ClInclude Include="sdk\helpers\matrix.h" />
+    <ClInclude Include="settings\globals.h" />
+    <ClInclude Include="sdk\classes\entities\players\CCSPlayerPawn.h" />
+    <ClInclude Include="helpers\matrix.h" />
     <ClInclude Include="sdk\math\Transform.h" />
-    <ClInclude Include="sdk\helpers\Hitbox_t.h" />
-    <ClInclude Include="sdk\helpers\BBox_t.h" />
+    <ClInclude Include="sdk\classes\structs_and_classes\Hitbox_t.h" />
+    <ClInclude Include="sdk\classes\structs_and_classes\BBox_t.h" />
     <ClInclude Include="sdk\interfaces\CSource2Client.h" />
     <ClInclude Include="sdk\math\QAngle.h" />
-    <ClInclude Include="sdk\localplayer.h" />
-    <ClInclude Include="sdk\classes\Trace.h" />
-    <ClInclude Include="render.h" />
+    <ClInclude Include="render\render.h" />
     <ClInclude Include="sdk\hooking\shadow_vmt\ShadowVMT.h" />
-    <ClInclude Include="sdk\helpers\CBufferString.h" />
-    <ClInclude Include="sdk\helpers\CInterlockedInt.h" />
-    <ClInclude Include="sdk\helpers\CThreadMutex.h" />
-    <ClInclude Include="sdk\helpers\CThreadSpinMutex.h" />
-    <ClInclude Include="sdk\helpers\CThreadSpinRWLock.h" />
-    <ClInclude Include="sdk\helpers\CTSList.h" />
-    <ClInclude Include="sdk\helpers\CUtlMap.h" />
-    <ClInclude Include="sdk\helpers\CUtlMemory.h" />
-    <ClInclude Include="sdk\helpers\CUtlMemoryPoolBase.h" />
-    <ClInclude Include="sdk\helpers\CUtlRBTree.h" />
-    <ClInclude Include="sdk\helpers\CUtlString.h" />
-    <ClInclude Include="sdk\helpers\CUtlTSHash.h" />
+    <ClInclude Include="sdk\source_engine\CBufferString.h" />
+    <ClInclude Include="sdk\source_engine\CInterlockedInt.h" />
+    <ClInclude Include="sdk\source_engine\CThreadMutex.h" />
+    <ClInclude Include="sdk\source_engine\CThreadSpinMutex.h" />
+    <ClInclude Include="sdk\source_engine\CThreadSpinRWLock.h" />
+    <ClInclude Include="sdk\source_engine\CTSList.h" />
+    <ClInclude Include="sdk\source_engine\CUtlMap.h" />
+    <ClInclude Include="sdk\source_engine\CUtlMemory.h" />
+    <ClInclude Include="sdk\source_engine\CUtlMemoryPoolBase.h" />
+    <ClInclude Include="sdk\source_engine\CUtlRBTree.h" />
+    <ClInclude Include="sdk\source_engine\CUtlString.h" />
+    <ClInclude Include="sdk\source_engine\CUtlTSHash.h" />
     <ClInclude Include="sdk\math\math.h" />
     <ClInclude Include="interfaces.h" />
-    <ClInclude Include="sdk\helpers\CUtlVector.h" />
+    <ClInclude Include="sdk\source_engine\CUtlVector.h" />
     <ClInclude Include="sdk\interfaces\CInputSystem.h" />
     <ClInclude Include="sdk\hooking\safetyhook\safetyhook.hpp" />
     <ClInclude Include="sdk\hooking\safetyhook\Zydis.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="sdk\classes\CBaseEntity.cpp">
+    <ClCompile Include="sdk\classes\entities\CBaseEntity.cpp">
       <Filter>sdk\classes</Filter>
     </ClCompile>
     <ClCompile Include="sdk\sdk.cpp">
       <Filter>sdk</Filter>
     </ClCompile>
-    <ClCompile Include="sdk\helpers\netvars.cpp">
+    <ClCompile Include="helpers\netvars.cpp">
       <Filter>sdk\helpers</Filter>
     </ClCompile>
-    <ClCompile Include="sdk\helpers\dynamic_module.cpp">
+    <ClCompile Include="helpers\dynamic_module.cpp">
       <Filter>sdk\helpers</Filter>
     </ClCompile>
-    <ClCompile Include="sdk\helpers\console.cpp">
+    <ClCompile Include="helpers\console.cpp">
       <Filter>sdk\helpers</Filter>
     </ClCompile>
-    <ClCompile Include="sdk\classes\CBasePlayerWeapon.cpp">
+    <ClCompile Include="sdk\classes\entities\players\CBasePlayerWeapon.cpp">
       <Filter>sdk\classes</Filter>
     </ClCompile>
     <ClCompile Include="hooks\functions\OnAddEntity.cpp">
@@ -246,7 +244,7 @@
       <Filter>sdk\math</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="sdk\helpers\modules.cpp">
+    <ClCompile Include="helpers\modules.cpp">
       <Filter>sdk\helpers</Filter>
     </ClCompile>
     <ClCompile Include="hooks\functions\CreateMove.cpp">
@@ -291,21 +289,19 @@
     <ClCompile Include="hooks\functions\WinProc.cpp">
       <Filter>hooks\functions</Filter>
     </ClCompile>
-    <ClCompile Include="sdk\helpers\entity_data.cpp">
+    <ClCompile Include="features\entity_data.cpp">
       <Filter>sdk\helpers</Filter>
     </ClCompile>
-    <ClCompile Include="sdk\classes\CCSPlayerController.cpp">
+    <ClCompile Include="sdk\classes\entities\players\CCSPlayerController.cpp">
       <Filter>sdk\classes</Filter>
     </ClCompile>
     <ClCompile Include="features\esp.cpp">
       <Filter>features</Filter>
     </ClCompile>
-    <ClCompile Include="sdk\helpers\globals.cpp" />
-    <ClCompile Include="sdk\classes\CCSPlayerPawn.cpp" />
-    <ClCompile Include="sdk\classes\Trace.cpp" />
-    <ClCompile Include="render.cpp" />
+    <ClCompile Include="settings\globals.cpp" />
+    <ClCompile Include="sdk\classes\entities\players\CCSPlayerPawn.cpp" />
+    <ClCompile Include="render\render.cpp" />
     <ClCompile Include="sdk\hooking\shadow_vmt\ShadowVMT.cpp" />
-    <ClCompile Include="sdk\localplayer.cpp" />
     <ClCompile Include="sdk\math\QAngle.cpp" />
     <ClCompile Include="interfaces.cpp" />
     <ClCompile Include="sdk\hooking\safetyhook\safetyhook.cpp" />

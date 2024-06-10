@@ -7,11 +7,11 @@
 #include <vector>
 #include <optional>
 
-#include "../helpers/CUtlTSHash.h"
-#include "../helpers/CUtlVector.h"
-#include "../helpers/CUtlMap.h"
-#include "../helpers/vfunc.h"
-#include "../helpers/CThreadSpinRWLock.h"
+#include "../../sdk/source_engine/CUtlTSHash.h"
+#include "../../sdk/source_engine/CUtlVector.h"
+#include "../../sdk/source_engine/CUtlMap.h"
+#include "../../helpers/vfunc.h"
+#include "../../sdk/source_engine/CThreadSpinRWLock.h"
 
 // Copyright (C) 2023 neverlosecc
 // See end of file for extended copyright information.

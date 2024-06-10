@@ -2,8 +2,7 @@
 #pragma warning(disable:4191)
 #include <cassert>
 #include <cstddef>
-
-#include "../helpers/vfunc.h"
+#include "../../helpers/vfunc.h"
 
 class IMemAlloc 
 {

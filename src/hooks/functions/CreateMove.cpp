@@ -1,8 +1,7 @@
 #include "../hooks.h"
 #include "../../sdk/sdk.h"
-#include "../../sdk/helpers/entity_data.h"
+#include "../../../../features/entity_data.h"
 #include "../../sdk/math/math.h"
-#include "../../sdk/localplayer.h"
 #include "../../settings/settings.h"
 
 float distance_based_fov(const QAngle& delta, const float& distance)
@@ -53,7 +52,7 @@ namespace Aimbot
         out.clamp_normalize();
     }
 
-    void Aim(CUserCmd* cmd, CBaseUserCmdPB* base_cmd)
+    void Aim(CUserCmd* cmd)
     {
         if (!g::engine_client->IsInGame())
             return;
@@ -110,16 +109,18 @@ namespace Aimbot
                         best_angle = target_angle;
                     }
 
-                    if (i % 25 == 0)
-                        printf("[%d]: fov: %.1f, best_fov: %.1f\n", hitbox_data.index, fov, best_fov);
+                    //if (i % 25 == 0)
+                      //  printf("[%d]: fov: %.1f, best_fov: %.1f\n", hitbox_data.index, fov, best_fov);
 
                     //smooth(settings::visuals::smooth, viewangles, best_angle, best_angle); //behaves weirdly @ >2 smooth 
 
-                   /* if (!(cmd->buttonStates.m_nValue & IN_ATTACK)) //This doesnt work properly
-                        continue;*/
+                    bool on_button_down = cmd->buttonStates.m_nValueChanged & IN_ATTACK;
 
-                    if (!GetAsyncKeyState(VK_LBUTTON))
+                    if (!on_button_down) //This doesnt work properly
                         continue;
+
+                   /* if (!GetAsyncKeyState(VK_LBUTTON))
+                        continue;*/
 
                     const auto& best_angle_vec = best_angle.to_vector();
                     if (!best_angle_vec.is_valid())
@@ -137,20 +138,27 @@ namespace Aimbot
     }
 }
 
-bool __fastcall hooks::clientmode_createmove::hooked(void* rcx, CUserCmd* cmd)
+
+void print_values(CUserCmd* cmd)
 {
-    if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
-        return original_fn(rcx, cmd);
+    //const auto& cmd = g::csgo_input->GetUserCmd();
+ 
+    printf("%llu, %llu, %llu\n", cmd->buttonStates.m_nValue, cmd->buttonStates.m_nValueChanged, cmd->buttonStates.m_nValueScroll);
+}
 
-    if (!cmd)
-        return original_fn(rcx, cmd);
+CCSPlayerController* controller = nullptr;
 
-    auto base_cmd = cmd->cmd.m_pBaseCmd;
+bool __fastcall hooks::clientmode_createmove::hooked(void* rcx, CUserCmd* cmd) //CUserCmd* cmd - second argument isnt probably the cmd?
+{
+    cmd = g::csgo_input->GetUserCmd();
 
-    if (!base_cmd)
-        return original_fn(rcx, cmd);
+    const auto& result = original_fn(rcx, cmd);
+    if (!cmd || (!g::engine_client->IsInGame() || !g::engine_client->IsConnected()))
+        return result;
 
-    Aimbot::Aim(cmd, base_cmd);
+    //print_values(cmd);
+  
+    Aimbot::Aim(cmd);
 
-    return original_fn(rcx, cmd);
+    return result;
 }

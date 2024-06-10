@@ -1,7 +1,6 @@
 #include <vector>
-
 #include "Netvars.h"
-#include "../sdk.h"
+#include "../../../../sdk/sdk.h"
 
 namespace netvars
 {

@@ -1,9 +1,8 @@
 #include "entity_data.h"
-#include "../helpers/Hitbox_t.h"
-#include "../helpers/globals.h"
-#include "../../thirdparty/ImGui/imgui_internal.h"
+#include "../../../../sdk/classes/structs_and_classes/Hitbox_t.h"
+#include "../../../../settings/globals.h"
+#include "../../../../thirdparty/ImGui/imgui_internal.h"
 
-#include "../localplayer.h"
 
 namespace entity_data
 {
@@ -188,6 +187,8 @@ namespace entity_data
 		const auto& localplayer_pawn = localplayer->m_hPlayerPawn().Get<CCSPlayerPawn*>();
 		if (!localplayer_pawn)
 			return;
+
+		//Vector velocity = localplayer->m_vecVelocity();
 
 		std::lock_guard<std::mutex> lock(locker);
 

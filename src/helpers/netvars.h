@@ -1,7 +1,6 @@
 #pragma once
 #include <map>
-
-#include "../../sdk/helpers/fnv.h"
+#include "../../../../helpers/fnv.h"
 
 #define NETVAR(type, function, class_name, var_name) \
 __forceinline type& function() \

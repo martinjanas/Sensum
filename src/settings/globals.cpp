@@ -1,6 +1,6 @@
 #include "globals.h"
-#include "../../hooks/hooks.h"
-#include "../helpers/entity_data.h"
+#include "../../../../hooks/hooks.h"
+#include "../../../../features/entity_data.h"
 #include <d3d9types.h>
 
 namespace globals

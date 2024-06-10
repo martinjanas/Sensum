@@ -10,23 +10,52 @@
 #include "../sdk/interfaces/CInputSystem.h"
 #include "../sdk/math/Viewmatrix.h"
 
+class CGlobalVars
+{
+	char pad_0000[8]; //0x0000 //New class
+	float interval_per_ticks; //0x0008
+	float curtime; //0x000C
+	float curtime2; //0x0010
+	char pad_0014[4]; //0x0014
+	float fraction; //0x0018
+	bool N00000CD9; //0x001C
+	char pad_001D[3]; //0x001D
+	int64_t tick_count; //0x0020
+	void* net_channel; //0x0028
+};
+
 class CGlobalVarsBase
 {
 public:
-    float m_realtime; //0x0000
-    __int32 m_framecount; //0x0004
-    float m_frametime; //0x0008
-    float m_abs_frametime; //0x000C
-    __int32 m_maxclients; //0x0010
-    char pad_0014[28]; //0x0014
-    float m_frametime2; //0x0030
-    float m_curtime; //0x0034
-    float m_curtime2; //0x0038
-    char pad_003C[20]; //0x003C
-    __int32 m_tickcount; //0x0050
-    char pad_0054[348]; //0x0054
-    DWORD64 m_current_map; //0x01B0
-    DWORD64 m_current_mapname; //0x01B8
+	float realtime; //0x0000
+	int32_t frame_count; //0x0004
+	float interval_per_ticks; //0x0008
+	float interval_per_ticks2; //0x000C
+	int32_t max_client; //0x0010
+	bool N00000CE3; //0x0014
+	char pad_0015[3]; //0x0015
+	bool prediction; //0x0018
+	char pad_0019[7]; //0x0019
+	CGlobalVars* global_vars;
+};
+
+class CNetworkGameClient
+{
+public:
+	CGlobalVarsBase* GetGlobalVars()
+	{
+		//xref: Curtime( %f )\nRealtime( %f )\n module: engine2
+		return GetVirtual<CGlobalVarsBase*(__thiscall*)(void*)>(this, 4)(this);
+	}
+};
+
+class CNetworkGameService
+{
+public:
+	CNetworkGameClient* GetNetworkGameClient()
+	{
+		return *reinterpret_cast<CNetworkGameClient**>(reinterpret_cast<uintptr_t>(this) + 0xB8);
+	}
 };
 
 namespace sdk
@@ -58,6 +87,8 @@ namespace interfaces //move to interfaces.h ?
 	extern CInputSystem* input_system;
 	extern void* client_mode;
     extern CGlobalVarsBase* global_vars;
+	extern CNetworkGameService* network_game_service;
+	extern CNetworkGameClient* network_game_client;
 }
 
 namespace g = interfaces;

@@ -1,6 +1,6 @@
 #pragma once
-#include "../math/Vector.h"
-#include "../helpers/CUtlVector.h"
+#include "../../../sdk/math/Vector.h"
+#include "../../../sdk/source_engine/CUtlVector.h"
 
 enum EHitboxes
 {
