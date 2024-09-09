@@ -1,8 +1,8 @@
 #pragma once
 #define NOMINMAX
 #include <Windows.h>
-#include "../../../../sdk/math/Viewmatrix.h"
-#include "../../../../sdk/math/Vector.h"
+#include "../../sdk/math/Viewmatrix.h"
+#include "../../sdk/math/Vector.h"
 
 namespace globals
 {

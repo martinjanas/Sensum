@@ -1,13 +1,14 @@
 #pragma once
-#include "../../../../sdk/sdk.h"
-#include "../../../../settings/globals.h"
-#include "../../../../sdk/source_engine/CHandle.h"
-#include "../../../../sdk/classes/entities/CEntityInstance.h"
-#include "../../../../helpers/console.h"
+#include "../sdk/sdk.h"
+#include "../sdk/helpers/globals.h"
+#include "../sdk/classes/CHandle.h"
+#include "../sdk/classes/CEntityInstance.h"
+#include "../sdk/helpers/console.h"
 #include "../thirdparty/ImGui/imgui.h"
 #include "../thirdparty/ImGui/imgui_internal.h"
 #include "../thirdparty/ImGui/backends/imgui_impl_dx11.h"
 #include "../thirdparty/ImGui/backends/imgui_impl_win32.h"
+
 #include "../sdk/hooking/safetyhook/safetyhook.hpp"
 #include "../sdk/hooking/shadow_vmt/ShadowVMT.h"
 

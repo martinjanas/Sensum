@@ -1,6 +1,6 @@
 #pragma once
 #include "Vector.h"
-#include "../../helpers/matrix.h"
+#include "../helpers/matrix.h"
 
 class Quaternion
 {

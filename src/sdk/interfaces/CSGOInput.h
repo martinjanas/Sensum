@@ -167,7 +167,7 @@ struct CInButtonState
 	void* pVTable; // 0x0
 	uint64_t m_nValue; // 0x8
 	uint64_t m_nValueChanged; // 0x10
-	uint64_t m_nValueScroll; // 0x18 //uint64_t
+	uint64_t m_nValueScroll; // 0x18
 };
 
 class CUserCmd
@@ -176,7 +176,7 @@ public:
 	void* pVTable;
 	CCSGOUserCmdPB cmd;
 	CInButtonState buttonStates;
-	std::byte pad[0x20];
+	std::byte pad[0x20]; //pad[0x20] //was pad[48]
 };
 
 class CSGOInput

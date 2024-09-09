@@ -1,7 +1,7 @@
 #pragma once
 #include "../settings/settings.h"
-#include "../../../../features/entity_data.h"
-#include "../../../../settings/globals.h"
+#include "../sdk/helpers/entity_data.h"
+#include "../sdk/helpers/globals.h"
 
 namespace features
 {

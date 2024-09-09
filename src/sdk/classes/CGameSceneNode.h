@@ -1,10 +1,10 @@
 #pragma once
-#include "../../../helpers/netvars.h"
-#include "../../../helpers/vfunc.h"
-#include "../../../../sdk/classes/entities/components/CSkeletonInstance.h"
-#include "../../../sdk/math/Vector.h"
-#include "../../../sdk/math/Transform.h"
-#include "../../../sdk/math/QAngle.h"
+#include "../../sdk/helpers/netvars.h"
+#include "../../sdk/helpers/vfunc.h"
+#include "../../sdk/classes/CSkeletonInstance.h"
+#include "../../sdk/math/Vector.h"
+#include "../../sdk/math/Transform.h"
+#include "../../sdk/math/QAngle.h"
 
 class CGameSceneNode
 {

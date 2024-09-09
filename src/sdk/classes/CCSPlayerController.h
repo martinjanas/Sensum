@@ -1,10 +1,10 @@
 #pragma once
-#include "../../../../helpers/netvars.h"
-#include "../../../../helpers/vfunc.h"
-#include "../../../../sdk/math/Vector.h"
-#include "../../../../sdk/classes/entities/CBaseEntity.h"
-#include "../../../../sdk/classes/entities/services/CPlayerMoneyServices.h"
-#include "../../../../sdk/source_engine/CHandle.h"
+#include "../../sdk/helpers/netvars.h"
+#include "../../sdk/helpers/vfunc.h"
+#include "../../sdk/math/Vector.h"
+#include "../../sdk/classes/CBaseEntity.h"
+#include "../../sdk/classes/CPlayerMoneyServices.h"
+#include "../../sdk/classes/CHandle.h"
 
 //C_CSPlayerPawn: C_CSPlayerPawnBase: C_BasePlayerPawn
 //CCSPlayerController : CBasePlayerController: C_BaseEntity

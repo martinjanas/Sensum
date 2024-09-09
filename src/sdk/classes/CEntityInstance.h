@@ -1,6 +1,6 @@
 #pragma once
-#include "../../../sdk/classes/entities/CEntityIdentity.h"
-#include "../../../sdk/interfaces/SchemaSystem.h"
+#include "../../sdk/classes/CEntityIdentity.h"
+#include "../../sdk/interfaces/SchemaSystem.h"
 //#include "../../sdk/classes/CHandle.h"
 
 class CEntityInstance

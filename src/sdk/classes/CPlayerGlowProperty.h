@@ -1,7 +1,8 @@
 #pragma once
-#include "../../../../helpers/netvars.h"
-#include "../../../../helpers/vfunc.h"
-#include "../../../../sdk/math/Vector.h"
+
+#include "../../sdk/helpers/netvars.h"
+#include "../../sdk/helpers/vfunc.h"
+#include "../../sdk/math/Vector.h"
 
 class CGlowProperty
 {

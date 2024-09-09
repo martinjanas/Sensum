@@ -29,7 +29,7 @@ class Exporter
 {
 public:
 	Exporter(HMODULE _base) : base(_base) { }
-	Exporter() = default;
+	Exporter() { }
 
 	Exporter& get_export(const std::string_view& func_name)
 	{
@@ -60,7 +60,7 @@ public:
 		this->base = base;
 	}
 
-	PatternScanner() = default;
+	PatternScanner() { }
 
 	PatternScanner& scan(const char* signature)
 	{

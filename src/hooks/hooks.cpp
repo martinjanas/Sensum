@@ -1,6 +1,6 @@
 #include "hooks.h"
 #include "../settings/settings.h"
-#include "../../../../features/entity_data.h"
+#include "../sdk/helpers/entity_data.h"
 
 bool hooks::init()
 {

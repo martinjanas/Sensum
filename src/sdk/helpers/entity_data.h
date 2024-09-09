@@ -4,10 +4,10 @@
 #include <vector>
 #include <map>
 #include <array>
-#include "../../../../sdk/classes/entities/players/CCSPlayerController.h"
-#include "../../../../sdk/classes/entities/players/CCSPlayerPawn.h"
-#include "../../../../sdk/classes/structs_and_classes/BBox_t.h"
-#include "../../../../sdk/math/QAngle.h"
+#include "../classes/CCSPlayerController.h"
+#include "../classes/CCSPlayerPawn.h"
+#include "../helpers/BBox_t.h"
+#include "../math/QAngle.h"
 
 namespace entity_data
 {

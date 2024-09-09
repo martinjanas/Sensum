@@ -1,7 +1,7 @@
 #include "../hooks.h"
 #include "../../sdk/sdk.h"
-#include "../../sdk/classes/entities/CBaseEntity.h"
-#include "../../features/entity_data.h""
+#include "../../sdk/classes/CBaseEntity.h"
+#include "../../sdk/helpers/entity_data.h"
 
 void __fastcall hooks::frame_stage_notify::hooked(void* a1, EClientFrameStage stage)
 {

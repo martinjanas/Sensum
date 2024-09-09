@@ -1,7 +1,7 @@
-#pragma once
-#include "../../sdk/classes/entities/CEntityInstance.h"
-#include "../../helpers/modules.h"
-#include "../../sdk/classes/entities/CBaseEntity.h"
+   #pragma once
+#include "../classes/CEntityInstance.h"
+#include "../helpers/modules.h"
+#include "../classes/CBaseEntity.h"
 
 #include <WinDNS.h>
 
@@ -33,23 +33,17 @@ public:
 	template <typename T = CBaseEntity*>
 	T GetLocalPlayerController()
 	{
-		T local_controller = nullptr;
-
 		for (int i = 1; i < 65; ++i)
 		{
 			T player = reinterpret_cast<T>(GetBaseEntity(i));
 
-			if (!player)
+			if (!player || !player->IsController())
 				continue;
 
 			if (player->m_bIsLocalPlayerController())
-			{
-				local_controller = player;
-				break;
-			}
+				return player;
 		}
-
-		return local_controller;
+		return nullptr;
 	}
 
 	/*CBaseEntity* GetBaseEntity(int index)
