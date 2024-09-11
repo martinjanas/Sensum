@@ -20,7 +20,7 @@ DWORD __stdcall on_attach(void* base)
     hooks::detach();
     console::detach();
 
-    FreeLibraryAndExitThread(reinterpret_cast<HMODULE>(base), EXIT_SUCCESS);
+    FreeLibraryAndExitThread(static_cast<HMODULE>(base), EXIT_SUCCESS);
 
     return TRUE;
 }

@@ -39,6 +39,7 @@ namespace entity_data
 		CCSPlayerPawn* localplayer_pawn;
 		ABBox_t abbox;
 		Vector local_eyepos;
+		Transform_t hitbox_transform[HITBOX_MAX];
 
 		std::array<hitbox_info_t, HITBOX_MAX> hitboxes;
 	};

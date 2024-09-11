@@ -21,136 +21,104 @@ namespace Aimbot
 {
     static std::list<entity_data::player_data_t> m_player_data;
 
-    static std::vector<int>& get_hitboxes()
+	std::vector<int>& GetTargetHitboxes()
     {
-        static std::vector<int> list{ HITBOX_HEAD, HITBOX_UPPER_CHEST, HITBOX_PELVIS };
+        static std::vector<int> list{ HITBOX_HEAD, HITBOX_UPPER_CHEST, HITBOX_LOWER_CHEST };
     
         return list;
     }
 
-    void smooth(const float& smooth, QAngle& viewangles, const QAngle& temp, QAngle& out)
+    void Aim(CUserCmd* cmd)
     {
-        out = temp;
-        out.clamp_normalize();
-
-        auto corrected_amount = smooth;
-        auto tickrate = (1.0f / 0.015625);
-
-        corrected_amount = tickrate * smooth / 64.f;
-
-        if (corrected_amount < 1.1f)
-            return;
-
-        auto temp_v = temp.to_vector();
-        auto viewangles_v = viewangles.to_vector();
-
-        auto delta = temp_v - viewangles_v;
-        
-        auto smoothed = viewangles_v + delta / corrected_amount;
-        auto smoothed_v = smoothed.to_qangle();
-
-        out = smoothed_v;
-        out.clamp_normalize();
-    }
-
-    void Aim(CUserCmd* cmd, CBaseUserCmdPB* base_cmd)
-    {
-        if (!g::engine_client->IsInGame())
-            return;
-
-        if (entity_data::player_entry_data.empty())
+        if (!g::engine_client->IsInGame() || entity_data::player_entry_data.empty())
             return;
 
         if (entity_data::locker.try_lock())
         {
             m_player_data.clear();
-            std::copy(entity_data::player_entry_data.front().player_data.begin(), entity_data::player_entry_data.front().player_data.end(), std::back_inserter(m_player_data));
+            std::ranges::copy(entity_data::player_entry_data.front().player_data, std::back_inserter(m_player_data));
             entity_data::locker.unlock();
         }
         
         float best_fov = 9999.f;
-        QAngle best_angle;
-
+        
         for (const auto& data : m_player_data)
         {
-            static int i = 0;
+            static int ticks = 0;
 
             QAngle viewangles;
             g::client->GetViewAngles(0, &viewangles);
 
-            const auto& hitbox_ids = get_hitboxes();
+            const auto& hitbox_ids = GetTargetHitboxes();
             if (hitbox_ids.empty())
                 continue;
 
-            if (!data.pawn || data.m_iHealth <= 0 || data.hitboxes.empty())
+            if (!data.pawn || data.m_iHealth <= 0)
                 continue;
 
             const auto& eye_pos = data.localplayer_pawn->GetEyePos();
 
-            for (const auto& hitbox_id : hitbox_ids)
+            for (const auto& hitbox_id : hitbox_ids) //redo this
             {
+                if (data.hitboxes.empty())
+                {
+                    printf("No hitboxes for player: %s\n", data.player_name);
+                    continue;
+                }
+
                 for (auto& hitbox_data : data.hitboxes)
                 {
                     if (hitbox_data.index != hitbox_id)
                         continue;
 
-                    QAngle target_angle = (hitbox_data.hitbox_pos - eye_pos).to_qangle();
+                    Vector hitbox_pos = hitbox_data.hitbox_pos;
+
+                    QAngle target_angle = (hitbox_pos - eye_pos).to_qangle();
                     target_angle.clamp_normalize();
 
                     auto delta = target_angle - viewangles;
                     delta.clamp_normalize();
 
+                    //float dist = hitbox_pos.dist_to(eye_pos); 
                     float dist = data.m_vecOrigin.dist_to(eye_pos);
 
                     float fov = distance_based_fov(delta, dist);
 
+                    float delta_dist = viewangles.to_vector().dist_to(target_angle.to_vector());
+
+                    auto viewangles_normalized = viewangles.to_vector();
+                    viewangles_normalized.normalize();
+
+                    auto target_angle_normalized = target_angle.to_vector();
+                    target_angle_normalized.normalize();
+
+                    float delta_vec_dist = viewangles_normalized.dist_to(target_angle_normalized);
+
                     if (fov < best_fov) 
-                    {
-                        best_fov = fov; //MJ: Is this really correct?
-                        best_angle = target_angle;
-                    }
+                        best_fov = fov;
 
-                    if (i % 25 == 0)
-                        printf("[%d]: fov: %.1f, best_fov: %.1f\n", hitbox_data.index, fov, best_fov);
-
-                    //smooth(settings::visuals::smooth, viewangles, best_angle, best_angle); //behaves weirdly @ >2 smooth 
-
-                   /* if (!(cmd->buttonStates.m_nValue & IN_ATTACK)) //This doesnt work properly
-                        continue;*/
+                    printf("[%s: %d]: fov: %.1f, best_fov: %.1f, dist: %.1f, delta_dist: %.1f, delta_vec_dist: %.1f\n", hitbox_data.entity_name, hitbox_data.index, fov, best_fov, dist, delta_dist, delta_vec_dist);
 
                     if (!GetAsyncKeyState(VK_LBUTTON))
-                        continue;
-
-                    const auto& best_angle_vec = best_angle.to_vector();
-                    if (!best_angle_vec.is_valid())
                         continue;
 
                     if (best_fov > settings::visuals::aimbot_fov)
                         continue;
 
-                    g::client->SetViewAngles(0, best_angle);
+                    g::client->SetViewAngles(0, target_angle);
                 }
             }
-
-            i++;
+            ticks++;
         }
     }
 }
 
-bool __fastcall hooks::clientmode_createmove::hooked(void* rcx, CUserCmd* cmd)
+bool hooks::clientmode_createmove::hooked(void* rcx, CUserCmd* cmd)
 {
     if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
         return original_fn(rcx, cmd);
 
-    if (!cmd)
-        return original_fn(rcx, cmd);
-
-    auto base_cmd = cmd->cmd.m_pBaseCmd;
-
-    if (!base_cmd)
-        return original_fn(rcx, cmd);
-
-    Aimbot::Aim(cmd, base_cmd);
+    Aimbot::Aim(cmd);
 
     return original_fn(rcx, cmd);
 }

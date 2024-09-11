@@ -176,6 +176,29 @@ namespace entity_data
 		}
 	}
 
+	void hitbox2(const char* name, std::array<hitbox_info_t, HITBOX_MAX>& out, Transform_t* hitbox_trans, HitboxSet_t* hitbox_set)
+	{
+		auto& hitboxes = hitbox_set->m_HitBoxes();
+		if (hitboxes.Count() == 0)
+			return;
+
+		for (int i = 0; i < HITBOX_MAX; i++)
+		{
+			Hitbox_t hitbox = *hitboxes.AtPtr(i);
+
+			const auto& radius = hitbox.m_flShapeRadius();
+
+			auto& trans = hitbox_trans[i];
+
+			auto mins = (hitbox.m_vMinBounds() - radius).transform(trans.ToMatrix3x4());
+			auto maxs = (hitbox.m_vMaxBounds() + radius).transform(trans.ToMatrix3x4());
+
+			auto hitbox_pos = (mins + maxs) * 0.5f;
+
+			out[i] = { hitbox_pos, hitbox.m_nHitBoxIndex(), name };
+		}
+	}
+
 	void fetch_player_data()
 	{
 		if (!g::engine_client->IsInGame())
@@ -219,6 +242,10 @@ namespace entity_data
 				continue;
 
 			if (pawn->InAir())
+				continue;
+
+			HitboxSet_t* hitbox_set = pawn->GetHitboxSet(0);
+			if (!hitbox_set)
 				continue;
 
 			/*EmitSound_t params; //crashing/throwing exceptions:
@@ -265,10 +292,13 @@ namespace entity_data
 			player_data.pawn = pawn;
 			player_data.localplayer_pawn = localplayer_pawn;
 			player_data.local_eyepos = localplayer_pawn->GetEyePos();
+			int hitbox_count = pawn->HitboxToWorldTransform(hitbox_set, player_data.hitbox_transform);
+
+			hitbox2(player_data.player_name, player_data.hitboxes, player_data.hitbox_transform, hitbox_set);
+			
+			//hitbox(pawn, player_data.player_name, player_data.hitboxes);
 
 			GetBBox(scene_node, collision, player_data.abbox);
-			hitbox(pawn, player_data.player_name, player_data.hitboxes);
-
 			//get_head_bbox(pawn, localplayer_pawn, player_data.head_bbox);
 
 			entry_data.player_data.push_back(std::move(player_data));
