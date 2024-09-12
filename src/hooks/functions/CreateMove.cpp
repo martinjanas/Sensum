@@ -4,6 +4,7 @@
 #include "../../sdk/math/math.h"
 #include "../../sdk/localplayer.h"
 #include "../../settings/settings.h"
+#include <unordered_set>
 
 float distance_based_fov(const QAngle& delta, const float& distance)
 {
@@ -19,96 +20,88 @@ float distance_based_fov(const QAngle& delta, const float& distance)
 
 namespace Aimbot
 {
-    static std::list<entity_data::player_data_t> m_player_data;
+    std::list<entity_data::player_data_t> m_player_data;
 
-	std::vector<int>& GetTargetHitboxes()
+	std::unordered_set<int>& GetTargetHitboxes()
     {
-        static std::vector<int> list{ HITBOX_HEAD, HITBOX_UPPER_CHEST, HITBOX_LOWER_CHEST };
-    
+        static std::unordered_set<int> list = { HITBOX_HEAD, HITBOX_LOWER_CHEST, HITBOX_UPPER_CHEST };
+
         return list;
     }
 
     void Aim(CUserCmd* cmd)
     {
-        if (!g::engine_client->IsInGame() || entity_data::player_entry_data.empty())
+        if (!g::engine_client->IsInGame())
             return;
 
         if (entity_data::locker.try_lock())
         {
             m_player_data.clear();
-            std::ranges::copy(entity_data::player_entry_data.front().player_data, std::back_inserter(m_player_data));
+
+            if (!entity_data::player_entry_data.empty())
+                std::ranges::copy(entity_data::player_entry_data.front().player_data, std::back_inserter(m_player_data));
+
             entity_data::locker.unlock();
         }
         
+        QAngle viewangles;
+        g::client->GetViewAngles(0, &viewangles);
+
         float best_fov = 9999.f;
-        
+        QAngle best_angle;
+
         for (const auto& data : m_player_data)
         {
-            static int ticks = 0;
-
-            QAngle viewangles;
-            g::client->GetViewAngles(0, &viewangles);
-
-            const auto& hitbox_ids = GetTargetHitboxes();
-            if (hitbox_ids.empty())
-                continue;
-
             if (!data.pawn || data.m_iHealth <= 0)
                 continue;
 
-            const auto& eye_pos = data.localplayer_pawn->GetEyePos();
+            if (data.hitboxes.empty())
+                continue;
 
-            for (const auto& hitbox_id : hitbox_ids) //redo this
+            for (auto& hitbox_data : data.hitboxes)
             {
-                if (data.hitboxes.empty())
-                {
-                    printf("No hitboxes for player: %s\n", data.player_name);
+                const auto& hitbox_ids = GetTargetHitboxes();
+                if (hitbox_ids.empty())
                     continue;
-                }
 
-                for (auto& hitbox_data : data.hitboxes)
-                {
-                    if (hitbox_data.index != hitbox_id)
-                        continue;
+                if (hitbox_ids.find(hitbox_data.index) == hitbox_ids.end())
+                    continue;
 
-                    Vector hitbox_pos = hitbox_data.hitbox_pos;
+                const Vector& hitbox_pos = hitbox_data.hitbox_pos;
 
-                    QAngle target_angle = (hitbox_pos - eye_pos).to_qangle();
-                    target_angle.clamp_normalize();
+                auto eye_pos = data.localplayer_pawn->GetEyePos();
 
-                    auto delta = target_angle - viewangles;
-                    delta.clamp_normalize();
+                Vector delta_target_angle = (hitbox_pos - eye_pos);
 
-                    //float dist = hitbox_pos.dist_to(eye_pos); 
-                    float dist = data.m_vecOrigin.dist_to(eye_pos);
+                QAngle target_angle = delta_target_angle.to_qangle();
+                target_angle.clamp_normalize();
 
-                    float fov = distance_based_fov(delta, dist);
+                auto delta = target_angle - viewangles;
+                delta.clamp_normalize();
 
-                    float delta_dist = viewangles.to_vector().dist_to(target_angle.to_vector());
+                //float dist = hitbox_pos.dist_to(eye_pos); //returns bullshit distance
+                float dist = data.m_vecOrigin.dist_to(eye_pos);
 
-                    auto viewangles_normalized = viewangles.to_vector();
-                    viewangles_normalized.normalize();
+                //float fov = distance_based_fov(delta, dist);
 
-                    auto target_angle_normalized = target_angle.to_vector();
-                    target_angle_normalized.normalize();
+                float fov = std::hypotf(delta.pitch, delta.yaw);
 
-                    float delta_vec_dist = viewangles_normalized.dist_to(target_angle_normalized);
+                //if (fov < best_fov)
+                //{
+                //    best_fov = fov;
+                //    best_angle = target_angle; //best angle not applying to other enemies?
+                //}
 
-                    if (fov < best_fov) 
-                        best_fov = fov;
+                printf("[%s: %d]: fov: %.1f, best_fov: %.1f, dist: %.1f\n", hitbox_data.entity_name, hitbox_data.index, fov, best_fov, dist);
 
-                    printf("[%s: %d]: fov: %.1f, best_fov: %.1f, dist: %.1f, delta_dist: %.1f, delta_vec_dist: %.1f\n", hitbox_data.entity_name, hitbox_data.index, fov, best_fov, dist, delta_dist, delta_vec_dist);
+                if (!GetAsyncKeyState(VK_LBUTTON))
+                    continue;
 
-                    if (!GetAsyncKeyState(VK_LBUTTON))
-                        continue;
+                if (fov > settings::visuals::aimbot_fov)
+                    continue;
 
-                    if (best_fov > settings::visuals::aimbot_fov)
-                        continue;
-
-                    g::client->SetViewAngles(0, target_angle);
-                }
+                g::client->SetViewAngles(0, target_angle);
             }
-            ticks++;
         }
     }
 }

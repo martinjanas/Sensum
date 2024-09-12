@@ -152,20 +152,7 @@ namespace entity_data
 
 			const auto& radius = hitbox.m_flShapeRadius();
 
-			/*const Vector& mins = hitbox.m_vMinBounds();
-			const Vector& maxs = hitbox.m_vMaxBounds();
-
-			Vector center = (mins + maxs) * 0.5f;*/
-
 			auto& trans = hitbox_trans[i];
-
-			//auto hitbox_pos = (center + trans.m_pos);
-
-			/*Vector mins, maxs;
-			transform_vector(hitbox.m_vMinBounds() - radius, trans.ToMatrix3x4(), mins);
-			transform_vector(hitbox.m_vMaxBounds() + radius, trans.ToMatrix3x4(), maxs);
-
-			auto hitbox_pos = (mins + maxs) * 0.5f;*/
 
 			auto mins = (hitbox.m_vMinBounds() - radius).transform(trans.ToMatrix3x4());
 			auto maxs = (hitbox.m_vMaxBounds() + radius).transform(trans.ToMatrix3x4());
@@ -292,11 +279,11 @@ namespace entity_data
 			player_data.pawn = pawn;
 			player_data.localplayer_pawn = localplayer_pawn;
 			player_data.local_eyepos = localplayer_pawn->GetEyePos();
-			int hitbox_count = pawn->HitboxToWorldTransform(hitbox_set, player_data.hitbox_transform);
+			//int hitbox_count = pawn->HitboxToWorldTransform(hitbox_set, player_data.hitbox_transform);
 
-			hitbox2(player_data.player_name, player_data.hitboxes, player_data.hitbox_transform, hitbox_set);
+			//hitbox2(player_data.player_name, player_data.hitboxes, player_data.hitbox_transform, hitbox_set);
 			
-			//hitbox(pawn, player_data.player_name, player_data.hitboxes);
+			hitbox(pawn, player_data.player_name, player_data.hitboxes);
 
 			GetBBox(scene_node, collision, player_data.abbox);
 			//get_head_bbox(pawn, localplayer_pawn, player_data.head_bbox);

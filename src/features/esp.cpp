@@ -46,7 +46,7 @@ namespace features::esp
 			m_player_data.clear();
 
 			if (!entity_data::player_entry_data.empty())
-				std::copy(entity_data::player_entry_data.front().player_data.begin(), entity_data::player_entry_data.front().player_data.end(), std::back_inserter(m_player_data));
+				std::ranges::copy(entity_data::player_entry_data.front().player_data, std::back_inserter(m_player_data));
 			
 			entity_data::locker.unlock();
 		}
@@ -77,6 +77,38 @@ namespace features::esp
 			Draw3DBox(data.abbox);
 
 			esp::bone_esp(data);
+
+			if (!data.hitboxes.empty())
+			{
+				//const auto& eye_pos = data.localplayer_pawn->GetEyePos();
+
+				/*QAngle viewangles;
+				g::client->GetViewAngles(0, &viewangles);*/
+
+				static Vector hitbox_w2s;
+				Vector target_w2s;
+				Vector delta_w2s;
+
+				for (auto& hitbox_data : data.hitboxes)
+				{
+					Vector hitbox_pos = hitbox_data.hitbox_pos;
+
+					/*QAngle target_angle = (hitbox_pos - eye_pos).to_qangle();
+					target_angle.clamp_normalize();*/
+
+					/*auto delta = target_angle - viewangles;
+					delta.clamp_normalize();*/
+
+					/*if (globals::world2screen(delta.to_vector(), delta_w2s))
+						globals::draw_list->AddCircle(delta_w2s.as_vec2(), 12.f, IM_COL32(255, 0, 0, 255), 255);*/
+
+					/*if (globals::world2screen(target_angle.to_vector(), target_w2s))
+						globals::draw_list->AddCircle(target_w2s.as_vec2(), 5.f, IM_COL32(0, 255, 0, 255), 255);*/ //this making me float
+
+					if (globals::world2screen(hitbox_pos, hitbox_w2s))
+						globals::draw_list->AddCircle(hitbox_w2s.as_vec2(), 8.f, IM_COL32_WHITE, 255);
+				}
+			}
 		}
 	}
 
