@@ -20,11 +20,9 @@ namespace entity_data
 
 	void destroy() //TODO: Call this if localplayer is nullptr
 	{
-		locker.lock();
-		{
-			player_instances.clear();
-		}
-		locker.unlock();
+		std::lock_guard<std::mutex> lock(entity_data::locker, std::adopt_lock);
+
+		player_instances.clear();
 	}
 
 	//https://github.com/nezu-cc/BakaWare4/blob/f82a60479287926b9fa105ea053851da9a7d040e/cheat/src/valve/cs/entity.cpp
@@ -67,142 +65,63 @@ namespace entity_data
 		//TODO: https://github.com/alza54/opensource2/blob/ff7c27a072f059597277b2eeacaf012683d4ff74/OpenSource2-SDK/src/sdk/source-sdk/classes/entity/c_baseentity.cpp#L97
 	}
 
-	void get_head_bbox(CCSPlayerPawn* pawn, CCSPlayerPawn* localplayer_pawn, BBox_t& out)
+	void GetHitbox(entity_data::player_data_t& player_data)
 	{
-		if (pawn == localplayer_pawn)
-			return;
-
-		HitboxSet_t* hitbox_set = pawn->GetHitboxSet(0);
-
+		HitboxSet_t* hitbox_set = player_data.m_PlayerPawn->GetHitboxSet(0);
 		if (!hitbox_set)
 			return;
 
-		Hitbox_t* hitbox = &hitbox_set->m_HitBoxes()[0];
-	
-		auto skeleton_instance = pawn->m_pGameSceneNode()->GetSkeletonInstance();
-
-		if (!skeleton_instance)
-			return;
-
-		auto head_bone = skeleton_instance->m_modelState().bones[6].position;
-
-		Vector mins = (head_bone + hitbox->m_vMinBounds());
-		Vector maxs = (head_bone + hitbox->m_vMaxBounds());
-
-		Vector points[8] =
-		{
-			Vector(mins.x, mins.y, mins.z),
-			Vector(mins.x, maxs.y, mins.z),
-			Vector(maxs.x, maxs.y, mins.z),
-			Vector(maxs.x, mins.y, mins.z),
-			Vector(maxs.x, maxs.y, maxs.z),
-			Vector(mins.x, maxs.y, maxs.z),
-			Vector(mins.x, mins.y, maxs.z),
-			Vector(maxs.x, mins.y, maxs.z)
-		};
-
-		float left = (std::numeric_limits<float>::max)();
-		float top = (std::numeric_limits<float>::max)();
-		float right = std::numeric_limits<float>::lowest();
-		float bottom = std::numeric_limits<float>::lowest();
-
-		Vector screen_points[8] = { };
-		for (int i = 0; i < 8; i++)
-		{
-			if (!globals::world2screen(points[i], screen_points[i]))
-				return;
-
-			left = std::min<float>(left, screen_points[i].x);
-			top = std::min<float>(top, screen_points[i].y);
-			right = std::max<float>(right, screen_points[i].x);
-			bottom = std::max<float>(bottom, screen_points[i].y);
-		}
-
-		out.top = top;
-		out.left = left;
-		out.right = right;
-		out.bottom = bottom;
-	}
-
-	inline void transform_vector(const Vector& in1, const matrix3x4_t& in2, Vector& out)
-	{
-		out[0] = in1.dot_product(in2[0]) + in2[0][3];
-		out[1] = in1.dot_product(in2[1]) + in2[1][3];
-		out[2] = in1.dot_product(in2[2]) + in2[2][3];
-	}
-
-	void hitbox(CCSPlayerPawn* pawn, const char* name, std::array<hitbox_info_t, HITBOX_MAX>& out)
-	{
-		HitboxSet_t* hitbox_set = pawn->GetHitboxSet(0);
-		if (!hitbox_set)
-			return;
-
-		Transform_t hitbox_trans[HITBOX_MAX];
-		int hitbox_count = pawn->HitboxToWorldTransform(hitbox_set, hitbox_trans);
-		if (!hitbox_count)
-			return;
-		
 		auto& hitboxes = hitbox_set->m_HitBoxes();
-		if (hitboxes.Count() == 0)
+		if (hitboxes.Count() == 0 || hitboxes.Count() > HITBOX_MAX)
 			return;
 
-		for (int i = 0; i < HITBOX_MAX; i++)
+		for (int i = 0; i < HITBOX_MAX; ++i)
 		{
-			Hitbox_t hitbox = *hitboxes.AtPtr(i);
+			Hitbox_t* hitbox = &hitboxes[i];
 
-			const auto& radius = hitbox.m_flShapeRadius();
+			if (!hitbox)
+				continue;
 
-			auto& trans = hitbox_trans[i];
+			if (!player_data.m_PlayerPawn->HitboxToWorldTransform(hitbox_set, player_data.hitbox_transform))
+				continue;
 
-			auto mins = (hitbox.m_vMinBounds() - radius).transform(trans.ToMatrix3x4());
-			auto maxs = (hitbox.m_vMaxBounds() + radius).transform(trans.ToMatrix3x4());
+			const auto& hitbox_matrix = player_data.hitbox_transform[i];
+
+			const auto& radius = hitbox->m_flShapeRadius() != -1 ? hitbox->m_flShapeRadius() : 0.f;
+
+			const auto& mins = (hitbox->m_vMinBounds() - radius).transform(hitbox_matrix.ToMatrix3x4());
+			const auto& maxs = (hitbox->m_vMaxBounds() + radius).transform(hitbox_matrix.ToMatrix3x4());
 
 			auto hitbox_pos = (mins + maxs) * 0.5f;
 
-			out[i] = { hitbox_pos, hitbox.m_nHitBoxIndex(), name};
+			player_data.hitboxes[i] = { hitbox_pos, hitbox->m_nHitBoxIndex(), player_data.m_szPlayerName };
 		}
 	}
 
-	void hitbox2(const char* name, std::array<hitbox_info_t, HITBOX_MAX>& out, Transform_t* hitbox_trans, HitboxSet_t* hitbox_set)
-	{
-		auto& hitboxes = hitbox_set->m_HitBoxes();
-		if (hitboxes.Count() == 0)
-			return;
-
-		for (int i = 0; i < HITBOX_MAX; i++)
-		{
-			Hitbox_t hitbox = *hitboxes.AtPtr(i);
-
-			const auto& radius = hitbox.m_flShapeRadius();
-
-			auto& trans = hitbox_trans[i];
-
-			auto mins = (hitbox.m_vMinBounds() - radius).transform(trans.ToMatrix3x4());
-			auto maxs = (hitbox.m_vMaxBounds() + radius).transform(trans.ToMatrix3x4());
-
-			auto hitbox_pos = (mins + maxs) * 0.5f;
-
-			out[i] = { hitbox_pos, hitbox.m_nHitBoxIndex(), name };
-		}
-	}
-
-	void fetch_player_data()
+	void fetch_player_data(CUserCmd* cmd)
 	{
 		if (!g::engine_client->IsInGame())
 			return;
 		
 		const auto& localplayer = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
 		if (!localplayer)
-			return;
+		{
+			destroy();
 
-		const auto& localplayer_pawn = localplayer->m_hPlayerPawn().Get<CCSPlayerPawn*>();
-		if (!localplayer_pawn)
+			return;
+		}
+
+		const auto& localpawn = localplayer->m_hPlayerPawn().Get<CCSPlayerPawn*>();
+		if (!localpawn || !localpawn->IsAlive())
 			return;
 
 		std::lock_guard<std::mutex> lock(locker);
 
+		const auto& local_team = localpawn->m_iTeamNum();
+		const auto& eye_pos = localpawn->GetEyePos();
+		
 		entry_data_t entry_data;
-		for (const auto& instance : player_instances) //TODO: Refactor this in the future
+		for (const auto& instance : player_instances)
 		{
 			if (!instance.entity || !instance.handle.IsValid())
 				continue;
@@ -216,77 +135,42 @@ namespace entity_data
 				continue;
 
 			const auto& pawn = controller->m_hPlayerPawn().Get<CCSPlayerPawn*>();
-			if (!pawn)
-				continue;
-		
-			if (!pawn->IsAlive())
+			if (!pawn || !pawn->IsAlive() || pawn == localpawn || pawn->m_iTeamNum() == local_team || pawn->InAir())
 				continue;
 
-			if (pawn == localplayer_pawn)
-				continue;
-
-			if (pawn->m_iTeamNum() == localplayer_pawn->m_iTeamNum())
-				continue;
-
-			if (pawn->InAir())
-				continue;
-
-			HitboxSet_t* hitbox_set = pawn->GetHitboxSet(0);
+			auto hitbox_set = pawn->GetHitboxSet(0);
 			if (!hitbox_set)
 				continue;
 
-			/*EmitSound_t params; //crashing/throwing exceptions:
-			const auto& emit_sound = pawn->EmitSound(params, "BaseCombatCharacter.AmmoPickup", 0.f);
-			printf("emit_sound: %d\n", emit_sound);*/
-
-			const auto& scene_node = pawn->m_pGameSceneNode();
-			if (!scene_node)
+			const auto scene_node = pawn->m_pGameSceneNode();
+			const auto weapon_services = pawn->m_pWeaponServices();
+			if (!scene_node || !weapon_services)
 				continue;
 
-			const auto& weapon_services = pawn->m_pWeaponServices();
-			if (!weapon_services)
+			const auto active_wpn = weapon_services->m_hActiveWeapon().Get<CBasePlayerWeapon*>();
+			const auto collision = pawn->m_pCollision();
+			const auto skeleton_instance = scene_node->GetSkeletonInstance();
+			if (!active_wpn || !collision || !skeleton_instance)
 				continue;
 
-			const auto& active_wpn = weapon_services->m_hActiveWeapon().Get<CBasePlayerWeapon*>();
-			if (!active_wpn)
-				continue;
-
-			const auto& collision = pawn->m_pCollision();
-			if (!collision)
-				continue;
-
-			const auto& skeleton_instance = scene_node->GetSkeletonInstance();
-			if (!skeleton_instance)
-				continue;
-
-			const auto& model_state = skeleton_instance->m_modelState();
-
-			const auto& model = model_state.modelHandle;
+			const auto model_state = skeleton_instance->m_modelState();
+			const auto model = model_state.modelHandle;
 			if (!model.IsValid())
 				continue;
 
-			const auto& eye_pos = localplayer_pawn->GetEyePos();
-
 			player_data_t player_data;
-			player_data.player_name = controller->m_sSanitizedPlayerName();
-			player_data.index = index;
+			player_data.m_szPlayerName = controller->m_sSanitizedPlayerName();
+			player_data.m_iPlayerIndex = index;
 			player_data.m_vecOrigin = scene_node->m_vecOrigin();
 			player_data.m_iHealth = pawn->m_iHealth();
 			player_data.m_iShotsFired = pawn->m_iShotsFired();
-			player_data.clip = active_wpn->m_iClip1();
-			player_data.model_state = model_state;
-			player_data.model = model;
-			player_data.pawn = pawn;
-			player_data.localplayer_pawn = localplayer_pawn;
-			player_data.local_eyepos = localplayer_pawn->GetEyePos();
-			//int hitbox_count = pawn->HitboxToWorldTransform(hitbox_set, player_data.hitbox_transform);
-
-			//hitbox2(player_data.player_name, player_data.hitboxes, player_data.hitbox_transform, hitbox_set);
+			player_data.m_iClip1 = active_wpn->m_iClip1();
+			player_data.m_ModelState = model_state;
+			player_data.m_hModel = model;
+			player_data.m_PlayerPawn = pawn;
 			
-			hitbox(pawn, player_data.player_name, player_data.hitboxes);
-
+			GetHitbox(player_data);
 			GetBBox(scene_node, collision, player_data.abbox);
-			//get_head_bbox(pawn, localplayer_pawn, player_data.head_bbox);
 
 			entry_data.player_data.push_back(std::move(player_data));
 		}

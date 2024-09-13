@@ -146,7 +146,7 @@ public:
 
     int HitboxToWorldTransform(HitboxSet_t* hitbox_set, Transform_t* out_transform) //Crashing?
     {
-        using fn = int(__thiscall*)(void*, HitboxSet_t*, Transform_t*, int);
+        using fn = int(__thiscall*)(void*, HitboxSet_t*, Transform_t*, int max_studio_bones);
 
         static auto addr = modules::client.pattern_scanner.scan("E8 ? ? ? ? 45 33 F6 4C 63 E0").add(0x1).abs().as();
 
@@ -156,7 +156,7 @@ public:
         const auto hitbox_to_world_transform = reinterpret_cast<fn>(addr);
 
         if (hitbox_to_world_transform)
-            return hitbox_to_world_transform(this, hitbox_set, out_transform, 1024); //MJ: I wonder what could be this 1024?
+            return hitbox_to_world_transform(this, hitbox_set, out_transform, 256); //1024
 
         return -1;
     }

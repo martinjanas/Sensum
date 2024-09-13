@@ -9,26 +9,22 @@ void __fastcall hooks::frame_stage_notify::hooked(void* a1, EClientFrameStage st
 	{
 	case FRAME_START:
 		break;
-
 	case FRAME_NET_UPDATE_START:
 		break;
-
 	case FRAME_NET_UPDATE_POSTDATAUPDATE_START:
 		break;
 	case FRAME_NET_UPDATE_POSTDATAUPDATE_END:
-		entity_data::fetch_player_data();
 		break;
-
 	case FRAME_NET_UPDATE_END:
+		entity_data::fetch_player_data(nullptr);
 		break;
-
 	case FRAME_RENDER_START:
 		break;
-
 	case FRAME_RENDER_END:
 		break;
-
 	case FRAME_NET_FULL_FRAME_UPDATE_ON_REMOVE:
+		break;
+	default:
 		break;
 	}
 

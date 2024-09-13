@@ -43,23 +43,20 @@ namespace features::esp
 
 		if (entity_data::locker.try_lock())
 		{
+			std::lock_guard<std::mutex> lock(entity_data::locker, std::adopt_lock);
+
 			m_player_data.clear();
 
 			if (!entity_data::player_entry_data.empty())
 				std::ranges::copy(entity_data::player_entry_data.front().player_data, std::back_inserter(m_player_data));
-			
-			entity_data::locker.unlock();
 		}
 
 		static Vector head_pos_out;
 		static Vector origin_out;
 
-		/*if (m_player_data.empty())
-			return;*/
-
 		for (auto& data : m_player_data)
 		{
-			if (data.index == 0)
+			if (data.m_iPlayerIndex == 0)
 				continue;
 			
 			Vector head_pos = data.m_vecOrigin;
@@ -78,37 +75,18 @@ namespace features::esp
 
 			esp::bone_esp(data);
 
-			if (!data.hitboxes.empty())
+			/*if (!data.hitboxes.empty())
 			{
-				//const auto& eye_pos = data.localplayer_pawn->GetEyePos();
-
-				/*QAngle viewangles;
-				g::client->GetViewAngles(0, &viewangles);*/
-
-				static Vector hitbox_w2s;
-				Vector target_w2s;
-				Vector delta_w2s;
-
+				Vector hitbox_w2s;
+				
 				for (auto& hitbox_data : data.hitboxes)
 				{
 					Vector hitbox_pos = hitbox_data.hitbox_pos;
 
-					/*QAngle target_angle = (hitbox_pos - eye_pos).to_qangle();
-					target_angle.clamp_normalize();*/
-
-					/*auto delta = target_angle - viewangles;
-					delta.clamp_normalize();*/
-
-					/*if (globals::world2screen(delta.to_vector(), delta_w2s))
-						globals::draw_list->AddCircle(delta_w2s.as_vec2(), 12.f, IM_COL32(255, 0, 0, 255), 255);*/
-
-					/*if (globals::world2screen(target_angle.to_vector(), target_w2s))
-						globals::draw_list->AddCircle(target_w2s.as_vec2(), 5.f, IM_COL32(0, 255, 0, 255), 255);*/ //this making me float
-
 					if (globals::world2screen(hitbox_pos, hitbox_w2s))
 						globals::draw_list->AddCircle(hitbox_w2s.as_vec2(), 8.f, IM_COL32_WHITE, 255);
 				}
-			}
+			}*/
 		}
 	}
 
@@ -120,11 +98,11 @@ namespace features::esp
 		Vector bone_pos_out;
 		Vector bone_parent_pos_out;
 
-		const auto& model = data.model;
+		const auto& model = data.m_hModel;
 		if (!model.IsValid())
 			return;
 
-		const auto& model_state = data.model_state;
+		const auto& model_state = data.m_ModelState;
 
 		static const auto& bone_count = model->BoneCount;
 		for (int i = 0; i < bone_count; ++i)
@@ -159,6 +137,6 @@ namespace features::esp
 		if (!settings::visuals::m_bNameEsp)
 			return;
 
-		globals::draw_list->AddText(ImVec2(origin_out.x - 15, screen_head_pos.y - 14), ImColor(settings::visuals::m_fNameColor.x, settings::visuals::m_fNameColor.y, settings::visuals::m_fNameColor.z, settings::visuals::m_fNameColor.w), data.player_name);
+		globals::draw_list->AddText(ImVec2(origin_out.x - 15, screen_head_pos.y - 14), ImColor(settings::visuals::m_fNameColor.x, settings::visuals::m_fNameColor.y, settings::visuals::m_fNameColor.z, settings::visuals::m_fNameColor.w), data.m_szPlayerName);
 	}
 }

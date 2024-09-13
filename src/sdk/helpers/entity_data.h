@@ -25,20 +25,17 @@ namespace entity_data
 
 	struct player_data_t
 	{
-		const char* player_name;
-		uint32_t index;
+		const char* m_szPlayerName;
+		uint32_t m_iPlayerIndex;
 		Vector m_vecOrigin;
 		int m_iHealth;
 		int m_iShotsFired;
-		int clip;
-		CModelState model_state;
-		CStrongHandle<CModel> model;
+		int m_iClip1;
+		CModelState m_ModelState;
+		CStrongHandle<CModel> m_hModel;
 		BBox_t bbox;
-		BBox_t head_bbox;
-		CCSPlayerPawn* pawn;
-		CCSPlayerPawn* localplayer_pawn;
+		CCSPlayerPawn* m_PlayerPawn;
 		ABBox_t abbox;
-		Vector local_eyepos;
 		Transform_t hitbox_transform[HITBOX_MAX];
 
 		std::array<hitbox_info_t, HITBOX_MAX> hitboxes;
@@ -67,7 +64,7 @@ namespace entity_data
 		extern std::mutex mutex;
 	};
 
-	void fetch_player_data();
+	void fetch_player_data(CUserCmd* cmd);
 	void destroy();
 }
 
