@@ -25,33 +25,34 @@ namespace Aimbot
 
 	std::unordered_set<int>& GetTargetHitboxes()
     {
-        static std::unordered_set<int> list = { HITBOX_HEAD, HITBOX_LOWER_CHEST, HITBOX_UPPER_CHEST };
+        static std::unordered_set<int> list = { HITBOX_HEAD, HITBOX_NECK, HITBOX_LOWER_CHEST, HITBOX_UPPER_CHEST, HITBOX_BELLY, HITBOX_THORAX };
 
         return list;
     }
 
-    void smooth(const float& amount, const QAngle& current_angles, const QAngle& aim_angles, QAngle& angles)
+    void smooth(const float& amount, const QAngle& current_angles, const QAngle& aim_angles, QAngle& out_angles)
     {
-        angles = aim_angles;
-        angles.clamp_normalize();
+        QAngle clamped_aim_angles = aim_angles;
+        clamped_aim_angles.clamp_normalize();
 
         auto corrected_amount = amount;
-        auto tickrate = 1.0f / 0.015625; //interval_per_tick on 64 tick
+        const float tickrate = 1.0f / 0.015625f; // interval_per_tick for 64 tick
+        corrected_amount = tickrate * amount / 64.0f;
 
-        corrected_amount = tickrate * amount / 64.f;
-
-        if (corrected_amount < 1.1f)
+        if (corrected_amount <= 1.1f)
+        {
+            out_angles = clamped_aim_angles;
             return;
+        }
 
-        Vector aim_vector = aim_angles.to_vector();
+        Vector aim_vector = clamped_aim_angles.to_vector();
         Vector current_vector = current_angles.to_vector();
-        
-        auto delta = aim_vector - current_vector;
-       
-        auto smoothed = current_vector + delta / corrected_amount;
 
-        angles = smoothed.to_qangle();
-        angles.clamp_normalize();
+        Vector delta = aim_vector - current_vector;
+        Vector smoothed = current_vector + delta / corrected_amount;
+
+        out_angles = smoothed.to_qangle();
+        out_angles.clamp_normalize();
     }
 
     void handle(CUserCmd* cmd)
@@ -134,7 +135,7 @@ namespace Aimbot
                 if (best_fov > settings::visuals::aimbot_fov)
                     continue;
 
-                smooth(settings::visuals::smooth, viewangles, best_angle, viewangles);
+                smooth(settings::visuals::smooth, viewangles, best_angle, best_angle);
 
                 g::client->SetViewAngles(0, best_angle);
             }
