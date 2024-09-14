@@ -55,6 +55,65 @@ namespace Aimbot
         out_angles.clamp_normalize();
     }
 
+    void smooth_constant(const float& speed, const QAngle& current_angles, const QAngle& target_angles, QAngle& smoothed_angles)
+    {
+        QAngle delta;
+        delta.pitch = target_angles.pitch - current_angles.pitch;
+        delta.yaw = target_angles.yaw - current_angles.yaw;
+        delta.clamp_normalize();
+
+        float step = speed * 0.015625f;
+
+        float length = sqrtf(delta.pitch * delta.pitch + delta.yaw * delta.yaw);
+
+        if (length > step)
+        {
+            delta.normalize(); 
+            delta *= step;
+        }
+
+        smoothed_angles.pitch = current_angles.pitch + delta.pitch;
+        smoothed_angles.yaw = current_angles.yaw + delta.yaw;
+        smoothed_angles.clamp_normalize();
+    }
+
+    void recoil(CCSPlayerPawn* localpawn, QAngle& viewangles)
+    {
+        static QAngle old_angle = { 0, 0, 0 };
+
+        auto& punch_cache = localpawn->m_aimPunchCache();
+
+        if (punch_cache.Count() <= 0 || punch_cache.Count() >= 0xFFFF)
+            return;
+
+        auto punch_angle = punch_cache[punch_cache.Count() - 1];
+        
+        if (localpawn->m_iShotsFired() >= 1)
+        {
+            QAngle new_punch = punch_angle;
+            new_punch.pitch *= 0.2f;
+            new_punch.yaw *= 2.f;
+
+            /*new_punch.pitch -= old_angle.pitch;
+            new_punch.yaw -= old_angle.yaw;*/
+
+            viewangles.pitch -= (punch_angle.pitch * 0.2f);
+            viewangles.yaw -= (punch_angle.yaw);
+            viewangles.clamp_normalize();
+
+            auto recoil_angle = viewangles;
+            recoil_angle.clamp_normalize();
+
+            smooth_constant(settings::visuals::const_smooth ? 24 : 12, viewangles, recoil_angle, recoil_angle);
+
+            if ((recoil_angle.pitch != 0.f || recoil_angle.yaw != 0.f) && GetAsyncKeyState(VK_LBUTTON))
+            {
+                g::client->SetViewAngles(0, recoil_angle);
+            }
+        }
+        old_angle = punch_angle;
+    }
+
     void handle(CUserCmd* cmd)
     {
         if (!g::engine_client->IsInGame())
@@ -87,6 +146,17 @@ namespace Aimbot
             return;
 
         const auto& eye_pos = localpawn->GetEyePos();
+
+        /*auto& punch_cache = localpawn->m_aimPunchCache();
+
+        if (punch_cache.Count() <= 0 || punch_cache.Count() >= 0xFFFF)
+            return;
+
+        auto punch_angle = punch_cache[punch_cache.Count() - 1];
+
+        viewangles.pitch -= (punch_angle.pitch * 0.2f); //This works, but its not right
+        viewangles.yaw -= (punch_angle.yaw);
+        viewangles.clamp_normalize();*/
 
         for (const auto& data : m_player_data)
         {
@@ -129,13 +199,17 @@ namespace Aimbot
 
                 //printf("[%s: %d]: fov: %.1f, best_fov: %.1f, dist: %.1f\n", hitbox_data->entity_name, hitbox_data->index, fov, best_fov, distance);
 
+                //recoil(localpawn, viewangles);
+
                 if (!GetAsyncKeyState(VK_LBUTTON))
                     continue;
 
                 if (best_fov > settings::visuals::aimbot_fov)
                     continue;
 
-                smooth(settings::visuals::smooth, viewangles, best_angle, best_angle);
+                if (!settings::visuals::const_smooth)
+                    smooth(settings::visuals::smooth, viewangles, best_angle, best_angle);
+                else smooth_constant(settings::visuals::smooth, viewangles, best_angle, best_angle);
 
                 g::client->SetViewAngles(0, best_angle);
             }

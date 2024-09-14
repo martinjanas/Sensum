@@ -19,6 +19,7 @@ namespace main_window
 
         ImGui::SliderInt("Aimbot FOV", &settings::visuals::aimbot_fov, 0, 360);
         ImGui::SliderFloat("Aimbot Smooth", &settings::visuals::smooth, 1.f, 60.f, "Smooth: %.1f");
+        ImGui::Checkbox("Const Smooth", &settings::visuals::const_smooth);
 
         ImGui::Checkbox("Fov changer", &settings::visuals::m_bFovChanger);
 

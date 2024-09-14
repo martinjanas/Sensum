@@ -17,7 +17,7 @@ public:
     NETVAR(CPlayerWeaponServices*, m_pWeaponServices, "C_BasePlayerPawn", "m_pWeaponServices");
     NETVAR(QAngle, m_angEyeAngles, "C_CSPlayerPawnBase", "m_angEyeAngles");
     NETVAR(QAngle, v_angle, "C_BasePlayerPawn", "v_angle");
-    NETVAR(void*, m_refMeshes, "PermModelData_t", "m_refMeshes");
+    NETVAR(CUtlVector<QAngle>, m_aimPunchCache, "C_CSPlayerPawn", "m_aimPunchCache");
 
     Vector GetEyePos();
     bool InAir();

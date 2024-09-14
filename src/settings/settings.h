@@ -11,6 +11,7 @@ namespace settings
 		extern bool m_bBoxEsp;
 		extern bool m_bHealthEsp;
 		extern bool m_bNameEsp;
+		extern bool const_smooth;
 
 		// int
 		extern int m_iFov;
