@@ -12,9 +12,9 @@ float distance_based_fov(const QAngle& delta, const float& distance)
     float pitch_diff = std::sinf(fabsf(delta.pitch) * math::deg2rad) * distance;
     float yaw_diff = std::sinf(fabsf(delta.yaw) * math::deg2rad) * distance;
 
-    float fov = sqrtf(pitch_diff * pitch_diff + yaw_diff * yaw_diff);
+    float fov = std::hypotf(pitch_diff, yaw_diff);
 
-    fov = std::clamp<float>(fov, -1, 360.f);
+    fov = std::clamp<float>(fov, 0.f, 360.f);
 
     return fov;
 }
@@ -23,7 +23,9 @@ namespace Aimbot
 {
     std::list<entity_data::player_data_t> m_player_data;
 
-	std::unordered_set<int>& GetTargetHitboxes()
+    QAngle old_punch{};
+
+	std::unordered_set<int>& GetTargetHitboxes() //Add hitbox target priority?
     {
         static std::unordered_set<int> list = { HITBOX_HEAD, HITBOX_NECK, HITBOX_LOWER_CHEST, HITBOX_UPPER_CHEST, HITBOX_BELLY, HITBOX_THORAX };
 
@@ -77,41 +79,26 @@ namespace Aimbot
         smoothed_angles.clamp_normalize();
     }
 
-    void recoil(CCSPlayerPawn* localpawn, QAngle& viewangles)
+    void recoil(CCSPlayerPawn* localpawn, QAngle& viewangles, QAngle viewangles_copy)
     {
-        static QAngle old_angle = { 0, 0, 0 };
-
         auto& punch_cache = localpawn->m_aimPunchCache();
 
         if (punch_cache.Count() <= 0 || punch_cache.Count() >= 0xFFFF)
             return;
 
         auto punch_angle = punch_cache[punch_cache.Count() - 1];
-        
-        if (localpawn->m_iShotsFired() >= 1)
+     
+        if (localpawn->m_iShotsFired() > 1)
         {
-            QAngle new_punch = punch_angle;
-            new_punch.pitch *= 0.2f;
-            new_punch.yaw *= 2.f;
+            viewangles_copy.pitch -= (punch_angle.pitch);
+            viewangles_copy.yaw -= (punch_angle.yaw);
+            viewangles_copy.clamp_normalize();
 
-            /*new_punch.pitch -= old_angle.pitch;
-            new_punch.yaw -= old_angle.yaw;*/
+            smooth_constant(24, viewangles, viewangles_copy, viewangles_copy);
 
-            viewangles.pitch -= (punch_angle.pitch * 0.2f);
-            viewangles.yaw -= (punch_angle.yaw);
-            viewangles.clamp_normalize();
-
-            auto recoil_angle = viewangles;
-            recoil_angle.clamp_normalize();
-
-            smooth_constant(settings::visuals::const_smooth ? 24 : 12, viewangles, recoil_angle, recoil_angle);
-
-            if ((recoil_angle.pitch != 0.f || recoil_angle.yaw != 0.f) && GetAsyncKeyState(VK_LBUTTON))
-            {
-                g::client->SetViewAngles(0, recoil_angle);
-            }
+            if (!viewangles_copy.is_zero() && GetAsyncKeyState(VK_LBUTTON))
+                g::client->SetViewAngles(0, viewangles_copy);
         }
-        old_angle = punch_angle;
     }
 
     void handle(CUserCmd* cmd)
@@ -147,16 +134,16 @@ namespace Aimbot
 
         const auto& eye_pos = localpawn->GetEyePos();
 
-        /*auto& punch_cache = localpawn->m_aimPunchCache();
+        //auto& punch_cache = localpawn->m_aimPunchCache();
 
-        if (punch_cache.Count() <= 0 || punch_cache.Count() >= 0xFFFF)
-            return;
+        //if (punch_cache.Count() <= 0 || punch_cache.Count() >= 0xFFFF)
+        //    return;
 
-        auto punch_angle = punch_cache[punch_cache.Count() - 1];
+        //auto punch_angle = punch_cache[punch_cache.Count() - 1];
 
-        viewangles.pitch -= (punch_angle.pitch * 0.2f); //This works, but its not right
-        viewangles.yaw -= (punch_angle.yaw);
-        viewangles.clamp_normalize();*/
+        //viewangles.pitch -= (punch_angle.pitch * 0.2f); //This works, but its not right
+        //viewangles.yaw -= (punch_angle.yaw);
+        //viewangles.clamp_normalize();
 
         for (const auto& data : m_player_data)
         {
@@ -199,7 +186,7 @@ namespace Aimbot
 
                 //printf("[%s: %d]: fov: %.1f, best_fov: %.1f, dist: %.1f\n", hitbox_data->entity_name, hitbox_data->index, fov, best_fov, distance);
 
-                //recoil(localpawn, viewangles);
+                recoil(localpawn, viewangles, viewangles);
 
                 if (!GetAsyncKeyState(VK_LBUTTON))
                     continue;
@@ -221,6 +208,11 @@ bool hooks::clientmode_createmove::hooked(void* rcx, CUserCmd* cmd)
 {
     if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
         return original_fn(rcx, cmd);
+
+    /*if (g::global_vars)
+    {
+        printf("maxclients: %i, curtime: %f, tickcount: %i, ipt: %f\n", g::global_vars->max_clients, g::global_vars->curtime, g::global_vars->tickcount, g::global_vars->interval_per_tick);
+    }*/ //still returning garbage data
 
     //entity_data::fetch_player_data(cmd);
 

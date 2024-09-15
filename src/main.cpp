@@ -5,7 +5,7 @@ DWORD __stdcall on_attach(void* base)
 {
     Sleep(5000);
 
-    //console::attach();
+    console::attach();
 
     sdk::init_modules();
     sdk::init_interfaces();

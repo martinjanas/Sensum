@@ -62,6 +62,11 @@ void QAngle::clamp_normalize()
 	*this = angles;
 }
 
+bool QAngle::is_zero()
+{
+	return pitch == 0.f || yaw == 0.f;
+}
+
 Vector QAngle::to_vector() const
 {
 	float pitch_rad = this->pitch * math::deg2rad;

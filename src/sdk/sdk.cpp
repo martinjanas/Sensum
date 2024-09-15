@@ -58,12 +58,7 @@ namespace sdk
 		g::entity_system = g::game_resource_service->GetGameEntitySystem();
 		g::render_system = **reinterpret_cast<CRenderSystem***>(modules::render_dx11.pattern_scanner.scan("66 0F 7F 0D ? ? ? ? 66 0F 7F 05 ? ? ? ? 0F 1F 40", "GetRenderSystemDX11").add(4).abs().as<uint8_t*>());
 
-		/*g::global_vars = modules::client.pattern_scanner.scan("48 89 0D ? ? ? ? 48 89 41").as<CGlobalVarsBase*>(); //Not working properly
-
-		if (g::global_vars)
-		{
-			printf("frametime: %f, maxclients: %d\n", g::global_vars->m_frametime, g::global_vars->m_maxclients);
-		}*/
+		g::global_vars = *modules::client.pattern_scanner.scan("48 89 15 ?? ?? ?? ?? 48 8D 05 ?? ?? ?? ?? 48 85 D2", "GlobalVars").add(0x3).abs().as<CGlobalVarsBase**>();
 
 		if (g::render_system)
 			g::swap_chain = g::render_system->swap_chain;
