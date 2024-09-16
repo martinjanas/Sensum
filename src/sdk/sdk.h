@@ -35,6 +35,26 @@ public:
 	char* current_mapname; //0x0188
 };
 
+class CNetworkGameClient //implement these later:
+{
+public:
+	CGlobalVarsBase* GetGlobalVars()
+	{
+		//xref: Curtime( %f )\nRealtime( %f )\n module: engine2
+		return GetVirtual<CGlobalVarsBase * (__thiscall*)(void*)>(this, 4)(this);
+	}
+};
+
+//g::network_game_service = modules::engine.GetInterfaceFromList<CNetworkGameService*>("NetworkClientService_001");
+class CNetworkGameService
+{
+public:
+	CNetworkGameClient* GetNetworkGameClient()
+	{
+		return *reinterpret_cast<CNetworkGameClient**>(reinterpret_cast<uintptr_t>(this) + 0xB8);
+	}
+};
+
 namespace sdk
 {
 	void init_modules();

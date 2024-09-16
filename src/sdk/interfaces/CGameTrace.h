@@ -1,5 +1,10 @@
 #pragma once
 
+#include "../../sdk/math/Vector.h"
+#include "../../sdk/math/QAngle.h"
+#include "../../sdk/classes/CBaseEntity.h"
+//#include "../../sdk/classes/CCSPlayerPawn.h"
+
 class Ray_t;
 class TraceFilter_t;
 class Trace_t; //aka GameTrace_t
@@ -70,7 +75,23 @@ struct TraceFilter_t
 	std::uint8_t m_v5;
 
 	TraceFilter_t() = default;
-	TraceFilter_t(std::uint32_t uMask, CCSPlayerPawn* pSkip1, CCSPlayerPawn* pSkip2, int nLayer);
+	//TraceFilter_t(std::uint32_t uMask, CCSPlayerPawn* pSkip1, CCSPlayerPawn* pSkip2, int nLayer);
+	//{
+	//	m_uTraceMask = uMask;
+	//	m_v1[0] = m_v1[1] = 0;
+	//	m_v2 = 7;
+	//	m_v3 = nLayer;
+	//	m_v4 = 0x49;
+	//	m_v5 = 0;
+
+	//	m_arrSkipHandles[0] = pSkip1->GetEntityHandle();
+	//	m_arrSkipHandles[1] = pSkip2->GetEntityHandle();
+	//	m_arrSkipHandles[2] = pSkip1->GetOwnerHandle();
+	//	m_arrSkipHandles[3] = pSkip2->GetOwnerHandle();
+
+	//	/*m_arrCollisions[0] = (pSkip1->);
+	//	m_arrCollisions[1] = pSkip2->GetCollisionMask();*/
+	//}
 };
 
 class CGameTrace

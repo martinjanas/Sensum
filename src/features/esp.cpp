@@ -105,7 +105,8 @@ namespace features::esp
 		const auto& model_state = data.m_ModelState;
 
 		static const auto& bone_count = model->BoneCount;
-		for (int i = 0; i < bone_count; ++i)
+
+		for (int i = 0; i < bone_count; ++i) //bone_count returns some high bullshit number, with 28 it renders also correctly
 		{
 			const auto& flag = model->GetBoneFlags(i);
 			if (!flag.HasFlag(static_cast<uint32_t>(FLAG_HITBOX)))
