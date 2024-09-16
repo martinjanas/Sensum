@@ -79,6 +79,33 @@ namespace Aimbot
         smoothed_angles.clamp_normalize();
     }
 
+    void smooth_exponential(const float& amount, const QAngle& current_angles, const QAngle& target_angles, QAngle& smoothed_angles)
+    {
+        //amount - ideal value: 1.0 - 1.3
+
+        // Clamp and normalize target angles to prevent issues with extreme values
+        QAngle clamped_target_angles = target_angles;
+        clamped_target_angles.clamp_normalize();
+
+        // Compute the corrected amount for smoothing based on the tickrate
+        const float tickrate = 1.0f / 0.015625f; // interval_per_tick for 64 tick
+        float corrected_amount = std::max(amount, 1.1f) * tickrate / 64.0f;
+
+        // Convert angles to vectors for easier manipulation
+        Vector current_vector = current_angles.to_vector();
+        Vector target_vector = clamped_target_angles.to_vector();
+
+        // Calculate the delta vector between the current and target vectors
+        Vector delta = target_vector - current_vector;
+
+        // Apply exponential smoothing
+        Vector smoothed_vector = current_vector + delta / corrected_amount;
+
+        // Convert back to angles and clamp/normalize the result
+        smoothed_angles = smoothed_vector.to_qangle();
+        smoothed_angles.clamp_normalize();
+    }
+
     void recoil(CCSPlayerPawn* localpawn, QAngle& viewangles, QAngle viewangles_copy)
     {
         auto& punch_cache = localpawn->m_aimPunchCache();
