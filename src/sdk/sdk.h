@@ -8,6 +8,7 @@
 #include "../sdk/interfaces/CSGOInput.h"
 #include "../sdk/interfaces/CSource2Client.h"
 #include "../sdk/interfaces/CInputSystem.h"
+#include "../sdk/interfaces/CGameTrace.h"
 #include "../sdk/math/Viewmatrix.h"
 
 class CGlobalVarsBase 
@@ -63,6 +64,7 @@ namespace interfaces //move to interfaces.h ?
 	extern CInputSystem* input_system;
 	extern void* client_mode;
     extern CGlobalVarsBase* global_vars;
+	extern CGameTrace* game_trace;
 }
 
 namespace g = interfaces;

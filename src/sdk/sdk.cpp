@@ -60,6 +60,8 @@ namespace sdk
 
 		g::global_vars = *modules::client.pattern_scanner.scan("48 89 15 ?? ?? ?? ?? 48 8D 05 ?? ?? ?? ?? 48 85 D2", "GlobalVars").add(0x3).abs().as<CGlobalVarsBase**>();
 
+		g::game_trace = *modules::client.pattern_scanner.scan("4C 8B 3D ? ? ? ? 24 C9 0C 49 66 0F 7F 45 ?").add(0x3).abs().as<CGameTrace**>();
+
 		if (g::render_system)
 			g::swap_chain = g::render_system->swap_chain;
 
@@ -81,6 +83,7 @@ namespace sdk
 		print_status(g::input_system);
 		print_status(g::client_mode);
 		print_status(g::global_vars);
+		print_status(g::game_trace);
 	}
 }
 
@@ -98,5 +101,6 @@ namespace interfaces
 	CInputSystem* input_system{};
 	void* client_mode{};
 	CGlobalVarsBase* global_vars{};
+	CGameTrace* game_trace{};
 }
 

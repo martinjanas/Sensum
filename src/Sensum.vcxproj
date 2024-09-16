@@ -152,6 +152,7 @@
     <ClInclude Include="sdk\helpers\matrix.h" />
     <ClInclude Include="sdk\hooking\safetyhook\safetyhook.hpp" />
     <ClInclude Include="sdk\hooking\safetyhook\Zydis.h" />
+    <ClInclude Include="sdk\interfaces\CGameTrace.h" />
     <ClInclude Include="sdk\interfaces\CInputSystem.h" />
     <ClInclude Include="sdk\interfaces\CSource2Client.h" />
     <ClInclude Include="sdk\localplayer.h" />
