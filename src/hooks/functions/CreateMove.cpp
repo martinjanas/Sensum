@@ -23,7 +23,8 @@ namespace Aimbot
 {
     std::list<entity_data::player_data_t> m_player_data;
 
-    QAngle old_punch{};
+    static QAngle old_punch;
+    static bool was_firing_last_frame = false;
 
 	std::unordered_set<int>& GetTargetHitboxes() //Add hitbox target priority?
     {
@@ -106,32 +107,50 @@ namespace Aimbot
         smoothed_angles.clamp_normalize();
     }
 
-    void recoil(CCSPlayerPawn* localpawn, const QAngle& viewangles)
+    void recoil(CCSPlayerPawn* localpawn, QAngle& viewangles)
     {
+        // Get a reference to the punch angle cache
         auto& punch_cache = localpawn->m_aimPunchCache();
 
+        // Ensure the punch cache is valid
         if (punch_cache.Count() <= 0 || punch_cache.Count() >= 0xFFFF)
             return;
 
-        auto punch_angle = punch_cache[punch_cache.Count() - 1];
-     
-        auto previous_punch = punch_cache[punch_cache.Count() - 2];
+        // Get the most recent punch angle from the cache
+        QAngle current_punch = punch_cache[punch_cache.Count() - 1]; // Most recent angle at index 0
 
-        if (localpawn->m_iShotsFired() > 1)
+        // If the player has fired more than one shot
+        if (localpawn->m_iShotsFired() > 1 && GetAsyncKeyState(VK_LBUTTON))
         {
-            QAngle recoil_angle = viewangles;
-            recoil_angle.pitch -= ((old_punch.pitch + punch_angle.pitch) * settings::visuals::recoil_scale);
-            recoil_angle.yaw -= ((old_punch.yaw + punch_angle.yaw) * settings::visuals::recoil_scale);
-            recoil_angle.clamp_normalize();
-   
-            smooth_constant(0.5f, viewangles, recoil_angle, recoil_angle);
-
-            if (!recoil_angle.is_zero() && GetAsyncKeyState(VK_LBUTTON))
+            // Only initialize old_punch when the player starts shooting (for the first frame)
+            if (!was_firing_last_frame)
             {
-                g::client->SetViewAngles(0, recoil_angle);
-
-                old_punch = previous_punch;
+                old_punch = current_punch; // Set old_punch to the current punch angle when shooting starts
+                was_firing_last_frame = true; // Mark that the player was firing in the last frame
             }
+
+            // Calculate the delta between the current punch angle and the old punch angle
+            QAngle punch_delta = current_punch - old_punch;
+
+            // Update old_punch before applying compensation, so the next frame has the correct reference
+            old_punch = current_punch;
+
+            // Subtract the delta from the current view angles for smooth recoil compensation
+            QAngle compensated_angle = viewangles - (punch_delta * 2.0f); // Adjust scaling factor if needed // * 2.0f
+            compensated_angle.clamp_normalize(); // Ensure angles are within valid bounds
+
+            float smoothing_factor = settings::visuals::recoil_smooth / 60.f;
+
+            smooth(smoothing_factor, viewangles, compensated_angle, compensated_angle);
+
+            // Set the new view angles (compensated for recoil)
+            g::client->SetViewAngles(0, compensated_angle);
+        }
+        else
+        {
+            // Reset old punch when not firing (to prevent residual punch from affecting next burst)
+            old_punch = QAngle(0, 0, 0);
+            was_firing_last_frame = false; // Mark that the player is no longer firing
         }
     }
 
@@ -157,12 +176,10 @@ namespace Aimbot
         QAngle best_angle;
 
         CCSPlayerController* localplayer = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
-
         if (!localplayer)
             return;
 
         CCSPlayerPawn* localpawn = localplayer->m_hPlayerPawn().Get<CCSPlayerPawn*>();
-
         if (!localpawn)
             return;
 
@@ -222,8 +239,6 @@ namespace Aimbot
 
                 //printf("[%s: %d]: fov: %.1f, best_fov: %.1f, dist: %.1f\n", hitbox_data->entity_name, hitbox_data->index, fov, best_fov, distance);
 
-                recoil(localpawn, viewangles);
-
                 if (!GetAsyncKeyState(VK_LBUTTON))
                     continue;
 
@@ -237,6 +252,8 @@ namespace Aimbot
                 g::client->SetViewAngles(0, best_angle);
             }
         }
+
+        recoil(localpawn, viewangles);
     }
 }
 
@@ -245,12 +262,17 @@ bool hooks::clientmode_createmove::hooked(void* rcx, CUserCmd* cmd)
     if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
         return original_fn(rcx, cmd);
 
+    /*if (players::localplayer)
+    {
+        auto hp = players::localplayer->m_iszPlayerName();
+
+        printf("hp: %s\n", hp);
+    }*/
+
     /*if (g::global_vars)
     {
         printf("maxclients: %i, curtime: %f, tickcount: %i, ipt: %f\n", g::global_vars->max_clients, g::global_vars->curtime, g::global_vars->tickcount, g::global_vars->interval_per_tick);
     }*/ //still returning garbage data
-
-    //entity_data::fetch_player_data(cmd);
 
     Aimbot::handle(cmd);
 

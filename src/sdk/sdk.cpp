@@ -5,7 +5,6 @@
 #include <d3d11.h>
 
 #include "../sdk/localplayer.h"
-
 #include "../interfaces.h"
 
 void print_status(const char* name, void* ptr)
@@ -62,6 +61,8 @@ namespace sdk
 
 		g::game_trace = *modules::client.pattern_scanner.scan("4C 8B 3D ? ? ? ? 24 C9 0C 49 66 0F 7F 45 ?").add(0x3).abs().as<CGameTrace**>();
 
+		players::localplayer = modules::client.pattern_scanner.scan("48 83 3D ?? ?? ?? ?? ?? 0F 95 C0 C3").add(0x3).abs().as<CCSPlayerController*>();
+
 		if (g::render_system)
 			g::swap_chain = g::render_system->swap_chain;
 
@@ -84,6 +85,7 @@ namespace sdk
 		print_status(g::client_mode);
 		print_status(g::global_vars);
 		print_status(g::game_trace);
+		print_status(players::localplayer);
 	}
 }
 

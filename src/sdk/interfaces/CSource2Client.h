@@ -12,8 +12,9 @@ public:
 		GetVirtual<void(__thiscall*)(void*, int, QAngle*)>(this, 77)(this, slot, vec);
 	}
 
-	void SetViewAngles(int slot, const QAngle& vec)
+	void SetViewAngles(int slot, QAngle& vec)
 	{
+		vec.clamp_normalize();
 		GetVirtual<void(__thiscall*)(void*, int, const QAngle&)>(this, 78)(this, slot, vec);
 	}
 };

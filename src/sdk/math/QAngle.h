@@ -36,7 +36,17 @@ public:
 		return QAngle(this->pitch - v, this->yaw - v, this->roll);
 	}
 
+	QAngle operator*(float v)
+	{
+		return QAngle(this->pitch * v, this->yaw * v, this->roll);
+	}
+
 	QAngle operator-(const QAngle& other)
+	{
+		return QAngle(this->pitch - other.pitch, this->yaw - other.yaw, this->roll - other.roll);
+	}
+
+	QAngle operator-(const QAngle& other) const
 	{
 		return QAngle(this->pitch - other.pitch, this->yaw - other.yaw, this->roll - other.roll);
 	}

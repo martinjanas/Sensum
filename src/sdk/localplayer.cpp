@@ -2,5 +2,5 @@
 
 namespace players
 {
-	void* localplayer;
+	CCSPlayerController* localplayer;
 }

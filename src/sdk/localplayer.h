@@ -1,6 +1,7 @@
 #pragma once
+#include "../sdk/classes/CCSPlayerController.h"
 
 namespace players
 {
-	extern void* localplayer;
+	extern CCSPlayerController* localplayer;
 }

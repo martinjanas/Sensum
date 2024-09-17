@@ -33,7 +33,7 @@ public:
 	template <typename T = CBaseEntity*>
 	T GetLocalPlayerController()
 	{
-		for (int i = 1; i < 65; ++i)
+		for (int i = 1; i <= 64; ++i)
 		{
 			T player = reinterpret_cast<T>(GetBaseEntity(i));
 

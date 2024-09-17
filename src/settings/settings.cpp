@@ -17,6 +17,7 @@ namespace settings
 		int aimbot_fov = 20;
 
 		float smooth = 12.f;
+		float recoil_smooth = 24.f;
 		float recoil_scale = 1.f;
 		// colors
 		ImVec4 m_fBoneColor = ImVec4(255, 255, 255, 255);
