@@ -36,23 +36,26 @@ public:
 
 	Vector operator-();
 	Vector operator+(const Vector& other);
-	Vector operator+(const float& value);
+	Vector operator+(float value);
+	Vector& operator+=(const Vector& other);
+	Vector& operator+=(float value);
+	Vector operator-(const Vector& other);
+	Vector operator-(float value);
+	Vector& operator-=(const Vector& other);
+	Vector& operator-=(float value);
+	Vector operator*(const Vector& other);
+	Vector operator*(float value);
+	Vector& operator*=(const Vector& other);
+	Vector& operator*=(float value);
+	Vector operator/(const Vector& other);
+	Vector operator/(float other);
+	Vector& operator/=(const Vector& other);
+	Vector& operator/=(float value);
+
+	Vector operator-(const Vector& other) const;
 	Vector operator+(const Vector& other) const;
 	Vector operator*(float scale) const;
-	Vector operator-(const Vector& other) const;
-	Vector& operator+=(const Vector& other);
-	Vector& operator+=(const float& value);
-	Vector operator-(const Vector& other);
-	Vector operator-(const float& value);
-	Vector& operator-=(const Vector& other);
-	Vector& operator-=(const float& value);
-	Vector operator*(const Vector& other);
-	Vector operator*(const float& value);
-	Vector& operator*=(const Vector& other);
-	Vector operator*=(const float& value);
-	Vector operator/(const Vector& other);
-	Vector operator/(const float& other);
-	Vector& operator/=(const Vector& other);
-	Vector& operator/=(const float& value);
+
+	//TODO: Implement more const operators
 };
 

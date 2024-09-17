@@ -40,9 +40,21 @@ struct Trace_t
 {
 	Trace_t() = default;
 	SurfaceData_t* GetSurfaceData();
+;
+	int GetHitboxID()
+	{
+		if (m_pHitboxData)
+			return m_pHitboxData->m_nHitboxId;
+		return 0;
+	}
 
-	int GetHitboxID();
-	int GetHitgroup();
+	int GetHitgroup()
+	{
+		if (m_pHitboxData)
+			return m_pHitboxData->m_nHitGroup;
+		return 0;
+	}
+
 	bool DidHitWorld() const;
 
 	void* m_pSurface;

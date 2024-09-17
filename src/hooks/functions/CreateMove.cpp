@@ -106,7 +106,7 @@ namespace Aimbot
         smoothed_angles.clamp_normalize();
     }
 
-    void recoil(CCSPlayerPawn* localpawn, QAngle& viewangles, QAngle viewangles_copy)
+    void recoil(CCSPlayerPawn* localpawn, const QAngle& viewangles)
     {
         auto& punch_cache = localpawn->m_aimPunchCache();
 
@@ -115,16 +115,23 @@ namespace Aimbot
 
         auto punch_angle = punch_cache[punch_cache.Count() - 1];
      
+        auto previous_punch = punch_cache[punch_cache.Count() - 2];
+
         if (localpawn->m_iShotsFired() > 1)
         {
-            viewangles_copy.pitch -= (punch_angle.pitch);
-            viewangles_copy.yaw -= (punch_angle.yaw);
-            viewangles_copy.clamp_normalize();
+            QAngle recoil_angle = viewangles;
+            recoil_angle.pitch -= ((old_punch.pitch + punch_angle.pitch) * settings::visuals::recoil_scale);
+            recoil_angle.yaw -= ((old_punch.yaw + punch_angle.yaw) * settings::visuals::recoil_scale);
+            recoil_angle.clamp_normalize();
+   
+            smooth_constant(0.5f, viewangles, recoil_angle, recoil_angle);
 
-            smooth_constant(24, viewangles, viewangles_copy, viewangles_copy);
+            if (!recoil_angle.is_zero() && GetAsyncKeyState(VK_LBUTTON))
+            {
+                g::client->SetViewAngles(0, recoil_angle);
 
-            if (!viewangles_copy.is_zero() && GetAsyncKeyState(VK_LBUTTON))
-                g::client->SetViewAngles(0, viewangles_copy);
+                old_punch = previous_punch;
+            }
         }
     }
 
@@ -168,8 +175,10 @@ namespace Aimbot
 
         //auto punch_angle = punch_cache[punch_cache.Count() - 1];
 
-        //viewangles.pitch -= (punch_angle.pitch * 0.2f); //This works, but its not right
-        //viewangles.yaw -= (punch_angle.yaw);
+        //auto recoil_angle = localpawn->m_iShotsFired() > 1 ? punch_angle : QAngle();
+        //recoil_angle.clamp_normalize();
+
+        //viewangles -= recoil_angle; //This works, but its not allright
         //viewangles.clamp_normalize();
 
         for (const auto& data : m_player_data)
@@ -213,7 +222,7 @@ namespace Aimbot
 
                 //printf("[%s: %d]: fov: %.1f, best_fov: %.1f, dist: %.1f\n", hitbox_data->entity_name, hitbox_data->index, fov, best_fov, distance);
 
-                recoil(localpawn, viewangles, viewangles);
+                recoil(localpawn, viewangles);
 
                 if (!GetAsyncKeyState(VK_LBUTTON))
                     continue;

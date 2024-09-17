@@ -21,7 +21,7 @@ public:
 
 	Vector to_vector() const;
 
-	QAngle operator+(const float& v)
+	QAngle operator+(float v)
 	{
 		return QAngle(this->pitch + v, this->yaw + v, this->roll);
 	}
@@ -31,7 +31,7 @@ public:
 		return QAngle(this->pitch + other.pitch, this->yaw + other.yaw, this->roll + other.roll);
 	}
 
-	QAngle operator-(const float& v)
+	QAngle operator-(float v)
 	{
 		return QAngle(this->pitch - v, this->yaw - v, this->roll);
 	}
@@ -41,7 +41,7 @@ public:
 		return QAngle(this->pitch - other.pitch, this->yaw - other.yaw, this->roll - other.roll);
 	}
 
-	QAngle& operator/=(const float& other)
+	QAngle& operator/=(float other)
 	{
 		QAngle& temp = *this;
 
@@ -52,13 +52,57 @@ public:
 		return temp;
 	}
 
-	QAngle& operator*=(const float& other)
+	QAngle& operator*=(float other)
 	{
 		QAngle& temp = *this;
 
 		temp.pitch *= other;
 		temp.yaw *= other;
 		temp.roll *= other;
+
+		return temp;
+	}
+
+	QAngle& operator-=(const QAngle& other)
+	{
+		QAngle& temp = *this;
+
+		temp.pitch -= other.pitch;
+		temp.yaw -= other.yaw;
+		temp.roll -= other.roll;
+
+		return temp;
+	}
+
+	QAngle& operator*=(const QAngle& other)
+	{
+		QAngle& temp = *this;
+
+		temp.pitch *= other.pitch;
+		temp.yaw *= other.yaw;
+		temp.roll *= other.roll;
+
+		return temp;
+	}
+
+	QAngle& operator/=(const QAngle& other)
+	{
+		QAngle& temp = *this;
+
+		temp.pitch /= other.pitch;
+		temp.yaw /= other.yaw;
+		temp.roll /= other.roll;
+
+		return temp;
+	}
+
+	QAngle& operator+=(const QAngle& other)
+	{
+		QAngle& temp = *this;
+
+		temp.pitch += other.pitch;
+		temp.yaw += other.yaw;
+		temp.roll += other.roll;
 
 		return temp;
 	}

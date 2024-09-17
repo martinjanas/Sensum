@@ -121,7 +121,6 @@
     <ClInclude Include="features\features.h" />
     <ClInclude Include="interfaces.h" />
     <ClInclude Include="render.h" />
-    <ClInclude Include="sdk\classes\Trace.h" />
     <ClInclude Include="sdk\helpers\BBox_t.h" />
     <ClInclude Include="sdk\helpers\CBufferString.h" />
     <ClInclude Include="sdk\helpers\CInterlockedInt.h" />
@@ -202,7 +201,6 @@
     <ClCompile Include="hooks\functions\GetMatricesForView.cpp" />
     <ClCompile Include="interfaces.cpp" />
     <ClCompile Include="render.cpp" />
-    <ClCompile Include="sdk\classes\Trace.cpp" />
     <ClCompile Include="sdk\helpers\globals.cpp" />
     <ClCompile Include="hooks\functions\Present.cpp" />
     <ClCompile Include="hooks\functions\WinProc.cpp" />

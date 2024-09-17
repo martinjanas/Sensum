@@ -54,9 +54,7 @@ bool Vector::is_valid() const
 
 const char* Vector::to_string() const
 {
-	auto str = std::format("x: {:.2f}, y: {:.2f}, z: {:.2f}", x, y, z);
-
-	return str.c_str();
+	return std::format("x: {:.2f}, y: {:.2f}, z: {:.2f}", x, y, z).c_str();
 }
 
 ImVec2 Vector::as_vec2() const
@@ -130,20 +128,12 @@ Vector Vector::operator-()
 
 Vector Vector::operator+(const Vector& other)
 {
-	Vector& temp = *this;
-
-	temp = Vector(temp.x + other.x, temp.y + other.y, temp.z + other.z);
-
-	return temp;
+	return Vector(this->x + other.x, this->y + other.y, this->z + other.z);
 }
 
-Vector Vector::operator+(const float& value)
+Vector Vector::operator+(float value)
 {
-	Vector& temp = *this;
-
-	temp = Vector(temp.x + value, temp.y + value, temp.z + value);
-
-	return temp;
+	return Vector(this->x + value, this->y + value, this->z + value);
 }
 
 Vector Vector::operator+(const Vector& other) const 
@@ -151,15 +141,9 @@ Vector Vector::operator+(const Vector& other) const
 	return { x + other.x, y + other.y, z + other.z };
 }
 
-// Vector scaling
 Vector Vector::operator*(float scale) const
 {
-	return { x * scale, y * scale, z * scale };
-}
-
-Vector Vector::operator-(const Vector& other) const
-{
-	return { x - other.x, y - other.y, z - other.z };
+	return Vector(x * scale, y * scale, z * scale);
 }
 
 Vector& Vector::operator+=(const Vector& other)
@@ -171,7 +155,7 @@ Vector& Vector::operator+=(const Vector& other)
 	return *this;
 }
 
-Vector& Vector::operator+=(const float& value)
+Vector& Vector::operator+=(float value)
 {
 	x += value;
 	y += value;
@@ -182,20 +166,12 @@ Vector& Vector::operator+=(const float& value)
 
 Vector Vector::operator-(const Vector& other)
 {
-	Vector& temp = *this;
-
-	temp = Vector(temp.x - other.x, temp.y - other.y, temp.z - other.z);
-
-	return temp;
+	return Vector(this->x - other.x, this->y - other.y, this->z - other.z);
 }
 
-Vector Vector::operator-(const float& value)
+Vector Vector::operator-(float value)
 {
-	Vector& temp = *this;
-
-	temp = Vector(temp.x - value, temp.y - value, temp.z - value);
-
-	return temp;
+	return Vector(this->x - value, this->y - value, this->z - value);
 }
 
 Vector& Vector::operator-=(const Vector& other)
@@ -207,7 +183,7 @@ Vector& Vector::operator-=(const Vector& other)
 	return *this;
 }
 
-Vector& Vector::operator-=(const float& value)
+Vector& Vector::operator-=(float value)
 {
 	x -= value;
 	y -= value;
@@ -218,20 +194,12 @@ Vector& Vector::operator-=(const float& value)
 
 Vector Vector::operator*(const Vector& other)
 {
-	Vector& temp = *this;
-
-	temp = Vector(temp.x * other.x, temp.y * other.y, temp.z * other.z);
-
-	return temp;
+	return Vector(this->x * other.x, this->y * other.y, this->z * other.z);
 }
 
-Vector Vector::operator*(const float& value)
+Vector Vector::operator*(float value)
 {
-	Vector& temp = *this;
-
-	temp = Vector(temp.x * value, temp.y * value, temp.z * value);
-
-	return temp;
+	return Vector(this->x * value, this->y * value, this->z * value);
 }
 
 Vector& Vector::operator*=(const Vector& other)
@@ -243,7 +211,7 @@ Vector& Vector::operator*=(const Vector& other)
 	return *this;
 }
 
-Vector Vector::operator*=(const float& value)
+Vector& Vector::operator*=(float value)
 {
 	x *= value;
 	y *= value;
@@ -254,20 +222,12 @@ Vector Vector::operator*=(const float& value)
 
 Vector Vector::operator/(const Vector& other)
 {
-	Vector& temp = *this;
-
-	temp = Vector(temp.x / other.x, temp.y / other.y, temp.z / other.z);
-
-	return temp;
+	return Vector(this->x / other.x, this->y / other.y, this->z / other.z);
 }
 
-Vector Vector::operator/(const float& other)
+Vector Vector::operator/(float value)
 {
-	Vector& temp = *this;
-
-	temp = Vector(temp.x / other, temp.y / other, temp.z / other);
-
-	return temp;
+	return Vector(this->x / value, this->y / value, this->z / value);
 }
 
 Vector& Vector::operator/=(const Vector& other)
@@ -279,11 +239,16 @@ Vector& Vector::operator/=(const Vector& other)
 	return *this;
 }
 
-Vector& Vector::operator/=(const float& value)
+Vector& Vector::operator/=(float value)
 {
 	x /= value;
 	y /= value;
 	z /= value;
 
 	return *this;
+}
+
+Vector Vector::operator-(const Vector& other) const
+{
+	return Vector(this->x - other.x, this->y - other.y, this->z - other.z);
 }

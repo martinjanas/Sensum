@@ -1,10 +1,11 @@
 #pragma once
 #include <map>
+#include <type_traits>
 
 #include "../../sdk/helpers/fnv.h"
 
 #define NETVAR(type, function, class_name, var_name) \
-__forceinline type& function() \
+__forceinline std::add_lvalue_reference_t<type> function() \
 { \
     constexpr auto hash = fnv::hash_constexpr(class_name "->" var_name); \
     static auto offset = netvars::get_offset_by_hash_cached(hash);  \

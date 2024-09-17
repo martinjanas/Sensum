@@ -88,9 +88,19 @@ namespace entity_data
 			const auto& hitbox_matrix = player_data.hitbox_transform[i];
 
 			const auto& radius = hitbox->m_flShapeRadius() != -1 ? hitbox->m_flShapeRadius() : 0.f;
+	
+			//This code below extends the hitbox bounds, because we are modifying the m_vMin & m_vMax properties:
+			/*const auto& mins = (hitbox->m_vMinBounds() - radius).transform(hitbox_matrix.ToMatrix3x4());
+			const auto& maxs = (hitbox->m_vMaxBounds() + radius).transform(hitbox_matrix.ToMatrix3x4());*/
 
-			const auto& mins = (hitbox->m_vMinBounds() - radius).transform(hitbox_matrix.ToMatrix3x4());
-			const auto& maxs = (hitbox->m_vMaxBounds() + radius).transform(hitbox_matrix.ToMatrix3x4());
+			/*auto min_bounds = hitbox->m_vMinBounds();
+			auto max_bounds = hitbox->m_vMaxBounds();*/
+			
+			auto min_bounds = hitbox->m_vMinBounds() - radius;
+			auto max_bounds = hitbox->m_vMaxBounds() + radius;
+
+			const auto& mins = min_bounds.transform(hitbox_matrix.ToMatrix3x4());
+			const auto& maxs = max_bounds.transform(hitbox_matrix.ToMatrix3x4());
 
 			auto hitbox_pos = (mins + maxs) * 0.5f;
 
