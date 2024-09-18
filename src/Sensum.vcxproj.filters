@@ -311,5 +311,6 @@
     <ClCompile Include="sdk\hooking\safetyhook\Zydis.c" />
     <ClCompile Include="hooks\functions\GetMatricesForView.cpp" />
     <ClCompile Include="hooks\functions\GetFov.cpp" />
+    <ClCompile Include="features\aimbot.cpp" />
   </ItemGroup>
 </Project>

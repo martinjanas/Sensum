@@ -4,7 +4,7 @@ namespace features::esp
 {
 	std::list<entity_data::player_data_t> m_player_data;
 	
-	void Draw3DBox(ABBox_t& bbox)
+	void Draw3DBox(BBox_t& bbox)
 	{
 		const int BOTTOM_RIGHT_BACK = 0;
 		const int BOTTOM_RIGHT_FRONT = 1;
@@ -69,9 +69,9 @@ namespace features::esp
 				esp::name_esp(data, origin_out, head_pos_out);
 
 			if (settings::visuals::m_bBoxEsp)
-				globals::draw_list->AddRect(data.abbox.m_Mins.as_vec2(), data.abbox.m_Maxs.as_vec2(), IM_COL32(255, 0, 0, 255), 1.f, 15, 1.5f);
+				globals::draw_list->AddRect(data.bbox.m_Mins.as_vec2(), data.bbox.m_Maxs.as_vec2(), ImColor(settings::visuals::m_fBoxColor.x, settings::visuals::m_fBoxColor.y, settings::visuals::m_fBoxColor.z, settings::visuals::m_fBoxColor.w), 1.f, 15, 1.5f);
 			
-			Draw3DBox(data.abbox);
+			//Draw3DBox(data.bbox);
 
 			esp::bone_esp(data);
 
@@ -95,8 +95,8 @@ namespace features::esp
 		if (!settings::visuals::m_bBoneEsp)
 			return;
 		
-		Vector bone_pos_out;
-		Vector bone_parent_pos_out;
+		Vector bone_out;
+		Vector bone_parent_out;
 
 		const auto& model = data.m_hModel;
 		if (!model.IsValid())
@@ -104,9 +104,10 @@ namespace features::esp
 
 		const auto& model_state = data.m_ModelState;
 
-		static const auto& bone_count = model->BoneCount;
+		const Vector neck_chest_delta = model_state.bones[EBones::BONE_NECK].position - model_state.bones[EBones::BONE_SPINE_3].position;
+		const Vector chest_neck_midpoint = model_state.bones[EBones::BONE_SPINE_3].position + (neck_chest_delta * 0.5f);
 
-		for (int i = 0; i < bone_count; ++i) //bone_count returns some high bullshit number, with 28 it renders also correctly
+		for (int i = 0; i < EBones::BONE_MAX; ++i)
 		{
 			const auto& flag = model->GetBoneFlags(i);
 			if (!flag.HasFlag(static_cast<uint32_t>(FLAG_HITBOX)))
@@ -119,17 +120,26 @@ namespace features::esp
 			const auto& bones = model_state.bones[i];
 			const auto& parent_bones = model_state.bones[bone_parent_index];
 
-			const Vector& in_child = bones.position;
-			const Vector& in_parent = parent_bones.position;
+			Vector bone_pos = bones.position;
+			Vector parent_pos = parent_bones.position;
 
-			bool got_bones = globals::world2screen(in_child, bone_pos_out);
-			bool got_parents = globals::world2screen(in_parent, bone_parent_pos_out);
+			Vector delta_child = bones.position - chest_neck_midpoint;
+			Vector delta_parent = parent_bones.position - chest_neck_midpoint;
 
-			auto p_out_v2 = bone_pos_out.as_vec2();
-			auto bp_p_out_v2 = bone_parent_pos_out.as_vec2();
+			if (delta_parent.length() < 9.0f && delta_child.length() < 9.0f)
+				parent_pos = chest_neck_midpoint;
+
+			if (i == EBones::BONE_SPINE_2)
+				bone_pos = chest_neck_midpoint;
+
+			if (abs(delta_child.z) < 5.0f && delta_parent.length() < 5.0f && delta_child.length() < 5.0f || i == EBones::BONE_SPINE_3)
+				continue;
+
+			bool got_bones = globals::world2screen(bone_pos, bone_out);
+			bool got_parents = globals::world2screen(parent_pos, bone_parent_out);
 
 			if (got_bones && got_parents)
-				globals::draw_list->AddLine(p_out_v2, bp_p_out_v2, ImColor(settings::visuals::m_fBoneColor.x, settings::visuals::m_fBoneColor.y, settings::visuals::m_fBoneColor.z, settings::visuals::m_fBoneColor.w));
+				globals::draw_list->AddLine(bone_out.as_vec2(), bone_parent_out.as_vec2(), ImColor(settings::visuals::m_fBoneColor.x, settings::visuals::m_fBoneColor.y, settings::visuals::m_fBoneColor.z, settings::visuals::m_fBoneColor.w));
 		}
 	}
 

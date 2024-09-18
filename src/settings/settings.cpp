@@ -14,9 +14,9 @@ namespace settings
 
 		// int
 		int m_iFov = 90;
-		int aimbot_fov = 20;
+		int aimbot_fov = 45;
 
-		float smooth = 12.f;
+		float smooth = 1.1f;
 		float recoil_smooth = 24.f;
 		float recoil_scale = 1.f;
 		// colors

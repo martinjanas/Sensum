@@ -34,27 +34,78 @@ public:
 	float operator[](const size_t& index) const;
 	float& operator[](const size_t& index);
 
-	Vector operator-();
-	Vector operator+(const Vector& other);
-	Vector operator+(float value);
-	Vector& operator+=(const Vector& other);
-	Vector& operator+=(float value);
-	Vector operator-(const Vector& other);
-	Vector operator-(float value);
-	Vector& operator-=(const Vector& other);
-	Vector& operator-=(float value);
-	Vector operator*(const Vector& other);
-	Vector operator*(float value);
-	Vector& operator*=(const Vector& other);
-	Vector& operator*=(float value);
-	Vector operator/(const Vector& other);
-	Vector operator/(float other);
-	Vector& operator/=(const Vector& other);
-	Vector& operator/=(float value);
+	Vector operator+(const Vector& other) const {
+		return Vector(x + other.x, y + other.y, z + other.z);
+	}
 
-	Vector operator-(const Vector& other) const;
-	Vector operator+(const Vector& other) const;
-	Vector operator*(float scale) const;
+	Vector operator+(float scalar) const {
+		return Vector(x + scalar, y + scalar, z + scalar);
+	}
+
+	Vector operator-(float scalar) const {
+		return Vector(x - scalar, y - scalar, z - scalar);
+	}
+
+	Vector operator-(const Vector& other) const {
+		return Vector(x - other.x, y - other.y, z - other.z);
+	}
+
+	Vector operator*(float scalar) const {
+		return Vector(x * scalar, y * scalar, z * scalar);
+	}
+
+	Vector operator/(float scalar) const {
+		if (scalar != 0) {
+			return Vector(x / scalar, y / scalar, z / scalar);
+		}
+		
+		return *this;
+	}
+
+	Vector& operator+=(const Vector& other) {
+		x += other.x;
+		y += other.y;
+		z += other.z;
+		return *this;
+	}
+
+	Vector& operator-=(const Vector& other) {
+		x -= other.x;
+		y -= other.y;
+		z -= other.z;
+		return *this;
+	}
+
+	Vector& operator+=(float scalar) {
+		x += scalar;
+		y += scalar;
+		z += scalar;
+		return *this;
+	}
+
+	Vector& operator-=(float scalar) {
+		x -= scalar;
+		y -= scalar;
+		z -= scalar;
+		return *this;
+	}
+
+	Vector& operator*=(float scalar) {
+		x *= scalar;
+		y *= scalar;
+		z *= scalar;
+		return *this;
+	}
+
+	Vector& operator/=(float scalar) {
+		if (scalar != 0) {
+			x /= scalar;
+			y /= scalar;
+			z /= scalar;
+		}
+		// Handle division by zero as appropriate
+		return *this;
+	}
 
 	//TODO: Implement more const operators
 };

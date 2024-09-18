@@ -26,7 +26,7 @@ namespace entity_data
 	}
 
 	//https://github.com/nezu-cc/BakaWare4/blob/f82a60479287926b9fa105ea053851da9a7d040e/cheat/src/valve/cs/entity.cpp
-	bool GetBBox(CGameSceneNode* scene_node, CCollisionProperty* collision, ABBox_t& out)
+	bool GetBBox(CGameSceneNode* scene_node, CCollisionProperty* collision, BBox_t& out)
 	{
 		Vector mins = collision->m_vecMins();
 		Vector maxs = collision->m_vecMaxs();
@@ -49,20 +49,6 @@ namespace entity_data
 		}
 
 		return true;
-	}
-
-	bool GetBBoxByHitbox(CCSPlayerPawn* pawn, ABBox_t& out)
-	{
-		auto hitbox_set = pawn->GetHitboxSet(0);
-
-		if (!hitbox_set)
-			return false;
-
-		const auto& hitboxes = hitbox_set->m_HitBoxes();
-
-		Transform_t hitbox_trans[64];
-
-		//TODO: https://github.com/alza54/opensource2/blob/ff7c27a072f059597277b2eeacaf012683d4ff74/OpenSource2-SDK/src/sdk/source-sdk/classes/entity/c_baseentity.cpp#L97
 	}
 
 	void GetHitbox(entity_data::player_data_t& player_data)
@@ -93,12 +79,10 @@ namespace entity_data
 			/*const auto& mins = (hitbox->m_vMinBounds() - radius).transform(hitbox_matrix.ToMatrix3x4());
 			const auto& maxs = (hitbox->m_vMaxBounds() + radius).transform(hitbox_matrix.ToMatrix3x4());*/
 
-			/*auto min_bounds = hitbox->m_vMinBounds();
-			auto max_bounds = hitbox->m_vMaxBounds();*/
-			
 			auto min_bounds = hitbox->m_vMinBounds() - radius;
 			auto max_bounds = hitbox->m_vMaxBounds() + radius;
 
+			
 			const auto& mins = min_bounds.transform(hitbox_matrix.ToMatrix3x4());
 			const auto& maxs = max_bounds.transform(hitbox_matrix.ToMatrix3x4());
 
@@ -116,7 +100,7 @@ namespace entity_data
 		const auto& localplayer = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
 		if (!localplayer)
 		{
-			destroy();
+			//destroy();
 
 			return;
 		}
@@ -145,7 +129,7 @@ namespace entity_data
 				continue;
 
 			const auto& pawn = controller->m_hPlayerPawn().Get<CCSPlayerPawn*>();
-			if (!pawn || !pawn->IsAlive() || pawn == localpawn || pawn->m_iTeamNum() == local_team || pawn->InAir())
+			if (!pawn || !pawn->IsAlive() || pawn == localpawn || pawn->m_iTeamNum() == local_team)
 				continue;
 
 			auto hitbox_set = pawn->GetHitboxSet(0);
@@ -180,7 +164,7 @@ namespace entity_data
 			player_data.m_PlayerPawn = pawn;
 			
 			GetHitbox(player_data);
-			GetBBox(scene_node, collision, player_data.abbox);
+			GetBBox(scene_node, collision, player_data.bbox);
 
 			entry_data.player_data.push_back(std::move(player_data));
 		}

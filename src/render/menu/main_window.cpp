@@ -18,10 +18,10 @@ namespace main_window
         ImGui::ColorEdit3("###bonecolor", (float*)&settings::visuals::m_fBoneColor, ImGuiColorEditFlags_NoInputs);
 
         ImGui::SliderInt("Aimbot FOV", &settings::visuals::aimbot_fov, 0, 360);
-        ImGui::SliderFloat("###aimbotsmooth", &settings::visuals::smooth, 1.f, 60.f, "Smooth: %.1f");
+        ImGui::SliderFloat("###AimbotSmooth", &settings::visuals::smooth, 1.f, 10.f, "Smooth: %.1f");
         ImGui::Checkbox("Const Smooth", &settings::visuals::const_smooth);
         ImGui::SliderFloat("Recoil Scale", &settings::visuals::recoil_scale, 0.f, 1.f, "Recoil Scale: %.1f");
-        ImGui::SliderFloat("###recoilsmooth", &settings::visuals::recoil_smooth, 1.f, 60.f, "Recoil Smooth: %.1f");
+        ImGui::SliderFloat("###RecoilSmooth", &settings::visuals::recoil_smooth, 1.f, 10.f, "Recoil Smooth: %.1f");
 
         ImGui::Checkbox("Fov changer", &settings::visuals::m_bFovChanger);
 

@@ -35,7 +35,6 @@ namespace entity_data
 		CStrongHandle<CModel> m_hModel;
 		BBox_t bbox;
 		CCSPlayerPawn* m_PlayerPawn;
-		ABBox_t abbox;
 		Transform_t hitbox_transform[HITBOX_MAX];
 
 		std::array<hitbox_info_t, HITBOX_MAX> hitboxes;

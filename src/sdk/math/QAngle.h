@@ -21,101 +21,83 @@ public:
 
 	Vector to_vector() const;
 
-	QAngle operator+(float v)
-	{
-		return QAngle(this->pitch + v, this->yaw + v, this->roll);
-	}
+    QAngle operator+(float v) const
+    {
+        return QAngle(this->pitch + v, this->yaw + v, this->roll);
+    }
 
-	QAngle operator+(const QAngle& other)
-	{
-		return QAngle(this->pitch + other.pitch, this->yaw + other.yaw, this->roll + other.roll);
-	}
+    QAngle operator+(const QAngle& other) const
+    {
+        return QAngle(this->pitch + other.pitch, this->yaw + other.yaw, this->roll);
+    }
 
-	QAngle operator-(float v)
-	{
-		return QAngle(this->pitch - v, this->yaw - v, this->roll);
-	}
+    QAngle operator-(float v) const
+    {
+        return QAngle(this->pitch - v, this->yaw - v, this->roll);
+    }
 
-	QAngle operator*(float v)
-	{
-		return QAngle(this->pitch * v, this->yaw * v, this->roll);
-	}
+    QAngle operator*(float v) const
+    {
+        return QAngle(this->pitch * v, this->yaw * v, this->roll);
+    }
 
-	QAngle operator-(const QAngle& other)
-	{
-		return QAngle(this->pitch - other.pitch, this->yaw - other.yaw, this->roll - other.roll);
-	}
+    QAngle operator-(const QAngle& other) const
+    {
+        return QAngle(this->pitch - other.pitch, this->yaw - other.yaw, this->roll);
+    }
 
-	QAngle operator-(const QAngle& other) const
-	{
-		return QAngle(this->pitch - other.pitch, this->yaw - other.yaw, this->roll - other.roll);
-	}
+    QAngle operator/(float other) const
+    {
+        return QAngle(this->pitch / other, this->yaw / other, this->roll);
+    }
 
-	QAngle& operator/=(float other)
-	{
-		QAngle& temp = *this;
+    QAngle& operator/=(float other)
+    {
+        this->pitch /= other;
+        this->yaw /= other;
+        
+        return *this;
+    }
 
-		temp.pitch /= other;
-		temp.yaw /= other;
-		temp.roll /= other;
+    QAngle& operator*=(float other)
+    {
+        this->pitch *= other;
+        this->yaw *= other;
+        
+        return *this;
+    }
 
-		return temp;
-	}
+    QAngle& operator-=(const QAngle& other)
+    {
+        this->pitch -= other.pitch;
+        this->yaw -= other.yaw;
+        
+        return *this;
+    }
 
-	QAngle& operator*=(float other)
-	{
-		QAngle& temp = *this;
+    QAngle& operator*=(const QAngle& other)
+    {
+        this->pitch *= other.pitch;
+        this->yaw *= other.yaw;
+        
+        return *this;
+    }
 
-		temp.pitch *= other;
-		temp.yaw *= other;
-		temp.roll *= other;
+    QAngle& operator/=(const QAngle& other)
+    {
+        this->pitch /= other.pitch;
+        this->yaw /= other.yaw;
+        
+        return *this;
+    }
 
-		return temp;
-	}
-
-	QAngle& operator-=(const QAngle& other)
-	{
-		QAngle& temp = *this;
-
-		temp.pitch -= other.pitch;
-		temp.yaw -= other.yaw;
-		temp.roll -= other.roll;
-
-		return temp;
-	}
-
-	QAngle& operator*=(const QAngle& other)
-	{
-		QAngle& temp = *this;
-
-		temp.pitch *= other.pitch;
-		temp.yaw *= other.yaw;
-		temp.roll *= other.roll;
-
-		return temp;
-	}
-
-	QAngle& operator/=(const QAngle& other)
-	{
-		QAngle& temp = *this;
-
-		temp.pitch /= other.pitch;
-		temp.yaw /= other.yaw;
-		temp.roll /= other.roll;
-
-		return temp;
-	}
-
-	QAngle& operator+=(const QAngle& other)
-	{
-		QAngle& temp = *this;
-
-		temp.pitch += other.pitch;
-		temp.yaw += other.yaw;
-		temp.roll += other.roll;
-
-		return temp;
-	}
+    QAngle& operator+=(const QAngle& other)
+    {
+        this->pitch += other.pitch;
+        this->yaw += other.yaw;
+        
+        return *this;
+    }
 
 	/*void Clamp()
 	{

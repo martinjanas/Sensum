@@ -34,6 +34,64 @@ enum EBoneFlags : uint32_t
     FLAG_PROCEDURAL = 0x400000,
 };
 
+enum EBones
+{
+    BONE_PELVIS = 0,           // Main body (hips)
+    BONE_SPINE_0 = 1,          // Lower spine
+    BONE_SPINE_1 = 2,          // Mid spine
+    BONE_SPINE_2 = 3,          // Upper spine
+    BONE_SPINE_3 = 4,          // Neck base
+    BONE_NECK = 5,             // Neck
+    BONE_HEAD = 6,             // Head
+
+    // Left arm
+    BONE_L_CLAVICLE = 7,       // Left clavicle
+    BONE_L_UPPER_ARM = 8,      // Left upper arm
+    BONE_L_FOREARM = 9,        // Left forearm
+    BONE_L_HAND = 10,          // Left hand
+
+    // Right arm
+    BONE_R_CLAVICLE = 11,      // Right clavicle
+    BONE_R_UPPER_ARM = 12,     // Right upper arm
+    BONE_R_FOREARM = 13,       // Right forearm
+    BONE_R_HAND = 14,          // Right hand
+
+    // Left leg
+    BONE_L_THIGH = 15,         // Left thigh
+    BONE_L_CALF = 16,          // Left calf
+    BONE_L_FOOT = 17,          // Left foot
+    BONE_L_TOE = 18,           // Left toe
+
+    // Right leg
+    BONE_R_THIGH = 19,         // Right thigh
+    BONE_R_CALF = 20,          // Right calf
+    BONE_R_FOOT = 21,          // Right foot
+    BONE_R_TOE = 22,           // Right toe
+
+    // Fingers (left hand)
+    BONE_L_FINGER_0 = 23,      // Left thumb
+    BONE_L_FINGER_1 = 24,      // Left index finger
+    BONE_L_FINGER_2 = 25,      // Left middle finger
+    BONE_L_FINGER_3 = 26,      // Left ring finger
+    BONE_L_FINGER_4 = 27,      // Left pinky finger
+
+    // Fingers (right hand)
+    BONE_R_FINGER_0 = 28,      // Right thumb
+    BONE_R_FINGER_1 = 29,      // Right index finger
+    BONE_R_FINGER_2 = 30,      // Right middle finger
+    BONE_R_FINGER_3 = 31,      // Right ring finger
+    BONE_R_FINGER_4 = 32,      // Right pinky finger
+
+    // Additional bones (attachments, etc.)
+    BONE_WEAPON = 33,          // Weapon attachment point
+    BONE_WEAPON_HAND = 34,     // Hand that holds the weapon
+    BONE_MISC_0 = 35,          // Miscellaneous bone
+    BONE_MISC_1 = 36,          // Another miscellaneous bone
+
+    // End of bone list
+    BONE_MAX = 37              // Total number of bones
+};
+
 struct alignas(16) CBoneData 
 {
     Vector position;
