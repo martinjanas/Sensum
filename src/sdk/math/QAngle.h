@@ -16,7 +16,7 @@ public:
 
 	void normalize();
 	void clamp();
-	void clamp_normalize();
+	void normalize_clamp();
 	bool is_zero();
 
 	Vector to_vector() const;

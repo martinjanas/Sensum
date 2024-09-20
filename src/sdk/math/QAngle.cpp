@@ -18,48 +18,36 @@ QAngle::QAngle()
 
 void QAngle::normalize()
 {
-	QAngle angles = *this;
+	if (std::isfinite(pitch))
+		pitch = std::remainder(pitch, 360.0f);
 
-	for (auto i = 0; i < 3; i++)
-	{
-		while (angles[i] < -180.0f)
-			angles[i] += 360.0f;
+	if (std::isfinite(yaw))
+		yaw = std::remainder(yaw, 360.0f);
 
-		while (angles[i] > 180.0f)
-			angles[i] -= 360.0f;
-	}
-
-	*this = angles;
+	if (std::isfinite(roll))
+		roll = std::remainder(roll, 360.0f);
 }
 
 void QAngle::clamp()
 {
-	QAngle angle = *this;
+	if (!std::isfinite(pitch))
+		pitch = 0.f;
 
-	if (!std::isfinite(angle.pitch))
-		angle.pitch = 0.f;
+	if (!std::isfinite(yaw))
+		yaw = 0.f;
 
-	if (!std::isfinite(angle.yaw))
-		angle.yaw = 0.f;
+	if (!std::isfinite(roll))
+		roll = 0.f;
 
-	if (!std::isfinite(angle.roll))
-		angle.roll = 0.f;
-
-	angle.pitch = std::clamp(angle.pitch, -89.f, 89.f);
-	angle.yaw = std::clamp(std::remainder(angle.yaw, 360.f), -180.f, 180.f);
-	angle.roll = 0.f;
-
-	*this = angle;
+	pitch = std::clamp(pitch, -89.f, 89.f);
+	yaw = std::clamp(yaw, -180.f, 180.f);
+	roll = 0.f;
 }
 
-void QAngle::clamp_normalize()
+void QAngle::normalize_clamp()
 {
-	QAngle angles = *this;
-
-	angles.normalize();
-	angles.clamp();
-
-	*this = angles;
+	normalize();
+	clamp();
 }
 
 bool QAngle::is_zero()

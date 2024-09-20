@@ -10,13 +10,13 @@ namespace settings
 		bool m_bBoxEsp = false;
 		bool m_bNameEsp = false;
 		bool m_bHealthEsp = false;
-		bool const_smooth = true;
+		bool const_smooth = false;
 
 		// int
 		int m_iFov = 90;
 		int aimbot_fov = 45;
 
-		float smooth = 1.1f;
+		float smooth = 10.f;
 		float recoil_smooth = 24.f;
 		float recoil_scale = 1.f;
 		// colors

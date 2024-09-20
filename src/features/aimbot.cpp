@@ -1,5 +1,6 @@
 #include <unordered_set>
 #include <mutex>
+#include <algorithm>
 
 #include "features.h"
 #include "../settings/settings.h"
@@ -36,36 +37,24 @@ namespace features
         }
 
         //utterly broken
-        void smooth(const float& amount, const QAngle& current_angles, const QAngle& aim_angles, QAngle& out_angles)
+        void smooth(float amount, const QAngle& current_angles, const QAngle& aim_angles, QAngle& out_angles)
         {
-            QAngle clamped_aim_angles = aim_angles;
-            clamped_aim_angles.clamp_normalize();
+            amount = std::clamp(amount, 1.0f, 10.0f);
 
-            auto corrected_amount = amount;
-            const float tickrate = 1.0f / 0.015625f; // interval_per_tick for 64 tick
-            corrected_amount = tickrate * amount / 64.0f;
+            float smoothing_factor = amount;
 
-            if (corrected_amount <= 1.1f)
-            {
-                out_angles = clamped_aim_angles;
-                return;
-            }
+            QAngle delta = aim_angles - current_angles;
+            delta.normalize_clamp();
 
-            Vector aim_vector = clamped_aim_angles.to_vector();
-            Vector current_vector = current_angles.to_vector();
-
-            Vector delta = aim_vector - current_vector;
-            Vector smoothed = current_vector + delta / corrected_amount;
-
-            out_angles = smoothed.to_qangle();
-            out_angles.clamp_normalize();
+            out_angles = current_angles + delta / smoothing_factor;
+            out_angles.normalize_clamp();
         }
 
         //broken when smooth amount < 12
         void smooth_constant(const float& speed, const QAngle& current_angles, const QAngle& target_angles, QAngle& smoothed_angles)
         {
             QAngle delta = target_angles - current_angles;
-            delta.clamp_normalize();
+            delta.normalize_clamp();
 
             constexpr float tick_interval = 1.f / 64.f;
             float step = speed * tick_interval;
@@ -79,7 +68,7 @@ namespace features
             }
 
             smoothed_angles = current_angles + delta;
-            smoothed_angles.clamp_normalize();
+            smoothed_angles.normalize_clamp();
         }
 
         void smooth_exponential(const float& amount, const QAngle& current_angles, const QAngle& target_angles, QAngle& smoothed_angles)
@@ -88,7 +77,7 @@ namespace features
 
             // Clamp and normalize target angles to prevent issues with extreme values
             QAngle clamped_target_angles = target_angles;
-            clamped_target_angles.clamp_normalize();
+            clamped_target_angles.normalize_clamp();
 
             // Compute the corrected amount for smoothing based on the tickrate
             const float tickrate = 1.0f / 0.015625f; // interval_per_tick for 64 tick
@@ -106,10 +95,10 @@ namespace features
 
             // Convert back to angles and clamp/normalize the result
             smoothed_angles = smoothed_vector.to_qangle();
-            smoothed_angles.clamp_normalize();
+            smoothed_angles.normalize_clamp();
         }
         
-        void recoil(CCSPlayerPawn* localpawn, const QAngle& viewangles)
+        void recoil(CCSPlayerPawn* localpawn, const QAngle& viewangles, CUserCmd* cmd)
         {
             // Get a reference to the punch angle cache
             auto& punch_cache = localpawn->m_aimPunchCache();
@@ -119,10 +108,10 @@ namespace features
                 return;
 
             // Get the most recent punch angle from the cache
-            QAngle current_punch = punch_cache[punch_cache.Count() - 1]; // Most recent angle at index 0
+            QAngle current_punch = punch_cache[punch_cache.Count() - 2]; // Most recent angle at index 0
 
             // If the player has fired more than one shot
-            if (/*localpawn->m_iShotsFired() > 1 && */GetAsyncKeyState(VK_LBUTTON))
+            if (localpawn->m_iShotsFired() > 1 && cmd->IsButtonPressed(IN_ATTACK))
             {
                 // Only initialize old_punch when the player starts shooting (for the first frame)
                 if (!was_firing_last_frame)
@@ -132,16 +121,16 @@ namespace features
                 }
 
                 // Calculate the delta between the current punch angle and the old punch angle
-                QAngle punch_delta = current_punch - old_punch;
+                QAngle punch_delta = viewangles - current_punch - old_punch;
 
                 // Update old_punch before applying compensation, so the next frame has the correct reference
                 old_punch = current_punch;
 
                 // Subtract the delta from the current view angles for smooth recoil compensation
-                QAngle compensated_angle = viewangles - (punch_delta * 2.0f); // Adjust scaling factor if needed // * 2.0f
-                compensated_angle.clamp_normalize(); // Ensure angles are within valid bounds
+                QAngle compensated_angle = punch_delta * 2.0f; // Adjust scaling factor if needed // * 2.0f
+                compensated_angle.normalize_clamp(); // Ensure angles are within valid bounds
 
-                smooth(settings::visuals::recoil_smooth, viewangles, compensated_angle, compensated_angle);
+                //smooth(settings::visuals::recoil_smooth, viewangles, compensated_angle, compensated_angle);
 
                 // Set the new view angles (compensated for recoil)
                 g::client->SetViewAngles(0, compensated_angle);
@@ -221,10 +210,10 @@ namespace features
                         continue;
 
                     QAngle target_angle = (hitbox_data->hitbox_pos - eye_pos).to_qangle();
-                    target_angle.clamp_normalize();
+                    target_angle.normalize_clamp();
 
                     auto delta = target_angle - viewangles;
-                    delta.clamp_normalize();
+                    delta.normalize_clamp();
 
                     float distance = hitbox_data->hitbox_pos.dist_to(eye_pos);
                     //float distance = data.m_vecOrigin.dist_to(eye_pos);
@@ -239,21 +228,21 @@ namespace features
 
                     //printf("[%s: %d]: fov: %.1f, best_fov: %.1f, dist: %.1f\n", hitbox_data->entity_name, hitbox_data->index, fov, best_fov, distance);
 
-                    if (!GetAsyncKeyState(VK_LBUTTON))
+                    if (!cmd->IsButtonPressed(IN_ATTACK))
                         continue;
 
                     if (best_fov > settings::visuals::aimbot_fov)
                         continue;
 
-                    if (!settings::visuals::const_smooth)
+                    /*if (!settings::visuals::const_smooth)
                         smooth(settings::visuals::smooth, viewangles, best_angle, best_angle);
-                    else smooth_constant(settings::visuals::smooth, viewangles, best_angle, best_angle);
+                    else smooth_constant(settings::visuals::smooth, viewangles, best_angle, best_angle);*/
 
                     g::client->SetViewAngles(0, best_angle);
                 }
             }
 
-            //recoil(localpawn, viewangles);
+            //recoil(localpawn, viewangles, cmd); //This keeps overwriting my angles and thus aimbot is not locking on
         }
     }
 }

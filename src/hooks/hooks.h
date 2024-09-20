@@ -33,8 +33,8 @@ namespace hooks
 	struct clientmode_createmove
 	{
 		static const int index = 15;
-		using fn = bool(*)(void* rcx, CUserCmd* cmd);
-		static bool hooked(void* rcx, CUserCmd* cmd);
+		using fn = bool(*)(void* rcx);
+		static bool hooked(void* rcx);
 
 		inline static fn original_fn;
 	};
