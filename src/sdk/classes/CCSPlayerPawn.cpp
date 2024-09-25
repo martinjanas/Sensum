@@ -1,5 +1,6 @@
 #include "CCSPlayerPawn.h"
-#include "../../sdk/classes/CHandle.h"
+#include "../sdk.h"
+
 
 Vector CCSPlayerPawn::GetEyePos()
 {
@@ -8,7 +9,8 @@ Vector CCSPlayerPawn::GetEyePos()
 
 bool CCSPlayerPawn::InAir()
 {	
-	return m_hGroundEntity().Get() == nullptr;
+	//return m_hGroundEntity().Get() == nullptr;
+	return g::entity_system->GetEntityFromHandle(m_hGroundEntity()) == nullptr;
 }
 
 bool CCSPlayerPawn::IsAlive()

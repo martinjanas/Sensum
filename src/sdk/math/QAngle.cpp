@@ -18,14 +18,9 @@ QAngle::QAngle()
 
 void QAngle::normalize()
 {
-	if (std::isfinite(pitch))
-		pitch = std::remainder(pitch, 360.0f);
-
-	if (std::isfinite(yaw))
-		yaw = std::remainder(yaw, 360.0f);
-
-	if (std::isfinite(roll))
-		roll = std::remainder(roll, 360.0f);
+	pitch = std::remainder(pitch, 360.0f);
+	yaw = std::remainder(yaw, 360.0f);
+	roll = std::remainder(roll, 360.0f);
 }
 
 void QAngle::clamp()
@@ -41,7 +36,7 @@ void QAngle::clamp()
 
 	pitch = std::clamp(pitch, -89.f, 89.f);
 	yaw = std::clamp(yaw, -180.f, 180.f);
-	roll = 0.f;
+	roll = std::clamp(roll, -50.f, 50.f);
 }
 
 void QAngle::normalize_clamp()

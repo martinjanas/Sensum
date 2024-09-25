@@ -74,7 +74,6 @@
       <OmitFramePointers>false</OmitFramePointers>
       <MinimalRebuild>false</MinimalRebuild>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
-      <AdditionalOptions>/Zc:threadSafeInit %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -204,6 +203,7 @@
     <ClCompile Include="hooks\functions\GetMatricesForView.cpp" />
     <ClCompile Include="interfaces.cpp" />
     <ClCompile Include="render.cpp" />
+    <ClCompile Include="sdk\classes\CHandle.cpp" />
     <ClCompile Include="sdk\helpers\globals.cpp" />
     <ClCompile Include="hooks\functions\Present.cpp" />
     <ClCompile Include="hooks\functions\WinProc.cpp" />
@@ -223,6 +223,7 @@
     <ClCompile Include="sdk\helpers\netvars.cpp" />
     <ClCompile Include="sdk\hooking\safetyhook\safetyhook.cpp" />
     <ClCompile Include="sdk\hooking\safetyhook\Zydis.c" />
+    <ClCompile Include="sdk\interfaces\CGameTrace.cpp" />
     <ClCompile Include="sdk\localplayer.cpp" />
     <ClCompile Include="sdk\math\QAngle.cpp" />
     <ClCompile Include="sdk\sdk.cpp" />

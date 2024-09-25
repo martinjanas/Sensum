@@ -7,7 +7,7 @@ CEntityInstance* __fastcall hooks::on_remove_entity::hooked(void* rcx, CEntityIn
 {
     if (instance && instance->IsController())
     {
-        auto it = std::remove_if(entity_data::player_instances.begin(), entity_data::player_instances.end(), [&](const entity_data::instance_t& e) { return e.handle.GetIndex() == handle.GetIndex(); });
+        auto it = std::remove_if(entity_data::player_instances.begin(), entity_data::player_instances.end(), [&](const entity_data::instance_t& e) { return e.handle.GetEntryIndex() == handle.GetEntryIndex(); });
 
         entity_data::player_instances.erase(it, entity_data::player_instances.end());
     }

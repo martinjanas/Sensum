@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "../helpers/vfunc.h"
 
 enum EClientFrameStage : int
@@ -117,5 +119,14 @@ public:
     const char* GetLevelNameShort()
     {
         return GetVirtual<const char* (__thiscall*)(void*)>(this, 57)(this);
+    }
+
+    int GetLocalPlayer()
+    {
+        int index = -1;
+        
+        GetVirtual<void(__thiscall*)(void*, int&, int)>(this, 47)(this, index, 0); 
+        
+        return index + 1;
     }
 };

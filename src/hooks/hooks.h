@@ -12,6 +12,8 @@
 #include "../sdk/hooking/safetyhook/safetyhook.hpp"
 #include "../sdk/hooking/shadow_vmt/ShadowVMT.h"
 
+#include "../sdk/interfaces/IVEngineClient.h"
+
 namespace hooks
 {
 	inline static ShadowVMT entity_system;
@@ -52,7 +54,7 @@ namespace hooks
 	{
 		static const int index = 15;
 		using fn = CEntityInstance * (__thiscall*)(void*, CEntityInstance*, CHandle);
-		static CEntityInstance* __fastcall hooked(void* rcx, CEntityInstance* instance, CHandle handle);
+		static CEntityInstance* __fastcall hooked(void* rcx, CEntityInstance* instance, CHandle  handle);
 
 		inline static fn original_fn;
 	};
@@ -118,7 +120,7 @@ namespace hooks
 	{
 		static const int index = 36;
 		using fn = void(__fastcall*)(void*, EClientFrameStage);
-		static void __fastcall hooked(void* a1, EClientFrameStage stage);
+		static void __fastcall hooked(void* rcx, EClientFrameStage stage);
 
 		inline static fn original_fn;
 	};

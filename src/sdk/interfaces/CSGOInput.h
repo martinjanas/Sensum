@@ -200,9 +200,9 @@ public:
 	CMsgQAngle* pViewAngles;
 	std::int32_t nLegacyCommandNumber;
 	std::int32_t nClientTick;
-	float flForwardMove;
+	float flForwardMove; //Forwardmove, sidemove (and upmove?) - Range: -1.0 - 1.0
 	float flSideMove;
-	float flUpMove;
+	float flUpMove; 
 	std::int32_t nImpulse;
 	std::int32_t nWeaponSelect;
 	std::int32_t nRandomSeed;

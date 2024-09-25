@@ -312,5 +312,7 @@
     <ClCompile Include="hooks\functions\GetMatricesForView.cpp" />
     <ClCompile Include="hooks\functions\GetFov.cpp" />
     <ClCompile Include="features\aimbot.cpp" />
+    <ClCompile Include="sdk\classes\CHandle.cpp" />
+    <ClCompile Include="sdk\interfaces\CGameTrace.cpp" />
   </ItemGroup>
 </Project>

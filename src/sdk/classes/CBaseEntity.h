@@ -4,6 +4,7 @@
 #include "../../sdk/classes/CGameSceneNode.h"
 #include "../../sdk/classes/CEntityInstance.h"
 #include "../../sdk/classes/CPlayerGlowProperty.h"
+#include "../../sdk/classes/CHandle.h"
 
 enum LifeState_t : uint8_t
 {
@@ -53,6 +54,35 @@ class VPhysicsCollisionAttribute_t
     NETVAR(int, m_nCollisionFunctionMask, "VPhysicsCollisionAttribute_t", "m_nCollisionFunctionMask");
 };
 
+enum SolidType_t
+{
+    SOLID_NONE = 0,    // no solid model
+    SOLID_BSP = 1,    // a BSP tree
+    SOLID_BBOX = 2,    // an AABB
+    SOLID_OBB = 3,    // an OBB (not implemented yet)
+    SOLID_OBB_YAW = 4,    // an OBB, constrained so that it can only yaw
+    SOLID_CUSTOM = 5,    // Always call into the entity for tests
+    SOLID_VPHYSICS = 6,    // solid vphysics object, get vcollide from the model and collide with that
+    SOLID_LAST,
+};
+
+enum SolidFlags_t
+{
+    FSOLID_CUSTOMRAYTEST = 0x0001,    // Ignore solid type + always call into the entity for ray tests
+    FSOLID_CUSTOMBOXTEST = 0x0002,    // Ignore solid type + always call into the entity for swept box tests
+    FSOLID_NOT_SOLID = 0x0004,    // Are we currently not solid?
+    FSOLID_TRIGGER = 0x0008,    // This is something may be collideable but fires touch functions
+    // even when it's not collideable (when the FSOLID_NOT_SOLID flag is set)
+    FSOLID_NOT_STANDABLE = 0x0010,    // You can't stand on this
+    FSOLID_VOLUME_CONTENTS = 0x0020,    // Contains volumetric contents (like water)
+    FSOLID_FORCE_WORLD_ALIGNED = 0x0040,    // Forces the collision rep to be world-aligned even if it's SOLID_BSP or SOLID_VPHYSICS
+    FSOLID_USE_TRIGGER_BOUNDS = 0x0080,    // Uses a special trigger bounds separate from the normal OBB
+    FSOLID_ROOT_PARENT_ALIGNED = 0x0100,    // Collisions are defined in root parent's local coordinate space
+    FSOLID_TRIGGER_TOUCH_DEBRIS = 0x0200,    // This trigger will touch debris objects
+
+    FSOLID_MAX_BITS = 10
+};
+
 class CCollisionProperty //TODO: Add more members later
 {
 public:
@@ -60,6 +90,12 @@ public:
     NETVAR(Vector, m_vecMins, "CCollisionProperty", "m_vecMins");
     NETVAR(Vector, m_vecMaxs, "CCollisionProperty", "m_vecMaxs");
     NETVAR(float, m_flBoundingRadius, "CCollisionProperty", "m_flBoundingRadius");
+    NETVAR(uint8_t, m_usSolidFlags, "CCollisionProperty", "m_usSolidFlags");
+
+    uint16_t CollisionMask()
+    {
+        return *reinterpret_cast<uint16_t*>(this + 0x38);
+    }
 };
 
 struct EmitSound_t
@@ -82,11 +118,9 @@ struct EmitSound_t
     int							m_nSoundEntryVersion;
 };
 
-class CHandle;
 class CBaseEntity : public CEntityInstance
 {
 public:
-    NETVAR(CHandle, m_hGroundEntity, "C_BaseEntity", "m_hGroundEntity");
 	NETVAR(int, m_iHealth, "C_BaseEntity", "m_iHealth");
 	NETVAR(LifeState_t, m_lifeState, "C_BaseEntity", "m_lifeState");
     NETVAR(uint8_t, m_iTeamNum, "C_BaseEntity", "m_iTeamNum");
@@ -94,72 +128,29 @@ public:
     NETVAR(CCollisionProperty*, m_pCollision, "C_BaseEntity", "m_pCollision");
     NETVAR(CGlowProperty*, m_GlowProperty, "C_BaseModelEntity", "m_Glow");
     NETVAR(Vector, m_vecViewOffset, "C_BaseModelEntity", "m_vecViewOffset");
-    NETVAR(uint32_t, m_fFlags, "C_BaseEntity", "m_fFlags");
+    NETVAR(uint32_t, m_fFlags, "C_BaseEntity", "m_fFlags");   
+    CHandle m_hGroundEntity();
+    CHandle m_hOwnerEntity();
 
-    //int EmitSound(EmitSound_t& params, const char* sound_name, float sound_time) //crashing/throwing exceptions
-    //{
-    //    using fn = int (__thiscall*)(void*, EmitSound_t&, const char*, float);
-
-    //    static auto addr = modules::client.pattern_scanner.scan("E8 ? ? ? ? 41 2B FE", "EmitSound()").as();
-
-    //    auto emit_sound = reinterpret_cast<fn>(addr);
-
-    //    if (emit_sound)
-    //        return emit_sound(this, params, sound_name, 0.0f);
-
-    //    return -1;
-    //}
-
-    HitboxSet_t* GetHitboxSet(int i)
+    /*int EmitSound(EmitSound_t& params, const char* sound_name, float sound_time) //crashing/throwing exceptions
     {
-        using fn = HitboxSet_t * (__thiscall*)(void*, int);
+        using fn = int (__thiscall*)(void*, EmitSound_t&, const char*, float);
 
-        static auto addr = modules::client.pattern_scanner.scan("E8 ?? ?? ?? ?? 48 8B F0 48 85 C0 0F 84 35 02 00 00", "GetHitboxSet()").add(0x1).abs().as();
+        static auto addr = modules::client.pattern_scanner.scan("E8 ? ? ? ? 41 2B FE", "EmitSound()").as();
 
-        if (!addr)
-            return nullptr;
+        auto emit_sound = reinterpret_cast<fn>(addr);
 
-        const auto get_hitbox_set = reinterpret_cast<fn>(addr);
-
-        if (get_hitbox_set)
-            return get_hitbox_set(this, i);
-
-        return nullptr;
-    }
-
-    bool ComputeSurroundingBox(Vector* mins, Vector* maxs)
-    {
-        using fn = bool(__thiscall*)(void*, Vector*, Vector*);
-
-        static auto addr = modules::client.pattern_scanner.scan("E9 ? ? ? ? F6 43 5B FD").add(0x1).abs().as();
-
-        if (!addr)
-            return false;
-
-        const auto compute_surrounding_box = reinterpret_cast<fn>(addr);
-
-        if (compute_surrounding_box)
-            return compute_surrounding_box(this, mins, maxs);
-
-        return false;
-    }
-
-    int HitboxToWorldTransform(HitboxSet_t* hitbox_set, Transform_t* out_transform) //Crashing?
-    {
-        using fn = int(__thiscall*)(void*, HitboxSet_t*, Transform_t*, int max_studio_bones);
-
-        static auto addr = modules::client.pattern_scanner.scan("E8 ? ? ? ? 45 33 F6 4C 63 E0").add(0x1).abs().as();
-
-        if (!addr)
-            return -1;
-
-        const auto hitbox_to_world_transform = reinterpret_cast<fn>(addr);
-
-        if (hitbox_to_world_transform)
-            return hitbox_to_world_transform(this, hitbox_set, out_transform, 256); //1024
+        if (emit_sound)
+            return emit_sound(this, params, sound_name, 0.0f);
 
         return -1;
-    }
+    }*/
+
+    CHandle GetHandle();
+    std::uint32_t GetOwnerHandle();
+    HitboxSet_t* GetHitboxSet(int i);
+    bool ComputeSurroundingBox(Vector* mins, Vector* maxs);
+    int HitboxToWorldTransform(HitboxSet_t* hitbox_set, Transform_t* out_transform);
 };
 
 

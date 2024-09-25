@@ -105,7 +105,7 @@ namespace entity_data
 			return;
 		}
 
-		const auto& localpawn = localplayer->m_hPlayerPawn().Get<CCSPlayerPawn*>();
+		const auto& localpawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(localplayer->m_hPlayerPawn()); //localplayer->m_hPlayerPawn().Get<CCSPlayerPawn*>();
 		if (!localpawn || !localpawn->IsAlive())
 			return;
 
@@ -124,11 +124,11 @@ namespace entity_data
 			if (!controller)
 				continue;
 
-			const uint32_t& index = instance.handle.GetIndex();
+			const uint32_t& index = instance.handle.GetEntryIndex();
 			if (index <= 0 || index > 0x7FFF)
 				continue;
 
-			const auto& pawn = controller->m_hPlayerPawn().Get<CCSPlayerPawn*>();
+			const auto& pawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(controller->m_hPlayerPawn());  //controller->m_hPlayerPawn().Get<CCSPlayerPawn*>();
 			if (!pawn || !pawn->IsAlive() || pawn == localpawn || pawn->m_iTeamNum() == local_team)
 				continue;
 
@@ -141,7 +141,7 @@ namespace entity_data
 			if (!scene_node || !weapon_services)
 				continue;
 
-			const auto active_wpn = weapon_services->m_hActiveWeapon().Get<CBasePlayerWeapon*>();
+			const auto active_wpn = g::entity_system->GetEntityFromHandle<CBasePlayerWeapon*>(weapon_services->m_hActiveWeapon()); //weapon_services->m_hActiveWeapon().Get<CBasePlayerWeapon*>();
 			const auto collision = pawn->m_pCollision();
 			const auto skeleton_instance = scene_node->GetSkeletonInstance();
 			if (!active_wpn || !collision || !skeleton_instance)
@@ -156,6 +156,7 @@ namespace entity_data
 			player_data.m_szPlayerName = controller->m_sSanitizedPlayerName();
 			player_data.m_iPlayerIndex = index;
 			player_data.m_vecOrigin = scene_node->m_vecOrigin();
+			player_data.m_vecEyePos = (scene_node->m_vecOrigin() + pawn->m_vecViewOffset());
 			player_data.m_iHealth = pawn->m_iHealth();
 			player_data.m_iShotsFired = pawn->m_iShotsFired();
 			player_data.m_iClip1 = active_wpn->m_iClip1();

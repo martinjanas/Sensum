@@ -8,6 +8,7 @@
 #include "../sdk/helpers/entity_data.h"
 #include "../sdk/sdk.h"
 
+
 namespace features
 {
     namespace aimbot
@@ -31,7 +32,19 @@ namespace features
 
             float fov = std::hypotf(pitch_diff, yaw_diff);
 
-            fov = std::clamp<float>(fov, 0.f, 360.f);
+            fov = std::clamp<float>(fov, 0.f, 180.f);
+
+            return fov;
+        }
+
+        float old_distance_based_fov(const QAngle& delta, const float& distance)
+        {
+            float pitch_diff = std::sinf(fabsf(delta.pitch) * math::deg2rad) * distance;
+            float yaw_diff = std::sinf(fabsf(delta.yaw) * math::deg2rad) * distance;
+
+            float fov = std::hypotf(pitch_diff, yaw_diff);
+
+            fov = std::clamp<float>(fov, 0.f, 180.f);
 
             return fov;
         }
@@ -108,7 +121,7 @@ namespace features
                 return;
 
             // Get the most recent punch angle from the cache
-            QAngle current_punch = punch_cache[punch_cache.Count() - 2]; // Most recent angle at index 0
+            QAngle current_punch = punch_cache[punch_cache.Count() - 1]; // Most recent angle at index 0
 
             // If the player has fired more than one shot
             if (localpawn->m_iShotsFired() > 1 && cmd->IsButtonPressed(IN_ATTACK))
@@ -168,7 +181,7 @@ namespace features
             if (!localplayer)
                 return;
 
-            CCSPlayerPawn* localpawn = localplayer->m_hPlayerPawn().Get<CCSPlayerPawn*>();
+            CCSPlayerPawn* localpawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(localplayer->m_hPlayerPawn());  //localplayer->m_hPlayerPawn().Get<CCSPlayerPawn*>();
             if (!localpawn)
                 return;
 
@@ -219,6 +232,9 @@ namespace features
                     //float distance = data.m_vecOrigin.dist_to(eye_pos);
 
                     float fov = distance_based_fov(delta, distance);
+                    float old_fov = old_distance_based_fov(delta, distance);
+
+                    //float fov = std::hypotf(delta.pitch, delta.yaw);
 
                     if (fov < best_fov)
                     {
@@ -226,10 +242,10 @@ namespace features
                         best_angle = target_angle;
                     }
 
-                    //printf("[%s: %d]: fov: %.1f, best_fov: %.1f, dist: %.1f\n", hitbox_data->entity_name, hitbox_data->index, fov, best_fov, distance);
-
                     if (!cmd->IsButtonPressed(IN_ATTACK))
                         continue;
+
+                    printf("[%s: %d]: fov: %.1f, old_fov: %.1f, best_fov: %.1f, dist: %.1f\n", hitbox_data->entity_name, hitbox_data->index, fov, old_fov, best_fov, distance);
 
                     if (best_fov > settings::visuals::aimbot_fov)
                         continue;
@@ -238,7 +254,7 @@ namespace features
                         smooth(settings::visuals::smooth, viewangles, best_angle, best_angle);
                     else smooth_constant(settings::visuals::smooth, viewangles, best_angle, best_angle);*/
 
-                    g::client->SetViewAngles(0, best_angle);
+                    //g::client->SetViewAngles(0, best_angle);
                 }
             }
 

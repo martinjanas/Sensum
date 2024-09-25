@@ -7,6 +7,7 @@
 #include "../sdk/localplayer.h"
 #include "../interfaces.h"
 
+
 void print_status(const char* name, void* ptr)
 {
 	auto remove_leading_zeros = [](const std::string& input) -> std::string 

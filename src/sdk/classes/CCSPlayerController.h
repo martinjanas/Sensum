@@ -5,6 +5,7 @@
 #include "../../sdk/classes/CBaseEntity.h"
 #include "../../sdk/classes/CPlayerMoneyServices.h"
 #include "../../sdk/classes/CHandle.h"
+#include "../../sdk/classes/CCSPlayerPawn.h"
 
 //C_CSPlayerPawn: C_CSPlayerPawnBase: C_BasePlayerPawn
 //CCSPlayerController : CBasePlayerController: C_BaseEntity

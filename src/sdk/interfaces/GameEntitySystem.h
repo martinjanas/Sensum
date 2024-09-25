@@ -46,6 +46,14 @@ public:
 		return nullptr;
 	}
 
+	template <typename T = CBaseEntity*>
+	T GetEntityFromHandle(CHandle handle)
+	{
+		auto base_entity = GetBaseEntity(handle.GetEntryIndex());
+
+		return reinterpret_cast<T>(base_entity);
+	}
+
 	/*CBaseEntity* GetBaseEntity(int index)
 	{
 		using fn = CBaseEntity*(__thiscall*)(void*, int);

@@ -1,6 +1,8 @@
 #pragma once
 #include <dxgi.h>
 #include <d3d11.h>
+#include <cstddef>
+
 #include "../sdk/interfaces/IVEngineClient.h"
 #include "../sdk/interfaces/SchemaSystem.h"
 #include "../sdk/interfaces/IMemAlloc.h"
@@ -9,6 +11,8 @@
 #include "../sdk/interfaces/CSource2Client.h"
 #include "../sdk/interfaces/CInputSystem.h"
 #include "../sdk/interfaces/CGameTrace.h"
+#include "../sdk/interfaces/GameEntitySystem.h"
+
 #include "../sdk/math/Viewmatrix.h"
 
 class CGlobalVarsBase 
@@ -35,25 +39,25 @@ public:
 	char* current_mapname; //0x0188
 };
 
-class CNetworkGameClient //implement these later:
-{
-public:
-	CGlobalVarsBase* GetGlobalVars()
-	{
-		//xref: Curtime( %f )\nRealtime( %f )\n module: engine2
-		return GetVirtual<CGlobalVarsBase * (__thiscall*)(void*)>(this, 4)(this);
-	}
-};
+//class CNetworkGameClient //implement these later:
+//{
+//public:
+//	CGlobalVarsBase* GetGlobalVars()
+//	{
+//		//xref: Curtime( %f )\nRealtime( %f )\n module: engine2
+//		return GetVirtual<CGlobalVarsBase * (__thiscall*)(void*)>(this, 4)(this);
+//	}
+//};
 
 //g::network_game_service = modules::engine.GetInterfaceFromList<CNetworkGameService*>("NetworkClientService_001");
-class CNetworkGameService
-{
-public:
-	CNetworkGameClient* GetNetworkGameClient()
-	{
-		return *reinterpret_cast<CNetworkGameClient**>(reinterpret_cast<uintptr_t>(this) + 0xB8);
-	}
-};
+//class CNetworkGameService
+//{
+//public:
+//	CNetworkGameClient* GetNetworkGameClient()
+//	{
+//		return *reinterpret_cast<CNetworkGameClient**>(reinterpret_cast<uintptr_t>(this) + 0xB8);
+//	}
+//};
 
 namespace sdk
 {

@@ -9,6 +9,32 @@ class CEntityIdentity
 public:
     NETVAR(CUtlSymbolLarge, m_name, "CEntityIdentity", "m_name");
     NETVAR(CUtlSymbolLarge, m_designerName, "CEntityIdentity", "m_designerName");
+    NETVAR(uint32_t, m_flags, "CEntityIdentity", "m_flags");
+
+    uint32_t GetHandleIndex()
+    {
+        return reinterpret_cast<uint32_t>(this + 0x10);
+    }
+
+    [[nodiscard]] bool IsValid()
+    {
+        return GetHandleIndex() != 0xFFFFFFFF;
+    }
+
+    [[nodiscard]] int GetEntityIndex() //this should be the entity's index
+    {
+        if (!IsValid())
+            return 0x7FFF;
+
+        return GetHandleIndex() & 0x7FFF;
+    }
+
+    [[nodiscard]] int GetSerialNumber()
+    {
+        return GetHandleIndex() >> 15;
+    }
+
+    //uint32_t index;
 
     //int m_nameStringableIndex; // 0x14 int32_t
     //CUtlSymbolLarge m_name; // 0x18 CUtlSymbolLarge

@@ -6,8 +6,12 @@
 #include <array>
 #include "../classes/CCSPlayerController.h"
 #include "../classes/CCSPlayerPawn.h"
+#include "../classes/CBasePlayerWeapon.h"
 #include "../helpers/BBox_t.h"
 #include "../math/QAngle.h"
+#include "../sdk.h"
+#include "../classes/CHandle.h"
+#include "../../sdk/interfaces/CSGOInput.h"
 
 namespace entity_data
 {
@@ -28,6 +32,7 @@ namespace entity_data
 		const char* m_szPlayerName;
 		uint32_t m_iPlayerIndex;
 		Vector m_vecOrigin;
+		Vector m_vecEyePos;
 		int m_iHealth;
 		int m_iShotsFired;
 		int m_iClip1;

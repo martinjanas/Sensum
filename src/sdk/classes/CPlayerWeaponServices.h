@@ -9,5 +9,6 @@ class CPlayerWeaponServices
 {
 public:
     NETVAR(CHandle, m_hActiveWeapon, "CPlayer_WeaponServices", "m_hActiveWeapon");
+    NETVAR(CUtlVector<CHandle>, m_hMyWeapons, "CPlayer_WeaponServices", "m_hMyWeapons");
 };
 
