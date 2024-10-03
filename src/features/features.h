@@ -10,7 +10,7 @@ namespace features
 		void render();
 
 		void bone_esp(entity_data::player_data_t& data);
-		void name_esp(entity_data::player_data_t& data, const Vector& origin_out, const Vector& screen_head_pos);
+		void name_esp(entity_data::player_data_t& data, const BBox_t& bbox);
 	}
 
 	namespace aimbot

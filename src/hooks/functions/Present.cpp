@@ -99,7 +99,6 @@ namespace hooks
 	{
 		if (!g_pDevice || !g_pContext || !g_pRenderTargetView)
 		{
-			printf("Initializing dx11::g_p Vars\n");
 			swap_chain->GetDevice(__uuidof(ID3D11Device), (void**)&g_pDevice);
 			g_pDevice->GetImmediateContext(&g_pContext);
 
@@ -116,7 +115,6 @@ namespace hooks
 
 		if (!init_imgui_done && (g_pDevice && g_pContext))
 		{
-			printf("Initialiazing imgui\n");
 			hooks::wndproc::original = reinterpret_cast<WNDPROC>(SetWindowLongPtr(globals::hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(hooks::wndproc::hooked)));
 
 			ImGui::CreateContext();
@@ -124,6 +122,8 @@ namespace hooks
 			io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
 			ImGui_ImplWin32_Init(globals::hwnd);
 			ImGui_ImplDX11_Init(g_pDevice, g_pContext);
+
+			main_window::esp = ImGui::GetIO().Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\seguisbi.ttf", 16.f);
 
 			init_imgui_done = true;
 		}
@@ -142,9 +142,6 @@ namespace hooks
 		}
 		ImGui::EndFrame();
 		ImGui::Render();
-
-		if (!g_pRenderTargetView)
-			printf("rtv is not valid\n");
 
 		g_pContext->OMSetRenderTargets(1, &g_pRenderTargetView, nullptr);
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

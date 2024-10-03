@@ -242,7 +242,10 @@ namespace features
                         best_angle = target_angle;
                     }
 
-                    if (!cmd->IsButtonPressed(IN_ATTACK))
+                    /*if (!cmd->IsButtonPressed(IN_ATTACK))
+                        continue;*/
+
+                    if (!(GetAsyncKeyState(VK_LBUTTON)))
                         continue;
 
                     //printf("[%s: %d]: fov: %.1f, old_fov: %.1f, best_fov: %.1f, dist: %.1f\n", hitbox_data->entity_name, hitbox_data->index, fov, old_fov, best_fov, distance);
@@ -254,7 +257,7 @@ namespace features
                         smooth(settings::visuals::smooth, viewangles, best_angle, best_angle);
                     else smooth_constant(settings::visuals::smooth, viewangles, best_angle, best_angle);*/
 
-                    //g::client->SetViewAngles(0, best_angle);
+                    g::client->SetViewAngles(0, best_angle);
                 }
             }
 

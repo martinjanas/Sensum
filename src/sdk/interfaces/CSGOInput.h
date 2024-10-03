@@ -280,7 +280,12 @@ public:
 
 	bool IsButtonPressed(uint64_t button) const
 	{
-		return csgoUserCmd.pBaseCmd->pInButtonState->nValue & button;
+		return false; //TODO: Broken
+
+		/*if (!csgoUserCmd.pBaseCmd)
+			return false;
+
+		return csgoUserCmd.pBaseCmd->pInButtonState->nValue & button;*/
 	}
 };
 

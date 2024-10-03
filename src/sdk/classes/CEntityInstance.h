@@ -6,10 +6,11 @@
 class CEntityInstance
 {
 public:
-    CEntityIdentity* m_pEntity()
+    NETVAR(CEntityIdentity*, m_pEntity, "CEntityInstance", "m_pEntity");
+   /* CEntityIdentity* m_pEntity()
     {
         return reinterpret_cast<CEntityIdentity*>(reinterpret_cast<uintptr_t>(this) + 0x10);
-    }
+    }*/
 
     SchemaClassInfoData_t* GetSchemaClassInfo()
     {

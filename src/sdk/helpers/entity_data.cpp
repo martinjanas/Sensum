@@ -117,15 +117,15 @@ namespace entity_data
 			if (!on_screen || !hitbox_visible_set(i))
 				continue;
 
-			if (!player_data.is_visible) //TODO: Not working correctly
-			{
-				ray.Init(eye_pos, hitbox_pos);
-				g::game_trace->TraceShape(&ray, eye_pos, hitbox_pos, &filter, &trace);
+			//if (!player_data.is_visible) //TODO: Not working correctly
+			//{
+			//	ray.Init(eye_pos, hitbox_pos);
+			//	g::game_trace->TraceShape(&ray, eye_pos, hitbox_pos, &filter, &trace);
 
-				printf("contents: %u\n", trace.m_uContents);
+			//	printf("contents: %u\n", trace.m_uContents);
 
-				player_data.is_visible = trace.m_vecEndPos.dist_to(eye_pos) == hitbox_pos.dist_to(eye_pos);
-			}
+			//	player_data.is_visible = trace.m_vecEndPos.dist_to(eye_pos) == hitbox_pos.dist_to(eye_pos);
+			//}
 		}
 	}
 

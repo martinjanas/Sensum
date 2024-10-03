@@ -4,6 +4,8 @@ namespace main_window
 {
     bool is_open = false;
 
+    ImFont* esp;
+
     void Draw()
     {
         ImGui::Begin("Sensum", 0, ImGuiWindowFlags_NoCollapse);

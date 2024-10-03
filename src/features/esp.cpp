@@ -1,5 +1,5 @@
-#include "features.h"
-
+﻿#include "features.h"
+#include "../render/menu/main_window.h"
 namespace features::esp
 {
 	std::list<entity_data::player_data_t> m_player_data;
@@ -14,6 +14,19 @@ namespace features::esp
 		const int TOP_RIGHT_FRONT = 5;
 		const int TOP_LEFT_BACK = 6;
 		const int TOP_LEFT_FRONT = 7;
+
+		/*
+               6.........7
+			   /		/|
+		      /		   / |
+			4┌--------┐5 |
+			 | 	 ◯>   |  |
+			 |	─┼─   |  |
+		   2 |...│....|..|
+			 ||	/ \   | / 3
+			 ||       |/  
+			0└--------┘1
+				*/
 
 		//Top face
 		globals::draw_list->AddLine(bbox.m_Vertices[TOP_LEFT_FRONT].as_vec2(), bbox.m_Vertices[TOP_LEFT_BACK].as_vec2(), IM_COL32_WHITE);
@@ -59,8 +72,8 @@ namespace features::esp
 			if (data.m_iPlayerIndex == 0)
 				continue;
 			
-			if (!data.is_visible)
-				continue;
+			/*if (!data.is_visible)
+				continue;*/
 
 			Vector head_pos = data.m_vecAbsOrigin;
 			head_pos.z += 75.f;
@@ -68,12 +81,15 @@ namespace features::esp
 			bool got_origin = globals::world2screen(data.m_vecAbsOrigin, origin_out);
 			bool got_head_pos = globals::world2screen(head_pos, head_pos_out);
 
-			if (got_origin && got_head_pos)
-				esp::name_esp(data, origin_out, head_pos_out);
+			/*if (got_origin && got_head_pos)
+				esp::name_esp(data, origin_out, head_pos_out);*/
 
 			if (settings::visuals::m_bBoxEsp)
-				globals::draw_list->AddRect(data.bbox.m_Mins.as_vec2(), data.bbox.m_Maxs.as_vec2(), ImColor(settings::visuals::m_fBoxColor.x, settings::visuals::m_fBoxColor.y, settings::visuals::m_fBoxColor.z, settings::visuals::m_fBoxColor.w), 1.f, 15, 1.5f);
+				globals::draw_list->AddRect(data.bbox.GetTopLeft().as_vec2(), data.bbox.GetBottomRight().as_vec2(), ImColor(settings::visuals::m_fBoxColor.x, settings::visuals::m_fBoxColor.y, settings::visuals::m_fBoxColor.z, settings::visuals::m_fBoxColor.w), 1.f, 15, 1.5f);
+				//globals::draw_list->AddRect(data.bbox.m_Mins.as_vec2(), data.bbox.m_Maxs.as_vec2(), ImColor(settings::visuals::m_fBoxColor.x, settings::visuals::m_fBoxColor.y, settings::visuals::m_fBoxColor.z, settings::visuals::m_fBoxColor.w), 1.f, 15, 1.5f);
 			
+			esp::name_esp(data, data.bbox);
+
 			//Draw3DBox(data.bbox);
 
 			esp::bone_esp(data);
@@ -146,11 +162,36 @@ namespace features::esp
 		}
 	}
 
-	void name_esp(entity_data::player_data_t& data, const Vector& origin_out, const Vector& screen_head_pos)
+	void name_esp(entity_data::player_data_t& data, const BBox_t& bbox)
 	{
+		// Check if Name ESP is enabled in settings
 		if (!settings::visuals::m_bNameEsp)
 			return;
 
-		globals::draw_list->AddText(ImVec2(origin_out.x - 15, screen_head_pos.y - 14), ImColor(settings::visuals::m_fNameColor.x, settings::visuals::m_fNameColor.y, settings::visuals::m_fNameColor.z, settings::visuals::m_fNameColor.w), data.m_szPlayerName);
+		Vector top_mid = bbox.GetTopMid();
+		ImU32 color = ImColor(settings::visuals::m_fNameColor.x, settings::visuals::m_fNameColor.y, settings::visuals::m_fNameColor.z, settings::visuals::m_fNameColor.w);
+
+		Vector screen_top_left = bbox.GetTopLeft();
+		Vector screen_top_right = bbox.GetTopRight();
+
+		auto projected_box_width = screen_top_right.x - screen_top_left.x;
+
+		static const float bbox_size_x = 32.f;
+
+		float scale_factor = projected_box_width / bbox_size_x;
+
+		// Calculate the text size and position
+		auto text_size = ImGui::CalcTextSize(data.m_szPlayerName);
+		auto text_size_mid = text_size.x * 0.5f;
+		auto y_padding = 5.f;
+		
+		//not right: omfg
+		ImVec2 render_pos(top_mid.x + (text_size_mid * scale_factor), top_mid.y - (text_size.y * scale_factor) - y_padding);
+
+		/*ImVec2 render_pos(screen_top_left.x + (projected_box_width * 0.5f) - text_size_mid,
+			screen_top_left.y - text_size.y - y_padding);*/
+
+		// Draw the player name with the adjusted scale factor
+		globals::draw_list->AddText(main_window::esp, scale_factor, render_pos, color, data.m_szPlayerName);
 	}
 }

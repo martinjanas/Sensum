@@ -6,6 +6,8 @@ namespace main_window
 {
 	extern bool is_open;
 
+	extern ImFont* esp;
+
 	void Draw();
 }
 

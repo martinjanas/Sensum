@@ -125,7 +125,7 @@ public:
     {
         int index = -1;
         
-        GetVirtual<void(__thiscall*)(void*, int&, int)>(this, 47)(this, index, 0); 
+        GetVirtual<void(__thiscall*)(void*, int&, int)>(this, 49)(this, index, 0); 
         
         return index + 1;
     }

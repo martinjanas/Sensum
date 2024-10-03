@@ -71,6 +71,6 @@ public:
 
 	int GetHighestEntityIndex()
 	{
-		return *reinterpret_cast<int*>(this + 0x1510);
+		return *reinterpret_cast<int*>(this + 0x1520); //0x1510
 	}
 };
