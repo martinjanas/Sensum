@@ -5,6 +5,8 @@
 
 #include "../localplayer.h"
 
+#define MASK_PLAYER_VISIBILITY (CONTENTS_SOLID | CONTENTS_PLAYERCLIP | CONTENTS_WINDOW | CONTENTS_HITBOX)
+
 namespace entity_data
 {
 	std::list<instance_t> player_instances;
@@ -12,6 +14,11 @@ namespace entity_data
 	std::list<entry_data_t> player_entry_data;
 
 	std::mutex locker;
+
+	Ray_t ray;
+	Trace_t trace;
+
+	Vector origin;
 
 	namespace view_matrix
 	{
@@ -51,7 +58,23 @@ namespace entity_data
 		return true;
 	}
 
-	void GetHitbox(entity_data::player_data_t& player_data)
+	bool hitbox_visible_set(int index)
+	{
+		switch (index) 
+		{
+			case HITBOX_HEAD:
+			case HITBOX_UPPER_CHEST:
+			case HITBOX_RIGHT_CALF:
+			case HITBOX_LEFT_CALF:
+			case HITBOX_RIGHT_HAND:
+			case HITBOX_LEFT_HAND:
+				return true;
+			default:
+				return false;	 		
+		}
+	}
+
+	void GetHitbox(entity_data::player_data_t& player_data, const Vector& eye_pos, CCSPlayerPawn* local_pawn, const bool& on_screen)
 	{
 		HitboxSet_t* hitbox_set = player_data.m_PlayerPawn->GetHitboxSet(0);
 		if (!hitbox_set)
@@ -61,6 +84,8 @@ namespace entity_data
 		if (hitboxes.Count() == 0 || hitboxes.Count() > HITBOX_MAX)
 			return;
 
+		TraceFilter_t filter(MASK_PLAYER_VISIBILITY, local_pawn, player_data.m_PlayerPawn, 4); //4 //0x1C3003
+		
 		for (int i = 0; i < HITBOX_MAX; ++i)
 		{
 			Hitbox_t* hitbox = &hitboxes[i];
@@ -82,13 +107,25 @@ namespace entity_data
 			auto min_bounds = hitbox->m_vMinBounds() - radius;
 			auto max_bounds = hitbox->m_vMaxBounds() + radius;
 
-			
 			const auto& mins = min_bounds.transform(hitbox_matrix.ToMatrix3x4());
 			const auto& maxs = max_bounds.transform(hitbox_matrix.ToMatrix3x4());
 
 			auto hitbox_pos = (mins + maxs) * 0.5f;
 
 			player_data.hitboxes[i] = { hitbox_pos, hitbox->m_nHitBoxIndex(), player_data.m_szPlayerName };
+
+			if (!on_screen || !hitbox_visible_set(i))
+				continue;
+
+			if (!player_data.is_visible) //TODO: Not working correctly
+			{
+				ray.Init(eye_pos, hitbox_pos);
+				g::game_trace->TraceShape(&ray, eye_pos, hitbox_pos, &filter, &trace);
+
+				printf("contents: %u\n", trace.m_uContents);
+
+				player_data.is_visible = trace.m_vecEndPos.dist_to(eye_pos) == hitbox_pos.dist_to(eye_pos);
+			}
 		}
 	}
 
@@ -152,10 +189,13 @@ namespace entity_data
 			if (!model.IsValid())
 				continue;
 
+			const auto on_screen = globals::world2screen(scene_node->m_vecOrigin(), origin);
+
 			player_data_t player_data;
 			player_data.m_szPlayerName = controller->m_sSanitizedPlayerName();
 			player_data.m_iPlayerIndex = index;
 			player_data.m_vecOrigin = scene_node->m_vecOrigin();
+			player_data.m_vecAbsOrigin = scene_node->m_vecAbsOrigin();
 			player_data.m_vecEyePos = (scene_node->m_vecOrigin() + pawn->m_vecViewOffset());
 			player_data.m_iHealth = pawn->m_iHealth();
 			player_data.m_iShotsFired = pawn->m_iShotsFired();
@@ -164,7 +204,9 @@ namespace entity_data
 			player_data.m_hModel = model;
 			player_data.m_PlayerPawn = pawn;
 			
-			GetHitbox(player_data);
+			player_data.is_visible = false;
+
+			GetHitbox(player_data, eye_pos, localpawn, on_screen);
 			GetBBox(scene_node, collision, player_data.bbox);
 
 			entry_data.player_data.push_back(std::move(player_data));

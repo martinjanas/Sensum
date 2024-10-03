@@ -32,6 +32,7 @@ namespace entity_data
 		const char* m_szPlayerName;
 		uint32_t m_iPlayerIndex;
 		Vector m_vecOrigin;
+		Vector m_vecAbsOrigin;
 		Vector m_vecEyePos;
 		int m_iHealth;
 		int m_iShotsFired;
@@ -41,6 +42,7 @@ namespace entity_data
 		BBox_t bbox;
 		CCSPlayerPawn* m_PlayerPawn;
 		Transform_t hitbox_transform[HITBOX_MAX];
+		bool is_visible;
 
 		std::array<hitbox_info_t, HITBOX_MAX> hitboxes;
 	};

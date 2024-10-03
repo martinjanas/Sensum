@@ -106,7 +106,7 @@ public:
     {
         using fn = int(__thiscall*)(void*, int); //int -> BitFlag?
 
-        static auto addr = modules::client.pattern_scanner.scan("85 D2 78 16 3B 91", "GetBoneFlags").as();
+        static auto addr = modules::client.scan("85 D2 78 16 3B 91", "GetBoneFlags").as();
 
         const auto& get_bone_flags = reinterpret_cast<fn>(addr);
        
@@ -120,7 +120,7 @@ public:
     {
         using fn = int(__thiscall*)(void*, int);
 
-        static auto addr = modules::client.pattern_scanner.scan("E8 ? ? ? ? 41 0F 10 14 3F", "GetBoneParent").add(0x1).abs().as();
+        static auto addr = modules::client.scan("E8 ? ? ? ? 41 0F 10 14 3F", "GetBoneParent").add(0x1).abs().as();
 
         const auto& get_bone_parent = reinterpret_cast<fn>(addr);
 
@@ -134,7 +134,7 @@ public:
     {
         using fn = const char* (__thiscall*)(void*, int);
 
-        static auto addr = modules::client.pattern_scanner.scan("85 D2 78 25 3B 91", "GetBoneName").as();
+        static auto addr = modules::client.scan("85 D2 78 25 3B 91", "GetBoneName").as();
 
         const auto& get_bone_name = reinterpret_cast<fn>(addr);
 

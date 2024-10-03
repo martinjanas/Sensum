@@ -81,10 +81,9 @@ namespace interfaces //move to interfaces.h ?
 	extern CSchemaSystem* schema_system;
 	extern IMemAlloc* mem_alloc;
 	extern CGameResourceService* game_resource_service;
-	extern CGameEntitySystem* entity_system;
+	extern CEntitySystem* entity_system;
 	extern CSGOInput* csgo_input;
 	extern CRenderSystem* render_system;
-	extern IDXGISwapChain* swap_chain;
 	extern CInputSystem* input_system;
 	extern void* client_mode;
     extern CGlobalVarsBase* global_vars;

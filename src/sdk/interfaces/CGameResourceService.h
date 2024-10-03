@@ -5,8 +5,8 @@
 class CGameResourceService
 {
 public:
-	CGameEntitySystem* GetGameEntitySystem()
+	CEntitySystem* GetEntitySystem()
 	{
-		return *reinterpret_cast<CGameEntitySystem**>(reinterpret_cast<uintptr_t>(this) + 0x58);
+		return *reinterpret_cast<CEntitySystem**>(reinterpret_cast<uintptr_t>(this) + 0x58);
 	}
 };

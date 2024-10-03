@@ -59,10 +59,13 @@ namespace features::esp
 			if (data.m_iPlayerIndex == 0)
 				continue;
 			
-			Vector head_pos = data.m_vecOrigin;
+			if (!data.is_visible)
+				continue;
+
+			Vector head_pos = data.m_vecAbsOrigin;
 			head_pos.z += 75.f;
 
-			bool got_origin = globals::world2screen(data.m_vecOrigin, origin_out);
+			bool got_origin = globals::world2screen(data.m_vecAbsOrigin, origin_out);
 			bool got_head_pos = globals::world2screen(head_pos, head_pos_out);
 
 			if (got_origin && got_head_pos)

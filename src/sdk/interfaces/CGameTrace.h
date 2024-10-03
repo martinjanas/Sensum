@@ -3,6 +3,7 @@
 #include "../../sdk/math/Vector.h"
 #include "../../sdk/math/QAngle.h"
 #include "../../sdk/classes/CBaseEntity.h"
+#include "../../sdk/classes/CCSPlayerPawn.h"
 
 #define	CONTENTS_EMPTY			0		// No contents
 
@@ -138,6 +139,12 @@ struct Ray_t
 	Vector maxs;
 	std::byte pad01[0x4];
 	uint8_t unknown;
+
+	void Init(const Vector& start, const Vector& end)
+	{
+		this->start = start;
+		this->end = end;
+	}
 };
 
 struct TraceHitboxData_t
@@ -219,11 +226,23 @@ public:
 		using fn = bool(__fastcall*)(void*, Ray_t*, const Vector&, const Vector&, TraceFilter_t*, Trace_t*); //fastcall
 
 		//48 89 54 24 10 48 89 4C 24 08 55 53 56 57 41 54 41 56 41 57 48 8D AC
-		static const auto& addr = modules::client.pattern_scanner.scan("E8 ? ? ? ? 80 7D ? ? 75 ? F3 0F 10 45").add(0x1).abs().as();
+		static const auto& addr = modules::client.scan("E8 ? ? ? ? 80 7D 57 00", "TraceShape").add(0x1).abs().as();
 
 		auto trace_shape = reinterpret_cast<fn>(addr);
 		if (trace_shape)
 			return trace_shape(this, ray, start, end, filter, trace);
+
+		return false;
+	}
+
+	bool ClipRayToEntity(Ray_t* ray, const Vector& start, const Vector& end, CCSPlayerPawn* pawn, TraceFilter_t* filter, Trace_t* trace)
+	{
+		using fn = bool(__fastcall*)(void*, Ray_t*, const Vector&, const Vector&, CCSPlayerPawn*, TraceFilter_t*, Trace_t*);
+		static const auto addr = modules::client.scan("48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 48 89 7C 24 20 41 54 41 56 41 57 48 81 EC C0 00 00 00 48 8B 9C", "ClipRayToEntity").as();
+
+		auto clip_ray_to_entity = reinterpret_cast<fn>(addr);
+		if (clip_ray_to_entity)
+			return clip_ray_to_entity(this, ray, start, end, pawn, filter, trace);
 
 		return false;
 	}

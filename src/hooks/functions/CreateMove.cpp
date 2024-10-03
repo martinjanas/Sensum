@@ -29,34 +29,52 @@ void trace_shit()
     if (!local_pawn)
         return;
 
-    for (auto& x : m_player_data)
-    {
-        if (!x.m_PlayerPawn)
-            continue;
+    Vector start = local_pawn->GetEyePos();
+    Vector forward = local_pawn->m_angEyeAngles().to_vector();
+    forward.normalize();
 
-        auto eye_pos = local_pawn->GetEyePos();
+    Vector end = start + forward * 2048.f; 
 
-        Vector entity_eye_pos = x.m_vecEyePos;
+    //TraceFilter_t filter(0x1C3003 | CONTENTS_HITBOX | CONTENTS_PLAYERCLIP, local_pawn, nullptr, 4); //4 //0x1C3003
+    //Ray_t ray;
+    //ray.Init(start, end);
 
-        TraceFilter_t filter(0x1C3003, local_pawn, nullptr, 4); //4
-        Ray_t ray;
-        Trace_t trace;
+    //Trace_t trace;
+    //g::game_trace->TraceShape(&ray, start, end, &filter, &trace);
 
-        Vector start = eye_pos;
-        Vector end = entity_eye_pos;
+    //printf("fraction %.1f\n", trace.m_flFraction);
 
-        ray.start = start;
-        ray.end = end;
+    //if (trace.m_pHitEntity)
+    //{
+    //    auto info = trace.m_pHitEntity->GetSchemaClassInfo();
 
-        bool result = g::game_trace->TraceShape(&ray, start, end, &filter, &trace); //not working quite right
+    //    if (info)
+    //        printf("name %s\n", info->m_pszName);
+    //}
 
-        if (result)
-        {
-            bool did_hit = trace.m_flFraction > 0.97f;
+    //for (auto& x : m_player_data)
+    //{
+    //    if (!x.m_PlayerPawn)
+    //        continue;
 
-            printf("did hit? : %d\n", did_hit);
-        }
-    }
+    //    //bool result = g::game_trace->ClipRayToEntity(&ray, start, end, x.m_PlayerPawn, &filter, &trace); //crashing
+
+    //    //if (result)
+    //    //{
+    //    //    bool did_hit = trace.m_flFraction > 0.97f;
+
+    //    //    printf("start: %.1f, %.1f, %.1f\nend: %.1f, %.1f, %.1f\npos: %.1f, %.1f, %.1f\n", trace.m_vecStartPos.x, trace.m_vecStartPos.y, trace.m_vecStartPos.z, trace.m_vecEndPos.x, trace.m_vecEndPos.y, trace.m_vecEndPos.z, trace.m_vecPosition.x, trace.m_vecPosition.y, trace.m_vecPosition.z);
+
+    //    //    /*if (did_hit && trace.m_pHitEntity)
+    //    //    {
+    //    //        auto controller = (CCSPlayerController*)trace.m_pHitEntity;
+
+    //    //        const char* name = controller->m_iszPlayerName();
+
+    //    //        printf("hit_entity valid, name: %s\n", name);
+    //    //    }*/
+    //    //}
+    //}
 }
 
 bool hooks::clientmode_createmove::hooked(void* rcx)
@@ -65,7 +83,7 @@ bool hooks::clientmode_createmove::hooked(void* rcx)
 
     if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
         return original_fn(rcx);
-
+ 
     features::aimbot::handle(cmd);
 
     trace_shit();

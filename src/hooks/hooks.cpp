@@ -37,8 +37,8 @@ bool hooks::init()
 	client_mode.Apply(clientmode_createmove::index, reinterpret_cast<uintptr_t*>(&clientmode_createmove::hooked), reinterpret_cast<void**>(&clientmode_createmove::original_fn));
 	//csgo_input.Apply(override_view::index, reinterpret_cast<uintptr_t*>(&override_view::hooked), reinterpret_cast<void**>(&override_view::original_fn));
 
-	get_fov::safetyhook = safetyhook::create_inline(modules::client.pattern_scanner.scan("E8 ? ? ? ? F3 0F 11 45 ? 48 8B 5C 24 ?").add(0x1).abs().as(), reinterpret_cast<void*>(get_fov::hooked));
-	get_matrices_for_view::safetyhook = safetyhook::create_inline(modules::client.pattern_scanner.scan("40 53 48 81 EC ? ? ? ? 49 8B C1").as(), reinterpret_cast<void*>(get_matrices_for_view::hooked));
+	get_fov::safetyhook = safetyhook::create_inline(modules::client.scan("E8 ? ? ? ? F3 0F 11 45 ? 48 8B 5C 24 ?", "get_fov_hook").add(0x1).abs().as(), reinterpret_cast<void*>(get_fov::hooked));
+	get_matrices_for_view::safetyhook = safetyhook::create_inline(modules::client.scan("40 53 48 81 EC ? ? ? ? 49 8B C1", "get_matrices_for_view_hook").as(), reinterpret_cast<void*>(get_matrices_for_view::hooked));
 	
 	return true;
 }

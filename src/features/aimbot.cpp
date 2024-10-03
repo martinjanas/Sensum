@@ -245,7 +245,7 @@ namespace features
                     if (!cmd->IsButtonPressed(IN_ATTACK))
                         continue;
 
-                    printf("[%s: %d]: fov: %.1f, old_fov: %.1f, best_fov: %.1f, dist: %.1f\n", hitbox_data->entity_name, hitbox_data->index, fov, old_fov, best_fov, distance);
+                    //printf("[%s: %d]: fov: %.1f, old_fov: %.1f, best_fov: %.1f, dist: %.1f\n", hitbox_data->entity_name, hitbox_data->index, fov, old_fov, best_fov, distance);
 
                     if (best_fov > settings::visuals::aimbot_fov)
                         continue;

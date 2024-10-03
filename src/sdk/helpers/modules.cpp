@@ -6,7 +6,7 @@ namespace modules
 	DynamicModule engine;
 	DynamicModule schema;
 	DynamicModule tier0;
-	DynamicModule render_dx11;
+	DynamicModule directx11;
 	DynamicModule nav_system;
 	DynamicModule input_sys;
 }

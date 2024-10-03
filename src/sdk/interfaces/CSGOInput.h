@@ -343,16 +343,4 @@ public:
 	{
 		return &arrCommands[nSequenceNumber % MULTIPLAYER_BACKUP];
 	}
-
-	static CSGOInput* get()
-	{
-		static auto addr = modules::client.pattern_scanner.scan("E8 ? ? ? ? 48 8B 56 60", "CSGOInput::Get()").add(0x1).abs().as();
-
-		const auto& get_input = reinterpret_cast<CSGOInput * (__thiscall*)()>(addr);
-
-		if (get_input)
-			return get_input();
-
-		return nullptr;
-	}
 };

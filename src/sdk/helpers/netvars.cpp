@@ -11,19 +11,19 @@ namespace netvars
 
         for (const auto& module : netvar_modules)
         {
-            const auto& netvar_class = g::schema_system->FindTypeScopeForModule(module);
+            CSchemaSystemTypeScope* netvar_class = g::schema_system->FindTypeScopeForModule(module);
             if (!netvar_class)
                 continue;
 
-            auto classes = netvar_class->GetClassBindings();
+            CUtlTSHash<CSchemaClassBinding*> classes = netvar_class->GetClassBindings();
 
             for (const auto& class_binding : classes.GetElements())
             {
-                const auto& class_info = netvar_class->FindDeclaredClass(class_binding->GetName());
+                CSchemaClassInfo* class_info = netvar_class->FindDeclaredClass(class_binding->GetName());
 
                 for (auto j = 0; j < class_info->m_nFieldSize; j++)
                 {
-                    const auto& field = &class_info->m_pFields[j];//&class_info->GetFields()[j];
+                    SchemaClassFieldData_t* field = &class_info->m_pFields[j];//&class_info->GetFields()[j];
 
                     if (!field)
                         continue;

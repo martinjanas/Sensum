@@ -5,7 +5,7 @@
 
 #include <WinDNS.h>
 
-class CGameEntitySystem
+class CEntitySystem
 {
 public:
 	CBaseEntity* GetBaseEntity(uint32_t index)
@@ -53,32 +53,6 @@ public:
 
 		return reinterpret_cast<T>(base_entity);
 	}
-
-	/*CBaseEntity* GetBaseEntity(int index)
-	{
-		using fn = CBaseEntity*(__thiscall*)(void*, int);
-
-		static const auto& addr = modules::client.pattern_scan("8B D3 E8 ? ? ? ? 48 8B F8 48 85 C0 74 76");
-
-		if (!addr)
-			return nullptr;
-
-		//DynamicModule::resolve_rip_copy(addr, 3, 0);
-
-		auto rip_offset = DynamicModule::resolve_rip(addr, 0x3, std::nullopt);
-
-		if (!rip_offset)
-			return nullptr;
-
-		auto get_base_entity_fn = reinterpret_cast<fn>(rip_offset);
-
-		if (!get_base_entity_fn)
-			return nullptr;
-
-		const auto& base_entity = get_base_entity_fn(this, index);
-
-		return base_entity;
-	}*/
 
 	CEntityInstance* FindEntityByName(const char* name)
 	{

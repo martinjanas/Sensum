@@ -44,7 +44,7 @@ HitboxSet_t* CBaseEntity::GetHitboxSet(int i)
 {
     using fn = HitboxSet_t * (__thiscall*)(void*, int);
 
-    static auto addr = modules::client.pattern_scanner.scan("E8 ?? ?? ?? ?? 48 8B F0 48 85 C0 0F 84 35 02 00 00", "GetHitboxSet()").add(0x1).abs().as();
+    static auto addr = modules::client.scan("E8 ?? ?? ?? ?? 48 8B F0 48 85 C0 0F 84 35 02 00 00", "GetHitboxSet()").add(0x1).abs().as();
 
     if (!addr)
         return nullptr;
@@ -61,7 +61,7 @@ bool CBaseEntity::ComputeSurroundingBox(Vector* mins, Vector* maxs)
 {
     using fn = bool(__thiscall*)(void*, Vector*, Vector*);
 
-    static auto addr = modules::client.pattern_scanner.scan("E9 ? ? ? ? F6 43 5B FD").add(0x1).abs().as();
+    static auto addr = modules::client.scan("E9 ? ? ? ? F6 43 5B FD", "ComputeSurroundingBox").add(0x1).abs().as();
 
     if (!addr)
         return false;
@@ -78,7 +78,7 @@ int CBaseEntity::HitboxToWorldTransform(HitboxSet_t* hitbox_set, Transform_t* ou
 {
     using fn = int(__thiscall*)(void*, HitboxSet_t*, Transform_t*, int max_studio_bones);
 
-    static auto addr = modules::client.pattern_scanner.scan("E8 ? ? ? ? 45 33 F6 4C 63 E0").add(0x1).abs().as();
+    static auto addr = modules::client.scan("E8 ? ? ? ? 45 33 F6 4C 63 E0", "HitboxToWorldTransform").add(0x1).abs().as();
 
     if (!addr)
         return -1;
