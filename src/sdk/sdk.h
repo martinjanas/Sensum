@@ -14,29 +14,31 @@
 #include "../sdk/interfaces/GameEntitySystem.h"
 
 #include "../sdk/math/Viewmatrix.h"
+#include "../sdk/helpers/console.h"
 
-class CGlobalVarsBase 
+class CGlobalVarsBase
 {
 public:
-	float realtime; //0x0000
-	int framecount; //0x0004
-	float absoluteframetime; //0x0008
-	float absoluteframestarttimestddev; //0x000C
-	int max_clients; //0x0010
-	float interval_per_tick; //0x0014
-	char pad_0018[8]; //0x0018
-	void* get_curtime; //0x0020
-	float frametime; //0x0028
-	float curtime; //0x002C
-	float curtime2; //0x0030
-	char pad_0034[16]; //0x0034
-	int tickcount; //0x0044
-	void* net_channel; //0x0048
-	char pad_0050[232]; //0x0050
-	void* network_string_table_container; //0x0138
-	char pad_0140[64]; //0x0140
-	char* current_map; //0x0180
-	char* current_mapname; //0x0188
+	float m_realtime; //0x0000
+	int32_t m_framecount; //0x0004
+	float m_fratmetime; //0x0008
+	float m_abs_frametime; //0x000C
+	int32_t m_maxclients; //0x0010
+	char pad_0014[28]; //0x0014
+	float m_frametime2; //0x0030
+	float m_curtime; //0x0034
+	float m_curtime2; //0x0038
+	char pad_003C[20]; //0x003C
+	int32_t m_tickcount; //0x0050
+	char pad_0054[292]; //0x0054
+	uint64_t m_current_map; //0x0178
+	uint64_t m_current_mapname; //0x0180
+}; //Size: 0x0188
+
+class CClientModeCSNormal
+{
+public:
+
 };
 
 //class CNetworkGameClient //implement these later:
@@ -85,9 +87,11 @@ namespace interfaces //move to interfaces.h ?
 	extern CSGOInput* csgo_input;
 	extern CRenderSystem* render_system;
 	extern CInputSystem* input_system;
-	extern void* client_mode;
+	extern CClientModeCSNormal* client_mode_csnormal;
     extern CGlobalVarsBase* global_vars;
 	extern CGameTrace* game_trace;
+
+	extern Console* console;
 }
 
 namespace g = interfaces;

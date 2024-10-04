@@ -13,7 +13,7 @@ namespace globals
 	int height = -1;
 
 	bool can_unhook = false;
-
+	
 	bool is_in_view_plane(const Vector& in, Vector& out)
 	{
 		if (!entity_data::view_matrix::matrix)

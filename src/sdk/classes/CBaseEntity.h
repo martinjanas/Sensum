@@ -132,24 +132,23 @@ public:
     CHandle m_hGroundEntity();
     CHandle m_hOwnerEntity();
 
-    /*int EmitSound(EmitSound_t& params, const char* sound_name, float sound_time) //crashing/throwing exceptions
+    int EmitSound(EmitSound_t& params, const char* sound_name, float sound_time)
     {
-        using fn = int (__thiscall*)(void*, EmitSound_t&, const char*, float);
+        using fn = int(__thiscall*)(void*, EmitSound_t&, const char*, float);
 
-        static auto addr = modules::client.pattern_scanner.scan("E8 ? ? ? ? 41 2B FE", "EmitSound()").as();
+        static auto addr = modules::client.scan("48 8B C4 48 89 58 10 48 89 70 20 55 57 41 56 48 8D A8 08", "EmitSound").as();
 
         auto emit_sound = reinterpret_cast<fn>(addr);
 
         if (emit_sound)
             return emit_sound(this, params, sound_name, 0.0f);
 
-        return -1;
-    }*/
+        return 0;
+    }
 
     CHandle GetHandle();
     std::uint32_t GetOwnerHandle();
     HitboxSet_t* GetHitboxSet(int i);
-    bool ComputeSurroundingBox(Vector* mins, Vector* maxs);
     int HitboxToWorldTransform(HitboxSet_t* hitbox_set, Transform_t* out_transform);
 };
 

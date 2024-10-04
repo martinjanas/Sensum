@@ -5,10 +5,10 @@
 bool hooks::init()
 {
 	entity_system = ShadowVMT(g::entity_system);
-	//csgo_input = ShadowVMT(g::csgo_input);
+	csgo_input = ShadowVMT(g::csgo_input);
 	client = ShadowVMT(g::client);
 	swap_chain = ShadowVMT(g::render_system->swap_chain);
-	client_mode = ShadowVMT(g::client_mode);
+	client_mode = ShadowVMT(g::client_mode_csnormal);
 	
 	ID3D11Device* d3d11_device = nullptr;
 	g::render_system->swap_chain->GetDevice(IID_PPV_ARGS(&d3d11_device));
@@ -34,12 +34,13 @@ bool hooks::init()
 
 	//dxgi.Apply(directx::create_swapchain::index, reinterpret_cast<uintptr_t*>(&directx::create_swapchain::hooked), reinterpret_cast<void**>(&directx::create_swapchain::original_fn));
 
-	client_mode.Apply(clientmode_createmove::index, reinterpret_cast<uintptr_t*>(&clientmode_createmove::hooked), reinterpret_cast<void**>(&clientmode_createmove::original_fn));
-	//csgo_input.Apply(override_view::index, reinterpret_cast<uintptr_t*>(&override_view::hooked), reinterpret_cast<void**>(&override_view::original_fn));
+	//client_mode.Apply(override_view::index, reinterpret_cast<uintptr_t*>(&override_view::hooked), reinterpret_cast<void**>(&override_view::original_fn));
 
 	get_fov::safetyhook = safetyhook::create_inline(modules::client.scan("E8 ? ? ? ? F3 0F 11 45 ? 48 8B 5C 24 ?", "get_fov_hook").add(0x1).abs().as(), reinterpret_cast<void*>(get_fov::hooked));
 	get_matrices_for_view::safetyhook = safetyhook::create_inline(modules::client.scan("40 53 48 81 EC ? ? ? ? 49 8B C1", "get_matrices_for_view_hook").as(), reinterpret_cast<void*>(get_matrices_for_view::hooked));
-	
+	clientmodeshared_createmove::safetyhook = safetyhook::create_inline(modules::client.scan("40 53 48 83 EC 20 48 8B CA 48 8B DA", "createmove_shared_hook").as(), reinterpret_cast<void*>(clientmodeshared_createmove::hooked));
+	//emit_sound::safetyhook = safetyhook::create_inline(modules::client.scan("48 8B C4 4C 89 40 18 55 53 41 54 41 56 41 57 48 8D 68 A9 48 81", "emit_sound_hook").as(), reinterpret_cast<void*>(emit_sound::hooked));
+
 	return true;
 }
 
@@ -53,10 +54,10 @@ bool hooks::detach()
 	swap_chain.Remove(directx::present::index);
 	swap_chain.Remove(directx::resize_buffers::index);
 	dxgi.Remove(directx::create_swapchain::index);
-	client_mode.Remove(clientmode_createmove::index);
+	//csgo_input.Remove(csgoinput_createmove::index);
 
 	entity_system.RestoreTable();
-	//csgo_input.RestoreTable();
+	csgo_input.RestoreTable();
 	client.RestoreTable();
 	swap_chain.RestoreTable();
 	client_mode.RestoreTable();
@@ -99,11 +100,9 @@ public:
 	//constexpr std::ptrdiff_t m_pNext = 0x598; // C_PointCamera*
 };
 
-//void __fastcall hooks::override_view::hooked(void* rcx, void* rdx, CViewSetup* setup)
-//{
-//	if (g::engine_client->IsInGame())
-//		setup->flFov = 120.f;
-//
-//	original_fn(rcx, rdx, setup);
-//}
+int __fastcall hooks::emit_sound::hooked(void* rcx, EmitSound_t* params, int16_t a3, uint32_t ent_index)
+{
+	printf("Hello from emitsound hooked, index: %u\n", ent_index);
 
+	return safetyhook.fastcall<int>(rcx, params, a3, ent_index);
+}

@@ -151,6 +151,13 @@ namespace entity_data
 		const auto& local_team = localpawn->m_iTeamNum();
 		const auto& eye_pos = localpawn->GetEyePos();
 		
+		if (GetAsyncKeyState(VK_LBUTTON))
+		{
+			//BaseCombatCharacter.AmmoPickup
+			EmitSound_t params;
+			localpawn->EmitSound(params, "BaseCombatCharacter.AmmoPickup", 0.0f);
+		}
+
 		entry_data_t entry_data;
 		for (const auto& instance : player_instances)
 		{
@@ -192,7 +199,7 @@ namespace entity_data
 			const auto on_screen = globals::world2screen(scene_node->m_vecOrigin(), origin);
 
 			player_data_t player_data;
-			player_data.m_szPlayerName = controller->m_sSanitizedPlayerName();
+			player_data.m_szPlayerName = "Martin";//controller->m_sSanitizedPlayerName();
 			player_data.m_iPlayerIndex = index;
 			player_data.m_vecOrigin = scene_node->m_vecOrigin();
 			player_data.m_vecAbsOrigin = scene_node->m_vecAbsOrigin();

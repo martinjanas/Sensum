@@ -43,7 +43,8 @@ CHandle CBaseEntity::m_hOwnerEntity()
 HitboxSet_t* CBaseEntity::GetHitboxSet(int i)
 {
     using fn = HitboxSet_t * (__thiscall*)(void*, int);
-    static auto addr = modules::client.scan("E8 ? ? ? ? 4C 8B F8 48 85 C0 0F 84 ? ? ? ? 44 39 70 10", "GetHitboxSet()").add(0x1).abs().as();
+
+    static auto addr = modules::client.scan("48 89 5C 24 08 48 89 74 24 10 57 48 81 EC 40 01 00 00 8B DA 48 8B F9 E8 ?? ?? ?? ??", "GetHitboxSet").as();
 
     if (!addr)
         return nullptr;
@@ -56,27 +57,10 @@ HitboxSet_t* CBaseEntity::GetHitboxSet(int i)
     return nullptr;
 }
 
-bool CBaseEntity::ComputeSurroundingBox(Vector* mins, Vector* maxs)
-{
-    using fn = bool(__thiscall*)(void*, Vector*, Vector*);
-
-    static auto addr = modules::client.scan("E9 ? ? ? ? F6 43 5B FD", "ComputeSurroundingBox").add(0x1).abs().as();
-
-    if (!addr)
-        return false;
-
-    const auto compute_surrounding_box = reinterpret_cast<fn>(addr);
-
-    if (compute_surrounding_box)
-        return compute_surrounding_box(this, mins, maxs);
-
-    return false;
-}
-
-int CBaseEntity::HitboxToWorldTransform(HitboxSet_t* hitbox_set, Transform_t* out_transform) //Crashing?
+int CBaseEntity::HitboxToWorldTransform(HitboxSet_t* hitbox_set, Transform_t* out_transform)
 {
     using fn = int(__thiscall*)(void*, HitboxSet_t*, Transform_t*, int max_studio_bones);
-
+   
     static auto addr = modules::client.scan("48 89 5C 24 ? 55 57 41 54 41 56 41 57 48 83 EC 20", "HitboxToWorldTransform").as();
 
     if (!addr)
@@ -85,7 +69,7 @@ int CBaseEntity::HitboxToWorldTransform(HitboxSet_t* hitbox_set, Transform_t* ou
     const auto hitbox_to_world_transform = reinterpret_cast<fn>(addr);
 
     if (hitbox_to_world_transform)
-        return hitbox_to_world_transform(this, hitbox_set, out_transform, 256); //1024
+        return hitbox_to_world_transform(this, hitbox_set, out_transform, 1024);
 
     return -1;
 }

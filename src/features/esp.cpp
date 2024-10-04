@@ -164,7 +164,6 @@ namespace features::esp
 
 	void name_esp(entity_data::player_data_t& data, const BBox_t& bbox)
 	{
-		// Check if Name ESP is enabled in settings
 		if (!settings::visuals::m_bNameEsp)
 			return;
 
@@ -174,24 +173,23 @@ namespace features::esp
 		Vector screen_top_left = bbox.GetTopLeft();
 		Vector screen_top_right = bbox.GetTopRight();
 
+		static float base_font_size = 16.f;
+
 		auto projected_box_width = screen_top_right.x - screen_top_left.x;
+		float scale_factor = projected_box_width / (base_font_size * 3.f);
+		float font_size = scale_factor * base_font_size;
 
-		static const float bbox_size_x = 32.f;
-
-		float scale_factor = projected_box_width / bbox_size_x;
+		font_size = std::clamp<float>(font_size, 12.f, 24.f);
 
 		// Calculate the text size and position
-		auto text_size = ImGui::CalcTextSize(data.m_szPlayerName);
+		auto text_size = main_window::esp->CalcTextSizeA(font_size, FLT_MAX, 0.0f, data.m_szPlayerName);
 		auto text_size_mid = text_size.x * 0.5f;
 		auto y_padding = 5.f;
+
+		g::console->println("Scale Factor: %.1f", scale_factor);
 		
-		//not right: omfg
-		ImVec2 render_pos(top_mid.x + (text_size_mid * scale_factor), top_mid.y - (text_size.y * scale_factor) - y_padding);
+		ImVec2 render_pos(top_mid.x - text_size_mid, top_mid.y - text_size.y - y_padding);
 
-		/*ImVec2 render_pos(screen_top_left.x + (projected_box_width * 0.5f) - text_size_mid,
-			screen_top_left.y - text_size.y - y_padding);*/
-
-		// Draw the player name with the adjusted scale factor
-		globals::draw_list->AddText(main_window::esp, scale_factor, render_pos, color, data.m_szPlayerName);
+		globals::draw_list->AddText(main_window::esp, font_size, render_pos, color, data.m_szPlayerName);
 	}
 }

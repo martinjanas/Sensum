@@ -32,14 +32,22 @@ namespace hooks
 		LRESULT __stdcall hooked(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 	}
 
-	struct clientmode_createmove
+	struct clientmodeshared_createmove
 	{
-		static const int index = 15;
-		using fn = bool(*)(void* rcx);
-		static bool hooked(void* rcx);
+		using fn = bool(__fastcall*)(int64_t, int64_t);
+		static bool __fastcall hooked(int64_t a1, int64_t a2);
+
+		inline static SafetyHookInline safetyhook;
+	};
+
+	/*struct csgoinput_createmove
+	{
+		static const int index = 19;
+		using fn = char(__fastcall*)(uint32_t, int64_t, int64_t, float);
+		static char __fastcall hooked(uint32_t, int64_t a2, int64_t a3, float a4);
 
 		inline static fn original_fn;
-	};
+	};*/
 
 	struct on_add_entity
 	{
@@ -59,32 +67,23 @@ namespace hooks
 		inline static fn original_fn;
 	};
 
-	//class CViewSetup
-	//{
-	//public:
-	//	char char_pad01[0x490];
-	//	float flOrthoLeft; // 0x0494
-	//	float flOrthoTop; // 0x0498
-	//	float flOrthoRight; // 0x049C
-	//	float flOrthoBottom; // 0x04A0
-	//	char char_pad02[0x38];
-	//	float flFov; // 0x04D8
-	//	float flFovViewmodel; // 0x04DC
-	//	Vector vecOrigin; // 0x04E0
-	//	char char_pad03[0xC];
-	//	Vector angView; // 0x04F8
-	//	char char_pad04[0x14];
-	//	float flAspectRatio; // 0x0518
-	//}; //Size: 0x3040
-
-	//struct override_view
-	//{
-	//	static const int index = 15;
-	//	using fn = void(__fastcall*)(void*, void*, CViewSetup*);
-	//	static void __fastcall hooked(void* rcx, void* rdx, CViewSetup* setup);
-
-	//	inline static fn original_fn;
-	//};
+	class CViewSetup
+	{
+	public:
+		char char_pad01[0x490];
+		float flOrthoLeft; // 0x0494
+		float flOrthoTop; // 0x0498
+		float flOrthoRight; // 0x049C
+		float flOrthoBottom; // 0x04A0
+		char char_pad02[0x38];
+		float flFov; // 0x04D8
+		float flFovViewmodel; // 0x04DC
+		Vector vecOrigin; // 0x04E0
+		char char_pad03[0xC];
+		Vector angView; // 0x04F8
+		char char_pad04[0x14]; //0x0504
+		float flAspectRatio; // 0x0518
+	}; //Size: 0x3040
 
 	namespace directx
 	{
@@ -137,6 +136,14 @@ namespace hooks
 	{
 		using fn = void(__fastcall*)(void*, void* rdx, VMatrix* world_to_view, VMatrix* view_to_projection, VMatrix* world_to_projection, VMatrix* world_to_pixels);
 		static void __fastcall hooked(void* rcx, void* rdx, VMatrix* world_to_view, VMatrix* view_to_projection, VMatrix* world_to_projection, VMatrix* world_to_pixels);
+
+		inline static SafetyHookInline safetyhook;
+	};
+
+	struct emit_sound
+	{
+		using fn = int(__fastcall*)(void*, EmitSound_t*, int16_t, uint32_t);
+		static int __fastcall hooked(void* rcx, EmitSound_t* params, int16_t a3, uint32_t ent_index);
 
 		inline static SafetyHookInline safetyhook;
 	};

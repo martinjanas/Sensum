@@ -1,4 +1,5 @@
 #include "main_window.h"
+#include "../../sdk/helpers/globals.h"
 
 namespace main_window
 {
@@ -29,6 +30,8 @@ namespace main_window
 
         if (settings::visuals::m_bFovChanger)
             ImGui::SliderInt("Fov slider", &settings::visuals::m_iFov, 10, 200);
+
+        ImGui::Checkbox("Unhook", &globals::can_unhook);
 
         ImGui::End();
     }

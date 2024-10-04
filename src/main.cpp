@@ -1,11 +1,14 @@
 #include "hooks/hooks.h"
 #include "sdk/classes/CCSPlayerPawn.h"
+#include <filesystem>
+#include <fstream>
+#include <shlobj_core.h>
 
 DWORD __stdcall on_attach(void* base)
 {
     Sleep(5000);
 
-    console::attach();
+    g::console = new Console();
 
     sdk::init_modules();
     sdk::init_interfaces();
@@ -20,8 +23,10 @@ DWORD __stdcall on_attach(void* base)
         Sleep(50);
 
     hooks::detach();
-    console::detach();
+    g::console->detach();
 
+    delete g::console;
+    
     FreeLibraryAndExitThread(static_cast<HMODULE>(base), EXIT_SUCCESS);
 
     return TRUE;
@@ -35,7 +40,6 @@ BOOL APIENTRY DllMain(HMODULE module, DWORD reason, void* reserved)
     DisableThreadLibraryCalls(module);
 
     auto thread = LI_FN(CreateThread)(nullptr, 0, on_attach, module, 0, nullptr);
-
     if (thread)
         LI_FN(CloseHandle)(thread);
 

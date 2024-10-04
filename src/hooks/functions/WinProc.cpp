@@ -8,17 +8,26 @@ namespace hooks
 {
     LRESULT __stdcall hooks::wndproc::hooked(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
     {
+        if (msg == WM_CLOSE)
+        {
+            g::console->save_log();
+            Sleep(500);
+        }
+
         if (msg == WM_KEYDOWN && wparam == VK_INSERT)
             main_window::is_open = !main_window::is_open;
 
-        // Set flag to unhook
-        if (msg == WM_KEYDOWN && (wparam == VK_END || wparam == VK_DELETE))
+        if (msg == WM_KEYDOWN && ((wparam == VK_END || wparam == VK_DELETE) && GetKeyState(VK_LCONTROL) & 0x8000))
             globals::can_unhook = true;
 
-        //main_window::is_open && 
-        // Process ImGui messages if the main window is open
-        if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
-            return true;
+        if (main_window::is_open)
+        {
+            if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
+                return true;
+
+            if (msg == WM_LBUTTONDOWN || msg == WM_RBUTTONDOWN)
+                return 0;
+        }
 
         return CallWindowProcA(original, hwnd, msg, wparam, lparam);
     }
