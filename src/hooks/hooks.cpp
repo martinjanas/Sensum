@@ -36,9 +36,12 @@ bool hooks::init()
 
 	//client_mode.Apply(override_view::index, reinterpret_cast<uintptr_t*>(&override_view::hooked), reinterpret_cast<void**>(&override_view::original_fn));
 
+	csgo_input.Apply(createmove_csgoinput::index, reinterpret_cast<uintptr_t*>(&createmove_csgoinput::hooked), reinterpret_cast<void**>(&createmove_csgoinput::original_fn));
+
+	client_mode.Apply(level_init::index, reinterpret_cast<uintptr_t*>(&level_init::hooked), reinterpret_cast<void**>(&level_init::original_fn));
+
 	get_fov::safetyhook = safetyhook::create_inline(modules::client.scan("E8 ? ? ? ? F3 0F 11 45 ? 48 8B 5C 24 ?", "get_fov_hook").add(0x1).abs().as(), reinterpret_cast<void*>(get_fov::hooked));
 	get_matrices_for_view::safetyhook = safetyhook::create_inline(modules::client.scan("40 53 48 81 EC ? ? ? ? 49 8B C1", "get_matrices_for_view_hook").as(), reinterpret_cast<void*>(get_matrices_for_view::hooked));
-	clientmodeshared_createmove::safetyhook = safetyhook::create_inline(modules::client.scan("40 53 48 83 EC 20 48 8B CA 48 8B DA", "createmove_shared_hook").as(), reinterpret_cast<void*>(clientmodeshared_createmove::hooked));
 	//emit_sound::safetyhook = safetyhook::create_inline(modules::client.scan("48 8B C4 4C 89 40 18 55 53 41 54 41 56 41 57 48 8D 68 A9 48 81", "emit_sound_hook").as(), reinterpret_cast<void*>(emit_sound::hooked));
 
 	return true;
@@ -54,7 +57,7 @@ bool hooks::detach()
 	swap_chain.Remove(directx::present::index);
 	swap_chain.Remove(directx::resize_buffers::index);
 	dxgi.Remove(directx::create_swapchain::index);
-	//csgo_input.Remove(csgoinput_createmove::index);
+	csgo_input.Remove(createmove_csgoinput::index);
 
 	entity_system.RestoreTable();
 	csgo_input.RestoreTable();
@@ -100,9 +103,17 @@ public:
 	//constexpr std::ptrdiff_t m_pNext = 0x598; // C_PointCamera*
 };
 
+int64_t* __fastcall hooks::level_init::hooked(void* rcx, const char* map)
+{
+	g::global_vars = *modules::client.scan("48 8B 05 ?? ?? ?? ?? 44 8B B7 ?? ?? ?? ?? 8B 70 04 B8 ?? ?? ?? ??", "g::global_vars").add(0x3).abs().as<CGlobalVarsBase**>();
+
+	return original_fn(rcx, map);
+}
+
 int __fastcall hooks::emit_sound::hooked(void* rcx, EmitSound_t* params, int16_t a3, uint32_t ent_index)
 {
 	printf("Hello from emitsound hooked, index: %u\n", ent_index);
 
 	return safetyhook.fastcall<int>(rcx, params, a3, ent_index);
 }
+

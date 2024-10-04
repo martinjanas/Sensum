@@ -2,16 +2,15 @@
 #include "../../sdk/sdk.h"
 #include "../../features/features.h"
 
-bool __fastcall hooks::clientmodeshared_createmove::hooked(int64_t a1, int64_t a2)
+void __fastcall hooks::createmove_csgoinput::hooked(void* rcx, int slot, bool active)
 {
-    /*auto _cmd = g::csgo_input->GetUserCmd();
+    auto _cmd = g::csgo_input->GetUserCmd();
 
     if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
-        return original_fn(a1, a2, a3, a4);
+        original_fn(rcx, slot, active);
  
-    features::aimbot::handle(_cmd);*/
-       
-    printf("hello cmove\n");
-    return safetyhook.fastcall<bool>(a1, a2);
+    features::aimbot::handle(_cmd);
+
+    original_fn(rcx, slot, active);
 }
 

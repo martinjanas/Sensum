@@ -133,12 +133,12 @@
 
 struct Ray_t
 {
-	Vector start;
-	Vector end;
-	Vector mins;
-	Vector maxs;
-	std::byte pad01[0x4];
-	uint8_t unknown;
+	Vector start;   // 0x00
+	Vector end;     // 0x0C
+	Vector mins;    // 0x18
+	Vector maxs;    // 0x24
+	std::byte pad01[0x4]; // 0x30
+	uint8_t unknown;  // 0x34
 
 	void Init(const Vector& start, const Vector& end)
 	{
@@ -167,39 +167,40 @@ struct SurfaceData_t
 struct Trace_t
 {
 	Trace_t() = default;
-	SurfaceData_t* GetSurfaceData();
-;
-	int GetHitboxID()
+
+	SurfaceData_t* GetSurfaceData(); // Function declaration
+
+	int GetHitboxID() // Function with inline logic
 	{
 		if (m_pHitboxData)
 			return m_pHitboxData->m_nHitboxId;
 		return 0;
 	}
 
-	int GetHitgroup()
+	int GetHitgroup() // Function with inline logic
 	{
 		if (m_pHitboxData)
 			return m_pHitboxData->m_nHitGroup;
 		return 0;
 	}
 
-	bool DidHitWorld() const;
+	bool DidHitWorld() const; // Function declaration
 
-	void* m_pSurface;
-	CBaseEntity* m_pHitEntity;
-	TraceHitboxData_t* m_pHitboxData;
-	std::byte pad01[0x38];
-	uint32_t m_uContents;
-	std::byte pad02[0x24];
-	Vector m_vecStartPos;
-	Vector m_vecEndPos;
-	Vector m_vecNormal;
-	Vector m_vecPosition;
-	std::byte pad03[0x4];
-	float m_flFraction;
-	std::byte pad04[0x6];
-	bool m_bAllSolid;
-	std::byte pad05[0x4D];
+	void* m_pSurface;               // 0x00
+	CBaseEntity* m_pHitEntity;      // 0x08
+	TraceHitboxData_t* m_pHitboxData; // 0x10
+	std::byte pad01[0x38];          // 0x18
+	uint32_t m_uContents;           // 0x50
+	std::byte pad02[0x24];          // 0x54
+	Vector m_vecStartPos;           // 0x78
+	Vector m_vecEndPos;             // 0x84
+	Vector m_vecNormal;             // 0x90
+	Vector m_vecPosition;           // 0x9C
+	std::byte pad03[0x4];           // 0xA8
+	float m_flFraction;             // 0xAC
+	std::byte pad04[0x6];           // 0xB0
+	bool m_bAllSolid;               // 0xB6
+	std::byte pad05[0x4D];          // 0xB7
 };
 
 struct TraceFilter_t
@@ -221,12 +222,11 @@ struct TraceFilter_t
 class CGameTrace
 {
 public:
-	bool TraceShape(Ray_t* ray, const Vector& start, const Vector& end, TraceFilter_t* filter, Trace_t* trace)
+	bool TraceShape(Ray_t ray, const Vector& start, const Vector& end, TraceFilter_t* filter, Trace_t* trace)
 	{
-		using fn = bool(__fastcall*)(void*, Ray_t*, const Vector&, const Vector&, TraceFilter_t*, Trace_t*); //fastcall
-
-		//48 89 54 24 10 48 89 4C 24 08 55 53 56 57 41 54 41 56 41 57 48 8D AC
-		static const auto& addr = modules::client.scan("E8 ? ? ? ? 80 7D 57 00", "TraceShape").add(0x1).abs().as();
+		using fn = bool(__fastcall*)(void*, Ray_t, const Vector&, const Vector&, TraceFilter_t*, Trace_t*); //fastcall
+		//E8 ? ? ? ? 80 7D 57 00 + 0x1 abs
+		static const auto& addr = modules::client.scan("48 89 5C 24 20 48 89 4C 24 08 55 56 41", "TraceShape").as();
 
 		auto trace_shape = reinterpret_cast<fn>(addr);
 		if (trace_shape)

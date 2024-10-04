@@ -32,12 +32,22 @@ namespace hooks
 		LRESULT __stdcall hooked(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 	}
 
-	struct clientmodeshared_createmove
+	struct createmove_csgoinput
 	{
-		using fn = bool(__fastcall*)(int64_t, int64_t);
-		static bool __fastcall hooked(int64_t a1, int64_t a2);
+		static const int index = 5;
+		using fn = void(__fastcall*)(void*, int, bool);
+		static void __fastcall hooked(void* rcx, int slot, bool active);
 
-		inline static SafetyHookInline safetyhook;
+		inline static fn original_fn;
+	};
+
+	struct level_init
+	{
+		static const int index = 23;
+		using fn = int64_t * (__fastcall*)(void*, const char*);
+		static int64_t* _fastcall hooked(void* rcx, const char* map);
+
+		inline static fn original_fn;
 	};
 
 	/*struct csgoinput_createmove

@@ -5,7 +5,7 @@
 
 #include "../localplayer.h"
 
-#define MASK_PLAYER_VISIBILITY (CONTENTS_SOLID | CONTENTS_PLAYERCLIP | CONTENTS_WINDOW | CONTENTS_HITBOX)
+#define MASK_PLAYER_VISIBILITY (CONTENTS_SOLID | CONTENTS_PLAYERCLIP | CONTENTS_WINDOW | CONTENTS_HITBOX | CONTENTS_GRATE)
 
 namespace entity_data
 {
@@ -83,9 +83,10 @@ namespace entity_data
 		auto& hitboxes = hitbox_set->m_HitBoxes();
 		if (hitboxes.Count() == 0 || hitboxes.Count() > HITBOX_MAX)
 			return;
+		//MASK_PLAYER_VISIBILITY
+		TraceFilter_t filter(CONTENTS_SOLID | CONTENTS_MOVEABLE | CONTENTS_MONSTER | CONTENTS_DEBRIS | CONTENTS_HITBOX, local_pawn, player_data.m_PlayerPawn, 4); //4 //0x1C3003
+		//TraceFilter_t filter(0x1C3003, local_pawn, nullptr, 4); //4 //0x1C3003
 
-		TraceFilter_t filter(MASK_PLAYER_VISIBILITY, local_pawn, player_data.m_PlayerPawn, 4); //4 //0x1C3003
-		
 		for (int i = 0; i < HITBOX_MAX; ++i)
 		{
 			Hitbox_t* hitbox = &hitboxes[i];
@@ -100,10 +101,6 @@ namespace entity_data
 
 			const auto& radius = hitbox->m_flShapeRadius() != -1 ? hitbox->m_flShapeRadius() : 0.f;
 	
-			//This code below extends the hitbox bounds, because we are modifying the m_vMin & m_vMax properties:
-			/*const auto& mins = (hitbox->m_vMinBounds() - radius).transform(hitbox_matrix.ToMatrix3x4());
-			const auto& maxs = (hitbox->m_vMaxBounds() + radius).transform(hitbox_matrix.ToMatrix3x4());*/
-
 			auto min_bounds = hitbox->m_vMinBounds() - radius;
 			auto max_bounds = hitbox->m_vMaxBounds() + radius;
 
@@ -117,15 +114,15 @@ namespace entity_data
 			if (!on_screen || !hitbox_visible_set(i))
 				continue;
 
-			//if (!player_data.is_visible) //TODO: Not working correctly
-			//{
-			//	ray.Init(eye_pos, hitbox_pos);
-			//	g::game_trace->TraceShape(&ray, eye_pos, hitbox_pos, &filter, &trace);
+			if (!player_data.is_visible) //TODO: Not working correctly
+			{
+				ray.Init(eye_pos, hitbox_pos);
+				g::game_trace->TraceShape(ray, eye_pos, hitbox_pos, &filter, &trace);
 
-			//	printf("contents: %u\n", trace.m_uContents);
+				g::console->println("fraction %.2f", trace.m_flFraction);
 
-			//	player_data.is_visible = trace.m_vecEndPos.dist_to(eye_pos) == hitbox_pos.dist_to(eye_pos);
-			//}
+				player_data.is_visible = trace.m_flFraction > 0.97f; //trace.m_vecEndPos.dist_to(eye_pos) == hitbox_pos.dist_to(eye_pos);
+			}
 		}
 	}
 

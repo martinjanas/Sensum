@@ -72,17 +72,14 @@ namespace features::esp
 			if (data.m_iPlayerIndex == 0)
 				continue;
 			
-			/*if (!data.is_visible)
-				continue;*/
+			if (!data.is_visible)
+				continue;
 
 			Vector head_pos = data.m_vecAbsOrigin;
 			head_pos.z += 75.f;
 
 			bool got_origin = globals::world2screen(data.m_vecAbsOrigin, origin_out);
 			bool got_head_pos = globals::world2screen(head_pos, head_pos_out);
-
-			/*if (got_origin && got_head_pos)
-				esp::name_esp(data, origin_out, head_pos_out);*/
 
 			if (settings::visuals::m_bBoxEsp)
 				globals::draw_list->AddRect(data.bbox.GetTopLeft().as_vec2(), data.bbox.GetBottomRight().as_vec2(), ImColor(settings::visuals::m_fBoxColor.x, settings::visuals::m_fBoxColor.y, settings::visuals::m_fBoxColor.z, settings::visuals::m_fBoxColor.w), 1.f, 15, 1.5f);
