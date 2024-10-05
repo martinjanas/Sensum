@@ -50,14 +50,14 @@ namespace hooks
 		inline static fn original_fn;
 	};
 
-	/*struct csgoinput_createmove
+	struct level_shutdown
 	{
-		static const int index = 19;
-		using fn = char(__fastcall*)(uint32_t, int64_t, int64_t, float);
-		static char __fastcall hooked(uint32_t, int64_t a2, int64_t a3, float a4);
+		static const int index = 24;
+		using fn = int64_t * (__fastcall*)(void*);
+		static int64_t* _fastcall hooked(void* rcx);
 
 		inline static fn original_fn;
-	};*/
+	};
 
 	struct on_add_entity
 	{
@@ -146,14 +146,6 @@ namespace hooks
 	{
 		using fn = void(__fastcall*)(void*, void* rdx, VMatrix* world_to_view, VMatrix* view_to_projection, VMatrix* world_to_projection, VMatrix* world_to_pixels);
 		static void __fastcall hooked(void* rcx, void* rdx, VMatrix* world_to_view, VMatrix* view_to_projection, VMatrix* world_to_projection, VMatrix* world_to_pixels);
-
-		inline static SafetyHookInline safetyhook;
-	};
-
-	struct emit_sound
-	{
-		using fn = int(__fastcall*)(void*, EmitSound_t*, int16_t, uint32_t);
-		static int __fastcall hooked(void* rcx, EmitSound_t* params, int16_t a3, uint32_t ent_index);
 
 		inline static SafetyHookInline safetyhook;
 	};

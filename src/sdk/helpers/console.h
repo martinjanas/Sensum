@@ -26,7 +26,6 @@ public:
     {
         attach();
     }
-
     //Default: LOG_INFO
     template <ELogLevel log_level = LOG_INFO>
     void println(const char* format, ...)
@@ -85,5 +84,6 @@ private:
 
     std::list<std::string> log_data;
 };
+extern inline Console* g_Console = nullptr;
 
 

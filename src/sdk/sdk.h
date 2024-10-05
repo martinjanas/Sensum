@@ -12,9 +12,7 @@
 #include "../sdk/interfaces/CInputSystem.h"
 #include "../sdk/interfaces/CGameTrace.h"
 #include "../sdk/interfaces/GameEntitySystem.h"
-
 #include "../sdk/math/Viewmatrix.h"
-#include "../sdk/helpers/console.h"
 
 class CGlobalVarsBase
 {
@@ -90,8 +88,6 @@ namespace interfaces //move to interfaces.h ?
 	extern CClientModeCSNormal* client_mode_csnormal;
     extern CGlobalVarsBase* global_vars;
 	extern CGameTrace* game_trace;
-
-	extern Console* console;
 }
 
 namespace g = interfaces;

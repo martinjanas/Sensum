@@ -114,15 +114,15 @@ namespace entity_data
 			if (!on_screen || !hitbox_visible_set(i))
 				continue;
 
-			if (!player_data.is_visible) //TODO: Not working correctly
-			{
-				ray.Init(eye_pos, hitbox_pos);
-				g::game_trace->TraceShape(ray, eye_pos, hitbox_pos, &filter, &trace);
+			//if (!player_data.is_visible) //TODO: Not working correctly
+			//{
+			//	ray.Init(eye_pos, hitbox_pos);
+			//	g::game_trace->TraceShape(ray, eye_pos, hitbox_pos, &filter, &trace);
 
-				g::console->println("fraction %.2f", trace.m_flFraction);
+			//	g_Console->println("fraction %.2f", trace.m_flFraction);
 
-				player_data.is_visible = trace.m_flFraction > 0.97f; //trace.m_vecEndPos.dist_to(eye_pos) == hitbox_pos.dist_to(eye_pos);
-			}
+			//	player_data.is_visible = trace.m_flFraction > 0.97f; //trace.m_vecEndPos.dist_to(eye_pos) == hitbox_pos.dist_to(eye_pos);
+			//}
 		}
 	}
 
@@ -148,12 +148,12 @@ namespace entity_data
 		const auto& local_team = localpawn->m_iTeamNum();
 		const auto& eye_pos = localpawn->GetEyePos();
 		
-		if (GetAsyncKeyState(VK_LBUTTON))
-		{
-			//BaseCombatCharacter.AmmoPickup
-			EmitSound_t params;
-			localpawn->EmitSound(params, "BaseCombatCharacter.AmmoPickup", 0.0f);
-		}
+		//if (GetAsyncKeyState(VK_LBUTTON))
+		//{
+		//	//BaseCombatCharacter.AmmoPickup
+		//	EmitSound_t params;
+		//	localpawn->EmitSound(params, "BaseCombatCharacter.AmmoPickup", 0.0f);
+		//}
 
 		entry_data_t entry_data;
 		for (const auto& instance : player_instances)

@@ -39,11 +39,11 @@ bool hooks::init()
 	csgo_input.Apply(createmove_csgoinput::index, reinterpret_cast<uintptr_t*>(&createmove_csgoinput::hooked), reinterpret_cast<void**>(&createmove_csgoinput::original_fn));
 
 	client_mode.Apply(level_init::index, reinterpret_cast<uintptr_t*>(&level_init::hooked), reinterpret_cast<void**>(&level_init::original_fn));
+	client_mode.Apply(level_shutdown::index, reinterpret_cast<uintptr_t*>(&level_shutdown::hooked), reinterpret_cast<void**>(&level_shutdown::original_fn));
 
 	get_fov::safetyhook = safetyhook::create_inline(modules::client.scan("E8 ? ? ? ? F3 0F 11 45 ? 48 8B 5C 24 ?", "get_fov_hook").add(0x1).abs().as(), reinterpret_cast<void*>(get_fov::hooked));
 	get_matrices_for_view::safetyhook = safetyhook::create_inline(modules::client.scan("40 53 48 81 EC ? ? ? ? 49 8B C1", "get_matrices_for_view_hook").as(), reinterpret_cast<void*>(get_matrices_for_view::hooked));
-	//emit_sound::safetyhook = safetyhook::create_inline(modules::client.scan("48 8B C4 4C 89 40 18 55 53 41 54 41 56 41 57 48 8D 68 A9 48 81", "emit_sound_hook").as(), reinterpret_cast<void*>(emit_sound::hooked));
-
+	
 	return true;
 }
 
@@ -69,40 +69,6 @@ bool hooks::detach()
 	return true;
 }
 
-class C_PointCamera // C_BaseEntity 
-{
-public:
-	NETVAR(float, m_FOV, "C_PointCamera", "m_FOV");
-	NETVAR(float, m_flZFar, "C_PointCamera", "m_flZFar");
-	NETVAR(float, m_flZNear, "C_PointCamera", "m_flZNear");
-
-	//constexpr std::ptrdiff_t m_FOV = 0x540; // float
-	//constexpr std::ptrdiff_t m_Resolution = 0x544; // float
-	//constexpr std::ptrdiff_t m_bFogEnable = 0x548; // bool
-	//constexpr std::ptrdiff_t m_FogColor = 0x549; // Color
-	//constexpr std::ptrdiff_t m_flFogStart = 0x550; // float
-	//constexpr std::ptrdiff_t m_flFogEnd = 0x554; // float
-	//constexpr std::ptrdiff_t m_flFogMaxDensity = 0x558; // float
-	//constexpr std::ptrdiff_t m_bActive = 0x55C; // bool
-	//constexpr std::ptrdiff_t m_bUseScreenAspectRatio = 0x55D; // bool
-	//constexpr std::ptrdiff_t m_flAspectRatio = 0x560; // float
-	//constexpr std::ptrdiff_t m_bNoSky = 0x564; // bool
-	//constexpr std::ptrdiff_t m_fBrightness = 0x568; // float
-	//constexpr std::ptrdiff_t m_flZFar = 0x56C; // float
-	//constexpr std::ptrdiff_t m_flZNear = 0x570; // float
-	//constexpr std::ptrdiff_t m_bCanHLTVUse = 0x574; // bool
-	//constexpr std::ptrdiff_t m_bDofEnabled = 0x575; // bool
-	//constexpr std::ptrdiff_t m_flDofNearBlurry = 0x578; // float
-	//constexpr std::ptrdiff_t m_flDofNearCrisp = 0x57C; // float
-	//constexpr std::ptrdiff_t m_flDofFarCrisp = 0x580; // float
-	//constexpr std::ptrdiff_t m_flDofFarBlurry = 0x584; // float
-	//constexpr std::ptrdiff_t m_flDofTiltToGround = 0x588; // float
-	//constexpr std::ptrdiff_t m_TargetFOV = 0x58C; // float
-	//constexpr std::ptrdiff_t m_DegreesPerSecond = 0x590; // float
-	//constexpr std::ptrdiff_t m_bIsOn = 0x594; // bool
-	//constexpr std::ptrdiff_t m_pNext = 0x598; // C_PointCamera*
-};
-
 int64_t* __fastcall hooks::level_init::hooked(void* rcx, const char* map)
 {
 	g::global_vars = *modules::client.scan("48 8B 05 ?? ?? ?? ?? 44 8B B7 ?? ?? ?? ?? 8B 70 04 B8 ?? ?? ?? ??", "g::global_vars").add(0x3).abs().as<CGlobalVarsBase**>();
@@ -110,10 +76,8 @@ int64_t* __fastcall hooks::level_init::hooked(void* rcx, const char* map)
 	return original_fn(rcx, map);
 }
 
-int __fastcall hooks::emit_sound::hooked(void* rcx, EmitSound_t* params, int16_t a3, uint32_t ent_index)
+int64_t* __fastcall hooks::level_shutdown::hooked(void* rcx)
 {
-	printf("Hello from emitsound hooked, index: %u\n", ent_index);
-
-	return safetyhook.fastcall<int>(rcx, params, a3, ent_index);
+	return original_fn(rcx);
 }
 

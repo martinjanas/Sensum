@@ -8,7 +8,7 @@ DWORD __stdcall on_attach(void* base)
 {
     Sleep(5000);
 
-    g::console = new Console();
+    g_Console = new Console();
 
     sdk::init_modules();
     sdk::init_interfaces();
@@ -23,9 +23,9 @@ DWORD __stdcall on_attach(void* base)
         Sleep(50);
 
     hooks::detach();
-    g::console->detach();
+    g_Console->detach();
 
-    delete g::console;
+    delete g_Console;
     
     FreeLibraryAndExitThread(static_cast<HMODULE>(base), EXIT_SUCCESS);
 

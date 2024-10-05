@@ -12,6 +12,7 @@
 #include <Shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
 #include "../helpers/importer.h"
+#include "../../sdk/helpers/console.h"
 
 #pragma warning(disable:26495)
 
@@ -102,7 +103,7 @@ public:
 
 		if (!this->addr)
 		{
-			printf_s("PatternScanner: %s not found\n", sig_name);
+			g_Console->println("PatternScanner: %s not found\n", sig_name);
 		}
 
 		return *this;

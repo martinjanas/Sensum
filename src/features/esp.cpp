@@ -183,7 +183,7 @@ namespace features::esp
 		auto text_size_mid = text_size.x * 0.5f;
 		auto y_padding = 5.f;
 
-		g::console->println("Scale Factor: %.1f", scale_factor);
+		g_Console->println("Scale Factor: %.1f", scale_factor);
 		
 		ImVec2 render_pos(top_mid.x - text_size_mid, top_mid.y - text_size.y - y_padding);
 
