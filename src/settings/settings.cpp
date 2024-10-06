@@ -19,6 +19,9 @@ namespace settings
 		float smooth = 10.f;
 		float recoil_smooth = 24.f;
 		float recoil_scale = 1.f;
+		float box_rounding = 0.f;
+		float box_thickness = 2.f;
+
 		// colors
 		ImVec4 m_fBoneColor = ImVec4(255, 255, 255, 255);
 		ImVec4 m_fBoxColor = ImVec4(255, 255, 255, 255);

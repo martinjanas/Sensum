@@ -58,7 +58,7 @@ namespace sdk
 		g::global_vars = *modules::client.scan("48 8B 05 ?? ?? ?? ?? 44 8B B7 ?? ?? ?? ?? 8B 70 04 B8 ?? ?? ?? ??", "g::global_vars").add(0x3).abs().as<CGlobalVarsBase**>();
 		g::game_trace = *modules::client.scan("48 8B 0D ? ? ? ? 4C 8B C3 66 89 44 24", "g::game_trace").add(0x3).abs().as<CGameTrace**>();
 		g::client_mode_csnormal = modules::client.scan("48 8D 3D ? ? ? ? 48 8D 35 ? ? ? ? 90", "g::client_mode").add(0x3).abs().as<CClientModeCSNormal*>();
-		players::localplayer = modules::client.scan("48 83 3D ?? ?? ?? ?? ?? 0F 95 C0 C3", "players::localplayer").add(0x3).abs().as<CCSPlayerController*>();
+		players::localplayer = modules::client.scan("48 8B 05 ? ? ? ? 48 85 C0 74 53", "players::localplayer").add(0x3).abs().as<CCSPlayerController*>();
 		
 		g::entity_system = g::game_resource_service->GetEntitySystem();
 

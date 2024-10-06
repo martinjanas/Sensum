@@ -1,9 +1,14 @@
 ﻿#include "features.h"
 #include "../render/menu/main_window.h"
+#include "../../../../sdk/localplayer.h"
+
 namespace features::esp
 {
 	std::list<entity_data::player_data_t> m_player_data;
 	
+	Ray_t ray;
+	Trace_t trace;
+
 	void Draw3DBox(BBox_t& bbox)
 	{
 		const int BOTTOM_RIGHT_BACK = 0;
@@ -82,8 +87,7 @@ namespace features::esp
 			bool got_head_pos = globals::world2screen(head_pos, head_pos_out);
 
 			if (settings::visuals::m_bBoxEsp)
-				globals::draw_list->AddRect(data.bbox.GetTopLeft().as_vec2(), data.bbox.GetBottomRight().as_vec2(), ImColor(settings::visuals::m_fBoxColor.x, settings::visuals::m_fBoxColor.y, settings::visuals::m_fBoxColor.z, settings::visuals::m_fBoxColor.w), 1.f, 15, 1.5f);
-				//globals::draw_list->AddRect(data.bbox.m_Mins.as_vec2(), data.bbox.m_Maxs.as_vec2(), ImColor(settings::visuals::m_fBoxColor.x, settings::visuals::m_fBoxColor.y, settings::visuals::m_fBoxColor.z, settings::visuals::m_fBoxColor.w), 1.f, 15, 1.5f);
+				globals::draw_list->AddRect(data.bbox.m_Mins.as_vec2(), data.bbox.m_Maxs.as_vec2(), ImColor(settings::visuals::m_fBoxColor.x, settings::visuals::m_fBoxColor.y, settings::visuals::m_fBoxColor.z, settings::visuals::m_fBoxColor.w), settings::visuals::box_rounding, 0, settings::visuals::box_thickness);
 			
 			esp::name_esp(data, data.bbox);
 
@@ -91,18 +95,40 @@ namespace features::esp
 
 			esp::bone_esp(data);
 
-			/*if (!data.hitboxes.empty())
-			{
-				Vector hitbox_w2s;
-				
-				for (auto& hitbox_data : data.hitboxes)
+			{ 
+				auto localplayer = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
+				if (localplayer)
 				{
-					Vector hitbox_pos = hitbox_data.hitbox_pos;
+					auto localpawn = g::entity_system->GetEntityFromHandle(localplayer->m_hPlayerPawn());
 
-					if (globals::world2screen(hitbox_pos, hitbox_w2s))
-						globals::draw_list->AddCircle(hitbox_w2s.as_vec2(), 8.f, IM_COL32_WHITE, 255);
+					if (localpawn)
+					{
+						Vector start, end;
+						
+						if (globals::world2screen(data.trace.m_vecStartPos, start) && globals::world2screen(data.trace.m_vecEndPos, end))
+						{
+							globals::draw_list->AddLine(start.as_vec2(), end.as_vec2(), IM_COL32_WHITE);
+						}
+					}
 				}
-			}*/
+			}
+
+
+			//if (!data.hitboxes.empty())
+			//{
+			//	Vector hitbox_w2s;
+			//	
+			//	for (auto& hitbox_data : data.hitboxes)
+			//	{
+			//		Vector hitbox_pos = hitbox_data.hitbox_pos;
+
+			//		if (globals::world2screen(hitbox_pos, hitbox_w2s))
+			//			globals::draw_list->AddText(hitbox_w2s.as_vec2(), IM_COL32_WHITE, std::to_string(hitbox_data.index).c_str());
+
+			//		/*if (globals::world2screen(hitbox_pos, hitbox_w2s))
+			//			globals::draw_list->AddCircle(hitbox_w2s.as_vec2(), 8.f, IM_COL32_WHITE, 255);*/
+			//	}
+			//}
 		}
 	}
 
@@ -183,7 +209,7 @@ namespace features::esp
 		auto text_size_mid = text_size.x * 0.5f;
 		auto y_padding = 5.f;
 
-		g_Console->println("Scale Factor: %.1f", scale_factor);
+		//g_Console->println("Scale Factor: %.1f", scale_factor);
 		
 		ImVec2 render_pos(top_mid.x - text_size_mid, top_mid.y - text_size.y - y_padding);
 

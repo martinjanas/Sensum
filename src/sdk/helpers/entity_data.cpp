@@ -15,9 +15,6 @@ namespace entity_data
 
 	std::mutex locker;
 
-	Ray_t ray;
-	Trace_t trace;
-
 	Vector origin;
 
 	namespace view_matrix
@@ -25,34 +22,40 @@ namespace entity_data
 		VMatrix* matrix;
 	};
 
-	void destroy() //TODO: Call this if localplayer is nullptr
+	void destroy()
 	{
-		std::lock_guard<std::mutex> lock(entity_data::locker, std::adopt_lock);
+		std::lock_guard<std::mutex> lock(locker, std::adopt_lock);
 
-		player_instances.clear();
+		player_entry_data.clear();
 	}
 
-	//https://github.com/nezu-cc/BakaWare4/blob/f82a60479287926b9fa105ea053851da9a7d040e/cheat/src/valve/cs/entity.cpp
 	bool GetBBox(CGameSceneNode* scene_node, CCollisionProperty* collision, BBox_t& out)
 	{
 		Vector mins = collision->m_vecMins();
 		Vector maxs = collision->m_vecMaxs();
-		
-		//printf("mins: %s, maxs: %s\n", mins.ToString().c_str(), maxs.ToString().c_str());
-		//mins: -16, -16, 0
-		//maxs:  16, 16, 72 (54 crouching)
 
-		out.Invalidate();
+		const matrix3x4_t& transform = scene_node->m_nodeToWorld().ToMatrix3x4();
 
-		for (int i = 0; i < 8; ++i) 
+		bool valid = true;
+		for (int i = 0; i < 8; i++)
 		{
-			Vector worldPoint = Vector{ i & 1 ? maxs.x : mins.x, i & 2 ? maxs.y : mins.y, i & 4 ? maxs.z : mins.z };
+			Vector point = Vector{ i & 1 ? maxs.x : mins.x, i & 2 ? maxs.y : mins.y, i & 4 ? maxs.z : mins.z };
+			point = point.transform(transform);
 
-			if (!globals::world2screen(worldPoint.transform(scene_node->m_nodeToWorld().ToMatrix3x4()), out.m_Vertices[i]))
-				return false;
+			valid &= globals::world2screen(point, out.m_Vertices[i]);
+		}
 
-			out.m_Mins = ImMin(out.m_Mins, out.m_Vertices[i]);
-			out.m_Maxs = ImMax(out.m_Maxs, out.m_Vertices[i]);
+		if (!valid)
+			return false;
+
+		out.m_Mins = out.m_Vertices[0];
+		out.m_Maxs = out.m_Vertices[0];
+		for (int i = 1; i < 8; i++)
+		{
+			out.m_Mins.x = std::min(out.m_Mins.x, out.m_Vertices[i].x);
+			out.m_Mins.y = std::min(out.m_Mins.y, out.m_Vertices[i].y);
+			out.m_Maxs.x = std::max(out.m_Maxs.x, out.m_Vertices[i].x);
+			out.m_Maxs.y = std::max(out.m_Maxs.y, out.m_Vertices[i].y);
 		}
 
 		return true;
@@ -63,11 +66,14 @@ namespace entity_data
 		switch (index) 
 		{
 			case HITBOX_HEAD:
+			case HITBOX_LOWER_CHEST:
 			case HITBOX_UPPER_CHEST:
 			case HITBOX_RIGHT_CALF:
 			case HITBOX_LEFT_CALF:
 			case HITBOX_RIGHT_HAND:
 			case HITBOX_LEFT_HAND:
+			case HITBOX_LEFT_FOREARM:
+			case HITBOX_RIGHT_FOREARM:
 				return true;
 			default:
 				return false;	 		
@@ -84,16 +90,21 @@ namespace entity_data
 		if (hitboxes.Count() == 0 || hitboxes.Count() > HITBOX_MAX)
 			return;
 		//MASK_PLAYER_VISIBILITY
-		TraceFilter_t filter(CONTENTS_SOLID | CONTENTS_MOVEABLE | CONTENTS_MONSTER | CONTENTS_DEBRIS | CONTENTS_HITBOX, local_pawn, player_data.m_PlayerPawn, 4); //4 //0x1C3003
+		//TraceFilter_t filter(CONTENTS_SOLID | CONTENTS_MOVEABLE | CONTENTS_MONSTER | CONTENTS_DEBRIS | CONTENTS_HITBOX, local_pawn, player_data.m_PlayerPawn, 4); //4 //0x1C3003
 		//TraceFilter_t filter(0x1C3003, local_pawn, nullptr, 4); //4 //0x1C3003
 
+		Ray_t ray;
+		//TraceFilter_t filter(CONTENTS_SOLID | CONTENTS_MOVEABLE | CONTENTS_MONSTER | CONTENTS_DEBRIS | CONTENTS_HITBOX, nullptr, nullptr, 0); //totally fucking broken, the trace just goes thru walls no matter the mask
+
+		TraceFilter_t filter(MASK_VISIBLE, player_data.m_PlayerPawn, 4);
+		
 		for (int i = 0; i < HITBOX_MAX; ++i)
 		{
 			Hitbox_t* hitbox = &hitboxes[i];
 
 			if (!hitbox)
 				continue;
-
+				
 			if (!player_data.m_PlayerPawn->HitboxToWorldTransform(hitbox_set, player_data.hitbox_transform))
 				continue;
 
@@ -114,15 +125,23 @@ namespace entity_data
 			if (!on_screen || !hitbox_visible_set(i))
 				continue;
 
-			//if (!player_data.is_visible) //TODO: Not working correctly
-			//{
-			//	ray.Init(eye_pos, hitbox_pos);
-			//	g::game_trace->TraceShape(ray, eye_pos, hitbox_pos, &filter, &trace);
+			if (!player_data.is_visible) //TODO: Not working correctly - this is fucking fucked, the ray goes thru walls and shit
+			{
+				auto forward = player_data.m_vecEyeAngles.to_vector();
+				forward *= 512.f;
 
-			//	g_Console->println("fraction %.2f", trace.m_flFraction);
+				auto start = player_data.m_vecEyePos;
+				auto end = start + forward;
 
-			//	player_data.is_visible = trace.m_flFraction > 0.97f; //trace.m_vecEndPos.dist_to(eye_pos) == hitbox_pos.dist_to(eye_pos);
-			//}
+				//ray.start = start;
+				//ray.end = end;
+
+				g::game_trace->TraceShape(&ray, start, end, &filter, &player_data.trace);
+				
+				//g::game_trace->ClipRayToEntity(&ray, eye_pos, hitbox_pos, player_data.m_PlayerPawn, &filter, &player_data.trace);
+	
+				player_data.is_visible = true;//player_data.trace.m_vecEndPos.dist_to(eye_pos) == hitbox_pos.dist_to(eye_pos);
+			}
 		}
 	}
 
@@ -131,16 +150,15 @@ namespace entity_data
 		if (!g::engine_client->IsInGame())
 			return;
 		
-		const auto& localplayer = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
-		if (!localplayer)
+		const auto& local_controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>(); //players::localplayer;
+		if (!local_controller)
 		{
-			//destroy();
-
+			destroy();
 			return;
 		}
 
-		const auto& localpawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(localplayer->m_hPlayerPawn()); //localplayer->m_hPlayerPawn().Get<CCSPlayerPawn*>();
-		if (!localpawn || !localpawn->IsAlive())
+		const auto& localpawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(local_controller->m_hPlayerPawn());
+		if (!localpawn)
 			return;
 
 		std::lock_guard<std::mutex> lock(locker);
@@ -148,13 +166,6 @@ namespace entity_data
 		const auto& local_team = localpawn->m_iTeamNum();
 		const auto& eye_pos = localpawn->GetEyePos();
 		
-		//if (GetAsyncKeyState(VK_LBUTTON))
-		//{
-		//	//BaseCombatCharacter.AmmoPickup
-		//	EmitSound_t params;
-		//	localpawn->EmitSound(params, "BaseCombatCharacter.AmmoPickup", 0.0f);
-		//}
-
 		entry_data_t entry_data;
 		for (const auto& instance : player_instances)
 		{
@@ -201,6 +212,7 @@ namespace entity_data
 			player_data.m_vecOrigin = scene_node->m_vecOrigin();
 			player_data.m_vecAbsOrigin = scene_node->m_vecAbsOrigin();
 			player_data.m_vecEyePos = (scene_node->m_vecOrigin() + pawn->m_vecViewOffset());
+			player_data.m_vecEyeAngles = pawn->m_angEyeAngles();
 			player_data.m_iHealth = pawn->m_iHealth();
 			player_data.m_iShotsFired = pawn->m_iShotsFired();
 			player_data.m_iClip1 = active_wpn->m_iClip1();

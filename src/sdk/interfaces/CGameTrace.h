@@ -137,14 +137,9 @@ struct Ray_t
 	Vector end;     // 0x0C
 	Vector mins;    // 0x18
 	Vector maxs;    // 0x24
+	//some bool at 0x28 - probably something related to m_bAllSolid
 	std::byte pad01[0x4]; // 0x30
 	uint8_t unknown;  // 0x34
-
-	void Init(const Vector& start, const Vector& end)
-	{
-		this->start = start;
-		this->end = end;
-	}
 };
 
 struct TraceHitboxData_t
@@ -168,63 +163,82 @@ struct Trace_t
 {
 	Trace_t() = default;
 
-	SurfaceData_t* GetSurfaceData(); // Function declaration
+	SurfaceData_t* GetSurfaceData();
 
-	int GetHitboxID() // Function with inline logic
+	int GetHitboxID()
 	{
 		if (m_pHitboxData)
 			return m_pHitboxData->m_nHitboxId;
 		return 0;
 	}
 
-	int GetHitgroup() // Function with inline logic
+	int GetHitgroup()
 	{
 		if (m_pHitboxData)
 			return m_pHitboxData->m_nHitGroup;
 		return 0;
 	}
 
-	bool DidHitWorld() const; // Function declaration
-
-	void* m_pSurface;               // 0x00
-	CBaseEntity* m_pHitEntity;      // 0x08
-	TraceHitboxData_t* m_pHitboxData; // 0x10
-	std::byte pad01[0x38];          // 0x18
-	uint32_t m_uContents;           // 0x50
-	std::byte pad02[0x24];          // 0x54
-	Vector m_vecStartPos;           // 0x78
-	Vector m_vecEndPos;             // 0x84
-	Vector m_vecNormal;             // 0x90
-	Vector m_vecPosition;           // 0x9C
-	std::byte pad03[0x4];           // 0xA8
-	float m_flFraction;             // 0xAC
-	std::byte pad04[0x6];           // 0xB0
-	bool m_bAllSolid;               // 0xB6
-	std::byte pad05[0x4D];          // 0xB7
+	void* m_pSurface;					// 0x0
+	CBaseEntity* m_pHitEntity;			// 0x8
+	TraceHitboxData_t* m_pHitboxData;	// 0x10
+	std::byte pad01[0x38];				// 0x18
+	uint32_t m_uContents;				// 0x50
+	std::byte pad02[0x24];				// 0x54
+	Vector m_vecStartPos;				// 0x78
+	Vector m_vecEndPos;					// 0x84
+	Vector m_vecNormal;					// 0x90
+	Vector m_vecPosition;				// 0x9C
+	std::byte pad03[0x4];				// 0xA8
+	float m_flFraction;					// 0xAC
+	std::byte pad04[0x6];				// 0xB0
+	bool m_bAllSolid;					// 0xB6
+	bool m_bStartSolid;					// 0xB7
+	bool m_bSomeBool;					// 0xB8 
 };
 
 struct TraceFilter_t
 {
-	std::byte pad01[0x8];
-	std::int64_t m_uTraceMask;
-	std::array< std::int64_t, 2 > m_v1;
-	std::array< std::int32_t, 4 > m_arrSkipHandles;
-	std::array< std::int16_t, 2 > m_arrCollisions;
-	std::int16_t m_v2;
-	std::uint8_t m_v3;
-	std::uint8_t m_v4;
-	std::uint8_t m_v5;
+	std::byte pad01[0x8];							// 0x00
+	std::int64_t m_uTraceMask;						// 0x08
+	std::array<std::int64_t, 2> m_v1;				// 0x10
+	std::array<std::int32_t, 4> m_arrSkipHandles;   // 0x20
+	std::array<std::int16_t, 2> m_arrCollisions;    // 0x30
+	std::int16_t m_v2;								// 0x34
+	std::uint8_t m_nLayer;								// 0x36
+	std::uint8_t m_v4;								// 0x37 //flags
+	std::uint8_t m_flags;								// 0x38
 
 	TraceFilter_t() = default;
 	TraceFilter_t(std::uint32_t uMask, CBaseEntity* localplayer, CBaseEntity* player, int nLayer);
+
+	TraceFilter_t(std::uint32_t mask, CBaseEntity* skip_entity, int layer)
+	{
+		using fn = TraceFilter_t * (__fastcall*)(void*, CBaseEntity* skip_entity, uint32_t mask, int layer, int16_t flags);
+		static auto addr = modules::client.scan("48 89 5C 24 08 48 89 74 24 10 57 48 83 EC 20 0F B6 41 37 33", "TraceFilter_t::InitEntitiesOnly").as();
+
+		auto init_entities_only = reinterpret_cast<fn>(addr);
+		if (init_entities_only)
+			init_entities_only(this, skip_entity, mask, layer, 7); //15 = CollisionMask
+	}
+
+	TraceFilter_t* InitEntitiesOnly(CBaseEntity* skip_entity, uint32_t mask, int layer)
+	{
+		using fn = TraceFilter_t*(__fastcall*)(void*, CBaseEntity* skip_entity, uint32_t mask, int layer, int16_t flags);
+		static auto addr = modules::client.scan("48 89 5C 24 08 48 89 74 24 10 57 48 83 EC 20 0F B6 41 37 33", "TraceFilter_t::InitEntitiesOnly").as();
+
+		auto init_entities_only = reinterpret_cast<fn>(addr);
+		if (init_entities_only)
+			return init_entities_only(this, skip_entity, mask, layer, 15); //15 = CollisionMask
+	}
 };
 
 class CGameTrace
 {
 public:
-	bool TraceShape(Ray_t ray, const Vector& start, const Vector& end, TraceFilter_t* filter, Trace_t* trace)
+	bool TraceShape(Ray_t* ray, const Vector& start, const Vector& end, TraceFilter_t* filter, Trace_t* trace)
 	{
-		using fn = bool(__fastcall*)(void*, Ray_t, const Vector&, const Vector&, TraceFilter_t*, Trace_t*); //fastcall
+		using fn = bool(__fastcall*)(void*, Ray_t*, const Vector&, const Vector&, TraceFilter_t*, Trace_t*); //fastcall
 		//E8 ? ? ? ? 80 7D 57 00 + 0x1 abs
 		static const auto& addr = modules::client.scan("48 89 5C 24 20 48 89 4C 24 08 55 56 41", "TraceShape").as();
 

@@ -31,6 +31,9 @@ namespace main_window
         if (settings::visuals::m_bFovChanger)
             ImGui::SliderInt("Fov slider", &settings::visuals::m_iFov, 10, 200);
 
+        ImGui::SliderFloat("##boxrounding", &settings::visuals::box_rounding, 0.f, 2.f, "Box Rounding: %.1f");
+        ImGui::SliderFloat("##boxthickness", &settings::visuals::box_thickness, 0.f, 2.f, "Box Thickness: %.1f");
+
         ImGui::Checkbox("Unhook", &globals::can_unhook);
 
         ImGui::End();

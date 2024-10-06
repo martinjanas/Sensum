@@ -13,35 +13,26 @@ namespace globals
 	int height = -1;
 
 	bool can_unhook = false;
-	
-	bool is_in_view_plane(const Vector& in, Vector& out)
+
+	bool world2screen(const Vector& in, Vector& out)
 	{
 		if (!entity_data::view_matrix::matrix)
 			return false;
 
-		const auto& world_matrix = entity_data::view_matrix::matrix;
-	
-		float w = world_matrix->m[3][0] * in.x + world_matrix->m[3][1] * in.y + world_matrix->m[3][2] * in.z + world_matrix->m[3][3];
+		const auto& world_to_pixels = entity_data::view_matrix::matrix;
 
-		if (w > 0.01f)
-		{
-			out.x = world_matrix->m[0][0] * in.x + world_matrix->m[0][1] * in.y + world_matrix->m[0][2] * in.z + world_matrix->m[0][3];
-			out.y = world_matrix->m[1][0] * in.x + world_matrix->m[1][1] * in.y + world_matrix->m[1][2] * in.z + world_matrix->m[1][3];
-			out.z = 0.0f;
+		out.x = world_to_pixels->m[0][0] * in.x + world_to_pixels->m[0][1] * in.y + world_to_pixels->m[0][2] * in.z + world_to_pixels->m[0][3];
+		out.y = world_to_pixels->m[1][0] * in.x + world_to_pixels->m[1][1] * in.y + world_to_pixels->m[1][2] * in.z + world_to_pixels->m[1][3];
+		out.z = world_to_pixels->m[2][0] * in.x + world_to_pixels->m[2][1] * in.y + world_to_pixels->m[2][2] * in.z + world_to_pixels->m[2][3];
 
-			out.x /= w;
-			out.y /= w;
-			
-			return true;
-		}
+		float w = world_to_pixels->m[3][0] * in.x + world_to_pixels->m[3][1] * in.y + world_to_pixels->m[3][2] * in.z + world_to_pixels->m[3][3];
 
-		return false;
-	}
-
-	bool world2screen(const Vector& in, Vector& out)
-	{
-		if (!is_in_view_plane(in, out))
+		if (w < 0.01f)
 			return false;
+
+		out.x /= w;
+		out.y /= w;
+		out.z /= w; 
 
 		const int width = globals::width;
 		const int height = globals::height;

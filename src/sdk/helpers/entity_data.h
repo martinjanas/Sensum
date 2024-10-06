@@ -34,6 +34,7 @@ namespace entity_data
 		Vector m_vecOrigin;
 		Vector m_vecAbsOrigin;
 		Vector m_vecEyePos;
+		QAngle m_vecEyeAngles;
 		int m_iHealth;
 		int m_iShotsFired;
 		int m_iClip1;
@@ -43,6 +44,7 @@ namespace entity_data
 		CCSPlayerPawn* m_PlayerPawn;
 		Transform_t hitbox_transform[HITBOX_MAX];
 		bool is_visible;
+		Trace_t trace;
 
 		std::array<hitbox_info_t, HITBOX_MAX> hitboxes;
 	};

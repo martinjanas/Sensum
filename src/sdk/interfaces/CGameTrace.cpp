@@ -6,10 +6,13 @@ TraceFilter_t::TraceFilter_t(std::uint32_t uMask, CBaseEntity* localplayer, CBas
 {
 	m_uTraceMask = uMask;
 	m_v1[0] = m_v1[1] = 0;
-	m_v2 = 7;
-	m_v3 = nLayer;
+	m_v2 = 7; //was 7, 15 used mostly
+	m_nLayer = nLayer;
+
+	//auto v6 = m_v4 & 0xC9;
+	//m_v4 = v6 | 0x49; //0x49;
 	m_v4 = 0x49;
-	m_v5 = 0;
+	m_flags = 0;
 
 	if (localplayer)
 	{
