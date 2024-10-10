@@ -96,8 +96,10 @@ namespace entity_data
 		Ray_t ray;
 		//TraceFilter_t filter(CONTENTS_SOLID | CONTENTS_MOVEABLE | CONTENTS_MONSTER | CONTENTS_DEBRIS | CONTENTS_HITBOX, nullptr, nullptr, 0); //totally fucking broken, the trace just goes thru walls no matter the mask
 
-		TraceFilter_t filter(MASK_VISIBLE, player_data.m_PlayerPawn, 4);
+		TraceFilter_t filter(MASK_SOLID, player_data.m_PlayerPawn, 4);
 		
+		float multiplier = 100.f;
+
 		for (int i = 0; i < HITBOX_MAX; ++i)
 		{
 			Hitbox_t* hitbox = &hitboxes[i];
@@ -127,19 +129,7 @@ namespace entity_data
 
 			if (!player_data.is_visible) //TODO: Not working correctly - this is fucking fucked, the ray goes thru walls and shit
 			{
-				auto forward = player_data.m_vecEyeAngles.to_vector();
-				forward *= 512.f;
 
-				auto start = player_data.m_vecEyePos;
-				auto end = start + forward;
-
-				//ray.start = start;
-				//ray.end = end;
-
-				g::game_trace->TraceShape(&ray, start, end, &filter, &player_data.trace);
-				
-				//g::game_trace->ClipRayToEntity(&ray, eye_pos, hitbox_pos, player_data.m_PlayerPawn, &filter, &player_data.trace);
-	
 				player_data.is_visible = true;//player_data.trace.m_vecEndPos.dist_to(eye_pos) == hitbox_pos.dist_to(eye_pos);
 			}
 		}

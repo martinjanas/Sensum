@@ -88,12 +88,12 @@ class IVEngineClient
 public:
     bool IsPaused() //not returning correct values
     {
-        return GetVirtual<bool(__thiscall*)(void*)>(this, 11)(this); //not 10 11 12 13   15 16 17 18
+        return GetVirtual<bool(__thiscall*)(void*)>(this, 11)(this);
     }
 
     int GetMaxClients()
     {
-        return GetVirtual<int(__thiscall*)(void*)>(this, 34)(this); //31 -> 34
+        return GetVirtual<int(__thiscall*)(void*)>(this, 34)(this);
     }
 
     bool IsInGame()
@@ -106,27 +106,27 @@ public:
         return GetVirtual<bool(__thiscall*)(void*)>(this, 36)(this);
     }
 
+    int GetLocalPlayer()
+    {
+        int index = -1;
+
+        GetVirtual<void(__thiscall*)(void*, int&, int)>(this, 49)(this, index, 0);
+
+        return index + 1;
+    }
+
     void GetScreenSize(int& width, int& height)
     {
-        GetVirtual<void(__thiscall*)(void*, int&, int&)>(this, 53)(this, width, height);
+        GetVirtual<void(__thiscall*)(void*, int&, int&)>(this, 53)(this, width, height); //55 if returning nonsense values
     }
 
     const char* GetLevelName()
     {
-        return GetVirtual<const char* (__thiscall*)(void*)>(this, 56)(this);
+        return GetVirtual<const char* (__thiscall*)(void*)>(this, 58)(this);
     }
 
     const char* GetLevelNameShort()
     {
-        return GetVirtual<const char* (__thiscall*)(void*)>(this, 57)(this);
-    }
-
-    int GetLocalPlayer()
-    {
-        int index = -1;
-        
-        GetVirtual<void(__thiscall*)(void*, int&, int)>(this, 49)(this, index, 0); 
-        
-        return index + 1;
+        return GetVirtual<const char* (__thiscall*)(void*)>(this, 59)(this);
     }
 };
