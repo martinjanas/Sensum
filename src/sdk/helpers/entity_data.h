@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <array>
+#include <bitset>
 #include "../classes/CCSPlayerController.h"
 #include "../classes/CCSPlayerPawn.h"
 #include "../classes/CBasePlayerWeapon.h"
@@ -13,13 +14,20 @@
 #include "../classes/CHandle.h"
 #include "../../sdk/interfaces/CSGOInput.h"
 
+enum PLAYER_FLAGS : uint32_t
+{
+	PLAYER_VISIBLE,
+	PLAYER_IN_SMOKE,
+	PLAYER_IN_AIR,
+	PLAYER_ALIVE
+};
+
 namespace entity_data
 {
 	struct hitbox_info_t
 	{
 		Vector hitbox_pos;
 		uint16_t index;
-		const char* entity_name;
 	};
 
 	struct local_data_t
@@ -43,8 +51,7 @@ namespace entity_data
 		BBox_t bbox;
 		CCSPlayerPawn* m_PlayerPawn;
 		Transform_t hitbox_transform[HITBOX_MAX];
-		bool is_visible;
-		Trace_t trace;
+		std::bitset<32> flags;
 
 		std::array<hitbox_info_t, HITBOX_MAX> hitboxes;
 	};
@@ -54,14 +61,14 @@ namespace entity_data
 		std::list<player_data_t> player_data;
 	};
 
-	struct instance_t
+	struct EntityInstance_t
 	{
 		CEntityInstance* entity;
 		CHandle handle;
 	};
 
-	extern std::list<instance_t> player_instances;
-	extern std::list<instance_t> entity_instances;
+	extern std::list<EntityInstance_t> player_instances;
+	extern std::list<EntityInstance_t> entity_instances;
 	extern std::list<entry_data_t> player_entry_data;
 
 	extern std::mutex locker;
@@ -69,7 +76,6 @@ namespace entity_data
 	namespace view_matrix
 	{
 		extern VMatrix* matrix;
-		extern std::mutex mutex;
 	};
 
 	void fetch_player_data(CUserCmd* cmd);

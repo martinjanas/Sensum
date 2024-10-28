@@ -19,9 +19,9 @@ public:
 	}
 
 	//Doesnt trace shit
-	bool TraceRay(const Vector& vecAbsStart, const Vector& vecAbsEnd, TraceFilter_t* filter, Trace_t* trace)
-	{
-		//   @Note: this method initializes the trace filter vtable itself but copies the rest from argument //100
-		return GetVirtual<bool(__thiscall*)(void*, const Vector&, const Vector&, TraceFilter_t*, Trace_t*)>(this, 108)(this, vecAbsEnd, vecAbsEnd, &filter[1], trace);
-	}
+	//bool TraceRay(const Vector& vecAbsStart, const Vector& vecAbsEnd, CTraceFilter* filter, Trace_t* trace)
+	//{
+	//	//   @Note: this method initializes the trace filter vtable itself but copies the rest from argument //100
+	//	return GetVirtual<bool(__thiscall*)(void*, const Vector&, const Vector&, CTraceFilter*, Trace_t*)>(this, 108)(this, vecAbsEnd, vecAbsEnd, &filter[1], trace);
+	//}
 };

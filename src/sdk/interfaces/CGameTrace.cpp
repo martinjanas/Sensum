@@ -1,6 +1,7 @@
 #include "CGameTrace.h"
 
 #include "../../sdk/classes/CHandle.h"
+#include "../sdk.h"
 
 TraceFilter_t::TraceFilter_t(std::uint32_t uMask, CBaseEntity* localplayer, CBaseEntity* player, int nLayer)
 {

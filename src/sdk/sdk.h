@@ -87,7 +87,7 @@ namespace interfaces //move to interfaces.h ?
 	extern CInputSystem* input_system;
 	extern CClientModeCSNormal* client_mode_csnormal;
     extern CGlobalVarsBase* global_vars;
-	extern CGameTrace* game_trace;
+	extern CGameTrace* engine_trace;
 }
 
 namespace g = interfaces;

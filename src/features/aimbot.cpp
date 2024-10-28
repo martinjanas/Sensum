@@ -168,7 +168,7 @@ namespace features
                 m_player_data.clear();
 
                 if (!entity_data::player_entry_data.empty())
-                    std::ranges::copy(entity_data::player_entry_data.front().player_data, std::back_inserter(m_player_data));
+                    std::ranges::copy(entity_data::player_entry_data.back().player_data, std::back_inserter(m_player_data));
             }
 
             QAngle viewangles;
@@ -203,6 +203,9 @@ namespace features
             for (const auto& data : m_player_data)
             {
                 if (!data.m_PlayerPawn || data.m_iHealth <= 0)
+                    continue;
+
+                if (!data.flags.test(PLAYER_VISIBLE) || data.flags.test(PLAYER_IN_SMOKE))
                     continue;
 
                 if (data.hitboxes.empty())

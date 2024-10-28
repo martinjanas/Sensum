@@ -21,6 +21,15 @@ float Vector::dot_product(const Vector& v) const
 	return (x * v.x + y * v.y + z * v.z);
 }
 
+Vector Vector::cross(const Vector& other) const 
+{
+	return Vector(
+		y * other.z - z * other.y,
+		z * other.x - x * other.z,
+		x * other.y - y * other.x
+	);
+}
+
 float Vector::dist_to(const Vector& other) const
 {
 	Vector delta;

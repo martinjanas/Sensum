@@ -5,141 +5,310 @@
 #include "../../sdk/classes/CBaseEntity.h"
 #include "../../sdk/classes/CCSPlayerPawn.h"
 
-#define	CONTENTS_EMPTY			0		// No contents
+enum BuiltInInteractionLayer_t
+{
+	LAYER_INDEX_CONTENTS_SOLID = 0,
+	LAYER_INDEX_CONTENTS_HITBOX,
+	LAYER_INDEX_CONTENTS_TRIGGER,
+	LAYER_INDEX_CONTENTS_SKY,
+	LAYER_INDEX_FIRST_USER,
+	LAYER_INDEX_NOT_FOUND = -1,
+	LAYER_INDEX_MAX_ALLOWED = 64,
+};
 
-#define	CONTENTS_SOLID			0x1		// an eye is never valid in a solid
-#define	CONTENTS_WINDOW			0x2		// translucent, but not watery (glass)
-#define	CONTENTS_AUX			0x4
-#define	CONTENTS_GRATE			0x8		// alpha-tested "grate" textures.  Bullets/sight pass through, but solids don't
-#define	CONTENTS_SLIME			0x10
-#define	CONTENTS_WATER			0x20
-#define	CONTENTS_BLOCKLOS		0x40	// block AI line of sight
-#define CONTENTS_OPAQUE			0x80	// things that cannot be seen through (may be non-solid though)
-#define	LAST_VISIBLE_CONTENTS	0x80
+enum StandardInteractionLayers_t
+{
+	LAYER_INDEX_CONTENTS_PLAYER_CLIP = LAYER_INDEX_FIRST_USER,
+	LAYER_INDEX_CONTENTS_NPC_CLIP,
+	LAYER_INDEX_CONTENTS_BLOCK_LOS,
+	LAYER_INDEX_CONTENTS_BLOCK_LIGHT,
+	LAYER_INDEX_CONTENTS_LADDER,
+	LAYER_INDEX_CONTENTS_PICKUP,
+	LAYER_INDEX_CONTENTS_BLOCK_SOUND,
+	LAYER_INDEX_CONTENTS_NODRAW,
+	LAYER_INDEX_CONTENTS_WINDOW,
+	LAYER_INDEX_CONTENTS_PASS_BULLETS,
+	LAYER_INDEX_CONTENTS_WORLD_GEOMETRY,
+	LAYER_INDEX_CONTENTS_WATER,
+	LAYER_INDEX_CONTENTS_SLIME,
+	LAYER_INDEX_CONTENTS_TOUCH_ALL,
+	LAYER_INDEX_CONTENTS_PLAYER,
+	LAYER_INDEX_CONTENTS_NPC,
+	LAYER_INDEX_CONTENTS_DEBRIS,
+	LAYER_INDEX_CONTENTS_PHYSICS_PROP,
+	LAYER_INDEX_CONTENTS_NAV_IGNORE,
+	LAYER_INDEX_CONTENTS_NAV_LOCAL_IGNORE,
+	LAYER_INDEX_CONTENTS_POST_PROCESSING_VOLUME,
+	LAYER_INDEX_CONTENTS_UNUSED_LAYER3,
+	LAYER_INDEX_CONTENTS_CARRIED_OBJECT,
+	LAYER_INDEX_CONTENTS_PUSHAWAY,
+	LAYER_INDEX_CONTENTS_SERVER_ENTITY_ON_CLIENT,
+	LAYER_INDEX_CONTENTS_CARRIED_WEAPON,
+	LAYER_INDEX_CONTENTS_STATIC_LEVEL,
+	LAYER_INDEX_FIRST_MOD_SPECIFIC,
+};
 
-#define ALL_VISIBLE_CONTENTS (LAST_VISIBLE_CONTENTS | (LAST_VISIBLE_CONTENTS-1))
+enum ModSpecificInteractionLayers_t
+{
+	LAYER_INDEX_CONTENTS_CSGO_TEAM1 = LAYER_INDEX_FIRST_MOD_SPECIFIC,
+	LAYER_INDEX_CONTENTS_CSGO_TEAM2,
+	LAYER_INDEX_CONTENTS_CSGO_GRENADE_CLIP,
+	LAYER_INDEX_CONTENTS_CSGO_DRONE_CLIP,
+	LAYER_INDEX_CONTENTS_CSGO_MOVEABLE,
+	LAYER_INDEX_CONTENTS_CSGO_OPAQUE,
+	LAYER_INDEX_CONTENTS_CSGO_MONSTER,
+	LAYER_INDEX_CONTENTS_CSGO_UNUSED_LAYER,
+	LAYER_INDEX_CONTENTS_CSGO_THROWN_GRENADE,
+};
 
-#define CONTENTS_TESTFOGVOLUME	0x100
-#define CONTENTS_UNUSED			0x200	
+enum BuiltInCollisionGroup_t
+{
+	// Default layer, always collides with everything.
+	COLLISION_GROUP_ALWAYS = 0, // "always"
+	// This is how you turn off all collisions for an object - move it to this group
+	COLLISION_GROUP_NONPHYSICAL, // "never" 
+	// Trigger layer, never collides with anything, only triggers/interacts.  Use when querying for interaction layers.
+	COLLISION_GROUP_TRIGGER, // "trigger"
+	// Conditionally solid means that the collision response will be zero or as defined in the table when there are matching interactions
+	COLLISION_GROUP_CONDITIONALLY_SOLID, // needs interactions
+	// First unreserved collision layer index.
+	COLLISION_GROUP_FIRST_USER,
+	// Hard limit of 254 due to memory layout, and these are never visible to scene queries.
+	COLLISION_GROUPS_MAX_ALLOWED = 64,
+};
 
-// unused 
-// NOTE: If it's visible, grab from the top + update LAST_VISIBLE_CONTENTS
-// if not visible, then grab from the bottom.
-#define CONTENTS_UNUSED6		0x400
+enum StandardCollisionGroups_t
+{
+	COLLISION_GROUP_DEFAULT = COLLISION_GROUP_FIRST_USER,
+	COLLISION_GROUP_DEBRIS,			// Collides with nothing but world, static stuff and triggers
+	COLLISION_GROUP_INTERACTIVE_DEBRIS,	// Collides with everything except other interactive debris or debris
+	COLLISION_GROUP_INTERACTIVE,	// Collides with everything except interactive debris or debris
+	COLLISION_GROUP_PLAYER,
+	COLLISION_GROUP_BREAKABLE_GLASS,
+	COLLISION_GROUP_VEHICLE,
+	COLLISION_GROUP_PLAYER_MOVEMENT,  // For HL2, same as Collision_Group_Player, for
+	// TF2, this filters out other players and CBaseObjects
+	COLLISION_GROUP_NPC,			// Generic NPC group
+	COLLISION_GROUP_IN_VEHICLE,		// for any entity inside a vehicle
+	COLLISION_GROUP_WEAPON,			// for any weapons that need collision detection
+	COLLISION_GROUP_VEHICLE_CLIP,	// vehicle clip brush to restrict vehicle movement
+	COLLISION_GROUP_PROJECTILE,		// Projectiles!
+	COLLISION_GROUP_DOOR_BLOCKER,	// Blocks entities not permitted to get near moving doors
+	COLLISION_GROUP_PASSABLE_DOOR,	// Doors that the player shouldn't collide with
+	COLLISION_GROUP_DISSOLVING,		// Things that are dissolving are in this group
+	COLLISION_GROUP_PUSHAWAY,		// Nonsolid on client and server, pushaway in player code
 
-#define CONTENTS_TEAM1			0x800	// per team contents used to differentiate collisions 
-#define CONTENTS_TEAM2			0x1000	// between players and objects on different teams
+	COLLISION_GROUP_NPC_ACTOR,		// Used so NPCs in scripts ignore the player.
+	COLLISION_GROUP_NPC_SCRIPTED,	// Used for NPCs in scripts that should not collide with each other
+	COLLISION_GROUP_PZ_CLIP,
+	COLLISION_GROUP_PROPS,
 
-// ignore CONTENTS_OPAQUE on surfaces that have SURF_NODRAW
-#define CONTENTS_IGNORE_NODRAW_OPAQUE	0x2000
+	LAST_SHARED_COLLISION_GROUP,
+};
 
-// hits entities which are MOVETYPE_PUSH (doors, plats, etc.)
-#define CONTENTS_MOVEABLE		0x4000
+#define	CONTENTS_EMPTY						0ull // No contents
 
-// remaining contents are non-visible, and don't eat brushes
-#define	CONTENTS_AREAPORTAL		0x8000
+#define CONTENTS_SOLID						( 1ull << LAYER_INDEX_CONTENTS_SOLID )
+#define CONTENTS_HITBOX						( 1ull << LAYER_INDEX_CONTENTS_HITBOX )
+#define CONTENTS_TRIGGER					( 1ull << LAYER_INDEX_CONTENTS_TRIGGER )
+#define CONTENTS_SKY						( 1ull << LAYER_INDEX_CONTENTS_SKY )
 
-#define	CONTENTS_PLAYERCLIP		0x10000
-#define	CONTENTS_MONSTERCLIP	0x20000
+#define CONTENTS_PLAYER_CLIP				( 1ull << LAYER_INDEX_CONTENTS_PLAYER_CLIP )
+#define CONTENTS_NPC_CLIP					( 1ull << LAYER_INDEX_CONTENTS_NPC_CLIP )
+#define CONTENTS_BLOCK_LOS					( 1ull << LAYER_INDEX_CONTENTS_BLOCK_LOS )
+#define CONTENTS_BLOCK_LIGHT				( 1ull << LAYER_INDEX_CONTENTS_BLOCK_LIGHT )
+#define CONTENTS_LADDER						( 1ull << LAYER_INDEX_CONTENTS_LADDER )
+#define CONTENTS_PICKUP						( 1ull << LAYER_INDEX_CONTENTS_PICKUP )
+#define CONTENTS_BLOCK_SOUND				( 1ull << LAYER_INDEX_CONTENTS_BLOCK_SOUND )
+#define CONTENTS_NODRAW						( 1ull << LAYER_INDEX_CONTENTS_NODRAW )
+#define CONTENTS_WINDOW						( 1ull << LAYER_INDEX_CONTENTS_WINDOW )
+#define CONTENTS_PASS_BULLETS				( 1ull << LAYER_INDEX_CONTENTS_PASS_BULLETS )
+#define CONTENTS_WORLD_GEOMETRY				( 1ull << LAYER_INDEX_CONTENTS_WORLD_GEOMETRY )
+#define CONTENTS_WATER						( 1ull << LAYER_INDEX_CONTENTS_WATER )
+#define CONTENTS_SLIME						( 1ull << LAYER_INDEX_CONTENTS_SLIME )
+#define CONTENTS_TOUCH_ALL					( 1ull << LAYER_INDEX_CONTENTS_TOUCH_ALL )
+#define CONTENTS_PLAYER						( 1ull << LAYER_INDEX_CONTENTS_PLAYER )
+#define CONTENTS_NPC						( 1ull << LAYER_INDEX_CONTENTS_NPC )
+#define CONTENTS_DEBRIS						( 1ull << LAYER_INDEX_CONTENTS_DEBRIS )
+#define CONTENTS_PHYSICS_PROP				( 1ull << LAYER_INDEX_CONTENTS_PHYSICS_PROP )
+#define CONTENTS_NAV_IGNORE					( 1ull << LAYER_INDEX_CONTENTS_NAV_IGNORE )
+#define CONTENTS_NAV_LOCAL_IGNORE			( 1ull << LAYER_INDEX_CONTENTS_NAV_LOCAL_IGNORE )
+#define CONTENTS_POST_PROCESSING_VOLUME		( 1ull << LAYER_INDEX_CONTENTS_POST_PROCESSING_VOLUME )
+#define CONTENTS_UNUSED_LAYER3				( 1ull << LAYER_INDEX_CONTENTS_UNUSED_LAYER3 )
+#define CONTENTS_CARRIED_OBJECT				( 1ull << LAYER_INDEX_CONTENTS_CARRIED_OBJECT )
+#define CONTENTS_PUSHAWAY					( 1ull << LAYER_INDEX_CONTENTS_PUSHAWAY )
+#define CONTENTS_SERVER_ENTITY_ON_CLIENT	( 1ull << LAYER_INDEX_CONTENTS_SERVER_ENTITY_ON_CLIENT )
+#define CONTENTS_CARRIED_WEAPON				( 1ull << LAYER_INDEX_CONTENTS_CARRIED_WEAPON )
+#define CONTENTS_STATIC_LEVEL				( 1ull << LAYER_INDEX_CONTENTS_STATIC_LEVEL )
 
-// currents can be added to any other contents, and may be mixed
-#define	CONTENTS_CURRENT_0		0x40000
-#define	CONTENTS_CURRENT_90		0x80000
-#define	CONTENTS_CURRENT_180	0x100000
-#define	CONTENTS_CURRENT_270	0x200000
-#define	CONTENTS_CURRENT_UP		0x400000
-#define	CONTENTS_CURRENT_DOWN	0x800000
-
-#define	CONTENTS_ORIGIN			0x1000000	// removed before bsping an entity
-
-#define	CONTENTS_MONSTER		0x2000000	// should never be on a brush, only in game
-#define	CONTENTS_DEBRIS			0x4000000
-#define	CONTENTS_DETAIL			0x8000000	// brushes to be added after vis leafs
-#define	CONTENTS_TRANSLUCENT	0x10000000	// auto set if any surface has trans
-#define	CONTENTS_LADDER			0x20000000
-#define CONTENTS_HITBOX			0x40000000	// use accurate hitboxes on trace
-
-
-// NOTE: These are stored in a short in the engine now.  Don't use more than 16 bits
-#define	SURF_LIGHT		0x0001		// value will hold the light strength
-#define	SURF_SKY2D		0x0002		// don't draw, indicates we should skylight + draw 2d sky but not draw the 3D skybox
-#define	SURF_SKY		0x0004		// don't draw, but add to skybox
-#define	SURF_WARP		0x0008		// turbulent water warp
-#define	SURF_TRANS		0x0010
-#define SURF_NOPORTAL	0x0020	// the surface can not have a portal placed on it
-#define	SURF_TRIGGER	0x0040	// FIXME: This is an xbox hack to work around elimination of trigger surfaces, which breaks occluders
-#define	SURF_NODRAW		0x0080	// don't bother referencing the texture
-
-#define	SURF_HINT		0x0100	// make a primary bsp splitter
-
-#define	SURF_SKIP		0x0200	// completely ignore, allowing non-closed brushes
-#define SURF_NOLIGHT	0x0400	// Don't calculate light
-#define SURF_BUMPLIGHT	0x0800	// calculate three lightmaps for the surface for bumpmapping
-#define SURF_NOSHADOWS	0x1000	// Don't receive shadows
-#define SURF_NODECALS	0x2000	// Don't receive decals
-#define SURF_NOCHOP		0x4000	// Don't subdivide patches on this surface 
-#define SURF_HITBOX		0x8000	// surface is part of a hitbox
+#define CONTENTS_CSGO_TEAM1					( 1ull << LAYER_INDEX_CONTENTS_CSGO_TEAM1 )
+#define CONTENTS_CSGO_TEAM2					( 1ull << LAYER_INDEX_CONTENTS_CSGO_TEAM2 )
+#define CONTENTS_CSGO_GRENADE_CLIP			( 1ull << LAYER_INDEX_CONTENTS_CSGO_GRENADE_CLIP )
+#define CONTENTS_CSGO_DRONE_CLIP			( 1ull << LAYER_INDEX_CONTENTS_CSGO_DRONE_CLIP )
+#define CONTENTS_CSGO_MOVEABLE				( 1ull << LAYER_INDEX_CONTENTS_CSGO_MOVEABLE )
+#define CONTENTS_CSGO_OPAQUE				( 1ull << LAYER_INDEX_CONTENTS_CSGO_OPAQUE )
+#define CONTENTS_CSGO_MONSTER				( 1ull << LAYER_INDEX_CONTENTS_CSGO_MONSTER )
+#define CONTENTS_CSGO_UNUSED_LAYER			( 1ull << LAYER_INDEX_CONTENTS_CSGO_UNUSED_LAYER )
+#define CONTENTS_CSGO_THROWN_GRENADE		( 1ull << LAYER_INDEX_CONTENTS_CSGO_THROWN_GRENADE )
 
 
 
 // -----------------------------------------------------
 // spatial content masks - used for spatial queries (traceline,etc.)
 // -----------------------------------------------------
-#define	MASK_ALL					(0xFFFFFFFF)
+#define	MASK_ALL					(~0ull)
 // everything that is normally solid
-#define	MASK_SOLID					(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_WINDOW|CONTENTS_MONSTER|CONTENTS_GRATE)
+#define	MASK_SOLID					(CONTENTS_SOLID|CONTENTS_WINDOW|CONTENTS_PLAYER|CONTENTS_NPC|CONTENTS_PASS_BULLETS)
 // everything that blocks player movement
-#define	MASK_PLAYERSOLID			(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_PLAYERCLIP|CONTENTS_WINDOW|CONTENTS_MONSTER|CONTENTS_GRATE)
+#define	MASK_PLAYERSOLID			(CONTENTS_SOLID|CONTENTS_PLAYER_CLIP|CONTENTS_WINDOW|CONTENTS_PLAYER|CONTENTS_NPC|CONTENTS_PASS_BULLETS)
 // blocks npc movement
-#define	MASK_NPCSOLID				(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_MONSTERCLIP|CONTENTS_WINDOW|CONTENTS_MONSTER|CONTENTS_GRATE)
+#define	MASK_NPCSOLID				(CONTENTS_SOLID|CONTENTS_NPC_CLIP|CONTENTS_WINDOW|CONTENTS_PLAYER|CONTENTS_NPC|CONTENTS_PASS_BULLETS)
+// blocks fluid movement
+#define	MASK_NPCFLUID				(CONTENTS_SOLID|CONTENTS_NPC_CLIP|CONTENTS_WINDOW|CONTENTS_PLAYER|CONTENTS_NPC)
 // water physics in these contents
-#define	MASK_WATER					(CONTENTS_WATER|CONTENTS_MOVEABLE|CONTENTS_SLIME)
-// everything that blocks lighting
-#define	MASK_OPAQUE					(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_OPAQUE)
-// everything that blocks lighting, but with monsters added.
-#define MASK_OPAQUE_AND_NPCS		(MASK_OPAQUE|CONTENTS_MONSTER)
-// everything that blocks line of sight for AI
-#define MASK_BLOCKLOS				(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_BLOCKLOS)
-// everything that blocks line of sight for AI plus NPCs
-#define MASK_BLOCKLOS_AND_NPCS		(MASK_BLOCKLOS|CONTENTS_MONSTER)
-// everything that blocks line of sight for players
-#define	MASK_VISIBLE					(MASK_OPAQUE|CONTENTS_IGNORE_NODRAW_OPAQUE)
-// everything that blocks line of sight for players, but with monsters added.
-#define MASK_VISIBLE_AND_NPCS		(MASK_OPAQUE_AND_NPCS|CONTENTS_IGNORE_NODRAW_OPAQUE)
+#define	MASK_WATER					(CONTENTS_WATER|CONTENTS_SLIME)
 // bullets see these as solid
-#define	MASK_SHOT					(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_MONSTER|CONTENTS_WINDOW|CONTENTS_DEBRIS|CONTENTS_HITBOX)
+#define	MASK_SHOT					(CONTENTS_SOLID|CONTENTS_PLAYER|CONTENTS_NPC|CONTENTS_WINDOW|CONTENTS_DEBRIS|CONTENTS_HITBOX)
+// bullets see these as solid, except monsters (world+brush only)
+#define MASK_SHOT_BRUSHONLY			(CONTENTS_SOLID|CONTENTS_WINDOW|CONTENTS_DEBRIS)
 // non-raycasted weapons see this as solid (includes grates)
-#define MASK_SHOT_HULL				(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_MONSTER|CONTENTS_WINDOW|CONTENTS_DEBRIS|CONTENTS_GRATE)
+#define MASK_SHOT_HULL				(CONTENTS_SOLID|CONTENTS_PLAYER|CONTENTS_NPC|CONTENTS_WINDOW|CONTENTS_DEBRIS|CONTENTS_PASS_BULLETS)
 // hits solids (not grates) and passes through everything else
-#define MASK_SHOT_PORTAL			(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_WINDOW|CONTENTS_MONSTER)
+#define MASK_SHOT_PORTAL			(CONTENTS_SOLID|CONTENTS_WINDOW|CONTENTS_PLAYER|CONTENTS_NPC)
 // everything normally solid, except monsters (world+brush only)
-#define MASK_SOLID_BRUSHONLY		(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_WINDOW|CONTENTS_GRATE)
+#define MASK_SOLID_BRUSHONLY		(CONTENTS_SOLID|CONTENTS_WINDOW|CONTENTS_PASS_BULLETS)
 // everything normally solid for player movement, except monsters (world+brush only)
-#define MASK_PLAYERSOLID_BRUSHONLY	(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_WINDOW|CONTENTS_PLAYERCLIP|CONTENTS_GRATE)
+#define MASK_PLAYERSOLID_BRUSHONLY	(CONTENTS_SOLID|CONTENTS_WINDOW|CONTENTS_PLAYER_CLIP|CONTENTS_PASS_BULLETS)
 // everything normally solid for npc movement, except monsters (world+brush only)
-#define MASK_NPCSOLID_BRUSHONLY		(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_WINDOW|CONTENTS_MONSTERCLIP|CONTENTS_GRATE)
-// just the world, used for route rebuilding
-#define MASK_NPCWORLDSTATIC			(CONTENTS_SOLID|CONTENTS_WINDOW|CONTENTS_MONSTERCLIP|CONTENTS_GRATE)
-// These are things that can split areaportals
-#define MASK_SPLITAREAPORTAL		(CONTENTS_WATER|CONTENTS_SLIME)
+#define MASK_NPCSOLID_BRUSHONLY		(CONTENTS_SOLID|CONTENTS_WINDOW|CONTENTS_NPC_CLIP|CONTENTS_PASS_BULLETS)
 
-// UNDONE: This is untested, any moving water
-#define MASK_CURRENT				(CONTENTS_CURRENT_0|CONTENTS_CURRENT_90|CONTENTS_CURRENT_180|CONTENTS_CURRENT_270|CONTENTS_CURRENT_UP|CONTENTS_CURRENT_DOWN)
 
-// everything that blocks corpse movement
-// UNDONE: Not used yet / may be deleted
-#define	MASK_DEADSOLID				(CONTENTS_SOLID|CONTENTS_PLAYERCLIP|CONTENTS_WINDOW|CONTENTS_GRATE)
-
+enum RayType_t : uint8_t
+{
+	RAY_TYPE_LINE = 0,
+	RAY_TYPE_SPHERE,
+	RAY_TYPE_HULL,
+	RAY_TYPE_CAPSULE,
+	RAY_TYPE_MESH,
+};
 
 struct Ray_t
 {
-	Vector start;   // 0x00
-	Vector end;     // 0x0C
-	Vector mins;    // 0x18
-	Vector maxs;    // 0x24
-	//some bool at 0x28 - probably something related to m_bAllSolid
-	std::byte pad01[0x4]; // 0x30
-	uint8_t unknown;  // 0x34
+	Ray_t() { Init(Vector(0.0f, 0.0f, 0.0f)); }
+	Ray_t(const Vector& vStartOffset) { Init(vStartOffset); }
+	Ray_t(const Vector& vCenter, float flRadius) { Init(vCenter, flRadius); }
+	Ray_t(const Vector& vMins, const Vector& vMaxs) { Init(vMins, vMaxs); }
+	Ray_t(const Vector& vCenterA, const Vector& vCenterB, float flRadius) { Init(vCenterA, vCenterB, flRadius); }
+	Ray_t(const Vector& vMins, const Vector& vMaxs, const Vector* pVertices, int nNumVertices) { Init(vMins, vMaxs, pVertices, nNumVertices); }
+
+	void Init(const Vector& vStartOffset)
+	{
+		m_Line.m_vStartOffset = vStartOffset;
+		m_Line.m_flRadius = 0.0f;
+		m_eType = RAY_TYPE_LINE;
+	}
+
+	void Init(const Vector& vCenter, float flRadius)
+	{
+		if (flRadius > 0.0f)
+		{
+			m_Sphere.m_vCenter = vCenter;
+			m_Sphere.m_flRadius = flRadius;
+			m_eType = RAY_TYPE_SPHERE;
+		}
+		else
+		{
+			Init(vCenter);
+		}
+	}
+
+	void Init(const Vector& vMins, const Vector& vMaxs)
+	{
+		if (vMins != vMaxs)
+		{
+			m_Hull.m_vMins = vMins;
+			m_Hull.m_vMaxs = vMaxs;
+			m_eType = RAY_TYPE_HULL;
+		}
+		else
+		{
+			Init(vMins);
+		}
+	}
+
+	void Init(const Vector& vCenterA, const Vector& vCenterB, float flRadius)
+	{
+		if (vCenterA != vCenterB)
+		{
+			if (flRadius > 0.0f)
+			{
+				m_Capsule.m_vCenter[0] = vCenterA;
+				m_Capsule.m_vCenter[1] = vCenterB;
+				m_Capsule.m_flRadius = flRadius;
+				m_eType = RAY_TYPE_CAPSULE;
+			}
+			else
+			{
+				Init(vCenterA, vCenterB);
+			}
+		}
+		else
+		{
+			Init(vCenterA, flRadius);
+		}
+	}
+
+	void Init(const Vector& vMins, const Vector& vMaxs, const Vector* pVertices, int nNumVertices)
+	{
+		m_Mesh.m_vMins = vMins;
+		m_Mesh.m_vMaxs = vMaxs;
+		m_Mesh.m_pVertices = pVertices;
+		m_Mesh.m_nNumVertices = nNumVertices;
+		m_eType = RAY_TYPE_MESH;
+	}
+
+	struct Line_t
+	{
+		Vector m_vStartOffset;
+		float m_flRadius;
+	};
+
+	struct Sphere_t
+	{
+		Vector m_vCenter;
+		float m_flRadius;
+	};
+
+	struct Hull_t
+	{
+		Vector m_vMins;
+		Vector m_vMaxs;
+	};
+
+	struct Capsule_t
+	{
+		Vector m_vCenter[2];
+		float m_flRadius;
+	};
+
+	struct Mesh_t
+	{
+		Vector m_vMins;
+		Vector m_vMaxs;
+		const Vector* m_pVertices;
+		int m_nNumVertices;
+	};
+
+	union
+	{
+		Line_t 		m_Line;
+		Sphere_t 	m_Sphere;
+		Hull_t 		m_Hull;
+		Capsule_t 	m_Capsule;
+		Mesh_t 		m_Mesh;
+	};
+
+	RayType_t m_eType;
 };
 
 struct TraceHitboxData_t
@@ -169,32 +338,58 @@ struct Trace_t
 	{
 		if (m_pHitboxData)
 			return m_pHitboxData->m_nHitboxId;
-		return 0;
+		return -1;
 	}
 
 	int GetHitgroup()
 	{
 		if (m_pHitboxData)
 			return m_pHitboxData->m_nHitGroup;
-		return 0;
+		return -1;
 	}
 
-	void* m_pSurface;					// 0x0
-	CBaseEntity* m_pHitEntity;			// 0x8
-	TraceHitboxData_t* m_pHitboxData;	// 0x10
-	std::byte pad01[0x38];				// 0x18
-	uint32_t m_uContents;				// 0x50
-	std::byte pad02[0x24];				// 0x54
-	Vector m_vecStartPos;				// 0x78
-	Vector m_vecEndPos;					// 0x84
-	Vector m_vecNormal;					// 0x90
-	Vector m_vecPosition;				// 0x9C
-	std::byte pad03[0x4];				// 0xA8
-	float m_flFraction;					// 0xAC
-	std::byte pad04[0x6];				// 0xB0
-	bool m_bAllSolid;					// 0xB6
-	bool m_bStartSolid;					// 0xB7
-	bool m_bSomeBool;					// 0xB8 
+	//void* m_pSurface;					// 0x0
+	//CBaseEntity* m_pHitEntity;			// 0x8
+	//TraceHitboxData_t* m_pHitboxData;	// 0x10
+	//std::byte pad01[0x38];				// 0x18
+	//uint32_t m_uContents;				// 0x50
+	//std::byte pad02[0x24];				// 0x54
+	//Vector m_vecStartPos;				// 0x78
+	//Vector m_vecEndPos;					// 0x84
+	//Vector m_vecNormal;					// 0x90
+	//Vector m_vecPosition;				// 0x9C
+	//std::byte pad03[0x4];				// 0xA8
+	//float m_flFraction;					// 0xAC
+	//std::byte pad04[0x6];				// 0xB0
+	//bool m_bAllSolid;					// 0xB6
+	//bool m_bStartSolid;					// 0xB7
+	//bool m_bSomeBool;					// 0xB8 
+
+	void* m_pSurface;
+	CBaseEntity* m_pHitEntity;
+	TraceHitboxData_t* m_pHitboxData;
+	std::byte pad01[0x38];
+	std::uint32_t m_uContents;
+	std::byte pad02[0x24];
+	Vector m_vecStartPos;
+	Vector m_vecEndPos;
+	Vector m_vecNormal;
+	Vector m_vecPosition;
+	std::byte pad03[0x4];
+	float m_flFraction;
+	std::byte pad04[0x6];
+	bool m_bAllSolid;
+	std::byte pad05[0x4D];
+};
+static_assert(sizeof(Trace_t) == 264);
+
+enum PhysicsTraceType_t
+{
+	VPHYSICS_TRACE_EVERYTHING = 0,
+	VPHYSICS_TRACE_STATIC_ONLY,
+	VPHYSICS_TRACE_MOVING_ONLY,
+	VPHYSICS_TRACE_TRIGGERS_ONLY,
+	VPHYSICS_TRACE_STATIC_AND_MOVING,
 };
 
 struct TraceFilter_t
@@ -212,25 +407,37 @@ struct TraceFilter_t
 	TraceFilter_t() = default;
 	TraceFilter_t(std::uint32_t uMask, CBaseEntity* localplayer, CBaseEntity* player, int nLayer);
 
-	TraceFilter_t(std::uint32_t mask, CBaseEntity* skip_entity, int layer)
+	static TraceFilter_t* InitEntitiesOnly(TraceFilter_t* thisptr, CBaseEntity* skip, uint32_t mask, int layer)
 	{
-		using fn = TraceFilter_t * (__fastcall*)(void*, CBaseEntity* skip_entity, uint32_t mask, int layer, int16_t flags);
-		static auto addr = modules::client.scan("48 89 5C 24 08 48 89 74 24 10 57 48 83 EC 20 0F B6 41 37 33", "TraceFilter_t::InitEntitiesOnly").as();
+		using fn = TraceFilter_t*(__thiscall*)(void*, CBaseEntity*, uint32_t, int, int16_t);
+		static auto addr = modules::client.scan("E8 ? ? ? ? 48 81 4B ? ? ? ? ? 48 8D 05 ? ? ? ?", "TraceFilter_t::InitEntitiesOnly").add(0x1).abs().as();
 
 		auto init_entities_only = reinterpret_cast<fn>(addr);
 		if (init_entities_only)
-			init_entities_only(this, skip_entity, mask, layer, 7); //15 = CollisionMask
+			return init_entities_only(thisptr, skip, mask, layer, 15);
+
+		return nullptr;
 	}
 
-	TraceFilter_t* InitEntitiesOnly(CBaseEntity* skip_entity, uint32_t mask, int layer)
-	{
-		using fn = TraceFilter_t*(__fastcall*)(void*, CBaseEntity* skip_entity, uint32_t mask, int layer, int16_t flags);
-		static auto addr = modules::client.scan("48 89 5C 24 08 48 89 74 24 10 57 48 83 EC 20 0F B6 41 37 33", "TraceFilter_t::InitEntitiesOnly").as();
+	//TraceFilter_t(std::uint32_t mask, CBaseEntity* skip_entity, int layer)
+	//{
+	//	using fn = TraceFilter_t * (__fastcall*)(void*, CBaseEntity* skip_entity, uint32_t mask, int layer, int16_t flags);
+	//	static auto addr = modules::client.scan("48 89 5C 24 08 48 89 74 24 10 57 48 83 EC 20 0F B6 41 37 33", "TraceFilter_t::InitEntitiesOnly").as();
 
-		auto init_entities_only = reinterpret_cast<fn>(addr);
-		if (init_entities_only)
-			return init_entities_only(this, skip_entity, mask, layer, 15); //15 = CollisionMask
-	}
+	//	auto init_entities_only = reinterpret_cast<fn>(addr);
+	//	if (init_entities_only)
+	//		init_entities_only(this, skip_entity, mask, layer, 7); //15 = CollisionMask
+	//}
+
+	//TraceFilter_t* InitEntitiesOnly(CBaseEntity* skip_entity, uint32_t mask, int layer)
+	//{
+	//	using fn = TraceFilter_t * (__fastcall*)(void*, CBaseEntity* skip_entity, uint32_t mask, int layer, int16_t flags);
+	//	static auto addr = modules::client.scan("48 89 5C 24 08 48 89 74 24 10 57 48 83 EC 20 0F B6 41 37 33", "TraceFilter_t::InitEntitiesOnly").as();
+
+	//	auto init_entities_only = reinterpret_cast<fn>(addr);
+	//	if (init_entities_only)
+	//		return init_entities_only(this, skip_entity, mask, layer, 15); //15 = CollisionMask
+	//}
 };
 
 class CGameTrace
@@ -249,14 +456,20 @@ public:
 		return false;
 	}
 
-	bool ClipRayToEntity(Ray_t* ray, const Vector& start, const Vector& end, CCSPlayerPawn* pawn, TraceFilter_t* filter, Trace_t* trace)
+	////TraceRay - index 56
+	//void TraceRay(const Ray_t& ray, unsigned int fMask, TraceFilter_t* pTraceFilter, Trace_t* pTrace)
+	//{
+	//	GetVirtual<void(__thiscall*)(void*, const Ray_t&, uint32_t mask, TraceFilter_t*, Trace_t*)>(this, 56)(this, ray, fMask, pTraceFilter, pTrace);
+	//}
+
+	bool ClipRayToEntity(Ray_t* ray, const Vector& start, const Vector& end, CCSPlayerPawn* skip, TraceFilter_t* filter, Trace_t* trace)
 	{
 		using fn = bool(__fastcall*)(void*, Ray_t*, const Vector&, const Vector&, CCSPlayerPawn*, TraceFilter_t*, Trace_t*);
 		static const auto addr = modules::client.scan("48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 48 89 7C 24 20 41 54 41 56 41 57 48 81 EC C0 00 00 00 48 8B 9C", "ClipRayToEntity").as();
 
 		auto clip_ray_to_entity = reinterpret_cast<fn>(addr);
 		if (clip_ray_to_entity)
-			return clip_ray_to_entity(this, ray, start, end, pawn, filter, trace);
+			return clip_ray_to_entity(this, ray, start, end, skip, filter, trace);
 
 		return false;
 	}

@@ -66,7 +66,7 @@ namespace features::esp
 			m_player_data.clear();
 
 			if (!entity_data::player_entry_data.empty())
-				std::ranges::copy(entity_data::player_entry_data.front().player_data, std::back_inserter(m_player_data));
+				std::ranges::copy(entity_data::player_entry_data.back().player_data, std::back_inserter(m_player_data));
 		}
 
 		static Vector head_pos_out;
@@ -74,10 +74,7 @@ namespace features::esp
 
 		for (auto& data : m_player_data)
 		{
-			if (data.m_iPlayerIndex == 0)
-				continue;
-			
-			if (!data.is_visible)
+			if (!data.flags.test(PLAYER_VISIBLE) || data.flags.test(PLAYER_IN_SMOKE))
 				continue;
 
 			Vector head_pos = data.m_vecAbsOrigin;
@@ -94,25 +91,6 @@ namespace features::esp
 			//Draw3DBox(data.bbox);
 
 			esp::bone_esp(data);
-
-			{ 
-				auto localplayer = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
-				if (localplayer)
-				{
-					auto localpawn = g::entity_system->GetEntityFromHandle(localplayer->m_hPlayerPawn());
-
-					if (localpawn)
-					{
-						Vector start, end;
-						
-						if (globals::world2screen(data.trace.m_vecStartPos, start) && globals::world2screen(data.trace.m_vecEndPos, end))
-						{
-							globals::draw_list->AddLine(start.as_vec2(), end.as_vec2(), IM_COL32_WHITE);
-						}
-					}
-				}
-			}
-
 
 			//if (!data.hitboxes.empty())
 			//{

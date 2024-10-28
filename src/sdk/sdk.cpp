@@ -56,7 +56,7 @@ namespace sdk
 		g::csgo_input = modules::client.scan("48 8D 0D ? ? ? ? E8 ? ? ? ? 48 8D 05 ? ? ? ? 48 C7 05 ? ? ? ? FF FF FF FF", "g::csgo_input").add(0x3).abs().as<CSGOInput*>();
 		g::render_system = **modules::directx11.scan("66 0F 7F 0D ? ? ? ? 66 0F 7F 05 ? ? ? ? 48 89 2D", "g::render_system").add(4).abs().as<CRenderSystem***>();
 		g::global_vars = *modules::client.scan("48 8B 05 ?? ?? ?? ?? 44 8B B7 ?? ?? ?? ?? 8B 70 04 B8 ?? ?? ?? ??", "g::global_vars").add(0x3).abs().as<CGlobalVarsBase**>();
-		g::game_trace = *modules::client.scan("48 8B 0D ? ? ? ? 4C 8B C3 66 89 44 24", "g::game_trace").add(0x3).abs().as<CGameTrace**>();
+		g::engine_trace = *modules::client.scan("48 8B 0D ? ? ? ? 4C 8B C3 66 89 44 24", "g::game_trace").add(0x3).abs().as<CGameTrace**>();
 		g::client_mode_csnormal = modules::client.scan("48 8D 3D ? ? ? ? 48 8D 35 ? ? ? ? 90", "g::client_mode").add(0x3).abs().as<CClientModeCSNormal*>();
 		players::localplayer = modules::client.scan("48 8B 05 ? ? ? ? 48 85 C0 74 53", "players::localplayer").add(0x3).abs().as<CCSPlayerController*>();
 		
@@ -76,7 +76,7 @@ namespace sdk
 		print_status(g::input_system);
 		print_status(g::client_mode_csnormal);
 		print_status(g::global_vars);
-		print_status(g::game_trace);
+		print_status(g::engine_trace);
 		print_status(players::localplayer);
 	}
 }
@@ -94,6 +94,6 @@ namespace interfaces
 	CInputSystem* input_system{};
 	CClientModeCSNormal* client_mode_csnormal{};
 	CGlobalVarsBase* global_vars{};
-	CGameTrace* game_trace{};
+	CGameTrace* engine_trace{};
 }
 

@@ -22,6 +22,7 @@ public:
 	float length() const;
 	float length_sqr() const;
 	float dot_product(const Vector& v) const;
+	Vector cross(const Vector& other) const;
 	float dist_to(const Vector& other) const;
 	void normalize();
 	Vector transform(const matrix3x4_t& matrix) const;
@@ -33,6 +34,11 @@ public:
 	//Operator overloads
 	float operator[](const size_t& index) const;
 	float& operator[](const size_t& index);
+
+	Vector operator-() const 
+	{
+		return Vector(-x, -y, -z);
+	}
 
 	Vector operator+(const Vector& other) const {
 		return Vector(x + other.x, y + other.y, z + other.z);
@@ -105,6 +111,11 @@ public:
 		}
 		// Handle division by zero as appropriate
 		return *this;
+	}
+
+	bool operator!=(const Vector& other) const 
+	{
+		return (x != other.x) || (y != other.y) || (z != other.z);
 	}
 
 	//TODO: Implement more const operators
