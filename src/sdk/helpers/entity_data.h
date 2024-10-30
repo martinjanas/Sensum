@@ -28,6 +28,15 @@ namespace entity_data
 	{
 		Vector hitbox_pos;
 		uint16_t index;
+		bool visible;
+	};
+
+	struct bone_info_t
+	{
+		Vector bone;
+		Vector bone_parent;
+		bool got_bone;
+		bool got_parent;
 	};
 
 	struct local_data_t
@@ -54,6 +63,7 @@ namespace entity_data
 		std::bitset<32> flags;
 
 		std::array<hitbox_info_t, HITBOX_MAX> hitboxes;
+		std::list<bone_info_t> bones_w2s;
 	};
 
 	struct entry_data_t

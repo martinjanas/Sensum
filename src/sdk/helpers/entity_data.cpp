@@ -2,12 +2,7 @@
 #include "../helpers/Hitbox_t.h"
 #include "../helpers/globals.h"
 #include "../../thirdparty/ImGui/imgui_internal.h"
-
 #include "../localplayer.h"
-
-#define MASK_PLAYER_VISIBILITY (CONTENTS_SOLID | CONTENTS_WINDOW | CONTENTS_HITBOX)
-#define MASK_PLAYER_VISIBLE (CONTENTS_SOLID | CONTENTS_WINDOW | CONTENTS_PLAYER | CONTENTS_NPC | CONTENTS_DEBRIS | CONTENTS_HITBOX | CONTENTS_BLOCK_LOS)
-
 
 namespace entity_data
 {
@@ -16,8 +11,6 @@ namespace entity_data
 	std::list<entry_data_t> player_entry_data;
 
 	std::mutex locker;
-
-	Vector origin;
 
 	namespace view_matrix
 	{
@@ -37,18 +30,64 @@ namespace entity_data
 		return std::fabs(dist1 - dist2) < epsilon;
 	}
 
-	bool GetBBox(CGameSceneNode* scene_node, CCollisionProperty* collision, BBox_t& out)
+	void get_bones_w2s(entity_data::player_data_t& data)
+	{
+		const auto& model = data.m_hModel;
+		if (!model.IsValid())
+			return;
+
+		const auto& model_state = data.m_ModelState;
+
+		const Vector neck_chest_delta = model_state.bones[EBones::BONE_NECK].position - model_state.bones[EBones::BONE_SPINE_3].position;
+		const Vector chest_neck_midpoint = model_state.bones[EBones::BONE_SPINE_3].position + (neck_chest_delta * 0.5f);
+
+		bone_info_t esp_data;
+		for (int i = 0; i < EBones::BONE_MAX; ++i)
+		{
+			const auto& flag = model->GetBoneFlags(i);
+			if (!flag.HasFlag(static_cast<uint32_t>(FLAG_HITBOX)))
+				continue;
+
+			const auto& bone_parent_index = model->GetBoneParent(i);
+			if (bone_parent_index == -1)
+				continue;
+
+			const auto& bones = model_state.bones[i];
+			const auto& parent_bones = model_state.bones[bone_parent_index];
+
+			Vector bone_pos = bones.position;
+			Vector parent_pos = parent_bones.position;
+
+			Vector delta_child = bones.position - chest_neck_midpoint;
+			Vector delta_parent = parent_bones.position - chest_neck_midpoint;
+
+			if (delta_parent.length() < 9.0f && delta_child.length() < 9.0f)
+				parent_pos = chest_neck_midpoint;
+
+			if (i == EBones::BONE_SPINE_2)
+				bone_pos = chest_neck_midpoint;
+
+			if (abs(delta_child.z) < 5.0f && delta_parent.length() < 5.0f && delta_child.length() < 5.0f || i == EBones::BONE_SPINE_3)
+				continue;
+
+			esp_data.got_bone = globals::world2screen(bone_pos, esp_data.bone);
+			esp_data.got_parent = globals::world2screen(parent_pos, esp_data.bone_parent);
+
+			data.bones_w2s.push_back(esp_data);
+		}
+	}
+
+	bool get_bbox(CGameSceneNode* scene_node, CCollisionProperty* collision, BBox_t& out)
 	{
 		Vector mins = collision->m_vecMins();
 		Vector maxs = collision->m_vecMaxs();
 
-		const matrix3x4_t& transform = scene_node->m_nodeToWorld().ToMatrix3x4();
+		const matrix3x4_t& matrix = scene_node->m_nodeToWorld().ToMatrix3x4();
 
 		bool valid = true;
 		for (int i = 0; i < 8; i++)
 		{
-			Vector point = Vector{ i & 1 ? maxs.x : mins.x, i & 2 ? maxs.y : mins.y, i & 4 ? maxs.z : mins.z };
-			point = point.transform(transform);
+			Vector point = Vector{ i & 1 ? maxs.x : mins.x, i & 2 ? maxs.y : mins.y, i & 4 ? maxs.z : mins.z }.transform(matrix);
 
 			valid &= globals::world2screen(point, out.m_Vertices[i]);
 		}
@@ -88,7 +127,7 @@ namespace entity_data
 		}
 	}
 
-	bool IsInSmoke(const Vector& start, const Vector& end, const float& max_density)
+	bool is_in_smoke(const Vector& start, const Vector& end, const float& max_density)
 	{
 		using fn = float(__fastcall*)(const Vector&, const Vector&, void*);
 		static auto addr = modules::client.scan("E8 ? ? ? ? 0F 28 F8 44 0F 28 54 24 ?", "IsInSmoke").add(0x1).abs().as();
@@ -106,7 +145,27 @@ namespace entity_data
 		return false;
 	}
 
-	void GetHitbox(entity_data::player_data_t& player_data, const Vector& eye_pos, CCSPlayerPawn* local_pawn, const bool& on_screen)
+	void update_visiblity(entity_data::hitbox_info_t& hitbox_info, entity_data::player_data_t& player_data, CCSPlayerPawn* local_pawn)
+	{
+		if (!hitbox_info.visible)
+		{
+			Ray_t ray = { };
+			TraceFilter_t filter(MASK_PLAYER_VISIBLE, local_pawn, nullptr, 4);
+			Trace_t trace = { };
+
+			g::engine_trace->TraceShape(&ray, local_pawn->GetEyePos(), hitbox_info.hitbox_pos, &filter, &trace);
+
+			if (!player_data.flags.test(PLAYER_VISIBLE) && (trace.m_pHitEntity == player_data.m_PlayerPawn || trace.m_flFraction >= 0.97f))
+				player_data.flags.set(PLAYER_VISIBLE);
+
+			(trace.m_pHitEntity == player_data.m_PlayerPawn || trace.m_flFraction >= 0.97f) ? hitbox_info.visible = true : hitbox_info.visible = false;
+		}
+
+		if (player_data.flags.test(PLAYER_VISIBLE) && !player_data.flags.test(PLAYER_IN_SMOKE) && is_in_smoke(local_pawn->GetEyePos(), hitbox_info.hitbox_pos, 0.2f))
+			player_data.flags.set(PLAYER_IN_SMOKE);
+	}
+
+	void get_hitboxes(entity_data::player_data_t& player_data, const Vector& eye_pos, CCSPlayerPawn* local_pawn, const bool& on_screen)
 	{
 		HitboxSet_t* hitbox_set = player_data.m_PlayerPawn->GetHitboxSet(0);
 		if (!hitbox_set)
@@ -116,6 +175,7 @@ namespace entity_data
 		if (hitboxes.Count() == 0 || hitboxes.Count() > HITBOX_MAX)
 			return;
 	
+		hitbox_info_t hitbox_info;
 		for (int i = 0; i < HITBOX_MAX; ++i)
 		{
 			Hitbox_t* hitbox = &hitboxes[i];
@@ -128,8 +188,8 @@ namespace entity_data
 
 			const auto& hitbox_matrix = player_data.hitbox_transform[i];
 
-			const auto& radius = hitbox->m_flShapeRadius() != -1 ? hitbox->m_flShapeRadius() : 0.f;
-	
+			const auto& radius = hitbox->m_flShapeRadius();
+
 			auto min_bounds = hitbox->m_vMinBounds() - radius;
 			auto max_bounds = hitbox->m_vMaxBounds() + radius;
 
@@ -141,27 +201,18 @@ namespace entity_data
 
 			auto hitbox_pos = (mins + maxs) * 0.5f;
 
-			player_data.hitboxes[i] = { hitbox_pos, hitbox->m_nHitBoxIndex() };
+			player_data.hitboxes[i] = { hitbox_pos, hitbox->m_nHitBoxIndex(), false };
+
+			hitbox_info.hitbox_pos = hitbox_pos;
+			hitbox_info.index = hitbox->m_nHitBoxIndex();
+			hitbox_info.visible = false;
 
 			if (!on_screen || !hitbox_visible_set(i))
 				continue;
 
-			Vector start = local_pawn->GetEyePos();
-			Vector end = hitbox_pos;
+			update_visiblity(hitbox_info, player_data, local_pawn);
 
-			if (!player_data.flags.test(PLAYER_VISIBLE))
-			{
-				Ray_t ray = { };
-				TraceFilter_t filter(MASK_PLAYER_VISIBLE, local_pawn, nullptr, 4);
-				Trace_t trace = { };
-
-				g::engine_trace->TraceShape(&ray, start, end, &filter, &trace);
-
-				(trace.m_pHitEntity == player_data.m_PlayerPawn || trace.m_flFraction >= 0.97f) ? player_data.flags.set(PLAYER_VISIBLE) : player_data.flags.reset(PLAYER_VISIBLE);
-			}
-
-			if (player_data.flags.test(PLAYER_VISIBLE) && !player_data.flags.test(PLAYER_IN_SMOKE) && IsInSmoke(start, end, 0.2f))
-				player_data.flags.set(PLAYER_IN_SMOKE);
+			player_data.hitboxes[i] = hitbox_info;
 		}
 	}
 
@@ -224,7 +275,8 @@ namespace entity_data
 			if (!model.IsValid())
 				continue;
 
-			const auto on_screen = globals::world2screen(scene_node->m_vecOrigin(), origin);
+			Vector origin_w2s;
+			const auto on_screen = globals::world2screen(scene_node->m_vecOrigin(), origin_w2s);
 
 			player_data_t player_data;
 			player_data.m_szPlayerName = "Martin";//controller->m_sSanitizedPlayerName();
@@ -248,13 +300,14 @@ namespace entity_data
 			pawn->m_iHealth() > 0 ? player_data.flags.set(PLAYER_ALIVE) : player_data.flags.reset(PLAYER_ALIVE);
 			pawn->InAir() ? player_data.flags.set(PLAYER_IN_AIR) : player_data.flags.reset(PLAYER_IN_AIR);
 
-			GetHitbox(player_data, eye_pos, localpawn, on_screen);
-			GetBBox(scene_node, collision, player_data.bbox);
+			get_hitboxes(player_data, eye_pos, localpawn, on_screen);
+			get_bbox(scene_node, collision, player_data.bbox);
+			get_bones_w2s(player_data);
 
 			entry_data.player_data.push_back(std::move(player_data));
 		}
 
 		player_entry_data.clear();
-		player_entry_data.emplace_back(std::move(entry_data));
+		player_entry_data.push_back(std::move(entry_data));
 	}
 }

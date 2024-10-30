@@ -37,18 +37,6 @@ namespace features
             return fov;
         }
 
-        float old_distance_based_fov(const QAngle& delta, const float& distance)
-        {
-            float pitch_diff = std::sinf(fabsf(delta.pitch) * math::deg2rad) * distance;
-            float yaw_diff = std::sinf(fabsf(delta.yaw) * math::deg2rad) * distance;
-
-            float fov = std::hypotf(pitch_diff, yaw_diff);
-
-            fov = std::clamp<float>(fov, 0.f, 180.f);
-
-            return fov;
-        }
-
         //utterly broken
         void smooth(float amount, const QAngle& current_angles, const QAngle& aim_angles, QAngle& out_angles)
         {
@@ -205,7 +193,7 @@ namespace features
                 if (!data.m_PlayerPawn || data.m_iHealth <= 0)
                     continue;
 
-                if (!data.flags.test(PLAYER_VISIBLE) || data.flags.test(PLAYER_IN_SMOKE))
+                if (data.flags.test(PLAYER_IN_SMOKE))
                     continue;
 
                 if (data.hitboxes.empty())
@@ -225,6 +213,11 @@ namespace features
                     if (hitbox_ids.find(hitbox_data->index) == hitbox_ids.end())
                         continue;
 
+                    if (!hitbox_data->visible)
+                        continue;
+
+                    //reset the target when not visible, etc...
+
                     QAngle target_angle = (hitbox_data->hitbox_pos - eye_pos).to_qangle();
                     target_angle.normalize_clamp();
 
@@ -235,7 +228,6 @@ namespace features
                     //float distance = data.m_vecOrigin.dist_to(eye_pos);
 
                     float fov = distance_based_fov(delta, distance);
-                    float old_fov = old_distance_based_fov(delta, distance);
 
                     //float fov = std::hypotf(delta.pitch, delta.yaw);
 

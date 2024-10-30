@@ -182,6 +182,9 @@ enum StandardCollisionGroups_t
 // everything normally solid for npc movement, except monsters (world+brush only)
 #define MASK_NPCSOLID_BRUSHONLY		(CONTENTS_SOLID|CONTENTS_WINDOW|CONTENTS_NPC_CLIP|CONTENTS_PASS_BULLETS)
 
+//Custom defined masks
+#define MASK_PLAYER_VISIBLE (CONTENTS_SOLID | CONTENTS_WINDOW | CONTENTS_PLAYER | CONTENTS_NPC | CONTENTS_DEBRIS | CONTENTS_HITBOX | CONTENTS_BLOCK_LOS)
+
 
 enum RayType_t : uint8_t
 {

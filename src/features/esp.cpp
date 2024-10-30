@@ -1,13 +1,9 @@
 ﻿#include "features.h"
 #include "../render/menu/main_window.h"
-#include "../../../../sdk/localplayer.h"
 
 namespace features::esp
 {
 	std::list<entity_data::player_data_t> m_player_data;
-	
-	Ray_t ray;
-	Trace_t trace;
 
 	void Draw3DBox(BBox_t& bbox)
 	{
@@ -88,7 +84,7 @@ namespace features::esp
 			
 			esp::name_esp(data, data.bbox);
 
-			//Draw3DBox(data.bbox);
+			Draw3DBox(data.bbox);
 
 			esp::bone_esp(data);
 
@@ -114,52 +110,11 @@ namespace features::esp
 	{
 		if (!settings::visuals::m_bBoneEsp)
 			return;
-		
-		Vector bone_out;
-		Vector bone_parent_out;
 
-		const auto& model = data.m_hModel;
-		if (!model.IsValid())
-			return;
-
-		const auto& model_state = data.m_ModelState;
-
-		const Vector neck_chest_delta = model_state.bones[EBones::BONE_NECK].position - model_state.bones[EBones::BONE_SPINE_3].position;
-		const Vector chest_neck_midpoint = model_state.bones[EBones::BONE_SPINE_3].position + (neck_chest_delta * 0.5f);
-
-		for (int i = 0; i < EBones::BONE_MAX; ++i)
+		for (const auto& x : data.bones_w2s)
 		{
-			const auto& flag = model->GetBoneFlags(i);
-			if (!flag.HasFlag(static_cast<uint32_t>(FLAG_HITBOX)))
-				continue;
-
-			const auto& bone_parent_index = model->GetBoneParent(i);
-			if (bone_parent_index == -1)
-				continue;
-
-			const auto& bones = model_state.bones[i];
-			const auto& parent_bones = model_state.bones[bone_parent_index];
-
-			Vector bone_pos = bones.position;
-			Vector parent_pos = parent_bones.position;
-
-			Vector delta_child = bones.position - chest_neck_midpoint;
-			Vector delta_parent = parent_bones.position - chest_neck_midpoint;
-
-			if (delta_parent.length() < 9.0f && delta_child.length() < 9.0f)
-				parent_pos = chest_neck_midpoint;
-
-			if (i == EBones::BONE_SPINE_2)
-				bone_pos = chest_neck_midpoint;
-
-			if (abs(delta_child.z) < 5.0f && delta_parent.length() < 5.0f && delta_child.length() < 5.0f || i == EBones::BONE_SPINE_3)
-				continue;
-
-			bool got_bones = globals::world2screen(bone_pos, bone_out);
-			bool got_parents = globals::world2screen(parent_pos, bone_parent_out);
-
-			if (got_bones && got_parents)
-				globals::draw_list->AddLine(bone_out.as_vec2(), bone_parent_out.as_vec2(), ImColor(settings::visuals::m_fBoneColor.x, settings::visuals::m_fBoneColor.y, settings::visuals::m_fBoneColor.z, settings::visuals::m_fBoneColor.w));
+			if (x.got_bone && x.got_parent)
+				globals::draw_list->AddLine(x.bone.as_vec2(), x.bone_parent.as_vec2(), ImColor(settings::visuals::m_fBoneColor.x, settings::visuals::m_fBoneColor.y, settings::visuals::m_fBoneColor.z, settings::visuals::m_fBoneColor.w));
 		}
 	}
 

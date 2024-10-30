@@ -22,10 +22,6 @@ enum ELogLevel
 class Console
 {
 public:
-    Console()
-    {
-        attach();
-    }
     //Default: LOG_INFO
     template <ELogLevel log_level = LOG_INFO>
     void println(const char* format, ...)
@@ -76,10 +72,10 @@ public:
         va_end(args);
     }
 
+    void attach();
     void detach();
     void save_log();
 private:
-    void attach();
     void log_output(const char* msg);
 
     std::list<std::string> log_data;

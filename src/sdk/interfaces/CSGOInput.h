@@ -150,8 +150,6 @@ class CCSGOInterpolationInfoPB : public CBasePB
 {
 public:
 	float flFraction; // 0x18
-	int nSrcTick; // 0x1C
-	int nDstTick; // 0x20
 };
 
 class CCSGOInputHistoryEntryPB : public CBasePB
