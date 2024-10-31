@@ -15,7 +15,8 @@ namespace features
     {
         std::list<entity_data::player_data_t> m_player_data;
 
-        static QAngle old_punch;
+        static QAngle old_punch = { 0.f, 0.f, 0.f };
+        static QAngle current_punch = { 0.f, 0.f, 0.f };
         static bool was_firing_last_frame = false;
 
         std::unordered_set<int>& GetTargetHitboxes() //Add hitbox target priority?
@@ -37,11 +38,8 @@ namespace features
             return fov;
         }
 
-        //utterly broken
         void smooth(float amount, const QAngle& current_angles, const QAngle& aim_angles, QAngle& out_angles)
         {
-            amount = std::clamp(amount, 1.0f, 10.0f);
-
             float smoothing_factor = amount;
 
             QAngle delta = aim_angles - current_angles;
@@ -51,7 +49,7 @@ namespace features
             out_angles.normalize_clamp();
         }
 
-        //broken when smooth amount < 12
+        //broken, not constant at all
         void smooth_constant(const float& speed, const QAngle& current_angles, const QAngle& target_angles, QAngle& smoothed_angles)
         {
             QAngle delta = target_angles - current_angles;
@@ -99,7 +97,7 @@ namespace features
             smoothed_angles.normalize_clamp();
         }
         
-        void recoil(CCSPlayerPawn* localpawn, const QAngle& viewangles, CUserCmd* cmd)
+        void recoil(CCSPlayerPawn* localpawn, const QAngle& viewangles)
         {
             // Get a reference to the punch angle cache
             auto& punch_cache = localpawn->m_aimPunchCache();
@@ -108,40 +106,103 @@ namespace features
             if (punch_cache.Count() <= 0 || punch_cache.Count() >= 0xFFFF)
                 return;
 
-            // Get the most recent punch angle from the cache
-            QAngle current_punch = punch_cache[punch_cache.Count() - 1]; // Most recent angle at index 0
+            QAngle cp = punch_cache[punch_cache.Count()];
+            QAngle cpm1 = punch_cache[punch_cache.Count() - 1];
+            QAngle cpm2 = punch_cache[punch_cache.Count() - 2];
 
-            // If the player has fired more than one shot
-            if (localpawn->m_iShotsFired() > 1 && cmd->IsButtonPressed(IN_ATTACK))
+            int cp_count = punch_cache.Count();
+            int cp1_count = punch_cache.Count() - 1;
+            int cp2_count = punch_cache.Count() - 2;
+
+            g_Console->println("cpc: %d, cp: %.1f, %.1f", cp_count, cp.pitch, cp.yaw);
+            g_Console->println("cp1c: %d, cp1: %.1f, %.1f", cp1_count, cpm1.pitch, cpm1.yaw);
+            g_Console->println("cp2c: %d, cp2: %.1f, %.1f", cp2_count, cpm2.pitch, cpm2.yaw);
+
+            //// Get the most recent punch angle from the cache
+            //QAngle cp = punch_cache[punch_cache.Count() - 1]; // Most recent angle at index 0
+
+            //QAngle delta = viewangles - cp;
+            //delta.normalize_clamp();
+
+            ////.Count() is 129 when not shooting, once shooting it starts at 0 and goes up quickly up to 129
+            //g_Console->println("size: %d", punch_cache.Count());
+            /*g_Console->println("v: %.1f, %.1f", viewangles.pitch, viewangles.yaw);
+            g_Console->println("cp: %.1f, %.1f", cp.pitch, cp.yaw);
+            g_Console->println("delta: %.1f, %.1f", delta.pitch, delta.yaw);*/
+
+            if (g::input_system->IsButtonDown(ButtonCode::MouseLeft))
             {
-                // Only initialize old_punch when the player starts shooting (for the first frame)
-                if (!was_firing_last_frame)
-                {
-                    old_punch = current_punch; // Set old_punch to the current punch angle when shooting starts
-                    was_firing_last_frame = true; // Mark that the player was firing in the last frame
-                }
+                QAngle delta = viewangles - cp;
 
-                // Calculate the delta between the current punch angle and the old punch angle
-                QAngle punch_delta = viewangles - current_punch - old_punch;
+                smooth(settings::visuals::recoil_smooth, viewangles, delta, delta);
 
-                // Update old_punch before applying compensation, so the next frame has the correct reference
-                old_punch = current_punch;
+                g::client->SetViewAngles(0, delta);
+            }
+        }
 
-                // Subtract the delta from the current view angles for smooth recoil compensation
-                QAngle compensated_angle = punch_delta * 2.0f; // Adjust scaling factor if needed // * 2.0f
-                compensated_angle.normalize_clamp(); // Ensure angles are within valid bounds
+        //Standlone RCS:
+        //void recoil(CCSPlayerPawn* localpawn, const QAngle& viewangles, CUserCmd* cmd)
+        //{
+        //    auto& punch_cache = localpawn->m_aimPunchCache();
+        //    if (punch_cache.Count() <= 0 || punch_cache.Count() >= 0xFFFF)
+        //        return;
+
+        //    if (g::input_system->IsButtonDown(ButtonCode::MouseLeft))
+        //    {
+        //        current_punch = punch_cache[punch_cache.Count() - 1];
+        //        current_punch.pitch *= settings::visuals::pitch;
+        //        current_punch.yaw *= settings::visuals::yaw;
+        //        
+        //        QAngle compensated_angle = viewangles + (old_punch - current_punch);
+        //        compensated_angle.normalize_clamp();
+
+        //        //smooth(settings::visuals::recoil_smooth, viewangles, compensated_angle, compensated_angle);
+
+        //        g_Console->println("cp: %.1f, %.1f", current_punch.pitch, current_punch.yaw);
+        //        g_Console->println("op: %.1f, %.1f", old_punch.pitch, old_punch.yaw);
+        //        g_Console->println("ca: %.1f, %.1f", compensated_angle.pitch, compensated_angle.yaw);
+
+        //        /*if (compensated_angle.pitch > 12.f)
+        //            return;*/
+
+        //        g::client->SetViewAngles(0, compensated_angle);
+
+        //        old_punch = punch_cache[punch_cache.Count() - 2];
+        //    }
+
+        //    old_punch = current_punch;
+        //}
+
+        void recoil(CCSPlayerPawn* localpawn, const QAngle& viewangles, CUserCmd* cmd)
+        {
+            auto& punch_cache = localpawn->m_aimPunchCache();
+            if (punch_cache.Count() <= 0 || punch_cache.Count() >= 0xFFFF)
+                return;
+
+            if (g::input_system->IsButtonDown(ButtonCode::MouseLeft))
+            {
+                current_punch = punch_cache[punch_cache.Count() - 1];
+                current_punch.pitch *= settings::visuals::pitch;
+                current_punch.yaw *= settings::visuals::yaw;
+
+                QAngle compensated_angle = viewangles + (old_punch - current_punch);
+                compensated_angle.normalize_clamp();
 
                 //smooth(settings::visuals::recoil_smooth, viewangles, compensated_angle, compensated_angle);
 
-                // Set the new view angles (compensated for recoil)
+                g_Console->println("cp: %.1f, %.1f", current_punch.pitch, current_punch.yaw);
+                g_Console->println("op: %.1f, %.1f", old_punch.pitch, old_punch.yaw);
+                g_Console->println("ca: %.1f, %.1f", compensated_angle.pitch, compensated_angle.yaw);
+
+                /*if (compensated_angle.pitch > 12.f)
+                    return;*/
+
                 g::client->SetViewAngles(0, compensated_angle);
+
+                old_punch = punch_cache[punch_cache.Count() - 2];
             }
-            else
-            {
-                // Reset old punch when not firing (to prevent residual punch from affecting next burst)
-                old_punch = QAngle(0, 0, 0);
-                was_firing_last_frame = false; // Mark that the player is no longer firing
-            }
+
+            old_punch = current_punch;
         }
 
         void handle(CUserCmd* cmd)
@@ -183,10 +244,10 @@ namespace features
             //auto punch_angle = punch_cache[punch_cache.Count() - 1];
 
             //auto recoil_angle = localpawn->m_iShotsFired() > 1 ? punch_angle : QAngle();
-            //recoil_angle.clamp_normalize();
+            //recoil_angle.normalize_clamp();
 
             //viewangles -= recoil_angle; //This works, but its not allright
-            //viewangles.clamp_normalize();
+            //viewangles.normalize_clamp();
 
             for (const auto& data : m_player_data)
             {
@@ -243,7 +304,7 @@ namespace features
                     if (!(GetAsyncKeyState(VK_LBUTTON)))
                         continue;
 
-                    //printf("[%s: %d]: fov: %.1f, old_fov: %.1f, best_fov: %.1f, dist: %.1f\n", hitbox_data->entity_name, hitbox_data->index, fov, old_fov, best_fov, distance);
+                    //printf("[%s: %d]: fov: %.1f, best_fov: %.1f, dist: %.1f\n", data.m_szPlayerName, hitbox_data->index, fov, best_fov, distance);
 
                     if (best_fov > settings::visuals::aimbot_fov)
                         continue;
@@ -252,11 +313,13 @@ namespace features
                         smooth(settings::visuals::smooth, viewangles, best_angle, best_angle);
                     else smooth_constant(settings::visuals::smooth, viewangles, best_angle, best_angle);*/
 
+                    smooth(settings::visuals::smooth, viewangles, best_angle, best_angle);
+
                     g::client->SetViewAngles(0, best_angle);
                 }
             }
 
-            //recoil(localpawn, viewangles, cmd); //This keeps overwriting my angles and thus aimbot is not locking on
+            recoil(localpawn, viewangles, cmd); //This keeps overwriting my angles and thus aimbot is not locking on
         }
     }
 }

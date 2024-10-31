@@ -26,6 +26,9 @@ namespace main_window
         ImGui::SliderFloat("Recoil Scale", &settings::visuals::recoil_scale, 0.f, 1.f, "Recoil Scale: %.1f");
         ImGui::SliderFloat("###RecoilSmooth", &settings::visuals::recoil_smooth, 1.f, 10.f, "Recoil Smooth: %.1f");
 
+        ImGui::SliderFloat("Recoil Pitch", &settings::visuals::pitch, 1.f, 2.f, "Recoil Pitch: %.1f");
+        ImGui::SliderFloat("Recoil Yaw", &settings::visuals::yaw, 1.f, 2.f, "Recoil Yaw: %.1f");
+
         ImGui::Checkbox("Fov changer", &settings::visuals::m_bFovChanger);
 
         if (settings::visuals::m_bFovChanger)

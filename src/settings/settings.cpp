@@ -21,6 +21,8 @@ namespace settings
 		float recoil_scale = 1.f;
 		float box_rounding = 0.f;
 		float box_thickness = 2.f;
+		float pitch = 2.f;
+		float yaw = 2.f;
 
 		// colors
 		ImVec4 m_fBoneColor = ImVec4(255, 255, 255, 255);

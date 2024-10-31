@@ -22,6 +22,8 @@ namespace settings
 		extern float recoil_scale;
 		extern float box_rounding;
 		extern float box_thickness;
+		extern float pitch;
+		extern float yaw;
 
 		// colors
 		extern ImVec4 m_fBoneColor;

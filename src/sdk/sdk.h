@@ -39,25 +39,28 @@ public:
 
 };
 
-//class CNetworkGameClient //implement these later:
-//{
-//public:
-//	CGlobalVarsBase* GetGlobalVars()
-//	{
-//		//xref: Curtime( %f )\nRealtime( %f )\n module: engine2
-//		return GetVirtual<CGlobalVarsBase * (__thiscall*)(void*)>(this, 4)(this);
-//	}
-//};
+class CNetworkGameClient
+{
+public:
+	//CGlobalVarsBase* GetGlobalVars()
+	//{
+	//	//xref: Curtime( %f )\nRealtime( %f )\n module: engine2
+	//	return GetVirtual<CGlobalVarsBase * (__thiscall*)(void*)>(this, 4)(this);
+	//}
+};
 
-//g::network_game_service = modules::engine.GetInterfaceFromList<CNetworkGameService*>("NetworkClientService_001");
-//class CNetworkGameService
-//{
-//public:
-//	CNetworkGameClient* GetNetworkGameClient()
-//	{
-//		return *reinterpret_cast<CNetworkGameClient**>(reinterpret_cast<uintptr_t>(this) + 0xB8);
-//	}
-//};
+class CNetworkGameService
+{
+public:
+	CNetworkGameClient* GetNetworkGameClient()
+	{
+		//return *reinterpret_cast<CNetworkGameClient**>(reinterpret_cast<uintptr_t>(this) + 0xB8);
+
+		//index 23
+
+		return GetVirtual<CNetworkGameClient*(__thiscall*)(void*)>(this, 23)(this);
+	}
+};
 
 namespace sdk
 {
@@ -88,6 +91,8 @@ namespace interfaces //move to interfaces.h ?
 	extern CClientModeCSNormal* client_mode_csnormal;
     extern CGlobalVarsBase* global_vars;
 	extern CGameTrace* engine_trace;
+	extern CNetworkGameService* network_game_service;
+	extern CNetworkGameClient* network_game_client;
 }
 
 namespace g = interfaces;
