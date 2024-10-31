@@ -139,41 +139,9 @@ namespace features
                 g::client->SetViewAngles(0, delta);
             }
         }
-
-        //Standlone RCS:
-        //void recoil(CCSPlayerPawn* localpawn, const QAngle& viewangles, CUserCmd* cmd)
-        //{
-        //    auto& punch_cache = localpawn->m_aimPunchCache();
-        //    if (punch_cache.Count() <= 0 || punch_cache.Count() >= 0xFFFF)
-        //        return;
-
-        //    if (g::input_system->IsButtonDown(ButtonCode::MouseLeft))
-        //    {
-        //        current_punch = punch_cache[punch_cache.Count() - 1];
-        //        current_punch.pitch *= settings::visuals::pitch;
-        //        current_punch.yaw *= settings::visuals::yaw;
-        //        
-        //        QAngle compensated_angle = viewangles + (old_punch - current_punch);
-        //        compensated_angle.normalize_clamp();
-
-        //        //smooth(settings::visuals::recoil_smooth, viewangles, compensated_angle, compensated_angle);
-
-        //        g_Console->println("cp: %.1f, %.1f", current_punch.pitch, current_punch.yaw);
-        //        g_Console->println("op: %.1f, %.1f", old_punch.pitch, old_punch.yaw);
-        //        g_Console->println("ca: %.1f, %.1f", compensated_angle.pitch, compensated_angle.yaw);
-
-        //        /*if (compensated_angle.pitch > 12.f)
-        //            return;*/
-
-        //        g::client->SetViewAngles(0, compensated_angle);
-
-        //        old_punch = punch_cache[punch_cache.Count() - 2];
-        //    }
-
-        //    old_punch = current_punch;
-        //}
-
-        void recoil(CCSPlayerPawn* localpawn, const QAngle& viewangles, CUserCmd* cmd)
+        
+        //AKA standalone rcs
+        void fixed_point_rcs(CCSPlayerPawn* localpawn, const QAngle& viewangles, CUserCmd* cmd)
         {
             auto& punch_cache = localpawn->m_aimPunchCache();
             if (punch_cache.Count() <= 0 || punch_cache.Count() >= 0xFFFF)
@@ -184,7 +152,7 @@ namespace features
                 current_punch = punch_cache[punch_cache.Count() - 1];
                 current_punch.pitch *= settings::visuals::pitch;
                 current_punch.yaw *= settings::visuals::yaw;
-
+                
                 QAngle compensated_angle = viewangles + (old_punch - current_punch);
                 compensated_angle.normalize_clamp();
 
@@ -203,6 +171,55 @@ namespace features
             }
 
             old_punch = current_punch;
+        }
+
+        void rcs(CCSPlayerPawn* localpawn, const QAngle& viewangles, CUserCmd* cmd)
+        {
+            auto& punch_cache = localpawn->m_aimPunchCache();
+            if (punch_cache.Count() <= 1 || punch_cache.Count() >= 0xFFFF)
+                return;
+
+            static QAngle last_punch = { 0.0f, 0.0f, 0.f }; // Store the last punch angle
+            static bool is_shooting = false; // Track shooting state
+
+            if (g::input_system->IsButtonDown(ButtonCode::MouseLeft)) // Apply while shooting
+            {
+                is_shooting = true;
+
+                // Get the latest punch angle
+                QAngle current_punch = punch_cache[punch_cache.Count() - 1];
+                current_punch.pitch *= settings::visuals::pitch;
+                current_punch.yaw *= settings::visuals::yaw;
+
+                // Calculate the recoil offset
+                QAngle recoil_offset = current_punch - last_punch; // Determine the change in punch angle
+                recoil_offset /= 0.8f;
+
+                // If recoil_offset is positive, it means the gun is pulling down
+                // Counteract it directly
+                QAngle compensated_angle = viewangles - recoil_offset; // Adjust based on the recoil
+                compensated_angle.normalize_clamp();
+
+                // Print debug information to understand behavior
+                /*g_Console->println("Current Punch: %.2f, %.2f", current_punch.pitch, current_punch.yaw);
+                g_Console->println("Last Punch: %.2f, %.2f", last_punch.pitch, last_punch.yaw);
+                g_Console->println("Recoil Offset: %.2f, %.2f", recoil_offset.pitch, recoil_offset.yaw);
+                g_Console->println("Compensated Angle: %.2f, %.2f", compensated_angle.pitch, compensated_angle.yaw);*/
+
+                smooth(1.05, viewangles, compensated_angle, compensated_angle);
+
+                // Set the view angles based on the calculated compensation
+                g::client->SetViewAngles(0, compensated_angle);
+
+                // Update the last punch angle to the current one for the next frame
+                last_punch = current_punch;
+            }
+            else if (is_shooting) 
+            {
+                // Reset last_punch when the shooting ends to prepare for the next burst
+                last_punch = { 0.0f, 0.0f, 0.f };
+                is_shooting = false; // Reset shooting state
+            }
         }
 
         void handle(CUserCmd* cmd)
@@ -319,7 +336,7 @@ namespace features
                 }
             }
 
-            recoil(localpawn, viewangles, cmd); //This keeps overwriting my angles and thus aimbot is not locking on
+            rcs(localpawn, viewangles, cmd); //This keeps overwriting my angles and thus aimbot is not locking on
         }
     }
 }

@@ -7,7 +7,7 @@
 class CCSPlayerPawn : public CBaseEntity
 {
 public:
-    NETVAR(int, m_iShotsFired, "C_CSPlayerPawnBase", "m_iShotsFired");
+    NETVAR(int, m_iShotsFired, "C_CSPlayerPawn", "m_iShotsFired");
     NETVAR(float, m_flFlashDuration, "C_CSPlayerPawnBase", "m_flFlashDuration");
     NETVAR(int, m_iIDEntIndex, "C_CSPlayerPawnBase", "m_iIDEntIndex");
     NETVAR(Vector, m_pGlowServices, "C_CSPlayerPawn", "m_pGlowServices");

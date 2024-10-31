@@ -6,7 +6,7 @@
 
 DWORD __stdcall on_attach(void* base)
 {
-    //Sleep(5000);
+    Sleep(5000);
 
     g_Console = new Console();
     g_Console->attach();

@@ -20,6 +20,16 @@ public:
 	bool is_zero();
 
 	Vector to_vector() const;
+    
+    QAngle operator-() const
+    {
+        return QAngle(-this->pitch, -this->yaw, -this->roll);
+    }
+
+    QAngle operator-()
+    {
+        return QAngle(-this->pitch, -this->yaw, -this->roll);
+    }
 
     QAngle operator+(float v) const
     {
