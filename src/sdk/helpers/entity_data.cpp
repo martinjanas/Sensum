@@ -32,6 +32,9 @@ namespace entity_data
 
 	void get_bones_w2s(entity_data::player_data_t& data)
 	{
+		if (!data.bones_w2s.empty())
+			return;
+
 		const auto& model = data.m_hModel;
 		if (!model.IsValid())
 			return;
@@ -113,14 +116,11 @@ namespace entity_data
 		switch (index) 
 		{
 			case HITBOX_HEAD:
-			case HITBOX_LOWER_CHEST:
 			case HITBOX_UPPER_CHEST:
 			case HITBOX_RIGHT_CALF:
 			case HITBOX_LEFT_CALF:
-			//case HITBOX_RIGHT_HAND:
-			//case HITBOX_LEFT_HAND:
-			case HITBOX_LEFT_FOREARM:
-			case HITBOX_RIGHT_FOREARM:
+			case HITBOX_RIGHT_HAND:
+			case HITBOX_LEFT_HAND:
 				return true;
 			default:
 				return false;	 		
@@ -147,18 +147,20 @@ namespace entity_data
 
 	void update_visiblity(entity_data::hitbox_info_t& hitbox_info, entity_data::player_data_t& player_data, CCSPlayerPawn* local_pawn)
 	{
+		static Ray_t ray;
+		TraceFilter_t filter(MASK_PLAYER_VISIBLE, local_pawn, nullptr, 4);
+		Trace_t trace;
+
 		if (!hitbox_info.visible)
 		{
-			Ray_t ray = { };
-			TraceFilter_t filter(MASK_PLAYER_VISIBLE, local_pawn, nullptr, 4);
-			Trace_t trace = { };
-
 			g::engine_trace->TraceShape(&ray, local_pawn->GetEyePos(), hitbox_info.hitbox_pos, &filter, &trace);
 
-			if (!player_data.flags.test(PLAYER_VISIBLE) && (trace.m_pHitEntity == player_data.m_PlayerPawn || trace.m_flFraction >= 0.97f))
+			const bool is_visible = trace.m_flFraction >= 0.97f;
+
+			if (!player_data.flags.test(PLAYER_VISIBLE) && is_visible)
 				player_data.flags.set(PLAYER_VISIBLE);
 
-			(trace.m_pHitEntity == player_data.m_PlayerPawn || trace.m_flFraction >= 0.97f) ? hitbox_info.visible = true : hitbox_info.visible = false;
+			hitbox_info.visible = is_visible;
 		}
 
 		if (player_data.flags.test(PLAYER_VISIBLE) && !player_data.flags.test(PLAYER_IN_SMOKE) && is_in_smoke(local_pawn->GetEyePos(), hitbox_info.hitbox_pos, 0.2f))
@@ -259,19 +261,19 @@ namespace entity_data
 			if (!hitbox_set)
 				continue;
 
-			const auto scene_node = pawn->m_pGameSceneNode();
-			const auto weapon_services = pawn->m_pWeaponServices();
+			const auto& scene_node = pawn->m_pGameSceneNode();
+			const auto& weapon_services = pawn->m_pWeaponServices();
 			if (!scene_node || !weapon_services)
 				continue;
 
-			const auto active_wpn = g::entity_system->GetEntityFromHandle<CBasePlayerWeapon*>(weapon_services->m_hActiveWeapon()); //weapon_services->m_hActiveWeapon().Get<CBasePlayerWeapon*>();
-			const auto collision = pawn->m_pCollision();
-			const auto skeleton_instance = scene_node->GetSkeletonInstance();
+			const auto& active_wpn = g::entity_system->GetEntityFromHandle<CBasePlayerWeapon*>(weapon_services->m_hActiveWeapon()); //weapon_services->m_hActiveWeapon().Get<CBasePlayerWeapon*>();
+			const auto& collision = pawn->m_pCollision();
+			const auto& skeleton_instance = scene_node->GetSkeletonInstance();
 			if (!active_wpn || !collision || !skeleton_instance)
 				continue;
 
-			const auto model_state = skeleton_instance->m_modelState();
-			const auto model = model_state.modelHandle;
+			const auto& model_state = skeleton_instance->m_modelState();
+			const auto& model = model_state.modelHandle;
 			if (!model.IsValid())
 				continue;
 
@@ -302,7 +304,7 @@ namespace entity_data
 
 			get_hitboxes(player_data, eye_pos, localpawn, on_screen);
 			get_bbox(scene_node, collision, player_data.bbox);
-			get_bones_w2s(player_data);
+			//get_bones_w2s(player_data);
 
 			entry_data.player_data.push_back(std::move(player_data));
 		}

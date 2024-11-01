@@ -15,7 +15,7 @@ namespace features
     {
         std::list<entity_data::player_data_t> m_player_data;
 
-        static QAngle old_punch = { 0.f, 0.f, 0.f };
+        static QAngle last_punch = { 0.f, 0.f, 0.f };
         static QAngle current_punch = { 0.f, 0.f, 0.f };
         static bool was_firing_last_frame = false;
 
@@ -97,49 +97,6 @@ namespace features
             smoothed_angles.normalize_clamp();
         }
         
-        void recoil(CCSPlayerPawn* localpawn, const QAngle& viewangles)
-        {
-            // Get a reference to the punch angle cache
-            auto& punch_cache = localpawn->m_aimPunchCache();
-
-            // Ensure the punch cache is valid
-            if (punch_cache.Count() <= 0 || punch_cache.Count() >= 0xFFFF)
-                return;
-
-            QAngle cp = punch_cache[punch_cache.Count()];
-            QAngle cpm1 = punch_cache[punch_cache.Count() - 1];
-            QAngle cpm2 = punch_cache[punch_cache.Count() - 2];
-
-            int cp_count = punch_cache.Count();
-            int cp1_count = punch_cache.Count() - 1;
-            int cp2_count = punch_cache.Count() - 2;
-
-            g_Console->println("cpc: %d, cp: %.1f, %.1f", cp_count, cp.pitch, cp.yaw);
-            g_Console->println("cp1c: %d, cp1: %.1f, %.1f", cp1_count, cpm1.pitch, cpm1.yaw);
-            g_Console->println("cp2c: %d, cp2: %.1f, %.1f", cp2_count, cpm2.pitch, cpm2.yaw);
-
-            //// Get the most recent punch angle from the cache
-            //QAngle cp = punch_cache[punch_cache.Count() - 1]; // Most recent angle at index 0
-
-            //QAngle delta = viewangles - cp;
-            //delta.normalize_clamp();
-
-            ////.Count() is 129 when not shooting, once shooting it starts at 0 and goes up quickly up to 129
-            //g_Console->println("size: %d", punch_cache.Count());
-            /*g_Console->println("v: %.1f, %.1f", viewangles.pitch, viewangles.yaw);
-            g_Console->println("cp: %.1f, %.1f", cp.pitch, cp.yaw);
-            g_Console->println("delta: %.1f, %.1f", delta.pitch, delta.yaw);*/
-
-            if (g::input_system->IsButtonDown(ButtonCode::MouseLeft))
-            {
-                QAngle delta = viewangles - cp;
-
-                smooth(settings::visuals::recoil_smooth, viewangles, delta, delta);
-
-                g::client->SetViewAngles(0, delta);
-            }
-        }
-        
         //AKA standalone rcs
         void fixed_point_rcs(CCSPlayerPawn* localpawn, const QAngle& viewangles, CUserCmd* cmd)
         {
@@ -153,24 +110,20 @@ namespace features
                 current_punch.pitch *= settings::visuals::pitch;
                 current_punch.yaw *= settings::visuals::yaw;
                 
-                QAngle compensated_angle = viewangles + (old_punch - current_punch);
+                QAngle compensated_angle = viewangles + (last_punch - current_punch);
                 compensated_angle.normalize_clamp();
 
                 //smooth(settings::visuals::recoil_smooth, viewangles, compensated_angle, compensated_angle);
-
-                g_Console->println("cp: %.1f, %.1f", current_punch.pitch, current_punch.yaw);
-                g_Console->println("op: %.1f, %.1f", old_punch.pitch, old_punch.yaw);
-                g_Console->println("ca: %.1f, %.1f", compensated_angle.pitch, compensated_angle.yaw);
 
                 /*if (compensated_angle.pitch > 12.f)
                     return;*/
 
                 g::client->SetViewAngles(0, compensated_angle);
 
-                old_punch = punch_cache[punch_cache.Count() - 2];
+                last_punch = punch_cache[punch_cache.Count() - 2];
             }
 
-            old_punch = current_punch;
+            last_punch = current_punch;
         }
 
         void rcs(CCSPlayerPawn* localpawn, const QAngle& viewangles, CUserCmd* cmd)
@@ -179,46 +132,29 @@ namespace features
             if (punch_cache.Count() <= 1 || punch_cache.Count() >= 0xFFFF)
                 return;
 
-            static QAngle last_punch = { 0.0f, 0.0f, 0.f }; // Store the last punch angle
-            static bool is_shooting = false; // Track shooting state
+            // Get the latest punch angle
+            QAngle current_punch = punch_cache[punch_cache.Count() - 1];
+            current_punch.pitch *= settings::visuals::pitch;
+            current_punch.yaw *= settings::visuals::yaw;
 
-            if (g::input_system->IsButtonDown(ButtonCode::MouseLeft)) // Apply while shooting
+            if (localpawn->m_iShotsFired() > 1 && g::input_system->IsButtonDown(ButtonCode::MouseLeft)) // Apply while shooting
             {
-                is_shooting = true;
+                QAngle recoil_delta = current_punch - last_punch; // Determine the change in punch angle
+                recoil_delta.pitch *= settings::visuals::pitch;
+                recoil_delta.yaw *= settings::visuals::yaw;
 
-                // Get the latest punch angle
-                QAngle current_punch = punch_cache[punch_cache.Count() - 1];
-                current_punch.pitch *= settings::visuals::pitch;
-                current_punch.yaw *= settings::visuals::yaw;
-
-                // Calculate the recoil offset
-                QAngle recoil_offset = current_punch - last_punch; // Determine the change in punch angle
-                recoil_offset /= 0.8f;
-
-                // If recoil_offset is positive, it means the gun is pulling down
-                // Counteract it directly
-                QAngle compensated_angle = viewangles - recoil_offset; // Adjust based on the recoil
+                QAngle compensated_angle = viewangles - recoil_delta; // Adjust based on the recoil
                 compensated_angle.normalize_clamp();
 
-                // Print debug information to understand behavior
-                /*g_Console->println("Current Punch: %.2f, %.2f", current_punch.pitch, current_punch.yaw);
-                g_Console->println("Last Punch: %.2f, %.2f", last_punch.pitch, last_punch.yaw);
-                g_Console->println("Recoil Offset: %.2f, %.2f", recoil_offset.pitch, recoil_offset.yaw);
-                g_Console->println("Compensated Angle: %.2f, %.2f", compensated_angle.pitch, compensated_angle.yaw);*/
+                smooth(settings::visuals::recoil_smooth, viewangles, compensated_angle, compensated_angle);
 
-                smooth(1.05, viewangles, compensated_angle, compensated_angle);
-
-                // Set the view angles based on the calculated compensation
                 g::client->SetViewAngles(0, compensated_angle);
 
-                // Update the last punch angle to the current one for the next frame
                 last_punch = current_punch;
             }
-            else if (is_shooting) 
+            else
             {
-                // Reset last_punch when the shooting ends to prepare for the next burst
                 last_punch = { 0.0f, 0.0f, 0.f };
-                is_shooting = false; // Reset shooting state
             }
         }
 
@@ -307,8 +243,6 @@ namespace features
 
                     float fov = distance_based_fov(delta, distance);
 
-                    //float fov = std::hypotf(delta.pitch, delta.yaw);
-
                     if (fov < best_fov)
                     {
                         best_fov = fov;
@@ -318,7 +252,22 @@ namespace features
                     /*if (!cmd->IsButtonPressed(IN_ATTACK))
                         continue;*/
 
+                    const auto& active_wpn_handle = localpawn->m_pWeaponServices()->m_hActiveWeapon();
+                    if (!active_wpn_handle.IsValid())
+                        continue;
+
+                    auto active_wpn = reinterpret_cast<CBasePlayerWeapon*>(g::entity_system->GetEntityFromHandle(active_wpn_handle));
+                    if (!active_wpn)
+                        continue;
+
                     if (!(GetAsyncKeyState(VK_LBUTTON)))
+                        continue;
+
+                    if (active_wpn->m_iItemDefinitionIndex() == 9 && !localpawn->m_bIsScoped())
+                        continue;
+
+                    int next_attack_tick = active_wpn->m_nNextPrimaryAttackTick().m_Value(); //This next shot attack checker works poorly on awp - needs fix!
+                    if (next_attack_tick <= localplayer->m_nTickBase() && active_wpn->m_iItemDefinitionIndex() != 9)
                         continue;
 
                     //printf("[%s: %d]: fov: %.1f, best_fov: %.1f, dist: %.1f\n", data.m_szPlayerName, hitbox_data->index, fov, best_fov, distance);

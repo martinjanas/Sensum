@@ -421,26 +421,6 @@ struct TraceFilter_t
 
 		return nullptr;
 	}
-
-	//TraceFilter_t(std::uint32_t mask, CBaseEntity* skip_entity, int layer)
-	//{
-	//	using fn = TraceFilter_t * (__fastcall*)(void*, CBaseEntity* skip_entity, uint32_t mask, int layer, int16_t flags);
-	//	static auto addr = modules::client.scan("48 89 5C 24 08 48 89 74 24 10 57 48 83 EC 20 0F B6 41 37 33", "TraceFilter_t::InitEntitiesOnly").as();
-
-	//	auto init_entities_only = reinterpret_cast<fn>(addr);
-	//	if (init_entities_only)
-	//		init_entities_only(this, skip_entity, mask, layer, 7); //15 = CollisionMask
-	//}
-
-	//TraceFilter_t* InitEntitiesOnly(CBaseEntity* skip_entity, uint32_t mask, int layer)
-	//{
-	//	using fn = TraceFilter_t * (__fastcall*)(void*, CBaseEntity* skip_entity, uint32_t mask, int layer, int16_t flags);
-	//	static auto addr = modules::client.scan("48 89 5C 24 08 48 89 74 24 10 57 48 83 EC 20 0F B6 41 37 33", "TraceFilter_t::InitEntitiesOnly").as();
-
-	//	auto init_entities_only = reinterpret_cast<fn>(addr);
-	//	if (init_entities_only)
-	//		return init_entities_only(this, skip_entity, mask, layer, 15); //15 = CollisionMask
-	//}
 };
 
 class CGameTrace

@@ -23,11 +23,10 @@ namespace main_window
         ImGui::SliderInt("Aimbot FOV", &settings::visuals::aimbot_fov, 0, 360);
         ImGui::SliderFloat("###AimbotSmooth", &settings::visuals::smooth, 1.f, 10.f, "Smooth: %.1f");
         ImGui::Checkbox("Const Smooth", &settings::visuals::const_smooth);
-        ImGui::SliderFloat("Recoil Scale", &settings::visuals::recoil_scale, 0.f, 1.f, "Recoil Scale: %.1f");
-        ImGui::SliderFloat("###RecoilSmooth", &settings::visuals::recoil_smooth, 1.f, 10.f, "Recoil Smooth: %.1f");
+        ImGui::SliderFloat("###RecoilSmooth", &settings::visuals::recoil_smooth, 1.0f, 1.1f, "Recoil Smooth: %.2f");
 
-        ImGui::SliderFloat("Recoil Pitch", &settings::visuals::pitch, 1.f, 2.f, "Recoil Pitch: %.1f");
-        ImGui::SliderFloat("Recoil Yaw", &settings::visuals::yaw, 1.f, 2.f, "Recoil Yaw: %.1f");
+        ImGui::SliderFloat("Recoil Pitch", &settings::visuals::pitch, 0.f, 2.f, "Recoil Pitch: %.1f");
+        ImGui::SliderFloat("Recoil Yaw", &settings::visuals::yaw, 0.f, 2.f, "Recoil Yaw: %.1f");
 
         ImGui::Checkbox("Fov changer", &settings::visuals::m_bFovChanger);
 

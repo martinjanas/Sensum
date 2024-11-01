@@ -19,4 +19,5 @@ public:
     NETVAR(const char*, m_iszPlayerName, "CBasePlayerController", "m_iszPlayerName");
     NETVAR(CHandle, m_hPawn, "CBasePlayerController", "m_hPawn");
     NETVAR(CHandle, m_hPlayerPawn, "CCSPlayerController", "m_hPlayerPawn");
+    NETVAR(uint32_t, m_nTickBase, "CBasePlayerController", "m_nTickBase");
 };

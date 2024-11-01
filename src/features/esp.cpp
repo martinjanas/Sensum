@@ -86,7 +86,7 @@ namespace features::esp
 
 			Draw3DBox(data.bbox);
 
-			esp::bone_esp(data);
+			//esp::bone_esp(data);
 
 			//if (!data.hitboxes.empty())
 			//{

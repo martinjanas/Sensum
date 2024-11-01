@@ -19,7 +19,6 @@ namespace settings
 
 		extern float smooth;
 		extern float recoil_smooth;
-		extern float recoil_scale;
 		extern float box_rounding;
 		extern float box_thickness;
 		extern float pitch;

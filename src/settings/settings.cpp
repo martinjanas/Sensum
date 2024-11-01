@@ -14,15 +14,14 @@ namespace settings
 
 		// int
 		int m_iFov = 90;
-		int aimbot_fov = 45;
+		int aimbot_fov = 20;
 
-		float smooth = 10.f;
-		float recoil_smooth = 24.f;
-		float recoil_scale = 1.f;
+		float smooth = 1.8f;
+		float recoil_smooth = 1.1f;
 		float box_rounding = 0.f;
 		float box_thickness = 2.f;
-		float pitch = 2.f;
-		float yaw = 2.f;
+		float pitch = 1.5f;
+		float yaw = 1.5f;
 
 		// colors
 		ImVec4 m_fBoneColor = ImVec4(255, 255, 255, 255);
