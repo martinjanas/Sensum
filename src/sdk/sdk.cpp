@@ -55,10 +55,6 @@ namespace sdk
 		g::input_system = modules::input_sys.GetInterfaceFromList<CInputSystem*>("InputSystemVersion001");
 		g::network_game_service = modules::engine.GetInterfaceFromList<CNetworkGameService*>("NetworkClientService_001");
 
-		if (g::network_game_service)
-			g::network_game_client = g::network_game_service->GetNetworkGameClient();
-
-		//48 8D 0D ? ? ? ? E8 ? ? ? ? 48 8D 05 ? ? ? ? 48 C7 05 ? ? ? ? FF FF FF FF 
 		g::csgo_input = modules::client.scan("48 89 05 ? ? ? ? 0F 57 C0 0F 11 05 ? ? ? ?", "g::csgo_input").add(0x3).abs().as<CSGOInput*>();
 		g::render_system = **modules::directx11.scan("66 0F 7F 0D ? ? ? ? 66 0F 7F 05 ? ? ? ? 48 89 2D", "g::render_system").add(4).abs().as<CRenderSystem***>();
 		g::global_vars = *modules::client.scan("48 8B 05 ?? ?? ?? ?? 44 8B B7 ?? ?? ?? ?? 8B 70 04 B8 ?? ?? ?? ??", "g::global_vars").add(0x3).abs().as<CGlobalVarsBase**>();
@@ -84,7 +80,6 @@ namespace sdk
 		print_status(g::global_vars);
 		print_status(g::engine_trace);
 		print_status(g::network_game_service);
-		print_status(g::network_game_client);
 		print_status(players::localplayer);
 	}
 }
@@ -104,6 +99,5 @@ namespace interfaces
 	CGlobalVarsBase* global_vars{};
 	CGameTrace* engine_trace{};
 	CNetworkGameService* network_game_service{};
-	CNetworkGameClient* network_game_client{};
 }
 

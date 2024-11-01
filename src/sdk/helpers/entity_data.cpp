@@ -155,7 +155,10 @@ namespace entity_data
 		{
 			g::engine_trace->TraceShape(&ray, local_pawn->GetEyePos(), hitbox_info.hitbox_pos, &filter, &trace);
 
-			const bool is_visible = trace.m_flFraction >= 0.97f;
+			if (trace.m_pHitEntity == local_pawn || !trace.m_pHitEntity->IsPawn())
+				return;
+			
+			const bool is_visible = trace.m_pHitEntity == player_data.m_PlayerPawn || trace.m_flFraction >= 0.97f;
 
 			if (!player_data.flags.test(PLAYER_VISIBLE) && is_visible)
 				player_data.flags.set(PLAYER_VISIBLE);
@@ -304,7 +307,7 @@ namespace entity_data
 
 			get_hitboxes(player_data, eye_pos, localpawn, on_screen);
 			get_bbox(scene_node, collision, player_data.bbox);
-			//get_bones_w2s(player_data);
+			get_bones_w2s(player_data);
 
 			entry_data.player_data.push_back(std::move(player_data));
 		}

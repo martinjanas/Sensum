@@ -47,6 +47,12 @@ public:
 	//	//xref: Curtime( %f )\nRealtime( %f )\n module: engine2
 	//	return GetVirtual<CGlobalVarsBase * (__thiscall*)(void*)>(this, 4)(this);
 	//}
+
+	void FullUpdate()
+	{
+		//   @ida: #STR: "Requesting full game update (%s)...\n"
+		GetVirtual<void(__thiscall*)(void*, const char*)>(this, 28)(this, "unk");
+	}
 };
 
 class CNetworkGameService
@@ -92,7 +98,6 @@ namespace interfaces //move to interfaces.h ?
     extern CGlobalVarsBase* global_vars;
 	extern CGameTrace* engine_trace;
 	extern CNetworkGameService* network_game_service;
-	extern CNetworkGameClient* network_game_client;
 }
 
 namespace g = interfaces;

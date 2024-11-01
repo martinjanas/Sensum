@@ -17,7 +17,6 @@ namespace features
 
         static QAngle last_punch = { 0.f, 0.f, 0.f };
         static QAngle current_punch = { 0.f, 0.f, 0.f };
-        static bool was_firing_last_frame = false;
 
         std::unordered_set<int>& GetTargetHitboxes() //Add hitbox target priority?
         {
@@ -189,19 +188,6 @@ namespace features
 
             const auto& eye_pos = localpawn->GetEyePos();
 
-            //auto& punch_cache = localpawn->m_aimPunchCache();
-
-            //if (punch_cache.Count() <= 0 || punch_cache.Count() >= 0xFFFF)
-            //    return;
-
-            //auto punch_angle = punch_cache[punch_cache.Count() - 1];
-
-            //auto recoil_angle = localpawn->m_iShotsFired() > 1 ? punch_angle : QAngle();
-            //recoil_angle.normalize_clamp();
-
-            //viewangles -= recoil_angle; //This works, but its not allright
-            //viewangles.normalize_clamp();
-
             for (const auto& data : m_player_data)
             {
                 if (!data.m_PlayerPawn || data.m_iHealth <= 0)
@@ -285,7 +271,7 @@ namespace features
                 }
             }
 
-            rcs(localpawn, viewangles, cmd); //This keeps overwriting my angles and thus aimbot is not locking on
+            rcs(localpawn, viewangles, cmd);
         }
     }
 }

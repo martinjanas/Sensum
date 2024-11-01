@@ -20,28 +20,28 @@ void skinchanger() //doesnt work
 	if (!weapon_services)
 		return;
 
-	auto my_weapons = weapon_services->m_hMyWeapons();
-	
 	static int paintkit = 522; //fade
 
+	auto my_weapons = weapon_services->m_hMyWeapons();
 	for (int i = 0; i < my_weapons.Count(); ++i)
 	{
 		const auto& handle = my_weapons[i];
 		if (!handle.IsValid())
 			continue;
 			
-		auto weapon = g::entity_system->GetEntityFromHandle<CBasePlayerWeapon*>(handle); //handle.Get<CBasePlayerWeapon*>();
+		auto weapon = g::entity_system->GetEntityFromHandle<CBasePlayerWeapon*>(handle);
 		if (!weapon)
 			continue;
 
-		auto attrib_manager = weapon->m_AttributeManager();
+		weapon->m_AttributeManager().m_Item().m_iItemIDHigh() = -1;
+		weapon->m_AttributeManager().m_Item().m_iItemIDLow() = -1;
+		
+		weapon->m_nFallbackPaintKit() = paintkit;
 
-		auto item = attrib_manager.m_Item();
+		auto client = g::network_game_service->GetNetworkGameClient();
 
-		item.m_iItemIDHigh() = -1;
-		item.m_iItemIDLow() = -1;
-
-		weapon->m_nFallbackPaintKit() = 38;
+		if (client && g::input_system->IsButtonDown(ButtonCode::KeyR))
+			client->FullUpdate();
 	}
 }
 
@@ -54,6 +54,7 @@ void __fastcall hooks::frame_stage_notify::hooked(void* rcx, EClientFrameStage s
 	case FRAME_NET_UPDATE_START:
 		break;
 	case FRAME_NET_UPDATE_POSTDATAUPDATE_START:
+		//skinchanger();
 		break;
 	case FRAME_NET_UPDATE_POSTDATAUPDATE_END:
 		break;
