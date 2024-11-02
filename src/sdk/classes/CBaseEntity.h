@@ -104,7 +104,6 @@ public:
     NETVAR(uint32_t, m_fFlags, "C_BaseEntity", "m_fFlags");   
     CHandle m_hGroundEntity();
     CHandle m_hOwnerEntity();
-    CHandle m_hOldMoveParent();
 
     int EmitSound(EmitSound_t& params, const char* sound_name, float sound_time)
     {

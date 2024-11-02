@@ -41,15 +41,6 @@ CHandle CBaseEntity::m_hOwnerEntity()
     return handle;
 }
 
-CHandle CBaseEntity::m_hOldMoveParent()
-{
-    constexpr auto hash = fnv::hash_constexpr("C_BaseEntity->m_hOldMoveParent");
-    static auto offset = netvars::get_offset_by_hash_cached(hash);
-    auto handle = *reinterpret_cast<CHandle*>(reinterpret_cast<uintptr_t>(this) + offset);
-
-    return handle;
-}
-
 HitboxSet_t* CBaseEntity::GetHitboxSet(int i)
 {
     using fn = HitboxSet_t * (__thiscall*)(void*, int);

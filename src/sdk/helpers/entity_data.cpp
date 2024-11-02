@@ -226,7 +226,7 @@ namespace entity_data
 		if (!g::engine_client->IsInGame())
 			return;
 		
-		const auto& local_controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>(); //players::localplayer;
+		const auto& local_controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
 		if (!local_controller)
 		{
 			destroy();
@@ -256,7 +256,11 @@ namespace entity_data
 			if (index <= 0 || index > 0x7FFF)
 				continue;
 
-			const auto& pawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(controller->m_hPlayerPawn());  //controller->m_hPlayerPawn().Get<CCSPlayerPawn*>();
+			if (!controller->m_hPawn().IsValid())
+				continue;
+
+			//was m_hPlayerPawn
+			const auto& pawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(controller->m_hPawn());
 			if (!pawn || !pawn->IsAlive() || pawn == localpawn || pawn->m_iTeamNum() == local_team)
 				continue;
 
@@ -264,19 +268,23 @@ namespace entity_data
 			if (!hitbox_set)
 				continue;
 
-			const auto& scene_node = pawn->m_pGameSceneNode();
-			const auto& weapon_services = pawn->m_pWeaponServices();
+			const auto scene_node = pawn->m_pGameSceneNode();
+			const auto weapon_services = pawn->m_pWeaponServices();
 			if (!scene_node || !weapon_services)
 				continue;
 
-			const auto& active_wpn = g::entity_system->GetEntityFromHandle<CBasePlayerWeapon*>(weapon_services->m_hActiveWeapon()); //weapon_services->m_hActiveWeapon().Get<CBasePlayerWeapon*>();
-			const auto& collision = pawn->m_pCollision();
-			const auto& skeleton_instance = scene_node->GetSkeletonInstance();
+			auto active_wpn_handle = weapon_services->m_hActiveWeapon();
+			if (!active_wpn_handle.IsValid())
+				continue;
+
+			const auto active_wpn = g::entity_system->GetEntityFromHandle<CBasePlayerWeapon*>(active_wpn_handle); //weapon_services->m_hActiveWeapon().Get<CBasePlayerWeapon*>();
+			const auto collision = pawn->m_pCollision();
+			const auto skeleton_instance = scene_node->GetSkeletonInstance();
 			if (!active_wpn || !collision || !skeleton_instance)
 				continue;
 
-			const auto& model_state = skeleton_instance->m_modelState();
-			const auto& model = model_state.modelHandle;
+			const auto model_state = skeleton_instance->m_modelState();
+			const auto model = model_state.modelHandle;
 			if (!model.IsValid())
 				continue;
 
