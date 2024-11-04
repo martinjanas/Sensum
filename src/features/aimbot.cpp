@@ -54,6 +54,20 @@ namespace features
             mouse_event(MOUSEEVENTF_MOVE, screenX, screenY, 0, 0);
         }
 
+        //Doesnt smooth at all
+        /*void smooth_exponential(float speed, const QAngle& aim_angles, const QAngle& current_angles, QAngle& smoothed_angle)
+        {
+            float alpha = speed / 10.0f;
+            alpha *= (1.f / 64.f);
+            alpha = std::clamp(alpha, 0.0f, 1.0f);
+
+            QAngle delta = aim_angles - current_angles;
+            delta.normalize_clamp();
+
+            smoothed_angle = current_angles + delta * alpha;
+            smoothed_angle.normalize_clamp();
+        }*/
+
         void smooth(float amount, const QAngle& current_angles, const QAngle& aim_angles, QAngle& out_angles)
         {
             float smoothing_factor = amount;
@@ -64,88 +78,57 @@ namespace features
             out_angles = current_angles + delta / smoothing_factor;
             out_angles.normalize_clamp();
         }
-
-        //broken, not constant at all
-        void smooth_constant(const float& speed, const QAngle& current_angles, const QAngle& target_angles, QAngle& smoothed_angles)
+    
+        void smooth_constant(float speed, const QAngle& current_angles, const QAngle& target_angles, QAngle& smoothed_angles) 
         {
-            QAngle delta = target_angles - current_angles;
+            QAngle current_angle_normalized = current_angles;
+            current_angle_normalized.normalize_clamp();
+
+            QAngle target_angle_normalized = target_angles;
+            target_angle_normalized.normalize_clamp();
+
+            QAngle delta = target_angle_normalized - current_angle_normalized;
             delta.normalize_clamp();
 
-            constexpr float tick_interval = 1.f / 64.f;
-            float step = speed * tick_interval;
+            float max_smooth_step = 10.0f;
+            float smooth_step = (max_smooth_step / (speed + 0.1f)) * (1.f / 64.f);
 
-            float length = sqrtf(delta.pitch * delta.pitch + delta.yaw * delta.yaw);
+            smoothed_angles = current_angle_normalized;
 
-            if (length > step)
+            if (std::fabs(delta.pitch) < smooth_step) 
             {
-                delta.normalize();
-                delta *= step;
+                smoothed_angles.pitch = target_angle_normalized.pitch;
+            }
+            else 
+            {
+                smoothed_angles.pitch += (delta.pitch > 0 ? smooth_step : -smooth_step);
             }
 
-            smoothed_angles = current_angles + delta;
-            smoothed_angles.normalize_clamp();
-        }
-
-        void smooth_exponential(const float& amount, const QAngle& current_angles, const QAngle& target_angles, QAngle& smoothed_angles)
-        {
-            //amount - ideal value: 1.0 - 1.3
-
-            // Clamp and normalize target angles to prevent issues with extreme values
-            QAngle clamped_target_angles = target_angles;
-            clamped_target_angles.normalize_clamp();
-
-            // Compute the corrected amount for smoothing based on the tickrate
-            const float tickrate = 1.0f / 0.015625f; // interval_per_tick for 64 tick
-            float corrected_amount = std::max(amount, 1.1f) * tickrate / 64.0f;
-
-            // Convert angles to vectors for easier manipulation
-            Vector current_vector = current_angles.to_vector();
-            Vector target_vector = clamped_target_angles.to_vector();
-
-            // Calculate the delta vector between the current and target vectors
-            Vector delta = target_vector - current_vector;
-
-            // Apply exponential smoothing
-            Vector smoothed_vector = current_vector + delta / corrected_amount;
-
-            // Convert back to angles and clamp/normalize the result
-            smoothed_angles = smoothed_vector.to_qangle();
-            smoothed_angles.normalize_clamp();
-        }
-        
-        //AKA standalone rcs
-        void fixed_point_rcs(CCSPlayerPawn* localpawn, const QAngle& viewangles, CUserCmd* cmd)
-        {
-            auto& punch_cache = localpawn->m_aimPunchCache();
-            if (punch_cache.Count() <= 0 || punch_cache.Count() >= 0xFFFF)
-                return;
-
-            if (g::input_system->IsButtonDown(ButtonCode::MouseLeft))
+            if (std::fabs(delta.yaw) < smooth_step) 
             {
-                current_punch = punch_cache[punch_cache.Count() - 1];
-                current_punch.pitch *= settings::visuals::pitch;
-                current_punch.yaw *= settings::visuals::yaw;
-                
-                QAngle compensated_angle = viewangles + (last_punch - current_punch);
-                compensated_angle.normalize_clamp();
-
-                //smooth(settings::visuals::recoil_smooth, viewangles, compensated_angle, compensated_angle);
-
-                /*if (compensated_angle.pitch > 12.f)
-                    return;*/
-
-                g::client->SetViewAngles(0, compensated_angle);
-
-                last_punch = punch_cache[punch_cache.Count() - 2];
+                smoothed_angles.yaw = target_angle_normalized.yaw;
+            }
+            else 
+            {
+                smoothed_angles.yaw += (delta.yaw > 0 ? smooth_step : -smooth_step);
             }
 
-            last_punch = current_punch;
+            if (std::fabs(delta.roll) < smooth_step) 
+            {
+                smoothed_angles.roll = target_angle_normalized.roll;
+            }
+            else 
+            {
+                smoothed_angles.roll += (delta.roll > 0 ? smooth_step : -smooth_step);
+            }
+
+            smoothed_angles.normalize_clamp();
         }
 
         void rcs(CCSPlayerPawn* localpawn, const QAngle& viewangles, CUserCmd* cmd)
         {
             auto& punch_cache = localpawn->m_aimPunchCache();
-            if (punch_cache.Count() <= 1 || punch_cache.Count() >= 0xFFFF)
+            if (punch_cache.Count() <= 0 || punch_cache.Count() >= 0xFFFF)
                 return;
 
             // Get the latest punch angle
@@ -162,9 +145,10 @@ namespace features
                 QAngle compensated_angle = viewangles - recoil_delta; // Adjust based on the recoil
                 compensated_angle.normalize_clamp();
 
-                smooth(settings::visuals::recoil_smooth, viewangles, compensated_angle, compensated_angle);
+                QAngle output;
+                smooth(1.1f, viewangles, compensated_angle, output);
 
-                g::client->SetViewAngles(0, compensated_angle);
+                g::client->SetViewAngles(0, output);
 
                 last_punch = current_punch;
             }
@@ -323,12 +307,10 @@ namespace features
                     if (best_fov > settings::visuals::aimbot_fov)
                         continue;
 
-                    /*if (!settings::visuals::const_smooth)
-                        smooth(settings::visuals::smooth, viewangles, best_angle, best_angle);
-                    else smooth_constant(settings::visuals::smooth, viewangles, best_angle, best_angle);*/
-
                     QAngle output;
-                    smooth(settings::visuals::smooth, viewangles, best_angle, output);
+                    if (!settings::visuals::const_smooth)
+                        smooth(settings::visuals::smooth, viewangles, best_angle, output);
+                    else smooth_constant(settings::visuals::smooth, viewangles, best_angle, output);
 
                     g::client->SetViewAngles(0, output);
                 }

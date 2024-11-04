@@ -18,7 +18,6 @@ namespace settings
 		extern int aimbot_fov;
 
 		extern float smooth;
-		extern float recoil_smooth;
 		extern float box_rounding;
 		extern float box_thickness;
 		extern float pitch;
