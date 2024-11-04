@@ -9,9 +9,6 @@ Vector CCSPlayerPawn::GetEyePos()
 
 bool CCSPlayerPawn::InAir()
 {	
-	if (!m_hGroundEntity().IsValid())
-		return false;
-
 	return g::entity_system->GetEntityFromHandle(m_hGroundEntity()) == nullptr;
 }
 

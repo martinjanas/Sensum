@@ -11,17 +11,19 @@ namespace settings
 		extern bool m_bBoxEsp;
 		extern bool m_bHealthEsp;
 		extern bool m_bNameEsp;
-		extern bool const_smooth;
 
 		// int
 		extern int m_iFov;
 		extern int aimbot_fov;
+		extern int aimbot_hitbox;
+		extern int smooth_mode;
 
 		extern float smooth;
 		extern float box_rounding;
 		extern float box_thickness;
 		extern float pitch;
 		extern float yaw;
+		extern float aim_fov_indenpendence;
 
 		// colors
 		extern ImVec4 m_fBoneColor;

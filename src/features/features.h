@@ -4,8 +4,19 @@
 #include "../sdk/helpers/globals.h"
 #include <unordered_set>
 
+enum ETargetSelection
+{
+	TARGET_HEAD = (1 << 0),
+	TARGET_CHEST = (1 << 1),
+	TARGET_ARMS = (1 << 2),
+	TARGET_LEGS = (1 << 3),
+	TARGET_NEAREST_IN_AIR = (1 << 4)
+};
+
 namespace features
 {
+
+
 	namespace esp
 	{
 		void render();

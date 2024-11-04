@@ -1,5 +1,6 @@
 #pragma once
 #include <algorithm>
+#include <cmath>
 
 class Vector;
 
@@ -107,6 +108,19 @@ public:
         this->yaw += other.yaw;
         
         return *this;
+    }
+
+    static QAngle lerp(const QAngle& a, const QAngle& b, float t) {
+        return QAngle(
+            a.pitch + (b.pitch - a.pitch) * t,
+            a.yaw + (b.yaw - a.yaw) * t,
+            a.roll + (b.roll - a.roll) * t
+        );
+    }
+
+    float length() const 
+    {
+        return std::sqrt(pitch * pitch + yaw * yaw + roll * roll);
     }
 
 	/*void Clamp()

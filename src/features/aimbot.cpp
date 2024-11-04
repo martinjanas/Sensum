@@ -17,9 +17,48 @@ namespace features
         static QAngle last_punch = { 0.f, 0.f, 0.f };
         static QAngle current_punch = { 0.f, 0.f, 0.f };
 
-        std::unordered_set<int>& GetTargetHitboxes() //Add hitbox target priority?
+        std::unordered_set<int> GetTargetHitboxes() // Add hitbox target priority
         {
-            static std::unordered_set<int> list = { HITBOX_HEAD, HITBOX_NECK, HITBOX_LOWER_CHEST, HITBOX_UPPER_CHEST, HITBOX_BELLY, HITBOX_THORAX };
+            static std::unordered_set<int> list;
+            static int previous_hitbox_value = -1;
+
+            int current_hitbox_value = settings::visuals::aimbot_hitbox;
+
+            if (current_hitbox_value != previous_hitbox_value)
+            {
+                list.clear();
+
+                if (current_hitbox_value & TARGET_HEAD)
+                {
+                    list.emplace(HITBOX_HEAD);
+                    list.emplace(HITBOX_NECK);
+                }
+
+                if (current_hitbox_value & TARGET_CHEST)
+                {
+                    list.emplace(HITBOX_UPPER_CHEST);
+                    list.emplace(HITBOX_LOWER_CHEST);
+                    list.emplace(HITBOX_THORAX);
+                    list.emplace(HITBOX_BELLY);
+                }
+
+                if (current_hitbox_value & TARGET_ARMS)
+                {
+                    list.emplace(HITBOX_LEFT_UPPER_ARM);
+                    list.emplace(HITBOX_RIGHT_UPPER_ARM);
+                }
+
+                if (current_hitbox_value & TARGET_LEGS)
+                {
+                    list.emplace(HITBOX_LEFT_THIGH);
+                    list.emplace(HITBOX_RIGHT_THIGH);
+                    list.emplace(HITBOX_PELVIS);
+                    list.emplace(HITBOX_LEFT_CALF);
+                    list.emplace(HITBOX_RIGHT_CALF);
+                }
+
+                previous_hitbox_value = current_hitbox_value;
+            }
 
             return list;
         }
@@ -54,20 +93,6 @@ namespace features
             mouse_event(MOUSEEVENTF_MOVE, screenX, screenY, 0, 0);
         }
 
-        //Doesnt smooth at all
-        /*void smooth_exponential(float speed, const QAngle& aim_angles, const QAngle& current_angles, QAngle& smoothed_angle)
-        {
-            float alpha = speed / 10.0f;
-            alpha *= (1.f / 64.f);
-            alpha = std::clamp(alpha, 0.0f, 1.0f);
-
-            QAngle delta = aim_angles - current_angles;
-            delta.normalize_clamp();
-
-            smoothed_angle = current_angles + delta * alpha;
-            smoothed_angle.normalize_clamp();
-        }*/
-
         void smooth(float amount, const QAngle& current_angles, const QAngle& aim_angles, QAngle& out_angles)
         {
             float smoothing_factor = amount;
@@ -87,43 +112,85 @@ namespace features
             QAngle target_angle_normalized = target_angles;
             target_angle_normalized.normalize_clamp();
 
+            // Calculate the delta and normalize it to the shortest path
             QAngle delta = target_angle_normalized - current_angle_normalized;
             delta.normalize_clamp();
 
-            float max_smooth_step = 10.0f;
-            float smooth_step = (max_smooth_step / (speed + 0.1f)) * (1.f / 64.f);
+            // Define the maximum smoothing step based on speed
+            float max_smooth_step = 10.0f; // Adjust this value for sensitivity
+            float smooth_step = (max_smooth_step / (speed + 0.1f)) * (1.0f / 64.0f);
 
+            // Start with the current angle
             smoothed_angles = current_angle_normalized;
 
-            if (std::fabs(delta.pitch) < smooth_step) 
-            {
+            // Smooth the pitch
+            if (std::fabs(delta.pitch) < smooth_step) {
                 smoothed_angles.pitch = target_angle_normalized.pitch;
             }
-            else 
-            {
+            else {
                 smoothed_angles.pitch += (delta.pitch > 0 ? smooth_step : -smooth_step);
             }
 
-            if (std::fabs(delta.yaw) < smooth_step) 
-            {
+            // Smooth the yaw
+            if (std::fabs(delta.yaw) < smooth_step) {
                 smoothed_angles.yaw = target_angle_normalized.yaw;
             }
-            else 
-            {
+            else {
                 smoothed_angles.yaw += (delta.yaw > 0 ? smooth_step : -smooth_step);
             }
 
-            if (std::fabs(delta.roll) < smooth_step) 
-            {
+            // Smooth the roll
+            if (std::fabs(delta.roll) < smooth_step) {
                 smoothed_angles.roll = target_angle_normalized.roll;
             }
-            else 
-            {
+            else {
                 smoothed_angles.roll += (delta.roll > 0 ? smooth_step : -smooth_step);
             }
 
+            // Normalize the final output angle
             smoothed_angles.normalize_clamp();
         }
+
+        QAngle calculate_unit_direction(const QAngle& angles) 
+        {
+            float pitch_rad = angles.pitch * (M_PI / 180.0f);
+            float yaw_rad = angles.yaw * (M_PI / 180.0f);
+
+            float x = std::cos(pitch_rad) * std::cos(yaw_rad);
+            float y = std::cos(pitch_rad) * std::sin(yaw_rad);
+            float z = std::sin(pitch_rad);
+
+            // Return a unit direction represented as QAngle
+            return QAngle{ x, y, z };
+        }
+
+        void smoothing_idk(float smooth, const QAngle& view_angles, const QAngle& target_angles, float fov, QAngle& out_angles) 
+        {
+            // Ensure smooth and fov values are reasonable
+            smooth = std::max(smooth, 1.0f);
+            fov = std::max(fov, 1.0f);
+
+            // Calculate the angular difference (delta) and normalize
+            QAngle delta = target_angles - view_angles;
+            delta.normalize_clamp();
+
+            // Convert delta to a unit directional QAngle
+            QAngle unit_delta = calculate_unit_direction(delta);
+
+            // Calculate the smoothing scale based on smooth factor and FOV adjustment
+            float fov_adjustment = std::max(fov / settings::visuals::aim_fov_indenpendence, 1.0f);
+            QAngle smoothed_delta = unit_delta * (1.0f / (smooth * fov_adjustment));
+
+            // Limit smoothed_delta to avoid overshooting
+            if (smoothed_delta.length() > delta.length())
+                smoothed_delta = delta; // Snap to target if smoothing overshoots
+
+            // Calculate the final output angles
+            out_angles = view_angles + smoothed_delta;
+            out_angles.normalize_clamp();
+        }
+
+        //TODO: Scale smoothing by frametime / (1.f / 64.f) ?
 
         void rcs(CCSPlayerPawn* localpawn, const QAngle& viewangles, CUserCmd* cmd)
         {
@@ -256,9 +323,31 @@ namespace features
                     if (hitbox_ids.empty())
                         continue;
 
-                    if (hitbox_ids.find(hitbox_data->index) == hitbox_ids.end()) /*TODO: && settings::nearest_hitbox*/
-                        continue;
+                    /*bool in_air = data.flags.test(PLAYER_IN_AIR) && (settings::visuals::aimbot_hitbox & (1 << 4));
 
+                    if (in_air)
+                    {
+                        hitbox_ids.emplace(HITBOX_HEAD);
+                        hitbox_ids.emplace(HITBOX_NECK);
+
+                        hitbox_ids.emplace(HITBOX_UPPER_CHEST);
+                        hitbox_ids.emplace(HITBOX_LOWER_CHEST);
+                        hitbox_ids.emplace(HITBOX_THORAX);
+                        hitbox_ids.emplace(HITBOX_BELLY);
+
+                        hitbox_ids.emplace(HITBOX_LEFT_UPPER_ARM);
+                        hitbox_ids.emplace(HITBOX_RIGHT_UPPER_ARM);
+
+                        hitbox_ids.emplace(HITBOX_LEFT_THIGH);
+                        hitbox_ids.emplace(HITBOX_RIGHT_THIGH);
+                        hitbox_ids.emplace(HITBOX_PELVIS);
+                        hitbox_ids.emplace(HITBOX_LEFT_CALF);
+                        hitbox_ids.emplace(HITBOX_RIGHT_CALF);
+                    }*/
+
+                    if (hitbox_ids.find(hitbox_data->index) == hitbox_ids.end())
+                        continue;
+                      
                     if (!hitbox_data->visible)
                         continue;
 
@@ -308,9 +397,10 @@ namespace features
                         continue;
 
                     QAngle output;
-                    if (!settings::visuals::const_smooth)
+                    if (settings::visuals::smooth_mode == 0)
                         smooth(settings::visuals::smooth, viewangles, best_angle, output);
-                    else smooth_constant(settings::visuals::smooth, viewangles, best_angle, output);
+                    else if (settings::visuals::smooth_mode == 1)
+                        smooth_constant(settings::visuals::smooth, viewangles, best_angle, output);
 
                     g::client->SetViewAngles(0, output);
                 }

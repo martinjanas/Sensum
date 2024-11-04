@@ -1,4 +1,5 @@
 #include "../settings/settings.h"
+#include "../features/features.h"
 
 namespace settings
 {
@@ -10,17 +11,19 @@ namespace settings
 		bool m_bBoxEsp = false;
 		bool m_bNameEsp = false;
 		bool m_bHealthEsp = false;
-		bool const_smooth = false;
 
 		// int
 		int m_iFov = 90;
 		int aimbot_fov = 20;
+		int aimbot_hitbox = TARGET_HEAD | TARGET_CHEST;
+		int smooth_mode = 1;
 
 		float smooth = 7.f;
 		float box_rounding = 0.f;
 		float box_thickness = 2.f;
 		float pitch = 1.5f;
 		float yaw = 1.5f;
+		float aim_fov_indenpendence = 0.1f;
 
 		// colors
 		ImVec4 m_fBoneColor = ImVec4(255, 255, 255, 255);
