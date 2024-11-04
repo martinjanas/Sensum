@@ -339,6 +339,7 @@ namespace entity_data
 
 			player_data.flags.reset(PLAYER_VISIBLE);
 			player_data.flags.reset(PLAYER_IN_SMOKE);
+			player_data.flags.reset(PLAYER_IN_AIR);
 
 			pawn->m_iHealth() > 0 ? player_data.flags.set(PLAYER_ALIVE) : player_data.flags.reset(PLAYER_ALIVE);
 			pawn->InAir() ? player_data.flags.set(PLAYER_IN_AIR) : player_data.flags.reset(PLAYER_IN_AIR);

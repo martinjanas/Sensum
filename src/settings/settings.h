@@ -23,8 +23,7 @@ namespace settings
 		extern float box_thickness;
 		extern float pitch;
 		extern float yaw;
-		extern float aim_fov_indenpendence;
-
+		
 		// colors
 		extern ImVec4 m_fBoneColor;
 		extern ImVec4 m_fBoxColor;

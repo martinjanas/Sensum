@@ -92,8 +92,7 @@ namespace main_window
 
         ImGui::SliderFloat("Recoil Pitch", &settings::visuals::pitch, 0.f, 2.f, "Recoil Pitch: %.1f");
         ImGui::SliderFloat("Recoil Yaw", &settings::visuals::yaw, 0.f, 2.f, "Recoil Yaw: %.1f");
-        ImGui::SliderFloat("Smoothing Independence", &settings::visuals::aim_fov_indenpendence, 0.f, 1.f, "Smoothing Independence: %.1f");
-
+        
         ImGui::Checkbox("Fov changer", &settings::visuals::m_bFovChanger);
 
         if (settings::visuals::m_bFovChanger)

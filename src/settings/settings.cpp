@@ -23,7 +23,6 @@ namespace settings
 		float box_thickness = 2.f;
 		float pitch = 1.5f;
 		float yaw = 1.5f;
-		float aim_fov_indenpendence = 0.1f;
 
 		// colors
 		ImVec4 m_fBoneColor = ImVec4(255, 255, 255, 255);

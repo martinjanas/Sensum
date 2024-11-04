@@ -17,7 +17,8 @@ namespace features
         static QAngle last_punch = { 0.f, 0.f, 0.f };
         static QAngle current_punch = { 0.f, 0.f, 0.f };
 
-        std::unordered_set<int> GetTargetHitboxes() // Add hitbox target priority
+        //Add hitbox target priority?
+        std::unordered_set<int> GetTargetHitboxes(const entity_data::player_data_t& data) 
         {
             static std::unordered_set<int> list;
             static int previous_hitbox_value = -1;
@@ -56,9 +57,64 @@ namespace features
                     list.emplace(HITBOX_LEFT_CALF);
                     list.emplace(HITBOX_RIGHT_CALF);
                 }
-
-                previous_hitbox_value = current_hitbox_value;
             }
+
+            if (current_hitbox_value & TARGET_NEAREST_IN_AIR && data.flags.test(PLAYER_IN_AIR))
+            {
+                list.clear();
+
+                list.emplace(HITBOX_HEAD);
+                list.emplace(HITBOX_NECK);
+                list.emplace(HITBOX_UPPER_CHEST);
+                list.emplace(HITBOX_LOWER_CHEST);
+                list.emplace(HITBOX_THORAX);
+                list.emplace(HITBOX_BELLY);
+                list.emplace(HITBOX_LEFT_UPPER_ARM);
+                list.emplace(HITBOX_RIGHT_UPPER_ARM);
+                list.emplace(HITBOX_LEFT_THIGH);
+                list.emplace(HITBOX_RIGHT_THIGH);
+                list.emplace(HITBOX_PELVIS);
+                list.emplace(HITBOX_LEFT_CALF);
+                list.emplace(HITBOX_RIGHT_CALF);
+            }
+            else if (!data.flags.test(PLAYER_IN_AIR))
+            {
+                list.clear();
+
+                if (list.empty() && previous_hitbox_value != -1)
+                {
+                    if (previous_hitbox_value & TARGET_HEAD)
+                    {
+                        list.emplace(HITBOX_HEAD);
+                        list.emplace(HITBOX_NECK);
+                    }
+
+                    if (previous_hitbox_value & TARGET_CHEST)
+                    {
+                        list.emplace(HITBOX_UPPER_CHEST);
+                        list.emplace(HITBOX_LOWER_CHEST);
+                        list.emplace(HITBOX_THORAX);
+                        list.emplace(HITBOX_BELLY);
+                    }
+
+                    if (previous_hitbox_value & TARGET_ARMS)
+                    {
+                        list.emplace(HITBOX_LEFT_UPPER_ARM);
+                        list.emplace(HITBOX_RIGHT_UPPER_ARM);
+                    }
+
+                    if (previous_hitbox_value & TARGET_LEGS)
+                    {
+                        list.emplace(HITBOX_LEFT_THIGH);
+                        list.emplace(HITBOX_RIGHT_THIGH);
+                        list.emplace(HITBOX_PELVIS);
+                        list.emplace(HITBOX_LEFT_CALF);
+                        list.emplace(HITBOX_RIGHT_CALF);
+                    }
+                }
+            }
+
+            previous_hitbox_value = current_hitbox_value;
 
             return list;
         }
@@ -149,45 +205,6 @@ namespace features
 
             // Normalize the final output angle
             smoothed_angles.normalize_clamp();
-        }
-
-        QAngle calculate_unit_direction(const QAngle& angles) 
-        {
-            float pitch_rad = angles.pitch * (M_PI / 180.0f);
-            float yaw_rad = angles.yaw * (M_PI / 180.0f);
-
-            float x = std::cos(pitch_rad) * std::cos(yaw_rad);
-            float y = std::cos(pitch_rad) * std::sin(yaw_rad);
-            float z = std::sin(pitch_rad);
-
-            // Return a unit direction represented as QAngle
-            return QAngle{ x, y, z };
-        }
-
-        void smoothing_idk(float smooth, const QAngle& view_angles, const QAngle& target_angles, float fov, QAngle& out_angles) 
-        {
-            // Ensure smooth and fov values are reasonable
-            smooth = std::max(smooth, 1.0f);
-            fov = std::max(fov, 1.0f);
-
-            // Calculate the angular difference (delta) and normalize
-            QAngle delta = target_angles - view_angles;
-            delta.normalize_clamp();
-
-            // Convert delta to a unit directional QAngle
-            QAngle unit_delta = calculate_unit_direction(delta);
-
-            // Calculate the smoothing scale based on smooth factor and FOV adjustment
-            float fov_adjustment = std::max(fov / settings::visuals::aim_fov_indenpendence, 1.0f);
-            QAngle smoothed_delta = unit_delta * (1.0f / (smooth * fov_adjustment));
-
-            // Limit smoothed_delta to avoid overshooting
-            if (smoothed_delta.length() > delta.length())
-                smoothed_delta = delta; // Snap to target if smoothing overshoots
-
-            // Calculate the final output angles
-            out_angles = view_angles + smoothed_delta;
-            out_angles.normalize_clamp();
         }
 
         //TODO: Scale smoothing by frametime / (1.f / 64.f) ?
@@ -319,31 +336,9 @@ namespace features
                     if (!hitbox_data)
                         continue;
 
-                    const auto& hitbox_ids = GetTargetHitboxes();
+                    const auto& hitbox_ids = GetTargetHitboxes(data);
                     if (hitbox_ids.empty())
                         continue;
-
-                    /*bool in_air = data.flags.test(PLAYER_IN_AIR) && (settings::visuals::aimbot_hitbox & (1 << 4));
-
-                    if (in_air)
-                    {
-                        hitbox_ids.emplace(HITBOX_HEAD);
-                        hitbox_ids.emplace(HITBOX_NECK);
-
-                        hitbox_ids.emplace(HITBOX_UPPER_CHEST);
-                        hitbox_ids.emplace(HITBOX_LOWER_CHEST);
-                        hitbox_ids.emplace(HITBOX_THORAX);
-                        hitbox_ids.emplace(HITBOX_BELLY);
-
-                        hitbox_ids.emplace(HITBOX_LEFT_UPPER_ARM);
-                        hitbox_ids.emplace(HITBOX_RIGHT_UPPER_ARM);
-
-                        hitbox_ids.emplace(HITBOX_LEFT_THIGH);
-                        hitbox_ids.emplace(HITBOX_RIGHT_THIGH);
-                        hitbox_ids.emplace(HITBOX_PELVIS);
-                        hitbox_ids.emplace(HITBOX_LEFT_CALF);
-                        hitbox_ids.emplace(HITBOX_RIGHT_CALF);
-                    }*/
 
                     if (hitbox_ids.find(hitbox_data->index) == hitbox_ids.end())
                         continue;
