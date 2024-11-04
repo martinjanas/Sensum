@@ -19,8 +19,8 @@ class CGlobalVarsBase
 public:
 	float m_realtime; //0x0000
 	int32_t m_framecount; //0x0004
-	float m_fratmetime; //0x0008
-	float m_abs_frametime; //0x000C
+	float m_frametime; //0x0008 //returns 0
+	float m_abs_frametime; //0x000C //returns 0
 	int32_t m_maxclients; //0x0010
 	char pad_0014[28]; //0x0014
 	float m_frametime2; //0x0030

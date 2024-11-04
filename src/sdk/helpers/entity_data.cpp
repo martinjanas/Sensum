@@ -3,6 +3,8 @@
 #include "../helpers/globals.h"
 #include "../../thirdparty/ImGui/imgui_internal.h"
 #include "../localplayer.h"
+#include "../../features/features.h"
+#include <queue>
 
 namespace entity_data
 {
@@ -19,7 +21,7 @@ namespace entity_data
 
 	void destroy()
 	{
-		std::lock_guard<std::mutex> lock(locker, std::adopt_lock);
+		std::lock_guard<std::mutex> lock(locker);
 
 		player_entry_data.clear();
 	}
@@ -111,22 +113,6 @@ namespace entity_data
 		return true;
 	}
 
-	bool hitbox_visible_set(int index)
-	{
-		switch (index) 
-		{
-			case HITBOX_HEAD:
-			case HITBOX_UPPER_CHEST:
-			case HITBOX_RIGHT_CALF:
-			case HITBOX_LEFT_CALF:
-			case HITBOX_RIGHT_HAND:
-			case HITBOX_LEFT_HAND:
-				return true;
-			default:
-				return false;	 		
-		}
-	}
-
 	bool is_in_smoke(const Vector& start, const Vector& end, const float& max_density)
 	{
 		using fn = float(__fastcall*)(const Vector&, const Vector&, void*);
@@ -145,29 +131,76 @@ namespace entity_data
 		return false;
 	}
 
-	void update_visiblity(entity_data::hitbox_info_t& hitbox_info, entity_data::player_data_t& player_data, CCSPlayerPawn* local_pawn)
+	std::map<int, std::vector<int>> hitbox_hierarchy = 
+	{
+		{HITBOX_HEAD, {HITBOX_NECK}},
+		{HITBOX_NECK, {HITBOX_UPPER_CHEST}},
+		{HITBOX_UPPER_CHEST, {HITBOX_LOWER_CHEST}},
+		{HITBOX_LOWER_CHEST, {HITBOX_THORAX}},
+		{HITBOX_THORAX, {HITBOX_BELLY}},
+		{HITBOX_BELLY, {HITBOX_PELVIS}},
+		{HITBOX_LEFT_UPPER_ARM, {HITBOX_LEFT_FOREARM}},
+		{HITBOX_RIGHT_UPPER_ARM, {HITBOX_RIGHT_FOREARM}},
+		{HITBOX_LEFT_THIGH, {HITBOX_LEFT_CALF}},
+		{HITBOX_RIGHT_THIGH, {HITBOX_RIGHT_CALF}},
+	};
+
+	void set_children_as_visible(int index, entity_data::player_data_t& player_data)
+	{
+		std::vector<int> to_process;
+		to_process.push_back(index);
+
+		while (!to_process.empty())
+		{
+			int current = to_process.back();
+			to_process.pop_back();
+
+			if (hitbox_hierarchy.find(current) == hitbox_hierarchy.end())
+				continue;
+
+			for (int child_index : hitbox_hierarchy[current])
+			{
+				if (player_data.hitboxes[child_index].visible)
+					continue;
+
+				player_data.hitboxes[child_index].visible = true;
+				to_process.push_back(child_index);
+			}
+		}
+	}
+
+	void update_visibility(entity_data::player_data_t& player_data, CCSPlayerPawn* local_pawn) 
 	{
 		static Ray_t ray;
 		TraceFilter_t filter(MASK_PLAYER_VISIBLE, local_pawn, nullptr, 4);
 		Trace_t trace;
 
-		if (!hitbox_info.visible)
-		{
-			g::engine_trace->TraceShape(&ray, local_pawn->GetEyePos(), hitbox_info.hitbox_pos, &filter, &trace);
+		static std::vector<int> hitbox_scan_ids = { HITBOX_HEAD, HITBOX_LOWER_CHEST, HITBOX_BELLY, HITBOX_LEFT_UPPER_ARM, HITBOX_RIGHT_UPPER_ARM, HITBOX_LEFT_THIGH, HITBOX_RIGHT_THIGH };
 
-			if (trace.m_pHitEntity == local_pawn || !trace.m_pHitEntity->IsPawn())
-				return;
-			
-			const bool is_visible = trace.m_pHitEntity == player_data.m_PlayerPawn || trace.m_flFraction >= 0.97f;
+		for (int hitbox_id : hitbox_scan_ids) 
+		{
+			auto& hitbox = player_data.hitboxes[hitbox_id];
+			if (hitbox.visible)
+				continue;
+
+			g::engine_trace->TraceShape(&ray, local_pawn->GetEyePos(), hitbox.hitbox_pos, &filter, &trace);
+
+			if (!trace.m_pHitEntity || trace.m_pHitEntity == local_pawn || !trace.m_pHitEntity->IsPawn())
+				continue;
+
+			bool is_visible = trace.m_pHitEntity == player_data.m_PlayerPawn || trace.m_flFraction == 1.0f/*>= 0.97f*/;
 
 			if (!player_data.flags.test(PLAYER_VISIBLE) && is_visible)
 				player_data.flags.set(PLAYER_VISIBLE);
 
-			hitbox_info.visible = is_visible;
-		}
+			hitbox.visible = is_visible;
 
-		if (player_data.flags.test(PLAYER_VISIBLE) && !player_data.flags.test(PLAYER_IN_SMOKE) && is_in_smoke(local_pawn->GetEyePos(), hitbox_info.hitbox_pos, 0.2f))
-			player_data.flags.set(PLAYER_IN_SMOKE);
+			if (is_visible)
+				set_children_as_visible(hitbox_id, player_data);
+
+			if (is_visible && !player_data.flags.test(PLAYER_IN_SMOKE) && is_in_smoke(local_pawn->GetEyePos(), hitbox.hitbox_pos, 0.2f))
+				player_data.flags.set(PLAYER_IN_SMOKE);
+		}
 	}
 
 	void get_hitboxes(entity_data::player_data_t& player_data, const Vector& eye_pos, CCSPlayerPawn* local_pawn, const bool& on_screen)
@@ -207,18 +240,12 @@ namespace entity_data
 			auto hitbox_pos = (mins + maxs) * 0.5f;
 
 			player_data.hitboxes[i] = { hitbox_pos, hitbox->m_nHitBoxIndex(), false };
-
-			hitbox_info.hitbox_pos = hitbox_pos;
-			hitbox_info.index = hitbox->m_nHitBoxIndex();
-			hitbox_info.visible = false;
-
-			if (!on_screen || !hitbox_visible_set(i))
-				continue;
-
-			update_visiblity(hitbox_info, player_data, local_pawn);
-
-			player_data.hitboxes[i] = hitbox_info;
 		}
+
+		if (!on_screen)
+			return;
+
+		update_visibility(player_data, local_pawn);
 	}
 
 	void fetch_player_data(CUserCmd* cmd)
@@ -242,6 +269,9 @@ namespace entity_data
 		const auto& local_team = localpawn->m_iTeamNum();
 		const auto& eye_pos = localpawn->GetEyePos();
 		
+		static Vector old_origin;
+		static QAngle old_angle;
+
 		entry_data_t entry_data;
 		for (const auto& instance : player_instances)
 		{
@@ -292,7 +322,7 @@ namespace entity_data
 			const auto on_screen = globals::world2screen(scene_node->m_vecOrigin(), origin_w2s);
 
 			player_data_t player_data;
-			player_data.m_szPlayerName = "Martin";//controller->m_sSanitizedPlayerName();
+			player_data.m_szPlayerName = controller->m_sSanitizedPlayerName();
 			player_data.m_iPlayerIndex = index;
 			player_data.m_vecOrigin = scene_node->m_vecOrigin();
 			player_data.m_vecAbsOrigin = scene_node->m_vecAbsOrigin();
@@ -313,9 +343,19 @@ namespace entity_data
 			pawn->m_iHealth() > 0 ? player_data.flags.set(PLAYER_ALIVE) : player_data.flags.reset(PLAYER_ALIVE);
 			pawn->InAir() ? player_data.flags.set(PLAYER_IN_AIR) : player_data.flags.reset(PLAYER_IN_AIR);
 
-			get_hitboxes(player_data, eye_pos, localpawn, on_screen);
+			if (old_origin != scene_node->m_vecOrigin() || (old_angle.pitch != pawn->m_angEyeAngles().yaw || old_angle.pitch != pawn->m_angEyeAngles().yaw))
+			{
+				get_hitboxes(player_data, eye_pos, localpawn, on_screen);
+				get_bbox(scene_node, collision, player_data.bbox);
+				get_bones_w2s(player_data);
+			}
+
+			/*get_hitboxes(player_data, eye_pos, localpawn, on_screen);
 			get_bbox(scene_node, collision, player_data.bbox);
-			get_bones_w2s(player_data);
+			get_bones_w2s(player_data);*/
+
+			old_origin = scene_node->m_vecOrigin();
+			old_angle = pawn->m_angEyeAngles();
 
 			entry_data.player_data.push_back(std::move(player_data));
 		}

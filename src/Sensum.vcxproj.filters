@@ -216,6 +216,7 @@
     <ClInclude Include="sdk\hooking\safetyhook\safetyhook.hpp" />
     <ClInclude Include="sdk\hooking\safetyhook\Zydis.h" />
     <ClInclude Include="sdk\interfaces\CGameTrace.h" />
+    <ClInclude Include="notify_system.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\classes\CBaseEntity.cpp">
@@ -314,5 +315,7 @@
     <ClCompile Include="features\aimbot.cpp" />
     <ClCompile Include="sdk\classes\CHandle.cpp" />
     <ClCompile Include="sdk\interfaces\CGameTrace.cpp" />
+    <ClCompile Include="notify_system.cpp" />
+    <ClCompile Include="sdk\helpers\matrix.cpp" />
   </ItemGroup>
 </Project>

@@ -26,6 +26,11 @@ enum EHitboxes
     HITBOX_MAX
 };
 
+//head: head, neck
+//chest: lowerc, upper, belly, pelvis, thorax
+//hands: upperarml, forearml, upperarmr, forearmr
+//legs: thighl, thighr, calfl, calfr
+
 struct matrix4x2_t
 {
 public:

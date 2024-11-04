@@ -1,5 +1,6 @@
 #pragma once
 
+class Vector;
 struct matrix3x4_t 
 {
     matrix3x4_t(float a1, float a2, float a3, float a4,
@@ -44,7 +45,7 @@ struct matrix3x4_t
         return result;
     }
 
-    matrix3x4_t operator*(const matrix3x4_t& other) const 
+    matrix3x4_t operator*(const matrix3x4_t& other) const
     {
         matrix3x4_t result;
         for (int i = 0; i < 3; ++i) {
@@ -57,6 +58,8 @@ struct matrix3x4_t
         }
         return result;
     }
+
+    Vector operator*(const Vector& vec) const;
 
     float data[3][4];
 };

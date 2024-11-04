@@ -8,7 +8,6 @@
 #include "../sdk/helpers/entity_data.h"
 #include "../sdk/sdk.h"
 
-
 namespace features
 {
     namespace aimbot
@@ -35,6 +34,24 @@ namespace features
             fov = std::clamp<float>(fov, 0.f, 180.f);
 
             return fov;
+        }
+
+        Vector angle_to_pixel(const QAngle& aimAngle, const QAngle& currentAngle, int screenWidth, int screenHeight)
+        {
+            auto delta = aimAngle - currentAngle;
+            delta.normalize_clamp();
+
+            // Map delta angles to pixel coordinates on the screen
+            float screenX = (-delta.yaw / 360.0f) * screenWidth; // Map yaw to [0, screenWidth]
+            float screenY = (delta.pitch / 90.0f) * screenHeight; // Map pitch to [0, screenHeight]
+
+            // Return the pixel coordinates as a Vector2
+            return Vector(screenX, screenY, 0.f);
+        }
+
+        void move_mouse(int screenX, int screenY) 
+        {
+            mouse_event(MOUSEEVENTF_MOVE, screenX, screenY, 0, 0);
         }
 
         void smooth(float amount, const QAngle& current_angles, const QAngle& aim_angles, QAngle& out_angles)
@@ -156,6 +173,51 @@ namespace features
                 last_punch = { 0.0f, 0.0f, 0.f };
             }
         }
+        
+        const char* hitbox_index_to_name(int index) 
+        {
+            switch (index) 
+            {
+                case HITBOX_HEAD:            
+                    return "Head";
+                case HITBOX_NECK:            
+                    return "Neck";
+                case HITBOX_PELVIS:          
+                    return "Pelvis";
+                case HITBOX_BELLY:           
+                    return "Belly";
+                case HITBOX_THORAX:          
+                    return "Thorax";
+                case HITBOX_LOWER_CHEST:     
+                    return "Lower Chest";
+                case HITBOX_UPPER_CHEST:     
+                    return "Upper Chest";
+                case HITBOX_RIGHT_THIGH:      
+                    return "Right Thigh";
+                case HITBOX_LEFT_THIGH:       
+                    return "Left Thigh";
+                case HITBOX_RIGHT_CALF:       
+                    return "Right Calf";
+                case HITBOX_LEFT_CALF:        
+                    return "Left Calf";
+                case HITBOX_RIGHT_FOOT:       
+                    return "Right Foot";
+                case HITBOX_LEFT_FOOT:        
+                    return "Left Foot";
+                case HITBOX_RIGHT_HAND:       
+                    return "Right Hand";
+                case HITBOX_LEFT_HAND:        
+                    return "Left Hand";
+                case HITBOX_RIGHT_UPPER_ARM:  
+                    return "Right Upper Arm";
+                case HITBOX_RIGHT_FOREARM:    
+                    return "Right Forearm";
+                case HITBOX_LEFT_UPPER_ARM:   
+                    return "Left Upper Arm";
+                case HITBOX_LEFT_FOREARM:     
+                    return "Left Forearm";
+            }
+        }
 
         void handle(CUserCmd* cmd)
         {
@@ -210,7 +272,7 @@ namespace features
                     if (hitbox_ids.empty())
                         continue;
 
-                    if (hitbox_ids.find(hitbox_data->index) == hitbox_ids.end())
+                    if (hitbox_ids.find(hitbox_data->index) == hitbox_ids.end()) /*TODO: && settings::nearest_hitbox*/
                         continue;
 
                     if (!hitbox_data->visible)
@@ -249,14 +311,14 @@ namespace features
                     if (!(GetAsyncKeyState(VK_LBUTTON)))
                         continue;
 
-                    if (active_wpn->m_iItemDefinitionIndex() == 9 && !localpawn->m_bIsScoped())
+                    if (active_wpn->m_iItemDefinitionIndex() == WEAPON_AWP && !localpawn->m_bIsScoped())
                         continue;
 
                     int next_attack_tick = active_wpn->m_nNextPrimaryAttackTick().m_Value(); //This next shot attack checker works poorly on awp - needs fix!
-                    if (next_attack_tick <= localplayer->m_nTickBase() && active_wpn->m_iItemDefinitionIndex() != 9)
+                    if (next_attack_tick <= localplayer->m_nTickBase() && active_wpn->m_iItemDefinitionIndex() == WEAPON_AWP)
                         continue;
 
-                    //printf("[%s: %d]: fov: %.1f, best_fov: %.1f, dist: %.1f\n", data.m_szPlayerName, hitbox_data->index, fov, best_fov, distance);
+                    //printf("[%s: %s]: fov: %.1f, best_fov: %.1f, dist: %.1f\n", data.m_szPlayerName, hitbox_index_to_name(hitbox_data->index), fov, best_fov, distance);
 
                     if (best_fov > settings::visuals::aimbot_fov)
                         continue;
@@ -265,9 +327,10 @@ namespace features
                         smooth(settings::visuals::smooth, viewangles, best_angle, best_angle);
                     else smooth_constant(settings::visuals::smooth, viewangles, best_angle, best_angle);*/
 
-                    smooth(settings::visuals::smooth, viewangles, best_angle, best_angle);
+                    QAngle output;
+                    smooth(settings::visuals::smooth, viewangles, best_angle, output);
 
-                    g::client->SetViewAngles(0, best_angle);
+                    g::client->SetViewAngles(0, output);
                 }
             }
 

@@ -2,6 +2,7 @@
 #include "../settings/settings.h"
 #include "../sdk/helpers/entity_data.h"
 #include "../sdk/helpers/globals.h"
+#include <unordered_set>
 
 namespace features
 {

@@ -50,6 +50,51 @@ namespace features::esp
 		globals::draw_list->AddLine(bbox.m_Vertices[TOP_RIGHT_BACK].as_vec2(), bbox.m_Vertices[BOTTOM_RIGHT_BACK].as_vec2(), IM_COL32_WHITE);
 	}
 
+	const char* hitbox_index_to_name(int index)
+	{
+		switch (index)
+		{
+		case HITBOX_HEAD:
+			return "Head";
+		case HITBOX_NECK:
+			return "Neck";
+		case HITBOX_PELVIS:
+			return "Pelvis";
+		case HITBOX_BELLY:
+			return "Belly";
+		case HITBOX_THORAX:
+			return "Thorax";
+		case HITBOX_LOWER_CHEST:
+			return "Lower Chest";
+		case HITBOX_UPPER_CHEST:
+			return "Upper Chest";
+		case HITBOX_RIGHT_THIGH:
+			return "Right Thigh";
+		case HITBOX_LEFT_THIGH:
+			return "Left Thigh";
+		case HITBOX_RIGHT_CALF:
+			return "Right Calf";
+		case HITBOX_LEFT_CALF:
+			return "Left Calf";
+		case HITBOX_RIGHT_FOOT:
+			return "Right Foot";
+		case HITBOX_LEFT_FOOT:
+			return "Left Foot";
+		case HITBOX_RIGHT_HAND:
+			return "Right Hand";
+		case HITBOX_LEFT_HAND:
+			return "Left Hand";
+		case HITBOX_RIGHT_UPPER_ARM:
+			return "Right Upper Arm";
+		case HITBOX_RIGHT_FOREARM:
+			return "Right Forearm";
+		case HITBOX_LEFT_UPPER_ARM:
+			return "Left Upper Arm";
+		case HITBOX_LEFT_FOREARM:
+			return "Left Forearm";
+		}
+	}
+
 	void render()
 	{
 		if (!g::engine_client->IsInGame())
@@ -90,14 +135,13 @@ namespace features::esp
 
 			//if (!data.hitboxes.empty())
 			//{
-			//	Vector hitbox_w2s;
-			//	
+			//	Vector hitbox_w2s;	
 			//	for (auto& hitbox_data : data.hitboxes)
 			//	{
 			//		Vector hitbox_pos = hitbox_data.hitbox_pos;
 
 			//		if (globals::world2screen(hitbox_pos, hitbox_w2s))
-			//			globals::draw_list->AddText(hitbox_w2s.as_vec2(), IM_COL32_WHITE, std::to_string(hitbox_data.index).c_str());
+			//			globals::draw_list->AddText(hitbox_w2s.as_vec2(), IM_COL32_WHITE, hitbox_index_to_name(hitbox_data.index));
 
 			//		/*if (globals::world2screen(hitbox_pos, hitbox_w2s))
 			//			globals::draw_list->AddCircle(hitbox_w2s.as_vec2(), 8.f, IM_COL32_WHITE, 255);*/
