@@ -5,7 +5,7 @@
 #include <d3d11.h>
 
 #include "../sdk/localplayer.h"
-#include "../interfaces.h"
+#include "../sdk/helpers/interfaces.h"
 
 
 void print_status(const char* name, void* ptr)

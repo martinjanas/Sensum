@@ -3,7 +3,7 @@
 #pragma once
 
 #include "../helpers/vfunc.h"
-#include "../../interfaces.h"
+#include "../../sdk/helpers/interfaces.h"
 
 template <class T>
 inline T* Construct(T* pMemory) {

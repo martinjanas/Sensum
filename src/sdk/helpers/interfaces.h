@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sdk/interfaces/IMemAlloc.h"
+#include "../interfaces/IMemAlloc.h"
 
 namespace mem_alloc_in
 {

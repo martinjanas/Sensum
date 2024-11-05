@@ -1,5 +1,5 @@
 #pragma once
-#include "sdk/helpers/globals.h"
+#include "globals.h"
 
 //enum ENotifyLevel
 //{

@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include "../../interfaces.h"
+#include "../../sdk/helpers/interfaces.h"
 
 template <class T>
 class CUtlVector {

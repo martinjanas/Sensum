@@ -6,10 +6,10 @@
 
 DWORD __stdcall on_attach(void* base)
 {
-    Sleep(5000);
+    //Sleep(5000);
 
     g_Console = new Console();
-    //g_Console->attach();
+    g_Console->attach();
 
     sdk::init_modules();
     sdk::init_interfaces();
@@ -24,7 +24,7 @@ DWORD __stdcall on_attach(void* base)
         Sleep(50);
 
     hooks::detach();
-    //g_Console->detach();
+    g_Console->detach();
 
     delete g_Console;
     

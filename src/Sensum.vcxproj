@@ -121,9 +121,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="features\features.h" />
-    <ClInclude Include="interfaces.h" />
-    <ClInclude Include="notify_system.h" />
-    <ClInclude Include="render.h" />
+    <ClInclude Include="render\fonts\droidsans.hpp" />
+    <ClInclude Include="render\fonts\undefeated.hpp" />
+    <ClInclude Include="render\imgui_custom.h" />
+    <ClInclude Include="render\menu.h" />
+    <ClInclude Include="render\render.h" />
+    <ClInclude Include="sdk\helpers\interfaces.h" />
+    <ClInclude Include="sdk\helpers\notify_system.h" />
+    <ClInclude Include="sdk\helpers\render.h" />
     <ClInclude Include="sdk\helpers\BBox_t.h" />
     <ClInclude Include="sdk\helpers\CBufferString.h" />
     <ClInclude Include="sdk\helpers\CInterlockedInt.h" />
@@ -203,9 +208,11 @@
     <ClCompile Include="features\esp.cpp" />
     <ClCompile Include="hooks\functions\GetFov.cpp" />
     <ClCompile Include="hooks\functions\GetMatricesForView.cpp" />
-    <ClCompile Include="interfaces.cpp" />
-    <ClCompile Include="notify_system.cpp" />
-    <ClCompile Include="render.cpp" />
+    <ClCompile Include="render\imgui_custom.cpp" />
+    <ClCompile Include="render\menu.cpp" />
+    <ClCompile Include="sdk\helpers\interfaces.cpp" />
+    <ClCompile Include="sdk\helpers\notify_system.cpp" />
+    <ClCompile Include="render\render.cpp" />
     <ClCompile Include="sdk\classes\CHandle.cpp" />
     <ClCompile Include="sdk\helpers\globals.cpp" />
     <ClCompile Include="hooks\functions\Present.cpp" />

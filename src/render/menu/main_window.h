@@ -9,5 +9,6 @@ namespace main_window
 	extern ImFont* esp;
 
 	void Draw();
+	void InitStyle();
 }
 

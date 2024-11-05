@@ -3,6 +3,7 @@
 #include "../hooks.h"
 #include "../../sdk/helpers/entity_data.h"
 #include "../../render/menu/main_window.h"
+#include "../../render/menu.h"
 #include "../../features/features.h"
 
 namespace hooks
@@ -123,7 +124,10 @@ namespace hooks
 			ImGui_ImplWin32_Init(globals::hwnd);
 			ImGui_ImplDX11_Init(g_pDevice, g_pContext);
 
+			render::apply_fonts();
+
 			main_window::esp = ImGui::GetIO().Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\seguisbi.ttf", 16.f);
+			main_window::InitStyle();
 
 			init_imgui_done = true;
 		}
@@ -135,8 +139,12 @@ namespace hooks
 		{
 			globals::draw_list = ImGui::GetBackgroundDrawList();
 
+			menu::modulate_window_alpha();
+
 			if (main_window::is_open)
 				main_window::Draw();
+
+			menu::draw();
 
 			features::esp::render();
 		}
