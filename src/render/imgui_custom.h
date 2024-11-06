@@ -3,9 +3,10 @@
 
 namespace imgui_custom
 {
-	
+	void selector(const char* label, ImVec2& pos);
 }
 
-namespace imgui = ImGui;
 namespace imc = imgui_custom;
+
+
 

@@ -18,7 +18,7 @@ namespace settings
 		int aimbot_hitbox = TARGET_HEAD | TARGET_CHEST;
 		int smooth_mode = 1;
 
-		float smooth = 7.f;
+		float smooth = 3.5f;
 		float box_rounding = 0.f;
 		float box_thickness = 2.f;
 		float pitch = 1.5f;

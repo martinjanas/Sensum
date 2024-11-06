@@ -186,6 +186,7 @@ namespace main_window
         ImGui::ColorEdit3("###bonecolor", (float*)&settings::visuals::m_fBoneColor, ImGuiColorEditFlags_NoInputs);
 
         ImGui::SliderInt("Aimbot FOV", &settings::visuals::aimbot_fov, 0, 360);
+
         ShowMultiSelectPopup("Hitboxes", settings::visuals::aimbot_hitbox, hitbox_items);
         ImGui::SliderFloat("###AimbotSmooth", &settings::visuals::smooth, 1.f, 10.f, "Smooth: %.1f");
         ShowSmoothModePopup("Smooth Mode", settings::visuals::smooth_mode, items);

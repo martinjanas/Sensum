@@ -1,6 +1,7 @@
 #include "menu.h"
 #include "../sdk/helpers/globals.h"
 #include "../sdk/helpers/console.h"
+#include "../render/imgui_custom.h"
 
 namespace menu
 {
@@ -64,6 +65,27 @@ namespace menu
 			render_header();
 
 			style->WindowPadding = old_window_padding;
+
+			imgui::BeginChild("##tabscontent", { 0, 0 }, false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+			{
+				imgui::Columns(3, nullptr, false);
+				{
+					if (current_tab == 0)
+						imc::selector("Very long fucking text", window_center);
+					else if (current_tab == 1)
+						imgui::GetForegroundDrawList()->AddText(window_center, IM_COL32_WHITE, "Visuals Tab");
+					else if (current_tab == 2)
+						imgui::GetForegroundDrawList()->AddText(window_center, IM_COL32_WHITE, "Misc Tab");
+					else if (current_tab == 3)
+						imgui::GetForegroundDrawList()->AddText(window_center, IM_COL32_WHITE, "Skins Tab");
+					else if (current_tab == 4)
+						imgui::GetForegroundDrawList()->AddText(window_center, IM_COL32_WHITE, "Players Tab");
+					else if (current_tab == 5)
+						imgui::GetForegroundDrawList()->AddText(window_center, IM_COL32_WHITE, "Config Tab");
+				}
+				imgui::Columns(1);
+			}
+			imgui::EndChild();
 		}
 		ImGui::End();
 

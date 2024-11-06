@@ -130,7 +130,7 @@ namespace features::esp
 			
 			esp::name_esp(data, data.bbox);
 
-			Draw3DBox(data.bbox);
+			//Draw3DBox(data.bbox);
 
 			esp::bone_esp(data);
 

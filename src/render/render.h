@@ -10,7 +10,10 @@ namespace render
 	{
 		extern ImFont* header_title;
 		extern ImFont* header_buttons;
+		extern ImFont* selector;
 	}
 
 	void init_fonts();
 }
+
+namespace imgui = ImGui;
