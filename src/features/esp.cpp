@@ -1,5 +1,6 @@
 ﻿#include "features.h"
 #include "../render/menu/main_window.h"
+#include "../render/render.h"
 
 namespace features::esp
 {
@@ -133,20 +134,20 @@ namespace features::esp
 
 			esp::bone_esp(data);
 
-			//if (!data.hitboxes.empty())
-			//{
-			//	Vector hitbox_w2s;	
-			//	for (auto& hitbox_data : data.hitboxes)
-			//	{
-			//		Vector hitbox_pos = hitbox_data.hitbox_pos;
+			/*if (!data.hitboxes.empty())
+			{
+				Vector hitbox_w2s;	
+				for (auto& hitbox_data : data.hitboxes)
+				{
+					Vector hitbox_pos = hitbox_data.hitbox_pos;
 
-			//		if (globals::world2screen(hitbox_pos, hitbox_w2s))
-			//			globals::draw_list->AddText(hitbox_w2s.as_vec2(), IM_COL32_WHITE, hitbox_index_to_name(hitbox_data.index));
+					//if (globals::world2screen(hitbox_pos, hitbox_w2s))
+						//globals::draw_list->AddText(hitbox_w2s.as_vec2(), IM_COL32_WHITE, hitbox_index_to_name(hitbox_data.index));
 
-			//		/*if (globals::world2screen(hitbox_pos, hitbox_w2s))
-			//			globals::draw_list->AddCircle(hitbox_w2s.as_vec2(), 8.f, IM_COL32_WHITE, 255);*/
-			//	}
-			//}
+					if (globals::world2screen(hitbox_pos, hitbox_w2s))
+						globals::draw_list->AddCircle(hitbox_w2s.as_vec2(), 8.f, IM_COL32_WHITE, 255);
+				}
+			}*/
 		}
 	}
 
@@ -182,7 +183,7 @@ namespace features::esp
 		font_size = std::clamp<float>(font_size, 12.f, 24.f);
 
 		// Calculate the text size and position
-		auto text_size = main_window::esp->CalcTextSizeA(font_size, FLT_MAX, 0.0f, data.m_szPlayerName);
+		auto text_size = render::fonts::header_buttons->CalcTextSizeA(font_size, FLT_MAX, 0.0f, data.m_szPlayerName);
 		auto text_size_mid = text_size.x * 0.5f;
 		auto y_padding = 5.f;
 
@@ -190,6 +191,6 @@ namespace features::esp
 		
 		ImVec2 render_pos(top_mid.x - text_size_mid, top_mid.y - text_size.y - y_padding);
 
-		globals::draw_list->AddText(main_window::esp, font_size, render_pos, color, data.m_szPlayerName);
+		globals::draw_list->AddText(render::fonts::header_buttons, font_size, render_pos, color, data.m_szPlayerName);
 	}
 }

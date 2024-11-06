@@ -6,8 +6,6 @@ namespace main_window
 {
     bool is_open = false;
 
-    ImFont* esp;
-
     void ShowSmoothModePopup(const char* label, int& current, const std::vector<std::string>& items) 
     {
         char buf[64];

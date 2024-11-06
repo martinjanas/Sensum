@@ -294,27 +294,27 @@ namespace entity_data
 			if (!pawn || !pawn->IsAlive() || pawn == localpawn || pawn->m_iTeamNum() == local_team)
 				continue;
 
-			auto hitbox_set = pawn->GetHitboxSet(0);
+			const auto& hitbox_set = pawn->GetHitboxSet(0);
 			if (!hitbox_set)
 				continue;
 
-			const auto scene_node = pawn->m_pGameSceneNode();
-			const auto weapon_services = pawn->m_pWeaponServices();
+			const auto& scene_node = pawn->m_pGameSceneNode();
+			const auto& weapon_services = pawn->m_pWeaponServices();
 			if (!scene_node || !weapon_services)
 				continue;
 
-			auto active_wpn_handle = weapon_services->m_hActiveWeapon();
+			const auto& active_wpn_handle = weapon_services->m_hActiveWeapon();
 			if (!active_wpn_handle.IsValid())
 				continue;
 
-			const auto active_wpn = g::entity_system->GetEntityFromHandle<CBasePlayerWeapon*>(active_wpn_handle); //weapon_services->m_hActiveWeapon().Get<CBasePlayerWeapon*>();
-			const auto collision = pawn->m_pCollision();
-			const auto skeleton_instance = scene_node->GetSkeletonInstance();
+			const auto& active_wpn = g::entity_system->GetEntityFromHandle<CBasePlayerWeapon*>(active_wpn_handle); //weapon_services->m_hActiveWeapon().Get<CBasePlayerWeapon*>();
+			const auto& collision = pawn->m_pCollision();
+			const auto& skeleton_instance = scene_node->GetSkeletonInstance();
 			if (!active_wpn || !collision || !skeleton_instance)
 				continue;
 
-			const auto model_state = skeleton_instance->m_modelState();
-			const auto model = model_state.modelHandle;
+			const auto& model_state = skeleton_instance->m_modelState();
+			const auto& model = model_state.modelHandle;
 			if (!model.IsValid())
 				continue;
 
@@ -350,10 +350,6 @@ namespace entity_data
 				get_bbox(scene_node, collision, player_data.bbox);
 				get_bones_w2s(player_data);
 			}
-
-			/*get_hitboxes(player_data, eye_pos, localpawn, on_screen);
-			get_bbox(scene_node, collision, player_data.bbox);
-			get_bones_w2s(player_data);*/
 
 			old_origin = scene_node->m_vecOrigin();
 			old_angle = pawn->m_angEyeAngles();

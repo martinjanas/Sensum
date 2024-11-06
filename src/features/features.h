@@ -3,6 +3,7 @@
 #include "../sdk/helpers/entity_data.h"
 #include "../sdk/helpers/globals.h"
 #include <unordered_set>
+#include <list>
 
 enum ETargetSelection
 {
@@ -15,8 +16,6 @@ enum ETargetSelection
 
 namespace features
 {
-
-
 	namespace esp
 	{
 		void render();

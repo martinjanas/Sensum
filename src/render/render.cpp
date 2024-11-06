@@ -10,12 +10,13 @@ namespace render
 		ImFont* header_buttons;
 	}
 
-	void apply_fonts()
+	void init_fonts()
 	{
 		ImFontConfig font_config;
 		font_config.OversampleH = 1;
 		font_config.OversampleV = 1;
 		font_config.PixelSnapH = true;
+		font_config.FontBuilderFlags |= ImGuiFreeTypeBuilderFlags_ForceAutoHint;
 
 		static const ImWchar ranges[] =
 		{
@@ -26,7 +27,7 @@ namespace render
 
 		auto io = &ImGui::GetIO();
 
-		fonts::header_title = ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(droidsans_compressed_data, droidsans_compressed_size, 34.f);
+		fonts::header_title = ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(droidsans_compressed_data, droidsans_compressed_size, 34.f, &font_config);
 		fonts::header_buttons = ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(droidsans_compressed_data, droidsans_compressed_size, 18.5f, &font_config, ranges); //17.f
 	}
 }

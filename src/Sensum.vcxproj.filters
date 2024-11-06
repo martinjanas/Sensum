@@ -222,6 +222,7 @@
     <ClInclude Include="render\render.h" />
     <ClInclude Include="render\fonts\droidsans.hpp" />
     <ClInclude Include="render\fonts\undefeated.hpp" />
+    <ClInclude Include="thirdparty\ImGui\imgui_freetype.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\classes\CBaseEntity.cpp">
@@ -324,5 +325,6 @@
     <ClCompile Include="sdk\helpers\matrix.cpp" />
     <ClCompile Include="render\menu.cpp" />
     <ClCompile Include="render\imgui_custom.cpp" />
+    <ClCompile Include="thirdparty\ImGui\imgui_freetype.cpp" />
   </ItemGroup>
 </Project>

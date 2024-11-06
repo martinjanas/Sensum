@@ -1,6 +1,7 @@
 #pragma once
 #include "../thirdparty/ImGui/imgui.h"
 #include "../thirdparty/ImGui/imgui_internal.h"
+#include "../thirdparty/ImGui/imgui_freetype.h"
 #include "../render/fonts/droidsans.hpp"
 
 namespace render
@@ -11,5 +12,5 @@ namespace render
 		extern ImFont* header_buttons;
 	}
 
-	void apply_fonts();
+	void init_fonts();
 }

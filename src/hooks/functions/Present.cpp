@@ -124,9 +124,8 @@ namespace hooks
 			ImGui_ImplWin32_Init(globals::hwnd);
 			ImGui_ImplDX11_Init(g_pDevice, g_pContext);
 
-			render::apply_fonts();
+			render::init_fonts();
 
-			main_window::esp = ImGui::GetIO().Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\seguisbi.ttf", 16.f);
 			main_window::InitStyle();
 
 			init_imgui_done = true;

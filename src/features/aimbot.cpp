@@ -175,7 +175,7 @@ namespace features
             // Define the maximum smoothing step based on speed
             float max_smooth_step = 10.0f; // Adjust this value for sensitivity
             float smooth_step = (max_smooth_step / (speed + 0.1f)) * (1.0f / 64.0f);
-
+            
             // Start with the current angle
             smoothed_angles = current_angle_normalized;
 
@@ -206,8 +206,6 @@ namespace features
             // Normalize the final output angle
             smoothed_angles.normalize_clamp();
         }
-
-        //TODO: Scale smoothing by frametime / (1.f / 64.f) ?
 
         void rcs(CCSPlayerPawn* localpawn, const QAngle& viewangles, CUserCmd* cmd)
         {
@@ -318,7 +316,7 @@ namespace features
 
             const auto& eye_pos = localpawn->GetEyePos();
 
-            for (const auto& data : m_player_data)
+            for (auto& data : m_player_data)
             {
                 if (!data.m_PlayerPawn || data.m_iHealth <= 0)
                     continue;
@@ -358,7 +356,6 @@ namespace features
                     //float distance = data.m_vecOrigin.dist_to(eye_pos);
 
                     float fov = distance_based_fov(delta, distance);
-
                     if (fov < best_fov)
                     {
                         best_fov = fov;
@@ -383,7 +380,7 @@ namespace features
                         continue;
 
                     int next_attack_tick = active_wpn->m_nNextPrimaryAttackTick().m_Value(); //This next shot attack checker works poorly on awp - needs fix!
-                    if (next_attack_tick <= localplayer->m_nTickBase() && active_wpn->m_iItemDefinitionIndex() == WEAPON_AWP)
+                    if (next_attack_tick <= localplayer->m_nTickBase() && active_wpn->m_iItemDefinitionIndex() != WEAPON_AWP)
                         continue;
 
                     //printf("[%s: %s]: fov: %.1f, best_fov: %.1f, dist: %.1f\n", data.m_szPlayerName, hitbox_index_to_name(hitbox_data->index), fov, best_fov, distance);

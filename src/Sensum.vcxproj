@@ -110,6 +110,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\src\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Manifest>
       <VerboseOutput>false</VerboseOutput>
@@ -198,6 +200,7 @@
     <ClInclude Include="thirdparty\ImGui\backends\imgui_impl_win32.h" />
     <ClInclude Include="thirdparty\ImGui\imconfig.h" />
     <ClInclude Include="thirdparty\ImGui\imgui.h" />
+    <ClInclude Include="thirdparty\ImGui\imgui_freetype.h" />
     <ClInclude Include="thirdparty\ImGui\imgui_internal.h" />
     <ClInclude Include="thirdparty\ImGui\imstb_rectpack.h" />
     <ClInclude Include="thirdparty\ImGui\imstb_textedit.h" />
@@ -248,6 +251,7 @@
     <ClCompile Include="thirdparty\ImGui\imgui.cpp" />
     <ClCompile Include="thirdparty\ImGui\imgui_demo.cpp" />
     <ClCompile Include="thirdparty\ImGui\imgui_draw.cpp" />
+    <ClCompile Include="thirdparty\ImGui\imgui_freetype.cpp" />
     <ClCompile Include="thirdparty\ImGui\imgui_tables.cpp" />
     <ClCompile Include="thirdparty\ImGui\imgui_widgets.cpp" />
   </ItemGroup>
