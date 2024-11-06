@@ -11,5 +11,6 @@ namespace modules
 
 	extern DynamicModule nav_system;
 	extern DynamicModule input_sys;
+	extern DynamicModule matchmaking;
 }
 

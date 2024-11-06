@@ -68,6 +68,50 @@ public:
 	}
 };
 
+class CGameType
+{
+public:
+	bool IsDeathmatch()
+	{
+		return GetGameType() == 1 && GetGameMode() == 2;
+	}
+
+	bool IsCasual()
+	{
+		return GetGameType() == 0 && GetGameMode() == 0;
+	}
+
+	bool IsCompetitive()
+	{
+		return GetGameType() == 0 && GetGameMode() == 1;
+	}
+
+	bool IsWingman()
+	{
+		return GetGameType() == 0 && GetGameMode() == 2;
+	}
+
+	bool IsArmsrace()
+	{
+		return GetGameType() == 1 && GetGameMode() == 0;
+	}
+
+	bool IsMatchmaking()
+	{
+		return IsCasual() || IsCompetitive();
+	}
+private:
+	int GetGameType()
+	{
+		return GetVirtual<int(__thiscall*)(void*)>(this, 19)(this);
+	}
+
+	int GetGameMode()
+	{
+		return GetVirtual<int(__thiscall*)(void*)>(this, 20)(this);
+	}
+};
+
 namespace sdk
 {
 	void init_modules();
@@ -98,6 +142,7 @@ namespace interfaces //move to interfaces.h ?
     extern CGlobalVarsBase* global_vars;
 	extern CGameTrace* engine_trace;
 	extern CNetworkGameService* network_game_service;
+	extern CGameType* game_type;
 }
 
 namespace g = interfaces;

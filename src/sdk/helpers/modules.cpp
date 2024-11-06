@@ -9,4 +9,5 @@ namespace modules
 	DynamicModule directx11;
 	DynamicModule nav_system;
 	DynamicModule input_sys;
+	DynamicModule matchmaking;
 }

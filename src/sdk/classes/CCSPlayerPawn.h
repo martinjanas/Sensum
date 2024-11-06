@@ -19,6 +19,7 @@ public:
     NETVAR(QAngle, v_angle, "C_BasePlayerPawn", "v_angle");
     NETVAR(CUtlVector<QAngle>, m_aimPunchCache, "C_CSPlayerPawn", "m_aimPunchCache");
     NETVAR(bool, m_bIsScoped, "C_CSPlayerPawn", "m_bIsScoped");
+    NETVAR(bool, m_bGunGameImmunity, "C_CSPlayerPawnBase", "m_bGunGameImmunity");
 
     Vector GetEyePos();
     bool InAir();

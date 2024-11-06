@@ -43,6 +43,7 @@ namespace sdk
 		modules::tier0 = DynamicModule("tier0.dll");
 		modules::directx11 = DynamicModule("rendersystemdx11.dll");
 		modules::input_sys = DynamicModule("inputsystem.dll");
+		modules::matchmaking = DynamicModule("matchmaking.dll");
 
 	}
 
@@ -54,6 +55,7 @@ namespace sdk
 		g::game_resource_service = modules::engine.GetInterfaceFromList<CGameResourceService*>("GameResourceServiceClientV001");
 		g::input_system = modules::input_sys.GetInterfaceFromList<CInputSystem*>("InputSystemVersion001");
 		g::network_game_service = modules::engine.GetInterfaceFromList<CNetworkGameService*>("NetworkClientService_001");
+		g::game_type = modules::matchmaking.GetInterfaceFromList<CGameType*>("GameTypes001");
 
 		g::csgo_input = modules::client.scan("48 89 05 ? ? ? ? 0F 57 C0 0F 11 05 ? ? ? ?", "g::csgo_input").add(0x3).abs().as<CSGOInput*>();
 		g::render_system = **modules::directx11.scan("66 0F 7F 0D ? ? ? ? 66 0F 7F 05 ? ? ? ? 48 89 2D", "g::render_system").add(4).abs().as<CRenderSystem***>();
@@ -99,5 +101,6 @@ namespace interfaces
 	CGlobalVarsBase* global_vars{};
 	CGameTrace* engine_trace{};
 	CNetworkGameService* network_game_service{};
+	CGameType* game_type{};
 }
 
