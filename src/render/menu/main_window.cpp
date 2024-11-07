@@ -189,7 +189,7 @@ namespace main_window
 
         ShowMultiSelectPopup("Hitboxes", settings::visuals::aimbot_hitbox, hitbox_items);
         ImGui::SliderFloat("###AimbotSmooth", &settings::visuals::smooth, 1.f, 10.f, "Smooth: %.1f");
-        ShowSmoothModePopup("Smooth Mode", settings::visuals::smooth_mode, items);
+        //ShowSmoothModePopup("Smooth Mode", settings::visuals::smooth_mode, items);
 
         ImGui::SliderFloat("Recoil Pitch", &settings::visuals::pitch, 0.f, 2.f, "Recoil Pitch: %.1f");
         ImGui::SliderFloat("Recoil Yaw", &settings::visuals::yaw, 0.f, 2.f, "Recoil Yaw: %.1f");

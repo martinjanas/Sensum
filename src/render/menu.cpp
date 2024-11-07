@@ -3,6 +3,8 @@
 #include "../sdk/helpers/console.h"
 #include "../render/imgui_custom.h"
 
+#include "../settings/settings.h"
+
 namespace menu
 {
 	bool is_open = false;
@@ -70,9 +72,13 @@ namespace menu
 			{
 				imgui::Columns(3, nullptr, false);
 				{
+					static const char* items[] = { "Linear", "Constant"};
+
 					if (current_tab == 0)
-						imc::Selector("Very long fucking text", "vlft");
-						//imc::selector("Very long fucking text", window_center);
+					{
+						//ImGui::SetCursorScreenPos(window_center);
+						imc::selector("Smoothing Mode", items, 2, &settings::visuals::smooth_mode);
+					}
 					else if (current_tab == 1)
 						imgui::GetForegroundDrawList()->AddText(window_center, IM_COL32_WHITE, "Visuals Tab");
 					else if (current_tab == 2)
