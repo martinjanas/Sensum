@@ -3,7 +3,7 @@
 
 namespace imgui_custom
 {
-	void selector(const char* label, ImVec2& pos);
+	bool Selector(const char* label, const char* unique_id);
 }
 
 namespace imc = imgui_custom;

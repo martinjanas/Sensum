@@ -71,7 +71,8 @@ namespace menu
 				imgui::Columns(3, nullptr, false);
 				{
 					if (current_tab == 0)
-						imc::selector("Very long fucking text", window_center);
+						imc::Selector("Very long fucking text", "vlft");
+						//imc::selector("Very long fucking text", window_center);
 					else if (current_tab == 1)
 						imgui::GetForegroundDrawList()->AddText(window_center, IM_COL32_WHITE, "Visuals Tab");
 					else if (current_tab == 2)
