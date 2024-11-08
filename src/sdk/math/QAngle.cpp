@@ -60,7 +60,7 @@ void QAngle::normalize_clamp()
 
 bool QAngle::is_zero()
 {
-	return pitch == 0.f && yaw == 0.f;
+	return pitch == 0.f && yaw == 0.f && roll == 0.f;
 }
 
 Vector QAngle::to_vector() const

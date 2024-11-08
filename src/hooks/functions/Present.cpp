@@ -2,7 +2,6 @@
 #include <dxgi.h>
 #include "../hooks.h"
 #include "../../sdk/helpers/entity_data.h"
-#include "../../render/menu/main_window.h"
 #include "../../render/menu.h"
 #include "../../features/features.h"
 
@@ -125,8 +124,7 @@ namespace hooks
 			ImGui_ImplDX11_Init(g_pDevice, g_pContext);
 
 			render::init_fonts();
-
-			main_window::InitStyle();
+			render::init_style();
 
 			init_imgui_done = true;
 		}
@@ -139,10 +137,6 @@ namespace hooks
 			globals::draw_list = ImGui::GetBackgroundDrawList();
 
 			menu::modulate_window_alpha();
-
-			if (main_window::is_open)
-				main_window::Draw();
-
 			menu::draw();
 
 			features::esp::render();

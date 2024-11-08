@@ -150,9 +150,6 @@
     <ClInclude Include="thirdparty\ImGui\imstb_truetype.h">
       <Filter>thirdparty\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="render\menu\main_window.h">
-      <Filter>menu</Filter>
-    </ClInclude>
     <ClInclude Include="settings\settings.h">
       <Filter>settings</Filter>
     </ClInclude>
@@ -285,9 +282,6 @@
     </ClCompile>
     <ClCompile Include="thirdparty\ImGui\imgui_widgets.cpp">
       <Filter>thirdparty\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="render\menu\main_window.cpp">
-      <Filter>menu</Filter>
     </ClCompile>
     <ClCompile Include="settings\settings.cpp">
       <Filter>settings</Filter>

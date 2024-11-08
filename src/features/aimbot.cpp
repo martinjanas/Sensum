@@ -15,7 +15,6 @@ namespace features
         std::list<entity_data::player_data_t> m_player_data;
 
         static QAngle last_punch = { 0.f, 0.f, 0.f };
-        static QAngle current_punch = { 0.f, 0.f, 0.f };
 
         //Add hitbox target priority?
         std::unordered_set<int> GetTargetHitboxes(const entity_data::player_data_t& data) 
@@ -209,7 +208,7 @@ namespace features
 
         void rcs(CCSPlayerPawn* localpawn, const QAngle& viewangles, CUserCmd* cmd)
         {
-            auto& punch_cache = localpawn->m_aimPunchCache();
+            auto punch_cache = localpawn->m_aimPunchCache();
             if (punch_cache.Count() <= 0 || punch_cache.Count() >= 0xFFFF)
                 return;
 
@@ -217,18 +216,21 @@ namespace features
             QAngle current_punch = punch_cache[punch_cache.Count() - 1];
             current_punch.pitch *= settings::visuals::pitch;
             current_punch.yaw *= settings::visuals::yaw;
+            current_punch.normalize_clamp();
 
             if (localpawn->m_iShotsFired() > 1 && g::input_system->IsButtonDown(ButtonCode::MouseLeft)) // Apply while shooting
             {
                 QAngle recoil_delta = current_punch - last_punch; // Determine the change in punch angle
                 recoil_delta.pitch *= settings::visuals::pitch;
                 recoil_delta.yaw *= settings::visuals::yaw;
+                recoil_delta.normalize_clamp();
 
                 QAngle compensated_angle = viewangles - recoil_delta; // Adjust based on the recoil
                 compensated_angle.normalize_clamp();
 
                 QAngle output;
                 smooth(1.1f, viewangles, compensated_angle, output);
+                output.normalize_clamp();
 
                 g::client->SetViewAngles(0, output);
 

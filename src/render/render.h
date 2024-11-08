@@ -14,6 +14,7 @@ namespace render
 	}
 
 	void init_fonts();
+	void init_style();
 }
 
 namespace imgui = ImGui;
