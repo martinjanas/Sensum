@@ -18,5 +18,7 @@ namespace globals
 	extern bool can_unhook;
 
 	bool world2screen(const Vector& in, Vector& out);
+
+	void* find_hud_element(const char* hud);
 }
 

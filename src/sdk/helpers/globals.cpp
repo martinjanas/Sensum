@@ -42,4 +42,18 @@ namespace globals
 
 		return true;
 	}
+
+	void* find_hud_element(const char* hud)
+	{
+		using fn = void* (__fastcall*)(const char*);
+
+		static auto addr = modules::client.scan("40 55 48 83 EC 20 48 83 3D ? ? ? ? ?", "FindHudElement").as();
+
+		const auto find_hud_el = reinterpret_cast<fn>(addr);
+
+		if (find_hud_el)
+			return find_hud_el(hud);
+
+		return nullptr;
+	}
 }

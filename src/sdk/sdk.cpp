@@ -82,6 +82,7 @@ namespace sdk
 		print_status(g::global_vars);
 		print_status(g::engine_trace);
 		print_status(g::network_game_service);
+		print_status(g::hud_chat);
 		print_status(players::localplayer);
 	}
 }
@@ -102,5 +103,6 @@ namespace interfaces
 	CGameTrace* engine_trace{};
 	CNetworkGameService* network_game_service{};
 	CGameType* game_type{};
+	CHudChat* hud_chat{};
 }
 

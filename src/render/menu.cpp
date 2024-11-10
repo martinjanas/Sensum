@@ -150,7 +150,7 @@ namespace menu
 			{
 				imgui::Columns(3, nullptr, false);
 				{
-					static const char* items[] = { "Linear", "Constant"};
+					std::vector<std::string> items = { "Linear", "Constant" };
 
 					if (was_logo_pressed)
 					{
@@ -159,8 +159,9 @@ namespace menu
 
 					if (current_tab == 0)
 					{
-						//ImGui::SetCursorScreenPos(window_center);
-						imc::selector("Smoothing Mode", items, 2, &settings::visuals::smooth_mode);
+						ImGui::SetCursorScreenPos(window_center);
+						imc::selector(items, &settings::visuals::smooth_mode);
+						//imc::selector("Smoothing Mode", items, 2, &settings::visuals::smooth_mode);
 					}
 					else if (current_tab == 1)
 						imgui::GetForegroundDrawList()->AddText(window_center, IM_COL32_WHITE, "Visuals Tab");
@@ -316,7 +317,7 @@ namespace menu
 					ImGui::SameLine();
 			}
 
-			ImGui::PopStyleColor(4);
+			ImGui::PopStyleColor(3);
 		}
 		ImGui::PopFont();
 	}
