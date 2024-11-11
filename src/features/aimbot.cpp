@@ -232,7 +232,7 @@ namespace features
                 smooth(1.1f, viewangles, compensated_angle, output);
                 output.normalize_clamp();
 
-                g::client->SetViewAngles(0, output);
+                g::client->SetViewAngles(output);
 
                 last_punch = current_punch;
             }
@@ -303,7 +303,7 @@ namespace features
             }
 
             QAngle viewangles;
-            g::client->GetViewAngles(0, &viewangles);
+            g::client->GetViewAngles(&viewangles);
 
             float best_fov = 9999.f;
             QAngle best_angle;
@@ -396,7 +396,7 @@ namespace features
                     else if (settings::visuals::smooth_mode == 1)
                         smooth_constant(settings::visuals::smooth, viewangles, best_angle, output);
 
-                    g::client->SetViewAngles(0, output);
+                    g::client->SetViewAngles(output);
                 }
             }
 

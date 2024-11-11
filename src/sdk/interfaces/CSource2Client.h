@@ -8,14 +8,14 @@
 class CSource2Client
 {
 public:
-	void GetViewAngles(int slot, QAngle* vec)
+	void GetViewAngles(QAngle* vec)
 	{
-		GetVirtual<void(__thiscall*)(void*, int, QAngle*)>(this, 77)(this, slot, vec);
+		GetVirtual<void(__thiscall*)(void*, int, QAngle*)>(this, 77)(this, 0, vec);
 	}
 
-	void SetViewAngles(int slot, const QAngle& vec)
+	void SetViewAngles(const QAngle& vec)
 	{
-		GetVirtual<void(__thiscall*)(void*, int, const QAngle&)>(this, 78)(this, slot, vec);
+		GetVirtual<void(__thiscall*)(void*, int, const QAngle&)>(this, 78)(this, 0, vec);
 	}
 
 	//Doesnt trace shit
