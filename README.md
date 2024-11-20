@@ -8,7 +8,7 @@
 You can find the CSGO version under the [**CSGO Branch**](https://github.com/martinjanas/Sensum/tree/csgo) if you want to learn from it.
 
 
-[![Sensum](https://wakatime.com/badge/github/martinjanas/Sensum.svg?style=for-the-badge)](https://wakatime.com/badge/github/martinjanas/Sensum)
+[![Sensum](https://wakatime.com/badge/github/martinjanas/Sensum.svg?style=social)](https://wakatime.com/badge/github/martinjanas/Sensum)
 
 
 
