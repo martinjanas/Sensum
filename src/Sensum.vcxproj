@@ -255,6 +255,9 @@
     <ClCompile Include="thirdparty\ImGui\imgui_tables.cpp" />
     <ClCompile Include="thirdparty\ImGui\imgui_widgets.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Library Include="libs\freetype.lib" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
 </Project>

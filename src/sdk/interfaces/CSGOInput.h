@@ -324,8 +324,8 @@ public:
 class CSGOInput
 {
 public:
-	std::byte pad01[0x250];
-	CUserCmd arrCommands[MULTIPLAYER_BACKUP];
+	std::byte pad00[0x250];
+	std::byte pad01[0x1]; //MJ: Is this correct?? 
 	std::byte pad02[0x99];
 	bool bInThirdPerson;
 	std::byte pad03[0x6];
@@ -341,9 +341,4 @@ public:
 	int32_t nAttackStartHistoryIndex1;
 	int32_t nAttackStartHistoryIndex2;
 	int32_t nAttackStartHistoryIndex3;
-
-	CUserCmd* GetUserCmd()
-	{
-		return &arrCommands[nSequenceNumber % MULTIPLAYER_BACKUP];
-	}
 };

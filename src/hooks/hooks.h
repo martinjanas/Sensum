@@ -34,9 +34,9 @@ namespace hooks
 
 	struct createmove_csgoinput
 	{
-		static const int index = 5;
-		using fn = void(__fastcall*)(void*, int, bool);
-		static void __fastcall hooked(void* rcx, int slot, bool active);
+		static const int index = 19;
+		using fn = bool(__fastcall*)(void*, int, CUserCmd*);
+		static bool __fastcall hooked(void* rcx, int slot, CUserCmd* cmd);
 
 		inline static fn original_fn;
 	};

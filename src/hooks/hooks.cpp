@@ -32,7 +32,7 @@ bool hooks::init()
 	swap_chain.Apply(directx::present::index, reinterpret_cast<uintptr_t*>(&directx::present::hooked), reinterpret_cast<void**>(&directx::present::original_fn));
 	//swap_chain.Apply(directx::resize_buffers::index, reinterpret_cast<uintptr_t*>(&directx::resize_buffers::hooked), reinterpret_cast<void**>(&directx::resize_buffers::original_fn));
 
-	//dxgi.Apply(directx::create_swapchain::index, reinterpret_cast<uintptr_t*>(&directx::create_swapchain::hooked), reinterpret_cast<void**>(&directx::create_swapchain::original_fn));
+	dxgi.Apply(directx::create_swapchain::index, reinterpret_cast<uintptr_t*>(&directx::create_swapchain::hooked), reinterpret_cast<void**>(&directx::create_swapchain::original_fn));
 
 	//client_mode.Apply(override_view::index, reinterpret_cast<uintptr_t*>(&override_view::hooked), reinterpret_cast<void**>(&override_view::original_fn));
 
@@ -43,7 +43,7 @@ bool hooks::init()
 
 	get_fov::safetyhook = safetyhook::create_inline(modules::client.scan("E8 ? ? ? ? F3 0F 11 45 ? 48 8B 5C 24 ?", "get_fov_hook").add(0x1).abs().as(), reinterpret_cast<void*>(get_fov::hooked));
 	get_matrices_for_view::safetyhook = safetyhook::create_inline(modules::client.scan("40 53 48 81 EC ? ? ? ? 49 8B C1", "get_matrices_for_view_hook").as(), reinterpret_cast<void*>(get_matrices_for_view::hooked));
-	
+
 	return true;
 }
 
@@ -80,4 +80,6 @@ int64_t* __fastcall hooks::level_shutdown::hooked(void* rcx)
 {
 	return original_fn(rcx);
 }
+
+
 
