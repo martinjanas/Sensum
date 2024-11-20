@@ -1,3 +1,5 @@
+[![wakatime](https://wakatime.com/badge/github/martinjanas/Sensum.svg)](https://wakatime.com/badge/github/martinjanas/Sensum)
+
 ## Sensum - Internal legit cheat for Counter Strike 2 (WIP)
  
 **This project is being worked on, expect things to be half done or just in place**
