@@ -102,7 +102,7 @@ public:
     NETVAR(CGlowProperty*, m_GlowProperty, "C_BaseModelEntity", "m_Glow");
     NETVAR(Vector, m_vecViewOffset, "C_BaseModelEntity", "m_vecViewOffset");
     NETVAR(uint32_t, m_fFlags, "C_BaseEntity", "m_fFlags");   
-    NETVAR(void*, m_nSubclassID, "C_BaseEntity", "m_nSubclassID");
+    NETVAR(uint32_t, m_nSubclassID, "C_BaseEntity", "m_nSubclassID");
 
     CHandle m_hGroundEntity();
     CHandle m_hOwnerEntity();

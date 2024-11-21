@@ -277,6 +277,14 @@ namespace features
             }
         }
 
+        bool is_weapon_valid(CBasePlayerWeapon* weapon, CCSWeaponBaseVData* wpn_data)
+        {
+            const auto& wep_type = wpn_data->m_WeaponType();
+
+            return !(wep_type == KNIFE || wep_type == C4 || wep_type == TASER || wep_type == GRENADE);
+        }
+
+        //TODO: Add IsInReload check
         void handle(CUserCmd* cmd)
         {
             if (!g::engine_client->IsInGame())
@@ -335,7 +343,7 @@ namespace features
                     if (!hitbox_data->visible)
                         continue;
 
-                    //reset the target when not visible, etc...
+                    //reset the target when not visible, etc... ?
 
                     QAngle target_angle = (hitbox_data->hitbox_pos - eye_pos).to_qangle();
                     target_angle.normalize_clamp();
@@ -356,9 +364,6 @@ namespace features
                     /*if (!cmd->IsButtonPressed(IN_ATTACK)) //broken, outdated structs
                         continue;*/
                     
-                    if (!(GetAsyncKeyState(VK_LBUTTON)))
-                        continue;
-
                     const auto& active_wpn_handle = localpawn->m_pWeaponServices()->m_hActiveWeapon();
                     if (!active_wpn_handle.IsValid())
                         continue;
@@ -367,11 +372,25 @@ namespace features
                     if (!active_wpn)
                         continue;
 
-                    if (active_wpn->m_iItemDefinitionIndex() == WEAPON_AWP && !localpawn->m_bIsScoped())
+                    const auto& wep_data = active_wpn->m_pWpnData();
+                    if (!wep_data)
                         continue;
 
+                    if (!is_weapon_valid(active_wpn, wep_data))
+                        continue;
+
+                    if (active_wpn->IsSniper() && !localpawn->m_bIsScoped())
+                        continue;
+
+                    if (active_wpn->m_bInReload())
+                        continue;
+
+                    //TODO: Implement proper next_attack check using more stuff?
                     int next_attack_tick = active_wpn->m_nNextPrimaryAttackTick().m_Value(); //This next shot attack checker works poorly on awp - needs fix!
-                    if (next_attack_tick <= localplayer->m_nTickBase() && active_wpn->m_iItemDefinitionIndex() != WEAPON_AWP) //temp fix
+                    if (next_attack_tick <= localplayer->m_nTickBase() && !active_wpn->IsSniper()) //temp fix
+                        continue;
+
+                    if (!(GetAsyncKeyState(VK_LBUTTON)))
                         continue;
 
                     //printf("[%s: %s]: fov: %.1f, best_fov: %.1f, dist: %.1f\n", data.m_szPlayerName, hitbox_index_to_name(hitbox_data->index), fov, best_fov, distance);

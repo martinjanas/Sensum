@@ -253,7 +253,7 @@ namespace entity_data
 		const auto& local_controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
 		if (!local_controller)
 		{
-			destroy();
+			//destroy();
 			return;
 		}
 

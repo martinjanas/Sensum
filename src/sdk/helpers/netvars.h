@@ -12,6 +12,14 @@ __forceinline std::add_lvalue_reference_t<type> function() \
     return *reinterpret_cast<type*>(reinterpret_cast<uintptr_t>(this) + offset); \
 } \
 
+#define NETVAR_OFFSET(type, function, class_name, var_name, offset) \
+__forceinline std::add_lvalue_reference_t<type> function() \
+{ \
+    constexpr auto hash = fnv::hash_constexpr(class_name "->" var_name); \
+    static auto addr = netvars::get_offset_by_hash_cached(hash) + offset;  \
+    return *reinterpret_cast<type*>(reinterpret_cast<uintptr_t>(this) + addr); \
+} \
+
 #define PNETVAR(type, function, class_name, var_name) \
 auto function() \
 { \

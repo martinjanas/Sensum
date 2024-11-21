@@ -91,7 +91,7 @@ enum EItemDefinitionIndex : uint16_t
 	WEAPON_KNIFE_SKELETON = 525
 };
 
-enum CSWeaponType : std::uint32_t
+enum CSWeaponType : std::uint32_t //TODO: Refactor, these names are confusing, add prefix?
 {
     KNIFE,
     PISTOL,
@@ -107,7 +107,7 @@ enum CSWeaponType : std::uint32_t
     HEALTHSHOT
 };
 
-class CCSWeaponBaseVData
+class CCSWeaponBaseVData //TODO: Add more members later
 {
 public:
     NETVAR(CSWeaponType, m_WeaponType, "CCSWeaponBaseVData", "m_WeaponType");
@@ -120,10 +120,66 @@ public:
     NETVAR(int, m_nFallbackPaintKit, "C_EconEntity", "m_nFallbackPaintKit");
     NETVAR(C_AttributeContainer, m_AttributeManager, "C_EconEntity", "m_AttributeManager");
 	NETVAR(GameTick_t, m_nNextPrimaryAttackTick, "C_BasePlayerWeapon", "m_nNextPrimaryAttackTick")
+	NETVAR(bool, m_bInReload, "C_CSWeaponBase", "m_bInReload")
+	NETVAR_OFFSET(CCSWeaponBaseVData*, m_pWpnData, "C_BaseEntity", "m_nSubclassID", 0x8)
 
-	CCSWeaponBaseVData* GetWeaponData();
+	bool IsPistol()
+	{
+		if (!m_pWpnData())
+			return false;
 
-    uint16_t m_iItemDefinitionIndex()
+		return m_pWpnData()->m_WeaponType() == PISTOL;
+	}
+
+	bool IsRifle()
+	{
+		if (!m_pWpnData())
+			return false;
+
+		return m_pWpnData()->m_WeaponType() == RIFLE;
+	}
+
+	bool IsSMG()
+	{
+		if (!m_pWpnData())
+			return false;
+
+		return m_pWpnData()->m_WeaponType() == SMG;
+	}
+
+	bool IsLMG()
+	{
+		if (!m_pWpnData())
+			return false;
+
+		return m_pWpnData()->m_WeaponType() == LMG;
+	}
+
+	bool IsShotgun()
+	{
+		if (!m_pWpnData())
+			return false;
+
+		return m_pWpnData()->m_WeaponType() == SHOTGUN;
+	}
+	
+	bool IsSniper()
+	{
+		if (!m_pWpnData())
+			return false;
+
+		return m_pWpnData()->m_WeaponType() == SNIPER;
+	}
+
+	bool IsTaser()
+	{
+		if (!m_pWpnData())
+			return false;
+
+		return m_pWpnData()->m_WeaponType() == TASER;
+	}
+
+	uint16_t m_iItemDefinitionIndex()
     {
         return m_AttributeManager().m_Item().m_iItemDefinitionIndex();
     }
