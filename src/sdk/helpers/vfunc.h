@@ -5,7 +5,7 @@
 //GetVirtual<void*(__thiscall*)(IMemAlloc*, std::size_t)>(this, 1)(this, size);
 
 template<typename FuncType>
-__forceinline static FuncType GetVirtual(void* ppClass, int index, const char* msg = "")
+__forceinline static FuncType GetVirtual(void* ppClass, int index)
 {
     return (*static_cast<FuncType**>(ppClass))[index];
 }

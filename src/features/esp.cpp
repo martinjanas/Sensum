@@ -100,15 +100,11 @@ namespace features::esp
 		if (!g::engine_client->IsInGame())
 			return;
 
-		if (entity_data::locker.try_lock())
-		{
-			std::lock_guard<std::mutex> lock(entity_data::locker, std::adopt_lock);
+		std::shared_lock<std::shared_mutex> lock(entity_data::locker);
 
-			m_player_data.clear();
-
-			if (!entity_data::player_entry_data.empty())
-				std::ranges::copy(entity_data::player_entry_data.back().player_data, std::back_inserter(m_player_data));
-		}
+		m_player_data.clear();
+		if (!entity_data::player_entry_data.empty())
+			std::copy(entity_data::player_entry_data.front().player_data.begin(), entity_data::player_entry_data.front().player_data.end(), std::back_inserter(m_player_data));
 
 		static Vector head_pos_out;
 		static Vector origin_out;

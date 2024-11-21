@@ -1,6 +1,7 @@
 #pragma once
 #include <list>
 #include <mutex>
+#include <shared_mutex>
 #include <vector>
 #include <map>
 #include <array>
@@ -81,7 +82,7 @@ namespace entity_data
 	extern std::list<EntityInstance_t> entity_instances;
 	extern std::list<entry_data_t> player_entry_data;
 
-	extern std::mutex locker;
+	extern std::shared_mutex locker;
 	
 	namespace view_matrix
 	{

@@ -174,24 +174,29 @@ namespace features
 
             smoothed_angles = current_angle_normalized;
 
-            if (std::fabs(delta.pitch) < smooth_step) {
+            if (std::fabs(delta.pitch) < smooth_step) 
+            {
                 smoothed_angles.pitch = target_angle_normalized.pitch;
             }
-            else {
+            else 
+            {
                 smoothed_angles.pitch += (delta.pitch > 0 ? smooth_step : -smooth_step);
             }
 
-            if (std::fabs(delta.yaw) < smooth_step) {
+            if (std::fabs(delta.yaw) < smooth_step) 
+            {
                 smoothed_angles.yaw = target_angle_normalized.yaw;
             }
             else {
                 smoothed_angles.yaw += (delta.yaw > 0 ? smooth_step : -smooth_step);
             }
 
-            if (std::fabs(delta.roll) < smooth_step) {
+            if (std::fabs(delta.roll) < smooth_step) 
+            {
                 smoothed_angles.roll = target_angle_normalized.roll;
             }
-            else {
+            else 
+            {
                 smoothed_angles.roll += (delta.roll > 0 ? smooth_step : -smooth_step);
             }
 
@@ -288,15 +293,11 @@ namespace features
             if (!g::engine_client->IsInGame())
                 return;
 
-            if (entity_data::locker.try_lock())
-            {
-                std::lock_guard<std::mutex> lock(entity_data::locker, std::adopt_lock);
+            std::shared_lock<std::shared_mutex> lock(entity_data::locker);
 
-                m_player_data.clear();
-
-                if (!entity_data::player_entry_data.empty())
-                    std::ranges::copy(entity_data::player_entry_data.back().player_data, std::back_inserter(m_player_data));
-            }
+            m_player_data.clear();
+            if (!entity_data::player_entry_data.empty())
+                std::copy(entity_data::player_entry_data.front().player_data.begin(), entity_data::player_entry_data.front().player_data.end(), std::back_inserter(m_player_data));
 
             QAngle viewangles;
             g::client->GetViewAngles(&viewangles);

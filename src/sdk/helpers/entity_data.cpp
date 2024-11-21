@@ -12,7 +12,7 @@ namespace entity_data
 	std::list<EntityInstance_t> entity_instances;
 	std::list<entry_data_t> player_entry_data;
 
-	std::mutex locker;
+	std::shared_mutex locker;
 
 	namespace view_matrix
 	{
@@ -32,6 +32,9 @@ namespace entity_data
 
 	void get_bones_w2s(entity_data::player_data_t& data)
 	{
+		if (!data.bones_w2s.empty())
+			return;
+
 		const auto& model = data.m_hModel;
 		if (!model.IsValid())
 			return;
@@ -248,7 +251,7 @@ namespace entity_data
 		if (!g::engine_client->IsInGame())
 			return;
 	
-		std::lock_guard<std::mutex> lock(locker);
+		std::unique_lock<std::shared_mutex> lock(locker);
 
 		const auto& local_controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
 		if (!local_controller)
