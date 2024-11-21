@@ -179,6 +179,38 @@ public:
 		return m_pWpnData()->m_WeaponType() == TASER;
 	}
 
+	bool IsGrenade()
+	{
+		if (!m_pWpnData())
+			return false;
+
+		return m_pWpnData()->m_WeaponType() == GRENADE;
+	}
+
+	bool IsKnife()
+	{
+		if (!m_pWpnData())
+			return false;
+
+		return m_pWpnData()->m_WeaponType() == KNIFE;
+	}
+
+	bool IsC4()
+	{
+		if (!m_pWpnData())
+			return false;
+
+		return m_pWpnData()->m_WeaponType() == C4;
+	}
+
+	bool IsHealthshot()
+	{
+		if (!m_pWpnData())
+			return false;
+
+		return m_pWpnData()->m_WeaponType() == HEALTHSHOT;
+	}
+
 	uint16_t m_iItemDefinitionIndex()
     {
         return m_AttributeManager().m_Item().m_iItemDefinitionIndex();

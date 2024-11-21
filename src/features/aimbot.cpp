@@ -277,11 +277,9 @@ namespace features
             }
         }
 
-        bool is_weapon_valid(CBasePlayerWeapon* weapon, CCSWeaponBaseVData* wpn_data)
+        bool is_weapon_valid(CBasePlayerWeapon* weapon)
         {
-            const auto& wep_type = wpn_data->m_WeaponType();
-
-            return !(wep_type == KNIFE || wep_type == C4 || wep_type == TASER || wep_type == GRENADE);
+            return !(weapon->IsKnife() || weapon->IsC4() || weapon->IsTaser() || weapon->IsGrenade() || weapon->IsHealthshot());
         }
 
         //TODO: Add IsInReload check
@@ -376,7 +374,7 @@ namespace features
                     if (!wep_data)
                         continue;
 
-                    if (!is_weapon_valid(active_wpn, wep_data))
+                    if (!is_weapon_valid(active_wpn))
                         continue;
 
                     if (active_wpn->IsSniper() && !localpawn->m_bIsScoped())
