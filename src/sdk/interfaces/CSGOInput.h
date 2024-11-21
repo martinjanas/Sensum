@@ -280,10 +280,10 @@ public:
 	{
 		return false; //TODO: Broken
 
-		/*if (!csgoUserCmd.pBaseCmd)
+		if (!csgoUserCmd.pBaseCmd)
 			return false;
 
-		return csgoUserCmd.pBaseCmd->pInButtonState->nValue & button;*/
+		return csgoUserCmd.pBaseCmd->pInButtonState->nValue & button;
 	}
 };
 
@@ -324,20 +324,18 @@ public:
 class CSGOInput
 {
 public:
-	std::byte pad00[0x250];
-	std::byte pad01[0x1]; //MJ: Is this correct?? 
-	std::byte pad02[0x99];
+	std::byte pad01[0x1];
 	bool bInThirdPerson;
-	std::byte pad03[0x6];
+	std::byte pad02[0x6];
 	QAngle angThirdPersonAngles;
-	std::byte pad04[0xE];
+	std::byte pad03[0x10];
 	std::int32_t nSequenceNumber;
-	double dbSomeTimer;
+	double m_dbSomeTimer;
 	CExtendedMoveData currentMoveData;
 	std::int32_t nWeaponSwitchTick;
-	std::byte pad05[0x1C4];
+	std::byte pad04[0x1C4];
 	CExtendedMoveData* pExtendedMoveData;
-	std::byte pad06[0x48];
+	std::byte pad05[0x48];
 	int32_t nAttackStartHistoryIndex1;
 	int32_t nAttackStartHistoryIndex2;
 	int32_t nAttackStartHistoryIndex3;

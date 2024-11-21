@@ -3,7 +3,7 @@
 
 namespace imgui_custom
 {
-    /*void selector(const char* label, const char** items, int items_count, int* v)
+    void selector(const char* label, const char** items, int items_count, int* v)
     {
         static ImVec2 widget_size(195.f, 26.f);
 
@@ -72,63 +72,5 @@ namespace imgui_custom
 
         draw_arrow_button("invisbutton#left", left_arrow_center, true);
         draw_arrow_button("invisbutton#right", right_arrow_center, false);
-    }*/
-
-    void selector(const std::vector<std::string>& items, int* v)
-    {
-        // Push a unique ID for the widget to avoid interference with other widgets
-        ImGui::PushID("CustomSelectableWidget");
-
-        // Define the size for the widget
-        const ImVec2 widgetSize(196, 26);
-
-        // Create a horizontal layout for the arrows and the current selection
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(5, 0));  // Adjust spacing between elements
-
-        // Begin a group to align everything horizontally
-        ImGui::BeginGroup();
-
-        // Left Arrow Button (to go backward)
-        if (ImGui::ArrowButton("##Left", ImGuiDir_Left)) {
-            if (*v > 0) {
-                --(*v);  // Move the selection backward
-            }
-        }
-
-        // SameLine to keep the elements in the same row
-        ImGui::SameLine();
-
-        // Add the selectable item showing the current selection
-        ImGui::ItemSize(widgetSize);  // Define the widget size for ImGui
-        ImGui::ItemAdd(ImRect(ImGui::GetCursorScreenPos(), ImGui::GetCursorScreenPos() + widgetSize), ImGui::GetID("##Selectable"));
-
-        // Set the active ID (interactive state) for the selectable
-        if (ImGui::IsItemHovered()) {
-            ImGui::SetActiveID(ImGui::GetID("##Selectable"), ImGui::GetCurrentWindow());
-        }
-
-        if (ImGui::Selectable(items[*v].c_str(), false, ImGuiSelectableFlags_None, widgetSize)) {
-            // If the selectable is clicked, it will update the value of *v
-            // This part can be handled if you want more complex behavior here
-        }
-
-        // SameLine to keep the elements in the same row
-        ImGui::SameLine();
-
-        // Right Arrow Button (to go forward)
-        if (ImGui::ArrowButton("##Right", ImGuiDir_Right)) {
-            if (*v < (items.size() - 1)) {
-                ++(*v);  // Move the selection forward
-            }
-        }
-
-        // End the group
-        ImGui::EndGroup();
-
-        // Pop style variable
-        ImGui::PopStyleVar();
-
-        // Pop the widget ID
-        ImGui::PopID();
     }
 }

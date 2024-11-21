@@ -159,7 +159,7 @@ namespace features
             out_angles.normalize_clamp();
         }
     
-        void smooth_constant(float speed, const QAngle& current_angles, const QAngle& target_angles, QAngle& smoothed_angles) 
+        void smooth_constant(float speed, const QAngle& current_angles, const QAngle& target_angles, QAngle& smoothed_angles)
         {
             QAngle current_angle_normalized = current_angles;
             current_angle_normalized.normalize_clamp();
@@ -167,18 +167,14 @@ namespace features
             QAngle target_angle_normalized = target_angles;
             target_angle_normalized.normalize_clamp();
 
-            // Calculate the delta and normalize it to the shortest path
             QAngle delta = target_angle_normalized - current_angle_normalized;
             delta.normalize_clamp();
 
-            // Define the maximum smoothing step based on speed
-            float max_smooth_step = 10.0f; // Adjust this value for sensitivity
+            float max_smooth_step = 10.0f;
             float smooth_step = (max_smooth_step / (speed + 0.1f)) * (1.0f / 64.0f);
-            
-            // Start with the current angle
+
             smoothed_angles = current_angle_normalized;
 
-            // Smooth the pitch
             if (std::fabs(delta.pitch) < smooth_step) {
                 smoothed_angles.pitch = target_angle_normalized.pitch;
             }
@@ -186,7 +182,6 @@ namespace features
                 smoothed_angles.pitch += (delta.pitch > 0 ? smooth_step : -smooth_step);
             }
 
-            // Smooth the yaw
             if (std::fabs(delta.yaw) < smooth_step) {
                 smoothed_angles.yaw = target_angle_normalized.yaw;
             }
@@ -194,7 +189,6 @@ namespace features
                 smoothed_angles.yaw += (delta.yaw > 0 ? smooth_step : -smooth_step);
             }
 
-            // Smooth the roll
             if (std::fabs(delta.roll) < smooth_step) {
                 smoothed_angles.roll = target_angle_normalized.roll;
             }
@@ -202,35 +196,30 @@ namespace features
                 smoothed_angles.roll += (delta.roll > 0 ? smooth_step : -smooth_step);
             }
 
-            // Normalize the final output angle
             smoothed_angles.normalize_clamp();
         }
 
         void rcs(CCSPlayerPawn* localpawn, const QAngle& viewangles, CUserCmd* cmd)
         {
-            auto punch_cache = localpawn->m_aimPunchCache();
-            if (punch_cache.Count() <= 0 || punch_cache.Count() >= 0xFFFF)
+            auto& punch_cache = localpawn->m_aimPunchCache();
+            if (punch_cache.Count() <= 1 || punch_cache.Count() >= 0xFFFF)
                 return;
 
-            // Get the latest punch angle
             QAngle current_punch = punch_cache[punch_cache.Count() - 1];
             current_punch.pitch *= settings::visuals::pitch;
             current_punch.yaw *= settings::visuals::yaw;
-            current_punch.normalize_clamp();
 
-            if (localpawn->m_iShotsFired() > 1 && g::input_system->IsButtonDown(ButtonCode::MouseLeft)) // Apply while shooting
+            if (localpawn->m_iShotsFired() > 1 && g::input_system->IsButtonDown(ButtonCode::MouseLeft))
             {
-                QAngle recoil_delta = current_punch - last_punch; // Determine the change in punch angle
+                QAngle recoil_delta = current_punch - last_punch;
                 recoil_delta.pitch *= settings::visuals::pitch;
                 recoil_delta.yaw *= settings::visuals::yaw;
-                recoil_delta.normalize_clamp();
 
-                QAngle compensated_angle = viewangles - recoil_delta; // Adjust based on the recoil
+                QAngle compensated_angle = viewangles - recoil_delta;
                 compensated_angle.normalize_clamp();
 
                 QAngle output;
                 smooth(1.1f, viewangles, compensated_angle, output);
-                output.normalize_clamp();
 
                 g::client->SetViewAngles(output);
 
@@ -238,7 +227,7 @@ namespace features
             }
             else
             {
-                last_punch = { 0.0f, 0.0f, 0.f };
+                last_punch = { 0.f, 0.f, 0.f };
             }
         }
         
@@ -332,7 +321,6 @@ namespace features
                 for (int i = 0; i < data.hitboxes.size(); i++)
                 {
                     auto* hitbox_data = &data.hitboxes[i];
-
                     if (!hitbox_data)
                         continue;
 
@@ -364,7 +352,7 @@ namespace features
                         best_angle = target_angle;
                     }
 
-                    /*if (!cmd->IsButtonPressed(IN_ATTACK))
+                    /*if (!cmd->IsButtonPressed(IN_ATTACK)) //broken, outdated structs
                         continue;*/
 
                     const auto& active_wpn_handle = localpawn->m_pWeaponServices()->m_hActiveWeapon();
@@ -375,7 +363,7 @@ namespace features
                     if (!active_wpn)
                         continue;
 
-                    if (!(GetAsyncKeyState(VK_LBUTTON)))
+                    if (!g::input_system->IsButtonDown(ButtonCode::MouseLeft))
                         continue;
 
                     if (active_wpn->m_iItemDefinitionIndex() == WEAPON_AWP && !localpawn->m_bIsScoped())
