@@ -16,6 +16,11 @@ public:
         return m_pElements[i];
     }
 
+    T& operator[](int i) const
+    {
+        return m_pElements[i];
+    }
+
     [[nodiscard]] int Count() const {
         return m_Size;
     }

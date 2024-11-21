@@ -13,12 +13,13 @@ public:
 		GetVirtual<void(__thiscall*)(void*, int, QAngle*)>(this, 77)(this, 0, vec);
 	}
 
-	void SetViewAngles(const QAngle& vec)
+	void SetViewAngles(QAngle& vec)
 	{
-		GetVirtual<void(__thiscall*)(void*, int, const QAngle&)>(this, 78)(this, 0, vec);
+		vec.normalize_clamp();
+
+		GetVirtual<void(__thiscall*)(void*, int, QAngle&)>(this, 78)(this, 0, vec);
 	}
 
-	//Doesnt trace shit
 	//bool TraceRay(const Vector& vecAbsStart, const Vector& vecAbsEnd, CTraceFilter* filter, Trace_t* trace)
 	//{
 	//	//   @Note: this method initializes the trace filter vtable itself but copies the rest from argument //100

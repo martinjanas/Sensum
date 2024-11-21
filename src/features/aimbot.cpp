@@ -139,7 +139,6 @@ namespace features
             float screenX = (-delta.yaw / 360.0f) * screenWidth; // Map yaw to [0, screenWidth]
             float screenY = (delta.pitch / 90.0f) * screenHeight; // Map pitch to [0, screenHeight]
 
-            // Return the pixel coordinates as a Vector2
             return Vector(screenX, screenY, 0.f);
         }
 
@@ -201,19 +200,21 @@ namespace features
 
         void rcs(CCSPlayerPawn* localpawn, const QAngle& viewangles, CUserCmd* cmd)
         {
-            auto& punch_cache = localpawn->m_aimPunchCache();
+            const auto& punch_cache = localpawn->m_aimPunchCache();
             if (punch_cache.Count() <= 1 || punch_cache.Count() >= 0xFFFF)
                 return;
 
             QAngle current_punch = punch_cache[punch_cache.Count() - 1];
             current_punch.pitch *= settings::visuals::pitch;
             current_punch.yaw *= settings::visuals::yaw;
+            current_punch.normalize_clamp();
 
             if (localpawn->m_iShotsFired() > 1 && g::input_system->IsButtonDown(ButtonCode::MouseLeft))
             {
                 QAngle recoil_delta = current_punch - last_punch;
                 recoil_delta.pitch *= settings::visuals::pitch;
                 recoil_delta.yaw *= settings::visuals::yaw;
+                recoil_delta.normalize_clamp();
 
                 QAngle compensated_angle = viewangles - recoil_delta;
                 compensated_angle.normalize_clamp();
@@ -227,7 +228,7 @@ namespace features
             }
             else
             {
-                last_punch = { 0.f, 0.f, 0.f };
+                last_punch = { 0.0f, 0.0f, 0.f };
             }
         }
         
@@ -354,6 +355,9 @@ namespace features
 
                     /*if (!cmd->IsButtonPressed(IN_ATTACK)) //broken, outdated structs
                         continue;*/
+                    
+                    if (!(GetAsyncKeyState(VK_LBUTTON)))
+                        continue;
 
                     const auto& active_wpn_handle = localpawn->m_pWeaponServices()->m_hActiveWeapon();
                     if (!active_wpn_handle.IsValid())
@@ -363,14 +367,11 @@ namespace features
                     if (!active_wpn)
                         continue;
 
-                    if (!g::input_system->IsButtonDown(ButtonCode::MouseLeft))
-                        continue;
-
                     if (active_wpn->m_iItemDefinitionIndex() == WEAPON_AWP && !localpawn->m_bIsScoped())
                         continue;
 
                     int next_attack_tick = active_wpn->m_nNextPrimaryAttackTick().m_Value(); //This next shot attack checker works poorly on awp - needs fix!
-                    if (next_attack_tick <= localplayer->m_nTickBase() && active_wpn->m_iItemDefinitionIndex() != WEAPON_AWP)
+                    if (next_attack_tick <= localplayer->m_nTickBase() && active_wpn->m_iItemDefinitionIndex() != WEAPON_AWP) //temp fix
                         continue;
 
                     //printf("[%s: %s]: fov: %.1f, best_fov: %.1f, dist: %.1f\n", data.m_szPlayerName, hitbox_index_to_name(hitbox_data->index), fov, best_fov, distance);

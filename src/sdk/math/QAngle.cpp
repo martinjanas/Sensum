@@ -18,22 +18,9 @@ QAngle::QAngle()
 
 void QAngle::normalize()
 {
-	/*pitch = std::remainder(pitch, 360.0f);
-	yaw = std::remainder(yaw, 360.0f);
-	roll = std::remainder(roll, 360.0f);*/
-
-	QAngle angles = *this;
-
-	for (auto i = 0; i < 3; i++)
-	{
-		while (angles[i] < -180.0f)
-			angles[i] += 360.0f;
-
-		while (angles[i] > 180.0f)
-			angles[i] -= 360.0f;
-	}
-
-	*this = angles;
+	pitch = std::remainderf(pitch, 360.0f);
+	yaw = std::remainderf(yaw, 360.0f);
+	roll = std::remainderf(roll, 360.0f);
 }
 
 void QAngle::clamp()

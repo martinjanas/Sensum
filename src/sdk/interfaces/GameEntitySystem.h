@@ -56,17 +56,17 @@ public:
 
 	CEntityInstance* FindEntityByName(const char* name)
 	{
-		return GetVirtual<CEntityInstance*(__thiscall*)(void*, const char*)>(this, 12)(this, name);
+		return GetVirtual<CEntityInstance*(__thiscall*)(void*, const char*)>(this, 12)(this, name); //probably outdated index? +1 ?
 	}
 
 	CEntityInstance* OnAddEntity(CEntityInstance* entity_instance, void* handle)
 	{
-		return GetVirtual<CEntityInstance*(__thiscall*)(void*, CEntityInstance*, void*)>(this, 14)(this, entity_instance, handle);
+		return GetVirtual<CEntityInstance*(__thiscall*)(void*, CEntityInstance*, void*)>(this, 15)(this, entity_instance, handle);
 	}
 
 	CEntityInstance* OnRemoveEntity(CEntityInstance* entity_instance, void* handle)
 	{
-		return GetVirtual<CEntityInstance * (__thiscall*)(void*, CEntityInstance*, void*)>(this, 15)(this, entity_instance, handle);
+		return GetVirtual<CEntityInstance * (__thiscall*)(void*, CEntityInstance*, void*)>(this, 16)(this, entity_instance, handle);
 	}
 
 	int GetHighestEntityIndex()

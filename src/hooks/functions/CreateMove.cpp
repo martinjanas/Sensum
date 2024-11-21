@@ -2,9 +2,9 @@
 #include "../../sdk/sdk.h"
 #include "../../features/features.h"
 
-bool __fastcall hooks::createmove_csgoinput::hooked(void* rcx, int slot, CUserCmd* cmd, float curtime)
+void __fastcall hooks::createmove_csgoinput::hooked(void* rcx, int slot, bool active)
 {
-    features::aimbot::handle(cmd);
+    features::aimbot::handle(nullptr); //TODO: get CUserCmd
 
-    return original_fn(rcx, slot, cmd, curtime);
+    original_fn(rcx, slot, active);
 }

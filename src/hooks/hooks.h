@@ -32,11 +32,20 @@ namespace hooks
 		LRESULT __stdcall hooked(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 	}
 
-	struct createmove_csgoinput
+	/*struct createmove_csgoinput
 	{
-		static const int index = 21;
+		static const int index = 21; //rcs not working correctly with this one, why?
 		using fn = bool(__fastcall*)(void*, int, CUserCmd*, float a4);
 		static bool __fastcall hooked(void* rcx, int slot, CUserCmd* cmd, float a4);
+
+		inline static fn original_fn;
+	};*/
+
+	struct createmove_csgoinput
+	{
+		static const int index = 5;
+		using fn = void(__fastcall*)(void*, int, bool);
+		static void __fastcall hooked(void* rcx, int slot, bool active);
 
 		inline static fn original_fn;
 	};
@@ -77,24 +86,6 @@ namespace hooks
 		inline static fn original_fn;
 	};
 
-	class CViewSetup
-	{
-	public:
-		char char_pad01[0x490];
-		float flOrthoLeft; // 0x0494
-		float flOrthoTop; // 0x0498
-		float flOrthoRight; // 0x049C
-		float flOrthoBottom; // 0x04A0
-		char char_pad02[0x38];
-		float flFov; // 0x04D8
-		float flFovViewmodel; // 0x04DC
-		Vector vecOrigin; // 0x04E0
-		char char_pad03[0xC];
-		Vector angView; // 0x04F8
-		char char_pad04[0x14]; //0x0504
-		float flAspectRatio; // 0x0518
-	}; //Size: 0x3040
-
 	namespace directx
 	{
 		struct present
@@ -134,7 +125,7 @@ namespace hooks
 		inline static fn original_fn;
 	};
 
-	struct get_fov //probably not safe to hook
+	struct get_fov
 	{
 		using fn = float(__fastcall*)(void*);
 		static float __fastcall hooked(void* camera);

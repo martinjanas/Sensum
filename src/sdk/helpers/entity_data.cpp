@@ -21,8 +21,6 @@ namespace entity_data
 
 	void destroy()
 	{
-		std::lock_guard<std::mutex> lock(locker);
-
 		player_entry_data.clear();
 	}
 
@@ -34,9 +32,6 @@ namespace entity_data
 
 	void get_bones_w2s(entity_data::player_data_t& data)
 	{
-		if (!data.bones_w2s.empty())
-			return;
-
 		const auto& model = data.m_hModel;
 		if (!model.IsValid())
 			return;
@@ -252,7 +247,9 @@ namespace entity_data
 	{
 		if (!g::engine_client->IsInGame())
 			return;
-		
+	
+		std::lock_guard<std::mutex> lock(locker);
+
 		const auto& local_controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
 		if (!local_controller)
 		{
@@ -263,8 +260,6 @@ namespace entity_data
 		const auto& localpawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(local_controller->m_hPlayerPawn());
 		if (!localpawn)
 			return;
-
-		std::lock_guard<std::mutex> lock(locker);
 
 		const auto& local_team = localpawn->m_iTeamNum();
 		const auto& eye_pos = localpawn->GetEyePos();
@@ -335,10 +330,6 @@ namespace entity_data
 			player_data.m_PlayerPawn = pawn;
 			
 			player_data.flags.reset();
-
-			player_data.flags.reset(PLAYER_VISIBLE);
-			player_data.flags.reset(PLAYER_IN_SMOKE);
-			player_data.flags.reset(PLAYER_IN_AIR);
 
 			pawn->m_iHealth() > 0 ? player_data.flags.set(PLAYER_ALIVE) : player_data.flags.reset(PLAYER_ALIVE);
 			pawn->InAir() ? player_data.flags.set(PLAYER_IN_AIR) : player_data.flags.reset(PLAYER_IN_AIR);
