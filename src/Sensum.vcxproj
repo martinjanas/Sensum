@@ -167,7 +167,6 @@
     <ClInclude Include="sdk\interfaces\CGameTrace.h" />
     <ClInclude Include="sdk\interfaces\CInputSystem.h" />
     <ClInclude Include="sdk\interfaces\CSource2Client.h" />
-    <ClInclude Include="sdk\localplayer.h" />
     <ClInclude Include="sdk\math\math.h" />
     <ClInclude Include="sdk\math\QAngle.h" />
     <ClInclude Include="sdk\math\Transform.h" />
@@ -240,7 +239,6 @@
     <ClCompile Include="sdk\hooking\safetyhook\safetyhook.cpp" />
     <ClCompile Include="sdk\hooking\safetyhook\Zydis.c" />
     <ClCompile Include="sdk\interfaces\CGameTrace.cpp" />
-    <ClCompile Include="sdk\localplayer.cpp" />
     <ClCompile Include="sdk\math\QAngle.cpp" />
     <ClCompile Include="sdk\sdk.cpp" />
     <ClCompile Include="main.cpp" />

@@ -191,7 +191,6 @@
     <ClInclude Include="sdk\helpers\BBox_t.h" />
     <ClInclude Include="sdk\interfaces\CSource2Client.h" />
     <ClInclude Include="sdk\math\QAngle.h" />
-    <ClInclude Include="sdk\localplayer.h" />
     <ClInclude Include="sdk\helpers\render.h" />
     <ClInclude Include="sdk\hooking\shadow_vmt\ShadowVMT.h" />
     <ClInclude Include="sdk\helpers\CBufferString.h" />
@@ -305,7 +304,6 @@
     <ClCompile Include="sdk\classes\CCSPlayerPawn.cpp" />
     <ClCompile Include="render\render.cpp" />
     <ClCompile Include="sdk\hooking\shadow_vmt\ShadowVMT.cpp" />
-    <ClCompile Include="sdk\localplayer.cpp" />
     <ClCompile Include="sdk\math\QAngle.cpp" />
     <ClCompile Include="sdk\helpers\interfaces.cpp" />
     <ClCompile Include="sdk\hooking\safetyhook\safetyhook.cpp" />

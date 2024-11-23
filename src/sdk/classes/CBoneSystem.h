@@ -105,43 +105,37 @@ public:
     BitFlag GetBoneFlags(const int index) 
     {
         using fn = int(__thiscall*)(void*, int); //int -> BitFlag?
-
-        static auto addr = modules::client.scan("85 D2 78 16 3B 91", "GetBoneFlags").as();
+        static auto addr = modules::client.get_sig_addr(FNV("CModel::GetBoneFlags"), __FUNCTION__).as();
+        if (!addr)
+            return {};
 
         const auto& get_bone_flags = reinterpret_cast<fn>(addr);
-       
         if (get_bone_flags)
             return BitFlag(get_bone_flags(this, index));
-
-        return {};
     }
 
     int GetBoneParent(const int index) 
     {
         using fn = int(__thiscall*)(void*, int);
-
-        static auto addr = modules::client.scan("E8 ? ? ? ? 41 0F 10 14 3F", "GetBoneParent").add(0x1).abs().as();
+        static auto addr = modules::client.get_sig_addr(FNV("CModel::GetBoneParent"), __FUNCTION__).as();
+        if (!addr)
+            return -1;
 
         const auto& get_bone_parent = reinterpret_cast<fn>(addr);
-
         if (get_bone_parent)
             return get_bone_parent(this, index);
-
-        return -1;
     }
 
     const char* GetBoneName(const std::int32_t index) 
     {
         using fn = const char* (__thiscall*)(void*, int);
-
-        static auto addr = modules::client.scan("85 D2 78 25 3B 91", "GetBoneName").as();
+        static auto addr = modules::client.get_sig_addr(FNV("CModel::GetBoneName"), __FUNCTION__).as();
+        if (!addr)
+            return nullptr;
 
         const auto& get_bone_name = reinterpret_cast<fn>(addr);
-
         if (get_bone_name)
             return get_bone_name(this, index);
-
-        return nullptr;
     }
 
 public:

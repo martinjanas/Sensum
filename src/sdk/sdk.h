@@ -143,7 +143,7 @@ namespace sdk
 {
 	void init_modules();
 	void init_interfaces();
-	void cache_sig_addresses();
+	void scan_and_cache_sigs();
 }
 
 class CRenderSystem //TODO: Move this into its own file
@@ -155,6 +155,7 @@ public:
 
 namespace interfaces //move to interfaces.h ?
 {
+	extern CCSPlayerController* localplayer;
 	extern IVEngineClient* engine_client;
 	extern CSource2Client* client;
 	extern CSchemaSystem* schema_system;

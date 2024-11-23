@@ -413,13 +413,13 @@ struct TraceFilter_t
 	static TraceFilter_t* InitEntitiesOnly(TraceFilter_t* thisptr, CBaseEntity* skip, uint32_t mask, int layer)
 	{
 		using fn = TraceFilter_t*(__thiscall*)(void*, CBaseEntity*, uint32_t, int, int16_t);
-		static auto addr = modules::client.scan("E8 ? ? ? ? 48 81 4B ? ? ? ? ? 48 8D 05 ? ? ? ?", "TraceFilter_t::InitEntitiesOnly").add(0x1).abs().as();
+		static auto addr = modules::client.get_sig_addr(FNV("TraceFilter_t::InitEntitiesOnly", __FUNCTION__)).as();
+		if (!addr)
+			return nullptr;
 
 		auto init_entities_only = reinterpret_cast<fn>(addr);
 		if (init_entities_only)
 			return init_entities_only(thisptr, skip, mask, layer, 15);
-
-		return nullptr;
 	}
 };
 
@@ -428,32 +428,31 @@ class CGameTrace
 public:
 	bool TraceShape(Ray_t* ray, const Vector& start, const Vector& end, TraceFilter_t* filter, Trace_t* trace)
 	{
-		using fn = bool(__fastcall*)(void*, Ray_t*, const Vector&, const Vector&, TraceFilter_t*, Trace_t*); //fastcall
-		//E8 ? ? ? ? 80 7D 57 00 + 0x1 abs
-		static const auto& addr = modules::client.scan("48 89 5C 24 20 48 89 4C 24 08 55 56 41", "TraceShape").as();
+		using fn = bool(__fastcall*)(void*, Ray_t*, const Vector&, const Vector&, TraceFilter_t*, Trace_t*);
+		static auto addr = modules::client.get_sig_addr(FNV("CGameTrace::TraceShape", __FUNCTION__)).as();
+		if (!addr)
+			return false;
 
 		auto trace_shape = reinterpret_cast<fn>(addr);
 		if (trace_shape)
 			return trace_shape(this, ray, start, end, filter, trace);
-
-		return false;
 	}
-
-	////TraceRay - index 56
-	//void TraceRay(const Ray_t& ray, unsigned int fMask, TraceFilter_t* pTraceFilter, Trace_t* pTrace)
-	//{
-	//	GetVirtual<void(__thiscall*)(void*, const Ray_t&, uint32_t mask, TraceFilter_t*, Trace_t*)>(this, 56)(this, ray, fMask, pTraceFilter, pTrace);
-	//}
 
 	bool ClipRayToEntity(Ray_t* ray, const Vector& start, const Vector& end, CCSPlayerPawn* skip, TraceFilter_t* filter, Trace_t* trace)
 	{
 		using fn = bool(__fastcall*)(void*, Ray_t*, const Vector&, const Vector&, CCSPlayerPawn*, TraceFilter_t*, Trace_t*);
-		static const auto addr = modules::client.scan("48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 48 89 7C 24 20 41 54 41 56 41 57 48 81 EC C0 00 00 00 48 8B 9C", "ClipRayToEntity").as();
+		static auto addr = modules::client.get_sig_addr(FNV("CGameTrace::ClipRayToEntity", __FUNCTION__)).as();
+		if (!addr)
+			return false;
 
 		auto clip_ray_to_entity = reinterpret_cast<fn>(addr);
 		if (clip_ray_to_entity)
 			return clip_ray_to_entity(this, ray, start, end, skip, filter, trace);
-
-		return false;
 	}
+
+	//TraceRay - index 56
+	/*void TraceRay(const Ray_t& ray, unsigned int fMask, TraceFilter_t* pTraceFilter, Trace_t* pTrace)
+	{
+		GetVirtual<void(__thiscall*)(void*, const Ray_t&, uint32_t mask, TraceFilter_t*, Trace_t*)>(this, 56)(this, ray, fMask, pTraceFilter, pTrace);
+	}*/
 };

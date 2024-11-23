@@ -4,7 +4,6 @@
 
 #include <d3d11.h>
 
-#include "../sdk/localplayer.h"
 #include "../sdk/helpers/interfaces.h"
 
 void print_status(const char* name, void* ptr)
@@ -31,9 +30,34 @@ void print_status(const char* name, void* ptr)
 
 namespace sdk
 {
-	void cache_sig_addresses()
+	void scan_and_cache_sigs()
 	{
-		modules::client.find_and_cache_sig("48 8B 05 ? ? ? ? 48 85 C0 74 53", "players::localplayer", 0x3);
+		modules::client.scan_and_cache_sig("48 8B 05 ? ? ? ? 48 85 C0 74 53", "g::localplayer", 0x3);
+		modules::client.scan_and_cache_sig("48 89 05 ? ? ? ? 0F 57 C0 0F 11 05 ? ? ? ?", "g::csgo_input", 0x3);
+		modules::directx11.scan_and_cache_sig("66 0F 7F 0D ? ? ? ? 48 8B F7 66 0F 7F 05", "g::render_system", 0x4);
+		modules::client.scan_and_cache_sig("48 8B 05 ?? ?? ?? ?? 44 8B B7 ?? ?? ?? ?? 8B 70 04 B8 ?? ?? ?? ??", "g::global_vars", 0x3);
+		modules::client.scan_and_cache_sig("48 8B 0D ? ? ? ? 4C 8B C3 66 89 44 24", "g::engine_trace", 0x3);
+		modules::client.scan_and_cache_sig("48 8D 3D ? ? ? ? 48 8D 35 ? ? ? ? 90", "g::clientmode_csnormal", 0x3);
+
+		modules::client.scan_and_cache_sig("48 89 5C 24 08 48 89 74 24 10 57 48 81 EC 40 01 00 00 8B DA 48 8B F9 E8 ?? ?? ?? ??", "CBaseEntity::GetHitboxSet", 0, false);
+		modules::client.scan_and_cache_sig("48 89 5C 24 ? 55 57 41 54 41 56 41 57 48 83 EC 20", "CBaseEntity::HitboxToWorldTransform", 0, false);
+		modules::client.scan_and_cache_sig("48 8B C4 48 89 58 10 48 89 70 20 55 57 41 56 48 8D A8 08", "CBaseEntity::EmitSound", 0, false);
+
+		modules::client.scan_and_cache_sig("85 D2 78 16 3B 91", "CModel::GetBoneFlags", 0, false);
+		modules::client.scan_and_cache_sig("E8 ? ? ? ? 41 0F 10 14 3F", "CModel::GetBoneParent", 0x1);
+		modules::client.scan_and_cache_sig("85 D2 78 25 3B 91", "CModel::GetBoneName", 0, false);
+
+		modules::client.scan_and_cache_sig("40 55 48 83 EC 20 48 83 3D ? ? ? ? ?", "globals::FindHudElement", 0, false);
+
+		modules::client.scan_and_cache_sig("48 89 5C 24 20 48 89 4C 24 08 55 56 41", "CGameTrace::TraceShape", 0, false);
+		modules::client.scan_and_cache_sig("48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 48 89 7C 24 20 41 54 41 56 41 57 48 81 EC C0 00 00 00 48 8B 9C", "CGameTrace::ClipRayToEntity", 0, false);
+
+		modules::client.scan_and_cache_sig("E8 ? ? ? ? 48 81 4B ? ? ? ? ? 48 8D 05 ? ? ? ?", "TraceFilter_t::InitEntitiesOnly", 0x1);
+
+		modules::client.scan_and_cache_sig("E8 ? ? ? ? 0F 28 F8 44 0F 28 54 24 ?", "IsInSmoke", 0x1);
+
+		modules::client.scan_and_cache_sig("E8 ? ? ? ? F3 0F 11 45 ? 48 8B 5C 24 ?", "hooks::GetFov", 0x1);
+		modules::client.scan_and_cache_sig("40 53 48 81 EC ? ? ? ? 49 8B C1", "hooks::GetMatricesForView", 0, false);
 	}
 
 	void init_modules()
@@ -48,33 +72,32 @@ namespace sdk
 		modules::matchmaking = DynamicModule("matchmaking.dll");
 		modules::gameoverlay = DynamicModule("GameOverlayRenderer64.dll");
 
-		cache_sig_addresses();
+		scan_and_cache_sigs();
 	}
 
 	void init_interfaces()
 	{
-		g::engine_client = modules::engine.GetInterfaceFromList<IVEngineClient*>("Source2EngineToClient001");
-		g::client = modules::client.GetInterfaceFromList<CSource2Client*>("Source2Client002");
-		g::schema_system = modules::schema.GetInterfaceFromList<CSchemaSystem*>("SchemaSystem_001");
-		g::game_resource_service = modules::engine.GetInterfaceFromList<CGameResourceService*>("GameResourceServiceClientV001");
-		g::input_system = modules::input_sys.GetInterfaceFromList<CInputSystem*>("InputSystemVersion001");
-		g::network_game_service = modules::engine.GetInterfaceFromList<CNetworkGameService*>("NetworkClientService_001");
-		g::game_type = modules::matchmaking.GetInterfaceFromList<CGameType*>("GameTypes001");
+		g::engine_client = modules::engine.get_interface_from_list<IVEngineClient*>("Source2EngineToClient001");
+		g::client = modules::client.get_interface_from_list<CSource2Client*>("Source2Client002");
+		g::schema_system = modules::schema.get_interface_from_list<CSchemaSystem*>("SchemaSystem_001");
+		g::game_resource_service = modules::engine.get_interface_from_list<CGameResourceService*>("GameResourceServiceClientV001");
+		g::input_system = modules::input_sys.get_interface_from_list<CInputSystem*>("InputSystemVersion001");
+		g::network_game_service = modules::engine.get_interface_from_list<CNetworkGameService*>("NetworkClientService_001");
+		g::game_type = modules::matchmaking.get_interface_from_list<CGameType*>("GameTypes001");
 
-		g::csgo_input = modules::client.scan("48 89 05 ? ? ? ? 0F 57 C0 0F 11 05 ? ? ? ?", "g::csgo_input").add(0x3).abs().as<CSGOInput*>();
-		g::render_system = **modules::directx11.scan("66 0F 7F 0D ? ? ? ? 48 8B F7 66 0F 7F 05", "g::render_system").add(4).abs().as<CRenderSystem***>();
-		g::global_vars = *modules::client.scan("48 8B 05 ?? ?? ?? ?? 44 8B B7 ?? ?? ?? ?? 8B 70 04 B8 ?? ?? ?? ??", "g::global_vars").add(0x3).abs().as<CGlobalVarsBase**>();
-		g::engine_trace = *modules::client.scan("48 8B 0D ? ? ? ? 4C 8B C3 66 89 44 24", "g::game_trace").add(0x3).abs().as<CGameTrace**>();
-		g::client_mode_csnormal = modules::client.scan("48 8D 3D ? ? ? ? 48 8D 35 ? ? ? ? 90", "g::client_mode").add(0x3).abs().as<CClientModeCSNormal*>();
-		players::localplayer = modules::client.scan("48 8B 05 ? ? ? ? 48 85 C0 74 53", "players::localplayer").add(0x3).abs().as<CCSPlayerController*>();
-		
-		CCSPlayerController* lp = modules::client.get_sig(FNV("players::localplayer")).as<CCSPlayerController*>();
+		g::csgo_input = modules::client.get_sig_addr(FNV("g::csgo_input")).as<CSGOInput*>();
+		g::render_system = **modules::directx11.get_sig_addr(FNV("g::render_system")).as<CRenderSystem***>();
+		g::global_vars = *modules::client.get_sig_addr(FNV("g::global_vars")).as<CGlobalVarsBase**>();
+		g::engine_trace = *modules::client.get_sig_addr(FNV("g::engine_trace")).as<CGameTrace**>();
+		g::client_mode_csnormal = modules::client.get_sig_addr(FNV("g::clientmode_csnormal")).as<CClientModeCSNormal*>();
+		g::localplayer = modules::client.get_sig_addr(FNV("g::localplayer")).as<CCSPlayerController*>();
 
 		g::entity_system = g::game_resource_service->GetEntitySystem();
 
 		g::mem_alloc = modules::tier0.get_export("g_pMemAlloc").as<IMemAlloc*>();
 		mem_alloc_in::mem_alloc = modules::tier0.get_export("g_pMemAlloc").as<IMemAlloc*>();
 
+		print_status(g::localplayer);
 		print_status(g::engine_client);
 		print_status(g::client);
 		print_status(g::schema_system);
@@ -89,13 +112,12 @@ namespace sdk
 		print_status(g::engine_trace);
 		print_status(g::network_game_service);
 		//print_status(g::hud_chat);
-		print_status(players::localplayer); //move to interfaces?
-		print_status(lp);
 	}
 }
 
 namespace interfaces
 {
+	CCSPlayerController* localplayer{};
 	IVEngineClient* engine_client{};
 	CSource2Client* client{};
 	CSchemaSystem* schema_system{};

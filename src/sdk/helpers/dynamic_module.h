@@ -26,7 +26,7 @@ struct InterfaceReg
 	InterfaceReg* m_pNext;	
 };
 
-static uintptr_t GetModuleBase(const char* module_name)
+static uintptr_t get_module_base(const char* module_name)
 {
 	PPEB peb = (PPEB)__readgsqword(0x60);
 	PPEB_LDR_DATA ldr = peb->Ldr;
@@ -98,17 +98,12 @@ public:
 	PatternScanner() = default;
 	PatternScanner(uintptr_t _base) : base(_base) { }
 
-	PatternScanner& scan(const char* signature, const char* sig_name)
+	PatternScanner& scan(const std::string_view& signature, const std::string_view& sig_name)
 	{
-		this->addr = pattern_scan(signature);
+		this->addr = pattern_scan(signature.data());
 
 		if (!this->addr)
-		{
-			g_Console->println("PatternScanner: %s not found\n", sig_name);
-		}
-
-		this->sig = signature;
-		this->sig_name = sig_name;
+			g_Console->println("PatternScanner: %s not found\n", sig_name.data());
 
 		return *this;
 	}
@@ -137,16 +132,6 @@ public:
 			return {};
 
 		return reinterpret_cast<T>(addr);
-	}
-
-	const char* get_signame()
-	{
-		return sig_name;
-	}
-
-	const char* get_sig()
-	{
-		return sig;
 	}
 
 private:
@@ -202,34 +187,24 @@ private:
 
 	uintptr_t base;
 	uint8_t* addr;
-	const char* sig_name;
-	const char* sig;
 };
 
-class SigCacher
+class SigAddrCacher
 {
 public:
-	SigCacher() = default;
+	SigAddrCacher() = default;
 
 	void cache_sig(const fnv::hash& hash, PatternScanner& sig)
 	{
 		sigmap[hash] = sig;
 	}
 
-	PatternScanner& get_sig(const fnv::hash& hash)
+	PatternScanner& get_addr(const fnv::hash& hash, const char* func_name = "")
 	{
 		auto it = sigmap.find(hash);
 		if (it != sigmap.end())
 			return it->second;
-	}
-
-	void print_contents()
-	{
-		for (auto& x : sigmap)
-		{
-			g_Console->println("Registered sigs:");
-			g_Console->println("%s: %s", x.second.get_signame(), x.second.get_sig());
-		}
+		else g_Console->println("hash not found in sigmap: %s", func_name);
 	}
 
 private:
@@ -240,10 +215,10 @@ class DynamicModule
 {
 public:
 	DynamicModule() = default;
-	DynamicModule(const std::string_view& mod_name) : base(GetModuleBase(mod_name.data())), pattern_scanner(base), exporter(base) { }
+	DynamicModule(const std::string_view& mod_name) : base(get_module_base(mod_name.data())), pattern_scanner(base), exporter(base) { }
 	
 	template<typename T>
-	T GetInterfaceFromList(const std::string_view& interface_name)
+	T get_interface_from_list(const std::string_view& interface_name)
 	{
 		auto interface_registry = *exporter.get_export("CreateInterface").add(0x3).abs().as<InterfaceReg**>();
 		if (!interface_registry)
@@ -258,30 +233,17 @@ public:
 		return nullptr;
 	}
 
-	void PrintAllInterfaces();
+	void dump_all_interfaces();
 	Exporter& get_export(const std::string_view& func_name);
 	PatternScanner& scan(const std::string_view& signature, const std::string_view& msg);
-	PatternScanner& get_sig(const fnv::hash& hash);
+	void scan_and_cache_sig(const std::string_view& sig, const std::string_view& sig_name, const uintptr_t& offset, bool abs = true);
+	PatternScanner& get_sig_addr(const fnv::hash& hash, const char* func_name = "");
 
-	void print_sig_contents()
-	{
-		sig_cacher.print_contents();
-	}
-
-	void find_and_cache_sig(const std::string_view& sig, const std::string_view& sig_name, const uintptr_t& offset, bool abs = true)
-	{
-		const auto& hash = fnv::hash_runtime(sig_name.data());
-
-		if (abs)
-			sig_cacher.cache_sig(hash, scan(sig, sig_name).add(offset).abs());
-		else sig_cacher.cache_sig(hash, scan(sig, sig_name).add(offset));
-	}
-	
 	uintptr_t base;
 private:
 	PatternScanner pattern_scanner;
 	Exporter exporter;
-	SigCacher sig_cacher;
+	SigAddrCacher sig_addr_cacher;
 };
 
 

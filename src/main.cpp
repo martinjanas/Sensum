@@ -14,10 +14,6 @@ DWORD __stdcall on_attach(void* base)
     sdk::init_modules();
     sdk::init_interfaces();
 
-    {
-        modules::client.print_sig_contents();
-    }
-
     netvars::init();
     hooks::init();
 

@@ -2,7 +2,6 @@
 #include "../helpers/Hitbox_t.h"
 #include "../helpers/globals.h"
 #include "../../thirdparty/ImGui/imgui_internal.h"
-#include "../localplayer.h"
 #include "../../features/features.h"
 #include <queue>
 
@@ -114,7 +113,7 @@ namespace entity_data
 	bool is_in_smoke(const Vector& start, const Vector& end, const float& max_density)
 	{
 		using fn = float(__fastcall*)(const Vector&, const Vector&, void*);
-		static auto addr = modules::client.scan("E8 ? ? ? ? 0F 28 F8 44 0F 28 54 24 ?", "IsInSmoke").add(0x1).abs().as();
+		static auto addr = modules::client.get_sig_addr(FNV("IsInSmoke"), __FUNCTION__).as();
 		if (!addr)
 			return false;
 
@@ -125,8 +124,6 @@ namespace entity_data
 
 			return smoke_density >= max_density;
 		}
-
-		return false;
 	}
 
 	std::map<int, std::vector<int>> hitbox_hierarchy = 
