@@ -13,6 +13,7 @@
 #pragma comment(lib, "Shlwapi.lib")
 #include "../helpers/importer.h"
 #include "../../sdk/helpers/console.h"
+#include "../../sdk/helpers/fnv.h"
 
 #pragma warning(disable:26495)
 
@@ -106,6 +107,9 @@ public:
 			g_Console->println("PatternScanner: %s not found\n", sig_name);
 		}
 
+		this->sig = signature;
+		this->sig_name = sig_name;
+
 		return *this;
 	}
 
@@ -134,6 +138,17 @@ public:
 
 		return reinterpret_cast<T>(addr);
 	}
+
+	const char* get_signame()
+	{
+		return sig_name;
+	}
+
+	const char* get_sig()
+	{
+		return sig;
+	}
+
 private:
 	std::uint8_t* pattern_scan(const char* signature) const
 	{
@@ -187,6 +202,38 @@ private:
 
 	uintptr_t base;
 	uint8_t* addr;
+	const char* sig_name;
+	const char* sig;
+};
+
+class SigCacher
+{
+public:
+	SigCacher() = default;
+
+	void cache_sig(const fnv::hash& hash, PatternScanner& sig)
+	{
+		sigmap[hash] = sig;
+	}
+
+	PatternScanner& get_sig(const fnv::hash& hash)
+	{
+		auto it = sigmap.find(hash);
+		if (it != sigmap.end())
+			return it->second;
+	}
+
+	void print_contents()
+	{
+		for (auto& x : sigmap)
+		{
+			g_Console->println("Registered sigs:");
+			g_Console->println("%s: %s", x.second.get_signame(), x.second.get_sig());
+		}
+	}
+
+private:
+	std::map<fnv::hash, PatternScanner> sigmap;
 };
 
 class DynamicModule
@@ -213,12 +260,28 @@ public:
 
 	void PrintAllInterfaces();
 	Exporter& get_export(const std::string_view& func_name);
-	PatternScanner& scan(const char* signature, const char* msg);
+	PatternScanner& scan(const std::string_view& signature, const std::string_view& msg);
+	PatternScanner& get_sig(const fnv::hash& hash);
 
+	void print_sig_contents()
+	{
+		sig_cacher.print_contents();
+	}
+
+	void find_and_cache_sig(const std::string_view& sig, const std::string_view& sig_name, const uintptr_t& offset, bool abs = true)
+	{
+		const auto& hash = fnv::hash_runtime(sig_name.data());
+
+		if (abs)
+			sig_cacher.cache_sig(hash, scan(sig, sig_name).add(offset).abs());
+		else sig_cacher.cache_sig(hash, scan(sig, sig_name).add(offset));
+	}
+	
 	uintptr_t base;
 private:
 	PatternScanner pattern_scanner;
 	Exporter exporter;
+	SigCacher sig_cacher;
 };
 
 

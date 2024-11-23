@@ -143,8 +143,7 @@ namespace sdk
 {
 	void init_modules();
 	void init_interfaces();
-
-	extern bool is_aimkey_down;
+	void cache_sig_addresses();
 }
 
 class CRenderSystem //TODO: Move this into its own file

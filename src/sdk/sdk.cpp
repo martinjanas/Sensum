@@ -31,7 +31,10 @@ void print_status(const char* name, void* ptr)
 
 namespace sdk
 {
-	extern bool is_aimkey_down = false;
+	void cache_sig_addresses()
+	{
+		modules::client.find_and_cache_sig("48 8B 05 ? ? ? ? 48 85 C0 74 53", "players::localplayer", 0x3);
+	}
 
 	void init_modules()
 	{
@@ -44,6 +47,8 @@ namespace sdk
 		modules::input_sys = DynamicModule("inputsystem.dll");
 		modules::matchmaking = DynamicModule("matchmaking.dll");
 		modules::gameoverlay = DynamicModule("GameOverlayRenderer64.dll");
+
+		cache_sig_addresses();
 	}
 
 	void init_interfaces()
@@ -63,6 +68,8 @@ namespace sdk
 		g::client_mode_csnormal = modules::client.scan("48 8D 3D ? ? ? ? 48 8D 35 ? ? ? ? 90", "g::client_mode").add(0x3).abs().as<CClientModeCSNormal*>();
 		players::localplayer = modules::client.scan("48 8B 05 ? ? ? ? 48 85 C0 74 53", "players::localplayer").add(0x3).abs().as<CCSPlayerController*>();
 		
+		CCSPlayerController* lp = modules::client.get_sig(FNV("players::localplayer")).as<CCSPlayerController*>();
+
 		g::entity_system = g::game_resource_service->GetEntitySystem();
 
 		g::mem_alloc = modules::tier0.get_export("g_pMemAlloc").as<IMemAlloc*>();
@@ -83,6 +90,7 @@ namespace sdk
 		print_status(g::network_game_service);
 		//print_status(g::hud_chat);
 		print_status(players::localplayer); //move to interfaces?
+		print_status(lp);
 	}
 }
 

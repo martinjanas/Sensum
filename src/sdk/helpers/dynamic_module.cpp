@@ -17,7 +17,13 @@ Exporter& DynamicModule::get_export(const std::string_view& func_name)
 	return exporter.get_export(func_name);
 }
 
-PatternScanner& DynamicModule::scan(const char* signature, const char* msg)
+PatternScanner& DynamicModule::scan(const std::string_view& signature, const std::string_view& msg)
 {
-	return pattern_scanner.scan(signature, msg);
+	return pattern_scanner.scan(signature.data(), msg.data());
 }
+
+PatternScanner& DynamicModule::get_sig(const fnv::hash& hash)
+{
+	return sig_cacher.get_sig(hash);
+}
+
