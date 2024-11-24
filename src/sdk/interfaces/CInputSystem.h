@@ -374,11 +374,11 @@ class CInputSystem
 public:
 	bool IsButtonDown(ButtonCode code)
 	{
-        return GetVirtual<bool(__thiscall*)(void*, ButtonCode)>(this, 18)(this, code);
+        return VTable::GetThiscall<bool>(this, 18, code);
 	}
 
     ButtonCode VirtualKeyToButtonCode(int vkey)
     {
-        return GetVirtual<ButtonCode(__thiscall*)(void*, int)>(this, 44)(this, vkey);
+        return VTable::GetThiscall<ButtonCode>(this, 44, vkey);
     }
 };

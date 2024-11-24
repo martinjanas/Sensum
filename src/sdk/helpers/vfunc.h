@@ -1,11 +1,53 @@
 #pragma once
+#include <utility>
 
 //Example usage:
-//GetVirtual<void*(__thiscall*)(void*, optional_arguments)>(this, func_index)(this, optional_arguments_value);
-//GetVirtual<void*(__thiscall*)(IMemAlloc*, std::size_t)>(this, 1)(this, size);
+//GetThiscall<void*>(this, index, optional_arguments);
+//GetThiscall<void*>(this, 1, size);
 
-template<typename FuncType>
-__forceinline static FuncType GetVirtual(void* ppClass, int index)
+class VTable
 {
-    return (*static_cast<FuncType**>(ppClass))[index];
-}
+public:
+    template<typename T, typename... Args>
+    static T GetThiscall(void* ppClass, int index, Args... args)
+    {
+        using fn = T(__thiscall*)(void*, Args...);
+        auto func = Get<fn>(ppClass, index);
+
+        return func(ppClass, std::forward<Args>(args)...);
+    }
+
+    template<typename T, typename... Args>
+    static T GetCdecl(void* ppClass, int index, Args... args)
+    {
+        using fn = T(__cdecl*)(Args...);
+        auto func = Get<fn>(ppClass, index);
+
+        return func(std::forward<Args>(args)...);
+    }
+
+    template<typename T, typename... Args>
+    static T GetStdcall(void* ppClass, int index, Args... args)
+    {
+        using fn = T(__stdcall*)(Args...);
+        auto func = Get<fn>(ppClass, index);
+
+        return func(std::forward<Args>(args)...);
+    }
+
+    template<typename T, typename... Args>
+    static T GetFastcall(void* ppClass, int index, Args... args)
+    {
+        using fn = T(__fastcall*)(Args...);
+        auto func = Get<fn>(ppClass, index);
+
+        return func(std::forward<Args>(args)...);
+    }
+private:
+    template<typename T>
+    static auto Get(void* ppClass, int index)
+    {
+        auto vtable = *static_cast<void***>(ppClass);
+        return reinterpret_cast<T>(vtable[index]);
+    }
+};

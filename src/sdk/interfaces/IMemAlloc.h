@@ -10,22 +10,22 @@ class IMemAlloc
 public:
     void* Alloc(std::size_t size) 
     {
-        return GetVirtual<void*(__thiscall*)(IMemAlloc*, std::size_t)>(this, 1)(this, size);
+        return VTable::GetThiscall<void*>(this, 1, size);
     }
 
     void* ReAlloc(const void* p, std::size_t size) 
     {
-        return GetVirtual<void*(__thiscall*)(IMemAlloc*, const void*, std::size_t)>(this, 2)(this, p, size);
+        return VTable::GetThiscall<void*>(this, 2, p, size);
     }
 
     void Free(const void* p) 
     {
-        return GetVirtual<void(__thiscall*)(IMemAlloc*, const void*)>(this, 3)(this, p);
+        VTable::GetThiscall<void>(this, 3, p);
     }
 
     std::size_t GetSize(const void* p) 
     {
-        return GetVirtual<std::size_t(__thiscall*)(IMemAlloc*, const void*)>(this, 17)(this, p);
+        return VTable::GetThiscall<std::size_t>(this, 17, p);
     }
 };
 

@@ -287,7 +287,6 @@ namespace features
             return !(weapon->IsKnife() || weapon->IsC4() || weapon->IsTaser() || weapon->IsGrenade() || weapon->IsHealthshot());
         }
 
-        //TODO: Add IsInReload check
         void handle(CUserCmd* cmd)
         {
             if (!g::engine_client->IsInGame())
@@ -320,7 +319,7 @@ namespace features
                 if (!data.m_PlayerPawn || data.m_iHealth <= 0)
                     continue;
 
-                if (data.flags.test(PLAYER_IN_SMOKE))
+                if (data.flags.test(PLAYER_IN_SMOKE) || !data.flags.test(PLAYER_VISIBLE))
                     continue;
 
                 if (data.hitboxes.empty())

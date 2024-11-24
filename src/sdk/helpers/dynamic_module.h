@@ -5,6 +5,7 @@
 #include <Windows.h>
 #include <cstdint>
 #include <map>
+#include <unordered_map>
 #include <vector>
 #include <stdexcept>
 #include <format>
@@ -101,7 +102,6 @@ public:
 	PatternScanner& scan(const std::string_view& signature, const std::string_view& sig_name)
 	{
 		this->addr = pattern_scan(signature.data());
-
 		if (!this->addr)
 			g_Console->println("PatternScanner: %s not found\n", sig_name.data());
 
@@ -208,7 +208,7 @@ public:
 	}
 
 private:
-	std::map<fnv::hash, PatternScanner> sigmap;
+	std::unordered_map<fnv::hash, PatternScanner> sigmap;
 };
 
 class DynamicModule

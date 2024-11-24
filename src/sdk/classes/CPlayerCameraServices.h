@@ -23,6 +23,6 @@ public:
 
     float GetFov()
     {
-        return GetVirtual<float(__thiscall*)(void*)>(this, 27)(this);
+        return VTable::GetThiscall<float>(this, 27);
     }
 };

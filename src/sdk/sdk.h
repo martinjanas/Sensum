@@ -51,7 +51,7 @@ public:
 	void FullUpdate()
 	{
 		//   @ida: #STR: "Requesting full game update (%s)...\n"
-		GetVirtual<void(__thiscall*)(void*, const char*)>(this, 28)(this, "unk");
+		VTable::GetThiscall<void>(this, 28, "unk");
 	}
 };
 
@@ -62,9 +62,7 @@ public:
 	{
 		//return *reinterpret_cast<CNetworkGameClient**>(reinterpret_cast<uintptr_t>(this) + 0xB8);
 
-		//index 23
-
-		return GetVirtual<CNetworkGameClient*(__thiscall*)(void*)>(this, 23)(this);
+		return VTable::GetThiscall<CNetworkGameClient*>(this, 23);
 	}
 };
 
@@ -103,12 +101,12 @@ public:
 private:
 	int GetGameType()
 	{
-		return GetVirtual<int(__thiscall*)(void*)>(this, 19)(this);
+		return VTable::GetThiscall<int>(this, 19);
 	}
 
 	int GetGameMode()
 	{
-		return GetVirtual<int(__thiscall*)(void*)>(this, 20)(this);
+		return VTable::GetThiscall<int>(this, 20);
 	}
 };
 

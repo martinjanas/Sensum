@@ -10,14 +10,13 @@ class CSource2Client
 public:
 	void GetViewAngles(QAngle* vec)
 	{
-		GetVirtual<void(__thiscall*)(void*, int, QAngle*)>(this, 77)(this, 0, vec);
+		VTable::GetThiscall<void>(this, 77, 0, vec);
 	}
 
 	void SetViewAngles(QAngle& vec)
 	{
 		vec.normalize_clamp();
-
-		GetVirtual<void(__thiscall*)(void*, int, QAngle&)>(this, 78)(this, 0, vec);
+		VTable::GetThiscall<void>(this, 78, 0, vec);
 	}
 
 	//bool TraceRay(const Vector& vecAbsStart, const Vector& vecAbsEnd, CTraceFilter* filter, Trace_t* trace)

@@ -16,7 +16,7 @@ public:
 
     CSkeletonInstance* GetSkeletonInstance()
     {
-        return GetVirtual<CSkeletonInstance * (__thiscall*)(void*)>(this, 8)(this);
+        return VTable::GetThiscall<CSkeletonInstance*>(this, 8);
     }
 };
 

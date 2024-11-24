@@ -454,5 +454,6 @@ public:
 	/*void TraceRay(const Ray_t& ray, unsigned int fMask, TraceFilter_t* pTraceFilter, Trace_t* pTrace)
 	{
 		GetVirtual<void(__thiscall*)(void*, const Ray_t&, uint32_t mask, TraceFilter_t*, Trace_t*)>(this, 56)(this, ray, fMask, pTraceFilter, pTrace);
+		VTable::GetThiscall<void>(this, 56, ray, fMask, pTraceFilter, pTrace);
 	}*/
 };

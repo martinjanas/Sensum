@@ -212,7 +212,7 @@ public:
 
 	int CalculateCmdCRCSize()
 	{
-		return GetVirtual<int(__thiscall*)(void*)>(this, 7)(this);
+		return VTable::GetThiscall<int>(this, 7);
 	}
 };
 
