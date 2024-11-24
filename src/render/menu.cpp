@@ -76,7 +76,7 @@ void draw_menu_debug()
 
 	ImGui::SliderFloat("##boxrounding", &settings::visuals::box_rounding, 0.f, 2.f, "Box Rounding: %.1f");
 	ImGui::SliderFloat("##boxthickness", &settings::visuals::box_thickness, 0.f, 2.f, "Box Thickness: %.1f");
-
+	ImGui::Checkbox("BHop", &settings::misc::m_bBHop);
 	ImGui::Checkbox("Unhook", &globals::can_unhook);
 	ImGui::PopFont();
 }
