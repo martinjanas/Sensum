@@ -3,32 +3,34 @@
 
 namespace settings
 {
-	namespace visuals
+	namespace aimbot //just for now, gonna move to weapon based settings later
 	{
-		// bool
-		extern bool m_bFovChanger;
-		extern bool m_bBoneEsp;
-		extern bool m_bBoxEsp;
-		extern bool m_bHealthEsp;
-		extern bool m_bNameEsp;
-
-		// int
-		extern int m_iFov;
-		extern int aimbot_fov;
-		extern int aimbot_hitbox;
+		extern int fov;
+		extern int hitboxes;
 		extern int smooth_mode;
-
 		extern float smooth;
-		extern float box_rounding;
-		extern float box_thickness;
 		extern float pitch;
 		extern float yaw;
-		
-		// colors
-		extern ImVec4 m_fBoneColor;
-		extern ImVec4 m_fBoxColor;
-		extern ImVec4 m_fHealthColor;
-		extern ImVec4 m_fNameColor;
+	}
+
+	namespace misc
+	{
+		extern bool fov_changer;
+		extern int fov;
+		extern bool bhop;
+	}
+
+	namespace esp
+	{
+		extern bool bone_esp;
+		extern bool box_esp;
+		extern bool name_esp;
+		extern bool health_esp;
+
+		extern ImVec4 bone_clr;
+		extern ImVec4 box_clr;
+		extern ImVec4 health_clr;
+		extern ImVec4 name_clr;
 	}
 }
 

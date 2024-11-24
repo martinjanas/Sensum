@@ -114,7 +114,6 @@ namespace sdk
 		g::global_vars = *modules::client.get_sig_addr(FNV("g::global_vars")).as<CGlobalVarsBase**>();
 		g::engine_trace = *modules::client.get_sig_addr(FNV("g::engine_trace")).as<CGameTrace**>();
 		g::client_mode_csnormal = modules::client.get_sig_addr(FNV("g::clientmode_csnormal")).as<CClientModeCSNormal*>();
-		g::localplayer = modules::client.get_sig_addr(FNV("g::localplayer")).as<CCSPlayerController*>();
 		g::game_rules = *modules::client.get_sig_addr(FNV("g::game_rules")).as<CGameRules**>();
 
 		g::entity_system = g::game_resource_service->GetEntitySystem();
@@ -122,7 +121,6 @@ namespace sdk
 		g::mem_alloc = modules::tier0.get_export("g_pMemAlloc").as<IMemAlloc*>();
 		mem_alloc_in::mem_alloc = modules::tier0.get_export("g_pMemAlloc").as<IMemAlloc*>();
 
-		print_status(g::localplayer);
 		print_status(g::engine_client);
 		print_status(g::client);
 		print_status(g::schema_system);
@@ -143,7 +141,6 @@ namespace sdk
 
 namespace interfaces
 {
-	CCSPlayerController* localplayer{};
 	IVEngineClient* engine_client{};
 	CSource2Client* client{};
 	CSchemaSystem* schema_system{};

@@ -30,7 +30,6 @@ namespace sdk
 
 namespace interfaces //move to interfaces.h ?
 {
-	extern CCSPlayerController* localplayer;
 	extern IVEngineClient* engine_client;
 	extern CSource2Client* client;
 	extern CSchemaSystem* schema_system;

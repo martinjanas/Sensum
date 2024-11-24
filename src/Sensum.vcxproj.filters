@@ -328,6 +328,7 @@
     <ClCompile Include="hooks\functions\LevelInit.cpp" />
     <ClCompile Include="hooks\functions\LevelShutdown.cpp" />
     <ClCompile Include="sdk\interfaces\ClientModeCSNormal.h" />
+    <ClCompile Include="features\bhop.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\freetype.lib" />

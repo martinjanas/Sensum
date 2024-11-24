@@ -52,30 +52,28 @@ void draw_menu_debug()
 	static std::vector<std::string> hitbox_items = { "Head", "Chest", "Arms", "Legs", "Nearest In Air" };
 
 	ImGui::PushFont(render::fonts::selector);
-	ImGui::Checkbox("Box", &settings::visuals::m_bBoxEsp); ImGui::SameLine();
-	ImGui::ColorEdit3("###boxcolor", (float*)&settings::visuals::m_fBoxColor, ImGuiColorEditFlags_NoInputs);
-	ImGui::Checkbox("Name", &settings::visuals::m_bNameEsp); ImGui::SameLine();
-	ImGui::ColorEdit3("###namecolor", (float*)&settings::visuals::m_fNameColor, ImGuiColorEditFlags_NoInputs);
-	ImGui::Checkbox("Health", &settings::visuals::m_bHealthEsp); ImGui::SameLine();
-	ImGui::ColorEdit3("###healthcolor", (float*)&settings::visuals::m_fHealthColor, ImGuiColorEditFlags_NoInputs);
-	ImGui::Checkbox("Bone esp", &settings::visuals::m_bBoneEsp); ImGui::SameLine();
-	ImGui::ColorEdit3("###bonecolor", (float*)&settings::visuals::m_fBoneColor, ImGuiColorEditFlags_NoInputs);
+	ImGui::Checkbox("Box", &settings::esp::box_esp); ImGui::SameLine();
+	ImGui::ColorEdit3("###boxcolor", (float*)&settings::esp::box_esp, ImGuiColorEditFlags_NoInputs);
+	ImGui::Checkbox("Name", &settings::esp::name_esp); ImGui::SameLine();
+	ImGui::ColorEdit3("###namecolor", (float*)&settings::esp::name_clr, ImGuiColorEditFlags_NoInputs);
+	ImGui::Checkbox("Health", &settings::esp::health_esp); ImGui::SameLine();
+	ImGui::ColorEdit3("###healthcolor", (float*)&settings::esp::health_clr, ImGuiColorEditFlags_NoInputs);
+	ImGui::Checkbox("Bone esp", &settings::esp::bone_esp); ImGui::SameLine();
+	ImGui::ColorEdit3("###bonecolor", (float*)&settings::esp::bone_clr, ImGuiColorEditFlags_NoInputs);
 
-	ImGui::SliderInt("Aimbot FOV", &settings::visuals::aimbot_fov, 0, 360);
+	ImGui::SliderInt("Aimbot FOV", &settings::aimbot::fov, 0, 180);
 
-	ShowMultiSelectPopup("Hitboxes", settings::visuals::aimbot_hitbox, hitbox_items);
-	ImGui::SliderFloat("###AimbotSmooth", &settings::visuals::smooth, 1.f, 10.f, "Smooth: %.1f");
+	ShowMultiSelectPopup("Hitboxes", settings::aimbot::hitboxes, hitbox_items);
+	ImGui::SliderFloat("###AimbotSmooth", &settings::aimbot::smooth, 1.f, 10.f, "Smooth: %.1f");
 	
-	ImGui::SliderFloat("Recoil Pitch", &settings::visuals::pitch, 0.f, 2.f, "Recoil Pitch: %.1f");
-	ImGui::SliderFloat("Recoil Yaw", &settings::visuals::yaw, 0.f, 2.f, "Recoil Yaw: %.1f");
+	ImGui::SliderFloat("Recoil Pitch", &settings::aimbot::pitch, 0.f, 2.f, "Recoil Pitch: %.1f");
+	ImGui::SliderFloat("Recoil Yaw", &settings::aimbot::yaw, 0.f, 2.f, "Recoil Yaw: %.1f");
 
-	ImGui::Checkbox("Fov changer", &settings::visuals::m_bFovChanger);
+	ImGui::Checkbox("Bhop", &settings::misc::bhop);
+	ImGui::Checkbox("Fov changer", &settings::misc::fov_changer);
 
-	if (settings::visuals::m_bFovChanger)
-		ImGui::SliderInt("Fov slider", &settings::visuals::m_iFov, 10, 200);
-
-	ImGui::SliderFloat("##boxrounding", &settings::visuals::box_rounding, 0.f, 2.f, "Box Rounding: %.1f");
-	ImGui::SliderFloat("##boxthickness", &settings::visuals::box_thickness, 0.f, 2.f, "Box Thickness: %.1f");
+	if (settings::misc::fov_changer)
+		ImGui::SliderInt("Fov slider", &settings::misc::fov, 10, 200);
 
 	ImGui::Checkbox("Unhook", &globals::can_unhook);
 	ImGui::PopFont();
@@ -159,7 +157,7 @@ namespace menu
 
 					if (current_tab == 0)
 					{
-						imc::selector("Smoothing Mode", items, 2, &settings::visuals::smooth_mode);
+						imc::selector("Smoothing Mode", items, 2, &settings::aimbot::smooth_mode);
 					}
 					else if (current_tab == 1)
 						imgui::GetForegroundDrawList()->AddText(window_center, IM_COL32_WHITE, "Visuals Tab");

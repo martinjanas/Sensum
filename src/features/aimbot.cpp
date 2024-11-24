@@ -22,7 +22,7 @@ namespace features
             static std::unordered_set<int> list;
             static int previous_hitbox_value = -1;
 
-            int current_hitbox_value = settings::visuals::aimbot_hitbox;
+            int current_hitbox_value = settings::aimbot::hitboxes;
 
             if (current_hitbox_value != previous_hitbox_value)
             {
@@ -210,15 +210,15 @@ namespace features
                 return;
 
             QAngle current_punch = punch_cache[punch_cache.Count() - 1];
-            current_punch.pitch *= settings::visuals::pitch;
-            current_punch.yaw *= settings::visuals::yaw;
+            current_punch.pitch *= settings::aimbot::pitch;
+            current_punch.yaw *= settings::aimbot::yaw;
             current_punch.normalize_clamp();
 
             if (localpawn->m_iShotsFired() > 1 && g::input_system->IsButtonDown(ButtonCode::MouseLeft))
             {
                 QAngle recoil_delta = current_punch - last_punch;
-                recoil_delta.pitch *= settings::visuals::pitch;
-                recoil_delta.yaw *= settings::visuals::yaw;
+                recoil_delta.pitch *= settings::aimbot::pitch;
+                recoil_delta.yaw *= settings::aimbot::yaw;
                 recoil_delta.normalize_clamp();
 
                 QAngle compensated_angle = viewangles - recoil_delta;
@@ -313,7 +313,6 @@ namespace features
                 return;
 
             const auto& eye_pos = localpawn->GetEyePos();
-
             for (auto& data : m_player_data)
             {
                 if (!data.m_PlayerPawn || data.m_iHealth <= 0)
@@ -337,11 +336,10 @@ namespace features
 
                     if (hitbox_ids.find(hitbox_data->index) == hitbox_ids.end())
                         continue;
-                      
-                    if (!hitbox_data->visible)
-                        continue;
 
                     //reset the target when not visible, etc... ?
+                    if (!hitbox_data->visible)
+                        continue;
 
                     QAngle target_angle = (hitbox_data->hitbox_pos - eye_pos).to_qangle();
                     target_angle.normalize_clamp();
@@ -359,9 +357,9 @@ namespace features
                         best_angle = target_angle;
                     }
 
-                    /*if (!cmd->IsButtonPressed(IN_ATTACK)) //broken, outdated structs
-                        continue;*/
-                    
+                    if (!(cmd->nButtons.nValue & IN_ATTACK))
+                        continue;
+
                     const auto& active_wpn_handle = localpawn->m_pWeaponServices()->m_hActiveWeapon();
                     if (!active_wpn_handle.IsValid())
                         continue;
@@ -388,19 +386,16 @@ namespace features
                     if (next_attack_tick <= localplayer->m_nTickBase() && !active_wpn->IsSniper()) //temp fix
                         continue;
 
-                    if (!(GetAsyncKeyState(VK_LBUTTON)))
-                        continue;
-
                     //printf("[%s: %s]: fov: %.1f, best_fov: %.1f, dist: %.1f\n", data.m_szPlayerName, hitbox_index_to_name(hitbox_data->index), fov, best_fov, distance);
 
-                    if (best_fov > settings::visuals::aimbot_fov)
+                    if (best_fov > settings::aimbot::fov)
                         continue;
 
                     QAngle output;
-                    if (settings::visuals::smooth_mode == 0)
-                        smooth(settings::visuals::smooth, viewangles, best_angle, output);
-                    else if (settings::visuals::smooth_mode == 1)
-                        smooth_constant(settings::visuals::smooth, viewangles, best_angle, output);
+                    if (settings::aimbot::smooth_mode == 0)
+                        smooth(settings::aimbot::smooth, viewangles, best_angle, output);
+                    else if (settings::aimbot::smooth_mode == 1)
+                        smooth_constant(settings::aimbot::smooth, viewangles, best_angle, output);
 
                     g::client->SetViewAngles(output);
                 }

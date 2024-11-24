@@ -28,4 +28,9 @@ namespace features
 	{
 		void handle(CUserCmd* cmd);
 	}
+
+	namespace bhop
+	{
+		void handle(CUserCmd* cmd);
+	}
 }

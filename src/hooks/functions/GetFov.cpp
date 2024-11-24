@@ -5,8 +5,8 @@ namespace hooks
 {
 	float __fastcall hooks::get_fov::hooked(void* camera)
 	{
-		if (g::engine_client->IsInGame() && settings::visuals::m_bFovChanger)
-			return static_cast<float>(settings::visuals::m_iFov);
+		if (g::engine_client->IsInGame() && settings::misc::fov_changer)
+			return static_cast<float>(settings::misc::fov);
 
 		return safetyhook.fastcall<float>(camera);
 	}

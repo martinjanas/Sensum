@@ -150,6 +150,8 @@ class CCSGOInterpolationInfoPB : public CBasePB
 {
 public:
 	float flFraction; // 0x18
+	int nSrcTick; // 0x1C
+	int nDstTick; // 0x20
 };
 
 class CCSGOInputHistoryEntryPB : public CBasePB
@@ -268,8 +270,8 @@ public:
 		for (int i = 0; i < this->csgoUserCmd.inputHistoryField.pRep->nAllocatedSize; i++)
 		{
 			CCSGOInputHistoryEntryPB* pInputEntry = this->GetInputHistoryEntry(i);
-			if (!pInputEntry)
-				continue; // || !pInputEntry->pViewAngles
+			if (!pInputEntry || !pInputEntry->pViewAngles)
+				continue;
 
 			pInputEntry->pViewAngles->angValue = angView;
 			pInputEntry->SetBits(EInputHistoryBits::INPUT_HISTORY_BITS_VIEWANGLES);
@@ -280,10 +282,10 @@ public:
 	{
 		return false; //TODO: Broken
 
-		if (!csgoUserCmd.pBaseCmd)
+		/*if (!csgoUserCmd.pBaseCmd)
 			return false;
 
-		return csgoUserCmd.pBaseCmd->pInButtonState->nValue & button;
+		return csgoUserCmd.pBaseCmd->pInButtonState->nValue & button;*/
 	}
 };
 

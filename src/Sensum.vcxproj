@@ -218,6 +218,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="features\aimbot.cpp" />
+    <ClCompile Include="features\bhop.cpp" />
     <ClCompile Include="features\esp.cpp" />
     <ClCompile Include="hooks\functions\GetFov.cpp" />
     <ClCompile Include="hooks\functions\GetMatricesForView.cpp" />

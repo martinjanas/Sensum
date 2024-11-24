@@ -120,8 +120,8 @@ namespace features::esp
 			bool got_origin = globals::world2screen(data.m_vecAbsOrigin, origin_out);
 			bool got_head_pos = globals::world2screen(head_pos, head_pos_out);
 
-			if (settings::visuals::m_bBoxEsp)
-				globals::draw_list->AddRect(data.bbox.m_Mins.as_vec2(), data.bbox.m_Maxs.as_vec2(), ImColor(settings::visuals::m_fBoxColor.x, settings::visuals::m_fBoxColor.y, settings::visuals::m_fBoxColor.z, settings::visuals::m_fBoxColor.w), settings::visuals::box_rounding, 0, settings::visuals::box_thickness);
+			if (settings::esp::box_esp)
+				globals::draw_list->AddRect(data.bbox.m_Mins.as_vec2(), data.bbox.m_Maxs.as_vec2(), ImColor(settings::esp::box_clr.x, settings::esp::box_clr.y, settings::esp::box_clr.z, settings::esp::box_clr.w), 0.f, 0);
 			
 			esp::name_esp(data, data.bbox);
 
@@ -148,23 +148,23 @@ namespace features::esp
 
 	void bone_esp(entity_data::player_data_t& data)
 	{
-		if (!settings::visuals::m_bBoneEsp)
+		if (!settings::esp::bone_esp)
 			return;
 
 		for (const auto& x : data.bones_w2s)
 		{
 			if (x.got_bone && x.got_parent)
-				globals::draw_list->AddLine(x.bone.as_vec2(), x.bone_parent.as_vec2(), ImColor(settings::visuals::m_fBoneColor.x, settings::visuals::m_fBoneColor.y, settings::visuals::m_fBoneColor.z, settings::visuals::m_fBoneColor.w));
+				globals::draw_list->AddLine(x.bone.as_vec2(), x.bone_parent.as_vec2(), ImColor(settings::esp::bone_clr.x, settings::esp::bone_clr.y, settings::esp::bone_clr.z, settings::esp::bone_clr.w));
 		}
 	}
 
 	void name_esp(entity_data::player_data_t& data, const BBox_t& bbox)
 	{
-		if (!settings::visuals::m_bNameEsp)
+		if (!settings::esp::name_esp)
 			return;
 
 		Vector top_mid = bbox.GetTopMid();
-		ImU32 color = ImColor(settings::visuals::m_fNameColor.x, settings::visuals::m_fNameColor.y, settings::visuals::m_fNameColor.z, settings::visuals::m_fNameColor.w);
+		ImU32 color = ImColor(settings::esp::name_clr.x, settings::esp::name_clr.y, settings::esp::name_clr.z, settings::esp::name_clr.w);
 
 		Vector screen_top_left = bbox.GetTopLeft();
 		Vector screen_top_right = bbox.GetTopRight();
