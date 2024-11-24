@@ -10,6 +10,7 @@ bool __fastcall hooks::createmove_csgoinput::hooked(void* rcx, int slot, CUserCm
     }
 
     features::aimbot::handle(cmd);
-
+    features::movement::handle(cmd);
+    
     return original_fn(rcx, slot, cmd);
 }
