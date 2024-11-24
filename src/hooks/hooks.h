@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "../sdk/sdk.h"
 #include "../sdk/helpers/globals.h"
 #include "../sdk/classes/CHandle.h"
@@ -12,16 +13,14 @@
 #include "../sdk/hooking/safetyhook/safetyhook.hpp"
 #include "../sdk/hooking/shadow_vmt/ShadowVMT.h"
 
-#include "../sdk/interfaces/IVEngineClient.h"
-
 namespace hooks
 {
+	inline static ShadowVMT dxgi;
 	inline static ShadowVMT entity_system;
 	inline static ShadowVMT csgo_input;
 	inline static ShadowVMT client;
 	inline static ShadowVMT swap_chain;
 	inline static ShadowVMT client_mode;
-	inline static ShadowVMT dxgi;
 
 	bool init();
 	bool detach();

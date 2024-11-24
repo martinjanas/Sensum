@@ -52,13 +52,6 @@ bool ShadowVMT::Apply(int index, uintptr_t* hook_function, void** original_fn)
 	return true;
 }
 
-void ShadowVMT::Remove(int index) 
-{
-	*reinterpret_cast<uintptr_t**>(&m_ptr_object_fake_vtable[index]) = m_object_hooks[index];
-
-	m_object_hooks.erase(index);
-}
-
 void ShadowVMT::RestoreTable()
 {
 	// Restore the original VMT pointer

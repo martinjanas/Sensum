@@ -14,7 +14,6 @@ public:
 	ShadowVMT() {};
 
 	bool Apply(int index, uintptr_t* hook_function, void** original_fn);
-	void Remove(int index);
 	void RestoreTable();
 
 private:

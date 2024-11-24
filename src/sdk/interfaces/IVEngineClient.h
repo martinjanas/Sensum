@@ -1,7 +1,5 @@
 #pragma once
-
 #include <functional>
-
 #include "../helpers/vfunc.h"
 
 enum EClientFrameStage : int

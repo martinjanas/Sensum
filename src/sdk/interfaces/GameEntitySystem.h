@@ -3,8 +3,6 @@
 #include "../helpers/modules.h"
 #include "../classes/CBaseEntity.h"
 
-#include <WinDNS.h>
-
 class CEntitySystem
 {
 public:
@@ -30,6 +28,7 @@ public:
 
 		return reinterpret_cast<CBaseEntity*>(entity);
 	}
+
 	template <typename T = CBaseEntity*>
 	T GetLocalPlayerController()
 	{
