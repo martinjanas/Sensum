@@ -30,4 +30,10 @@ namespace settings
 		ImVec4 m_fHealthColor = ImVec4(255, 255, 255, 255);
 		ImVec4 m_fNameColor = ImVec4(255, 255, 255, 255);
 	}
+
+	namespace misc 
+	{
+		// bool
+		bool m_bBHop = false;
+	}
 }
