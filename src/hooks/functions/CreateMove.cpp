@@ -2,12 +2,14 @@
 #include "../../sdk/sdk.h"
 #include "../../features/features.h"
 
-void __fastcall hooks::createmove_csgoinput::hooked(void* rcx, int slot, bool active)
+bool __fastcall hooks::createmove_csgoinput::hooked(void* rcx, int slot, CUserCmd* cmd)
 {
-    if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
-        original_fn(rcx, slot, active);
+    const bool original = original_fn(rcx, slot, cmd);
+    if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected()) {
+        return original;
+    }
 
-    features::aimbot::handle(nullptr); //TODO: get CUserCmd
+    features::aimbot::handle(cmd);
 
-    original_fn(rcx, slot, active);
+    return original_fn(rcx, slot, cmd);
 }
