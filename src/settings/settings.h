@@ -30,9 +30,10 @@ namespace settings
 		extern ImVec4 m_fHealthColor;
 		extern ImVec4 m_fNameColor;
 	}
+
+	namespace misc
+	{
+		// bool
+		extern bool m_bBHop;
+	}
 }
-
-
-
-
-
