@@ -32,20 +32,11 @@ namespace hooks
 		LRESULT __stdcall hooked(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 	}
 
-	/*struct createmove_csgoinput
-	{
-		static const int index = 21; //rcs not working correctly with this one, why?
-		using fn = bool(__fastcall*)(void*, int, CUserCmd*, float a4);
-		static bool __fastcall hooked(void* rcx, int slot, CUserCmd* cmd, float a4);
-
-		inline static fn original_fn;
-	};*/
-
 	struct createmove_csgoinput
 	{
-		static const int index = 5;
-		using fn = void(__fastcall*)(void*, int, bool);
-		static void __fastcall hooked(void* rcx, int slot, bool active);
+		static const int index = 21;
+		using fn = bool(__fastcall*)(void*, int, CUserCmd*);
+		static bool __fastcall hooked(void* rcx, int slot, CUserCmd* cmd);
 
 		inline static fn original_fn;
 	};
