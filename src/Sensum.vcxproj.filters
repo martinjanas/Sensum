@@ -219,6 +219,13 @@
     <ClInclude Include="render\fonts\droidsans.hpp" />
     <ClInclude Include="render\fonts\undefeated.hpp" />
     <ClInclude Include="thirdparty\ImGui\imgui_freetype.h" />
+    <ClInclude Include="sdk\interfaces\CGameRules.h" />
+    <ClInclude Include="sdk\interfaces\CRenderSystem.h" />
+    <ClInclude Include="sdk\interfaces\CNetworkGameClient.h" />
+    <ClInclude Include="sdk\interfaces\CGlobalVars.h" />
+    <ClInclude Include="sdk\interfaces\CNetworkGameService.h" />
+    <ClInclude Include="sdk\interfaces\CGameType.h" />
+    <ClInclude Include="sdk\interfaces\CHudChat.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\classes\CBaseEntity.cpp">
@@ -318,6 +325,9 @@
     <ClCompile Include="render\menu.cpp" />
     <ClCompile Include="render\imgui_custom.cpp" />
     <ClCompile Include="thirdparty\ImGui\imgui_freetype.cpp" />
+    <ClCompile Include="hooks\functions\LevelInit.cpp" />
+    <ClCompile Include="hooks\functions\LevelShutdown.cpp" />
+    <ClCompile Include="sdk\interfaces\ClientModeCSNormal.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\freetype.lib" />

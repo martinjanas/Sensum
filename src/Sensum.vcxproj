@@ -165,8 +165,15 @@
     <ClInclude Include="sdk\helpers\matrix.h" />
     <ClInclude Include="sdk\hooking\safetyhook\safetyhook.hpp" />
     <ClInclude Include="sdk\hooking\safetyhook\Zydis.h" />
+    <ClInclude Include="sdk\interfaces\CGameRules.h" />
     <ClInclude Include="sdk\interfaces\CGameTrace.h" />
+    <ClInclude Include="sdk\interfaces\CGameType.h" />
+    <ClInclude Include="sdk\interfaces\CGlobalVars.h" />
+    <ClInclude Include="sdk\interfaces\CHudChat.h" />
     <ClInclude Include="sdk\interfaces\CInputSystem.h" />
+    <ClInclude Include="sdk\interfaces\CNetworkGameClient.h" />
+    <ClInclude Include="sdk\interfaces\CNetworkGameService.h" />
+    <ClInclude Include="sdk\interfaces\CRenderSystem.h" />
     <ClInclude Include="sdk\interfaces\CSource2Client.h" />
     <ClInclude Include="sdk\math\math.h" />
     <ClInclude Include="sdk\math\QAngle.h" />
@@ -214,6 +221,8 @@
     <ClCompile Include="features\esp.cpp" />
     <ClCompile Include="hooks\functions\GetFov.cpp" />
     <ClCompile Include="hooks\functions\GetMatricesForView.cpp" />
+    <ClCompile Include="hooks\functions\LevelInit.cpp" />
+    <ClCompile Include="hooks\functions\LevelShutdown.cpp" />
     <ClCompile Include="render\imgui_custom.cpp" />
     <ClCompile Include="render\menu.cpp" />
     <ClCompile Include="sdk\helpers\interfaces.cpp" />
@@ -240,6 +249,7 @@
     <ClCompile Include="sdk\hooking\safetyhook\safetyhook.cpp" />
     <ClCompile Include="sdk\hooking\safetyhook\Zydis.c" />
     <ClCompile Include="sdk\interfaces\CGameTrace.cpp" />
+    <ClCompile Include="sdk\interfaces\ClientModeCSNormal.h" />
     <ClCompile Include="sdk\math\QAngle.cpp" />
     <ClCompile Include="sdk\sdk.cpp" />
     <ClCompile Include="main.cpp" />

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "../../sdk/math/Vector.h"
 #include "../../sdk/math/QAngle.h"
 #include "../../sdk/classes/CBaseEntity.h"
@@ -413,7 +412,7 @@ struct TraceFilter_t
 	static TraceFilter_t* InitEntitiesOnly(TraceFilter_t* thisptr, CBaseEntity* skip, uint32_t mask, int layer)
 	{
 		using fn = TraceFilter_t*(__thiscall*)(void*, CBaseEntity*, uint32_t, int, int16_t);
-		static auto addr = modules::client.get_sig_addr(FNV("TraceFilter_t::InitEntitiesOnly", __FUNCTION__)).as();
+		static auto addr = modules::client.get_sig_addr(FNV("TraceFilter_t::InitEntitiesOnly"), __FUNCTION__).as();
 		if (!addr)
 			return nullptr;
 
@@ -429,7 +428,7 @@ public:
 	bool TraceShape(Ray_t* ray, const Vector& start, const Vector& end, TraceFilter_t* filter, Trace_t* trace)
 	{
 		using fn = bool(__fastcall*)(void*, Ray_t*, const Vector&, const Vector&, TraceFilter_t*, Trace_t*);
-		static auto addr = modules::client.get_sig_addr(FNV("CGameTrace::TraceShape", __FUNCTION__)).as();
+		static auto addr = modules::client.get_sig_addr(FNV("CGameTrace::TraceShape"), __FUNCTION__).as();
 		if (!addr)
 			return false;
 
@@ -441,7 +440,7 @@ public:
 	bool ClipRayToEntity(Ray_t* ray, const Vector& start, const Vector& end, CCSPlayerPawn* skip, TraceFilter_t* filter, Trace_t* trace)
 	{
 		using fn = bool(__fastcall*)(void*, Ray_t*, const Vector&, const Vector&, CCSPlayerPawn*, TraceFilter_t*, Trace_t*);
-		static auto addr = modules::client.get_sig_addr(FNV("CGameTrace::ClipRayToEntity", __FUNCTION__)).as();
+		static auto addr = modules::client.get_sig_addr(FNV("CGameTrace::ClipRayToEntity"), __FUNCTION__).as();
 		if (!addr)
 			return false;
 

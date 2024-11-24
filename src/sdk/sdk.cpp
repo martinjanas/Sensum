@@ -46,6 +46,7 @@ namespace sdk
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 8B 05 ?? ?? ?? ?? 44 8B B7 ?? ?? ?? ?? 8B 70 04 B8 ?? ?? ?? ??", "g::global_vars", 0x3, true));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 8B 0D ? ? ? ? 4C 8B C3 66 89 44 24", "g::engine_trace", 0x3, true));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 8D 3D ? ? ? ? 48 8D 35 ? ? ? ? 90", "g::clientmode_csnormal", 0x3, true));
+		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 8B 0D ?? ?? ?? ?? 48 85 C9 74 16 48 8B 01 44 8B C2", "g::game_rules", 0x3, true));
 
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 08 48 89 74 24 10 57 48 81 EC 40 01 00 00 8B DA 48 8B F9 E8 ?? ?? ?? ??", "CBaseEntity::GetHitboxSet", 0, false));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 ? 55 57 41 54 41 56 41 57 48 83 EC 20", "CBaseEntity::HitboxToWorldTransform", 0, false));
@@ -86,6 +87,18 @@ namespace sdk
 		scan_and_cache_sigs();
 	}
 
+	void validate_interfaces_on_map_load()
+	{
+		g::global_vars = *modules::client.get_sig_addr(FNV("g::global_vars")).as<CGlobalVarsBase**>();
+		g::game_rules = *modules::client.get_sig_addr(FNV("g::game_rules")).as<CGameRules**>();
+	}
+
+	void invalidate_interfaces_on_map_unload()
+	{
+		g::global_vars = nullptr;
+		g::game_rules = nullptr;
+	}
+
 	void init_interfaces()
 	{
 		g::engine_client = modules::engine.get_interface_from_list<IVEngineClient*>("Source2EngineToClient001");
@@ -102,6 +115,7 @@ namespace sdk
 		g::engine_trace = *modules::client.get_sig_addr(FNV("g::engine_trace")).as<CGameTrace**>();
 		g::client_mode_csnormal = modules::client.get_sig_addr(FNV("g::clientmode_csnormal")).as<CClientModeCSNormal*>();
 		g::localplayer = modules::client.get_sig_addr(FNV("g::localplayer")).as<CCSPlayerController*>();
+		g::game_rules = *modules::client.get_sig_addr(FNV("g::game_rules")).as<CGameRules**>();
 
 		g::entity_system = g::game_resource_service->GetEntitySystem();
 
@@ -122,6 +136,7 @@ namespace sdk
 		print_status(g::global_vars);
 		print_status(g::engine_trace);
 		print_status(g::network_game_service);
+		print_status(g::game_rules);
 		//print_status(g::hud_chat);
 	}
 }
@@ -144,5 +159,6 @@ namespace interfaces
 	CNetworkGameService* network_game_service{};
 	CGameType* game_type{};
 	CHudChat* hud_chat{};
+	CGameRules* game_rules{};
 }
 
