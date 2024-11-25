@@ -4,6 +4,12 @@
 #include "CCSPlayerController.h"
 #include "CPlayerCameraServices.h"
 
+class CPlayer_ObserverServices
+{
+public:
+    NETVAR(CHandle, m_hObserverTarget, "CPlayer_ObserverServices", "m_hObserverTarget");
+};
+
 class CCSPlayerPawn : public CBaseEntity
 {
 public:
@@ -20,6 +26,7 @@ public:
     NETVAR(CUtlVector<QAngle>, m_aimPunchCache, "C_CSPlayerPawn", "m_aimPunchCache");
     NETVAR(bool, m_bIsScoped, "C_CSPlayerPawn", "m_bIsScoped");
     NETVAR(bool, m_bGunGameImmunity, "C_CSPlayerPawnBase", "m_bGunGameImmunity");
+    NETVAR(CPlayer_ObserverServices*, m_pObserverServices, "C_BasePlayerPawn", "m_pObserverServices")
 
     Vector GetEyePos();
     bool InAir();

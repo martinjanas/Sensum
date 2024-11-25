@@ -23,12 +23,6 @@ namespace entity_data
 		player_entry_data.clear();
 	}
 
-	bool is_dist_equal(float dist1, float dist2) 
-	{
-		float epsilon = std::numeric_limits<float>::epsilon() * std::max(std::fabs(dist1), std::fabs(dist2));
-		return std::fabs(dist1 - dist2) < epsilon;
-	}
-
 	void get_bones_w2s(entity_data::player_data_t& data)
 	{
 		if (!data.bones_w2s.empty())
@@ -253,20 +247,30 @@ namespace entity_data
 		const auto& local_controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
 		if (!local_controller)
 		{
-			//destroy(); //This is causing the esp/data to fuckup
+			destroy();
 			return;
 		}
 
-		const auto& localpawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(local_controller->m_hPlayerPawn());
+		CCSPlayerPawn* localpawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(local_controller->m_hPlayerPawn());
 		if (!localpawn)
 			return;
+
+		if (!localpawn->IsAlive() && localpawn->m_pObserverServices() && localpawn->m_pObserverServices()->m_hObserverTarget().IsValid())
+		{
+			const auto& observer_controller = g::entity_system->GetEntityFromHandle<CCSPlayerController*>(localpawn->m_pObserverServices()->m_hObserverTarget());
+			if (!observer_controller)
+				return;
+
+			CCSPlayerPawn* observer_pawn = reinterpret_cast<CCSPlayerPawn*>(observer_controller);
+			if (!observer_pawn)
+				return;
+
+			localpawn = observer_pawn;
+		}
 
 		const auto& local_team = localpawn->m_iTeamNum();
 		const auto& eye_pos = localpawn->GetEyePos();
 		
-		static Vector old_origin;
-		static QAngle old_angle;
-
 		entry_data_t entry_data;
 		for (const auto& instance : player_instances)
 		{
@@ -334,15 +338,15 @@ namespace entity_data
 			pawn->m_iHealth() > 0 ? player_data.flags.set(PLAYER_ALIVE) : player_data.flags.reset(PLAYER_ALIVE);
 			pawn->InAir() ? player_data.flags.set(PLAYER_IN_AIR) : player_data.flags.reset(PLAYER_IN_AIR);
 
-			if (old_origin != scene_node->m_vecOrigin() || (old_angle.pitch != pawn->m_angEyeAngles().yaw || old_angle.pitch != pawn->m_angEyeAngles().yaw))
+			if (player_data.m_vecOldOrigin != scene_node->m_vecOrigin() || (player_data.m_vecOldEyeAngles.pitch != pawn->m_angEyeAngles().pitch || player_data.m_vecOldEyeAngles.yaw != pawn->m_angEyeAngles().yaw))
 			{
 				get_hitboxes(player_data, eye_pos, localpawn, on_screen);
 				get_bbox(scene_node, collision, player_data.bbox);
 				get_bones_w2s(player_data);
 			}
 
-			old_origin = scene_node->m_vecOrigin();
-			old_angle = pawn->m_angEyeAngles();
+			player_data.m_vecOldOrigin = scene_node->m_vecOrigin();
+			player_data.m_vecOldEyeAngles = pawn->m_angEyeAngles();
 
 			entry_data.player_data.push_back(std::move(player_data));
 		}

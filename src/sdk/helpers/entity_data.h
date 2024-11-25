@@ -52,6 +52,8 @@ namespace entity_data
 		Vector m_vecOrigin;
 		Vector m_vecAbsOrigin;
 		Vector m_vecEyePos;
+		Vector m_vecOldOrigin;
+		QAngle m_vecOldEyeAngles;
 		QAngle m_vecEyeAngles;
 		int m_iHealth;
 		int m_iShotsFired;
