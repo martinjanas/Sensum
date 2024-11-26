@@ -20,12 +20,6 @@ CEntityInstance* __fastcall hooks::on_add_entity::hooked(void* rcx, CEntityInsta
 
         if (!exists)
             entity_data::entity_instances.emplace_back(instance, handle);
-
-        auto info = instance->GetSchemaClassInfo();
-        if (info)
-        {
-            g_Console->println("name: %s", info->m_pszName);
-        }
     }
 
     return original_fn(rcx, instance, handle);
