@@ -26,6 +26,7 @@ namespace settings
 		extern bool box_esp;
 		extern bool name_esp;
 		extern bool health_esp;
+		extern bool visible_only;
 
 		extern ImVec4 bone_clr;
 		extern ImVec4 box_clr;

@@ -111,11 +111,10 @@ namespace features::esp
 
 		for (auto& data : m_player_data)
 		{
-			if (!data.flags.test(PLAYER_VISIBLE) || data.flags.test(PLAYER_IN_SMOKE))
+			if (settings::esp::visible_only && (!data.flags.test(PLAYER_VISIBLE) || data.flags.test(PLAYER_IN_SMOKE)))
 				continue;
 
-			Vector head_pos = data.m_vecAbsOrigin;
-			head_pos.z += 75.f;
+			const Vector& head_pos = data.hitboxes[HITBOX_HEAD].hitbox_pos;
 
 			bool got_origin = globals::world2screen(data.m_vecAbsOrigin, origin_out);
 			bool got_head_pos = globals::world2screen(head_pos, head_pos_out);

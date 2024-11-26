@@ -26,6 +26,7 @@ namespace settings
 		bool box_esp = false;
 		bool name_esp = false;
 		bool health_esp = false;
+		bool visible_only = true;
 
 		ImVec4 bone_clr = ImVec4(255, 255, 255, 255);
 		ImVec4 box_clr = ImVec4(255, 255, 255, 255);

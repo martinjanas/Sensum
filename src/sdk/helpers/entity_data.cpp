@@ -246,16 +246,17 @@ namespace entity_data
 
 		const auto& local_controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
 		if (!local_controller)
+			return;
+
+		CCSPlayerPawn* localpawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(local_controller->m_hPawn());
+		if (!localpawn)
 		{
 			destroy();
 			return;
 		}
 
-		CCSPlayerPawn* localpawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(local_controller->m_hPlayerPawn());
-		if (!localpawn)
-			return;
-
-		if (!localpawn->IsAlive() && localpawn->m_pObserverServices() && localpawn->m_pObserverServices()->m_hObserverTarget().IsValid())
+		bool is_localpawn_spectating = !localpawn->IsAlive() && localpawn->m_pObserverServices();
+		if (is_localpawn_spectating)
 		{
 			const auto& observer_controller = g::entity_system->GetEntityFromHandle<CCSPlayerController*>(localpawn->m_pObserverServices()->m_hObserverTarget());
 			if (!observer_controller)

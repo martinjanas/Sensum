@@ -52,6 +52,7 @@ void draw_menu_debug()
 	static std::vector<std::string> hitbox_items = { "Head", "Chest", "Arms", "Legs", "Nearest In Air" };
 
 	ImGui::PushFont(render::fonts::selector);
+	ImGui::Checkbox("Visible Only", &settings::esp::visible_only);
 	ImGui::Checkbox("Box", &settings::esp::box_esp); ImGui::SameLine();
 	ImGui::ColorEdit3("###boxcolor", (float*)&settings::esp::box_esp, ImGuiColorEditFlags_NoInputs);
 	ImGui::Checkbox("Name", &settings::esp::name_esp); ImGui::SameLine();
