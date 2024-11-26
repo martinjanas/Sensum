@@ -14,6 +14,7 @@
 #include "../sdk.h"
 #include "../classes/CHandle.h"
 #include "../../sdk/interfaces/CSGOInput.h"
+#include "../../sdk/classes/GameTick_t.h"
 
 enum PLAYER_FLAGS : uint32_t
 {
@@ -69,9 +70,28 @@ namespace entity_data
 		std::list<bone_info_t> bones_w2s;
 	};
 
-	struct entry_data_t
+	struct bomb_data_t
+	{
+		bool m_bBombTicking;
+		int m_nBombSite;
+		float m_flC4Blow;
+		Vector m_vecAbsOrigin;
+	};
+
+	struct grenade_data_t
+	{
+		Vector m_vecOrigin;
+	};
+
+	struct player_entry_data_t
 	{
 		std::list<player_data_t> player_data;
+	};
+
+	struct entity_entry_data_t
+	{
+		std::list<bomb_data_t> bomb_data;
+		std::list<grenade_data_t> grenade_data;
 	};
 
 	struct EntityInstance_t
@@ -82,16 +102,19 @@ namespace entity_data
 
 	extern std::list<EntityInstance_t> player_instances;
 	extern std::list<EntityInstance_t> entity_instances;
-	extern std::list<entry_data_t> player_entry_data;
+	extern std::list<player_entry_data_t> player_entry_data;
+	extern std::list<entity_entry_data_t> entity_entry_data;
 
-	extern std::shared_mutex locker;
+	extern std::shared_mutex player_locker;
+	extern std::shared_mutex entity_locker;
 	
 	namespace view_matrix
 	{
 		extern VMatrix* matrix;
 	};
 
-	void fetch_player_data(CUserCmd* cmd);
+	void fetch_player_data();
+	void fetch_entity_info();
 	void destroy();
 }
 

@@ -292,7 +292,7 @@ namespace features
             if (!g::engine_client->IsInGame())
                 return;
 
-            std::shared_lock<std::shared_mutex> lock(entity_data::locker);
+            std::shared_lock<std::shared_mutex> lock(entity_data::player_locker);
 
             m_player_data.clear();
             if (!entity_data::player_entry_data.empty())

@@ -3,15 +3,19 @@
 #include "../helpers/globals.h"
 #include "../../thirdparty/ImGui/imgui_internal.h"
 #include "../../features/features.h"
+#include "../classes/CPlantedC4.h"
+#include "../classes/CGrenadeProjectile.h"
 #include <queue>
 
 namespace entity_data
 {
 	std::list<EntityInstance_t> player_instances;
 	std::list<EntityInstance_t> entity_instances;
-	std::list<entry_data_t> player_entry_data;
+	std::list<player_entry_data_t> player_entry_data;
+	std::list<entity_entry_data_t> entity_entry_data;
 
-	std::shared_mutex locker;
+	std::shared_mutex player_locker;
+	std::shared_mutex entity_locker;
 
 	namespace view_matrix
 	{
@@ -237,12 +241,12 @@ namespace entity_data
 		update_visibility(player_data, local_pawn);
 	}
 
-	void fetch_player_data(CUserCmd* cmd)
+	void fetch_player_data()
 	{
 		if (!g::engine_client->IsInGame())
 			return;
 	
-		std::unique_lock<std::shared_mutex> lock(locker);
+		std::unique_lock<std::shared_mutex> lock(player_locker);
 
 		const auto& local_controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
 		if (!local_controller)
@@ -272,7 +276,7 @@ namespace entity_data
 		const auto& local_team = localpawn->m_iTeamNum();
 		const auto& eye_pos = localpawn->GetEyePos();
 		
-		entry_data_t entry_data;
+		player_entry_data_t entry_data;
 		for (const auto& instance : player_instances)
 		{
 			if (!instance.entity || !instance.handle.IsValid())
@@ -354,5 +358,54 @@ namespace entity_data
 
 		player_entry_data.clear();
 		player_entry_data.push_back(std::move(entry_data));
+	}
+
+	void fetch_entity_info()
+	{
+		if (!g::engine_client->IsInGame())
+			return;
+
+		std::unique_lock<std::shared_mutex> lock(entity_locker);
+
+		entity_entry_data_t entry_data;
+		for (const auto& instance : entity_instances)
+		{
+			if (!instance.entity || !instance.handle.IsValid())
+				continue;
+
+			const auto& entity = reinterpret_cast<CBaseEntity*>(instance.entity);
+			if (!entity)
+				continue;
+
+			const uint32_t& index = instance.handle.GetEntryIndex();
+			if (index <= 0 || index > 0x7FFF)
+				continue;
+
+			if (entity->IsPlantedC4())
+			{
+				auto bomb_entity = reinterpret_cast<CPlantedC4*>(entity);
+
+				bomb_data_t bomb_data;
+				bomb_data.m_bBombTicking = bomb_entity->m_bBombTicking();
+				bomb_data.m_flC4Blow = bomb_entity->m_flC4Blow();
+				bomb_data.m_nBombSite = bomb_entity->m_nBombSite();
+				bomb_data.m_vecAbsOrigin = entity->m_pGameSceneNode()->m_vecAbsOrigin();
+
+				entry_data.bomb_data.push_back(std::move(bomb_data));
+			}
+			
+			if (entity->IsGrenade() || entity->IsGrenadeProjectile())
+			{
+				auto grenade_entity = reinterpret_cast<CGrenadeProjectile*>(entity);
+
+				grenade_data_t grenade_data;
+				grenade_data.m_vecOrigin = grenade_entity->m_pGameSceneNode()->m_vecOrigin();
+				
+				entry_data.grenade_data.push_back(grenade_data);
+			}
+		}
+
+		entity_entry_data.clear();
+		entity_entry_data.push_back(std::move(entry_data));
 	}
 }

@@ -2,13 +2,8 @@
 
 #include "../../sdk/helpers/netvars.h"
 #include "../../sdk/helpers/vfunc.h"
+#include "../../sdk/classes/GameTick_t.h"
 #include "../../sdk/classes/CBaseEntity.h"
-
-class GameTick_t //TODO: This doesnt belong here, move to own file.
-{
-public:
-    NETVAR(int32_t, m_Value, "GameTick_t", "m_Value");
-};
 
 class C_EconItemView
 {

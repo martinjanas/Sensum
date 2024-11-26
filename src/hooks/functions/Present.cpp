@@ -72,6 +72,7 @@ namespace hooks
 			menu::draw();
 
 			features::esp::render();
+			features::esp::render_entities();
 		}
 		ImGui::EndFrame();
 		ImGui::Render();

@@ -82,4 +82,69 @@ public:
 
         return class_name_hash == FNV("C_CSPlayerPawn") && prev_class_hash == FNV("C_CSPlayerPawnBase") && prev_prev_hash == FNV("C_BasePlayerPawn");
     }
+
+    bool IsPlantedC4()
+    {
+        const auto& class_info = GetSchemaClassInfo();
+
+        if (!class_info)
+            return false;
+
+        auto class_name_hash = fnv::hash_runtime(class_info->m_pszName);
+    
+        return class_name_hash == FNV("C_PlantedC4");
+    }
+
+    bool IsC4()
+    {
+        const auto& class_info = GetSchemaClassInfo();
+
+        if (!class_info)
+            return false;
+
+        auto class_name_hash = fnv::hash_runtime(class_info->m_pszName);
+
+        return class_name_hash == FNV("C_C4");
+    }
+
+    bool IsGrenade()
+    {
+        const auto& class_info = GetSchemaClassInfo();
+        if (!class_info)
+            return false;
+
+        auto base_classes = class_info->m_pBaseClassses;
+        if (!base_classes)
+            return false;
+
+        auto prev_class = base_classes->m_pPrevByClass;
+
+        if (!prev_class)
+            return false;
+
+        auto class_name_hash = fnv::hash_runtime(base_classes->m_pPrevByClass->GetName().data());
+
+        return class_name_hash == FNV("C_BaseCSGrenade");
+    }
+
+    bool IsGrenadeProjectile()
+    {
+        const auto& class_info = GetSchemaClassInfo();
+
+        if (!class_info)
+            return false;
+
+        auto base_classes = class_info->m_pBaseClassses;
+        if (!base_classes)
+            return false;
+
+        auto prev_class = base_classes->m_pPrevByClass;
+
+        if (!prev_class)
+            return false;
+
+        auto prev_name_hash = fnv::hash_runtime(prev_class->GetName().data());
+
+        return prev_name_hash == FNV("C_BaseCSGrenadeProjectile");
+    }
 };

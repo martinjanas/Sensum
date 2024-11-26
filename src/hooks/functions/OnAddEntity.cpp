@@ -14,6 +14,20 @@ CEntityInstance* __fastcall hooks::on_add_entity::hooked(void* rcx, CEntityInsta
             entity_data::player_instances.emplace_back(instance, handle);
     }
 
+    if (instance)
+    {
+        bool exists = std::any_of(entity_data::entity_instances.begin(), entity_data::entity_instances.end(), [&](const entity_data::EntityInstance_t& e) { return e.handle.GetEntryIndex() == handle.GetEntryIndex(); });
+
+        if (!exists)
+            entity_data::entity_instances.emplace_back(instance, handle);
+
+        auto info = instance->GetSchemaClassInfo();
+        if (info)
+        {
+            g_Console->println("name: %s", info->m_pszName);
+        }
+    }
+
     return original_fn(rcx, instance, handle);
 }
 

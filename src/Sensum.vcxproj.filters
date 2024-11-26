@@ -226,6 +226,8 @@
     <ClInclude Include="sdk\interfaces\CNetworkGameService.h" />
     <ClInclude Include="sdk\interfaces\CGameType.h" />
     <ClInclude Include="sdk\interfaces\CHudChat.h" />
+    <ClInclude Include="sdk\classes\GameTick_t.h" />
+    <ClInclude Include="sdk\classes\CGrenadeProjectile.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\classes\CBaseEntity.cpp">
@@ -329,6 +331,7 @@
     <ClCompile Include="hooks\functions\LevelShutdown.cpp" />
     <ClCompile Include="sdk\interfaces\ClientModeCSNormal.h" />
     <ClCompile Include="features\bhop.cpp" />
+    <ClCompile Include="sdk\classes\CPlantedC4.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\freetype.lib" />

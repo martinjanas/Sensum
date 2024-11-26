@@ -1,9 +1,12 @@
 ﻿#include "features.h"
 #include "../render/render.h"
+#include "../sdk/classes/CPlantedC4.h"
+#include <format>
 
 namespace features::esp
 {
 	std::list<entity_data::player_data_t> m_player_data;
+	std::list<entity_data::entity_entry_data_t> m_entity_entry_data;
 
 	void Draw3DBox(BBox_t& bbox)
 	{
@@ -95,12 +98,56 @@ namespace features::esp
 		}
 	}
 
+	void bomb_timer(const entity_data::bomb_data_t& bomb_data)
+	{
+		auto bomb_time = bomb_data.m_flC4Blow - g::global_vars->m_curtime;
+		bomb_time = std::clamp<float>(bomb_time, 0.f, 40.f);
+		if (bomb_time <= 0.0f)
+			return;
+
+		Vector pos;
+		if (globals::world2screen(bomb_data.m_vecAbsOrigin, pos))
+		{
+			ImGui::PushFont(render::fonts::header_buttons);
+			globals::draw_list->AddText(pos.as_vec2(), IM_COL32_BLACK, std::format("Time: {:.1f}", bomb_time).c_str());
+			ImGui::PopFont();
+		}
+	}
+
+	void grenades(const entity_data::grenade_data_t& grenade_data)
+	{
+		Vector pos;
+		if (globals::world2screen(grenade_data.m_vecOrigin, pos))
+			globals::draw_list->AddRect({ pos.x + 10.f, pos.y + 10.f }, { pos.x - 10.f, pos.y - 10.f }, IM_COL32_WHITE);
+	}
+
+	void render_entities()
+	{
+		if (!g::engine_client->IsInGame())
+			return;
+
+		std::shared_lock<std::shared_mutex> lock(entity_data::entity_locker);
+
+		m_entity_entry_data.clear();
+		if (!entity_data::entity_entry_data.empty())
+			std::copy(entity_data::entity_entry_data.begin(), entity_data::entity_entry_data.end(), std::back_inserter(m_entity_entry_data));
+
+		for (auto& entry : m_entity_entry_data)
+		{
+			for (auto& bomb_data : entry.bomb_data)
+				bomb_timer(bomb_data);
+
+			for (auto& grenade_data : entry.grenade_data)
+				grenades(grenade_data);
+		}
+	}
+
 	void render()
 	{
 		if (!g::engine_client->IsInGame())
 			return;
 
-		std::shared_lock<std::shared_mutex> lock(entity_data::locker);
+		std::shared_lock<std::shared_mutex> lock(entity_data::player_locker);
 
 		m_player_data.clear();
 		if (!entity_data::player_entry_data.empty())

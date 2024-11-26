@@ -19,6 +19,7 @@ namespace features
 	namespace esp
 	{
 		void render();
+		void render_entities();
 
 		void bone_esp(entity_data::player_data_t& data);
 		void name_esp(entity_data::player_data_t& data, const BBox_t& bbox);

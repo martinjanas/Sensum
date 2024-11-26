@@ -133,6 +133,8 @@
     <ClInclude Include="render\imgui_custom.h" />
     <ClInclude Include="render\menu.h" />
     <ClInclude Include="render\render.h" />
+    <ClInclude Include="sdk\classes\CGrenadeProjectile.h" />
+    <ClInclude Include="sdk\classes\GameTick_t.h" />
     <ClInclude Include="sdk\helpers\interfaces.h" />
     <ClInclude Include="sdk\helpers\notify_system.h" />
     <ClInclude Include="sdk\helpers\render.h" />
@@ -226,6 +228,7 @@
     <ClCompile Include="hooks\functions\LevelShutdown.cpp" />
     <ClCompile Include="render\imgui_custom.cpp" />
     <ClCompile Include="render\menu.cpp" />
+    <ClCompile Include="sdk\classes\CPlantedC4.h" />
     <ClCompile Include="sdk\helpers\interfaces.cpp" />
     <ClCompile Include="sdk\helpers\notify_system.cpp" />
     <ClCompile Include="render\render.cpp" />
