@@ -90,7 +90,7 @@ namespace entity_data
 
 	struct world_entity_info_t : generic_entity_info_t
 	{
-
+		const char* name;
 	};
 
 	struct player_entry_data_t

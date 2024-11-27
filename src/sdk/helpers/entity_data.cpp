@@ -404,13 +404,16 @@ namespace entity_data
 				entry_data.grenade_info.push_back(data);
 			}
 
-			if (entity->IsDroppedWorldEntity())
+			//Only push entities that do not have player owner
+			if (entity->IsDroppedWorldEntity() && !entity->m_hOwnerEntity().IsValid())
 			{
 				auto dropped_entity = reinterpret_cast<CBaseEntity*>(entity);
 
 				world_entity_info_t data;
 				data.m_vecOrigin = dropped_entity->m_pGameSceneNode()->m_vecOrigin();
+				data.name = dropped_entity->m_pEntity()->m_designerName();
 
+		
 				entry_data.dropped_ent_info.push_back(data);
 			}
 		}

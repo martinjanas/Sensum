@@ -7,8 +7,8 @@
 class CEntityIdentity
 {
 public:
-    NETVAR(CUtlSymbolLarge, m_name, "CEntityIdentity", "m_name");
-    NETVAR(CUtlSymbolLarge, m_designerName, "CEntityIdentity", "m_designerName");
+    NETVAR(const char*, m_name, "CEntityIdentity", "m_name");
+    NETVAR(const char*, m_designerName, "CEntityIdentity", "m_designerName");
     NETVAR(uint32_t, m_flags, "CEntityIdentity", "m_flags");
 
     uint32_t GetHandleIndex()

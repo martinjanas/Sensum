@@ -98,6 +98,7 @@ namespace features::esp
 		}
 	}
 
+	//bomb_timer, grenade_projectiles and dropped_entities functions are in wip/prototype stage, they will be redone properly later
 	void bomb_timer(const entity_data::bomb_info_t& bomb_info)
 	{
 		auto bomb_time = bomb_info.m_flC4Blow - g::global_vars->m_curtime;
@@ -126,7 +127,13 @@ namespace features::esp
 	{
 		Vector pos;
 		if (globals::world2screen(entity_info.m_vecOrigin, pos))
+		{
 			globals::draw_list->AddRect({ pos.x + 10.f, pos.y + 10.f }, { pos.x - 10.f, pos.y - 10.f }, IM_COL32_WHITE);
+
+			ImGui::PushFont(render::fonts::header_buttons);
+			globals::draw_list->AddText(pos.as_vec2(), IM_COL32_WHITE, entity_info.name);
+			ImGui::PopFont();
+		}
 	}
 
 	void render_entities()
