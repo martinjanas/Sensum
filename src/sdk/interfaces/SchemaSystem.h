@@ -485,7 +485,7 @@ public:
     std::int16_t m_nDerivedClassSize; // 0x0026
     SchemaClassFieldData_t* m_pFields; // 0x0028
     SchemaStaticFieldData_t* m_pStaticFields; // 0x0030
-    SchemaBaseClassInfoData_t* m_pBaseClassses; // 0x0038
+    SchemaBaseClassInfoData_t* m_pBaseClasses; // 0x0038
     SchemaFieldMetadataOverrideSetData_t* m_pFieldMetadataOverrides; // 0x0040
     SchemaMetadataEntryData_t* m_pStaticMetadata; // 0x0048
     CSchemaSystemTypeScope* m_pTypeScope; // 0x0050
@@ -521,8 +521,8 @@ public:
 
     [[nodiscard]] std::optional<CSchemaClassInfo*> GetBaseClass() const 
     {
-        if (m_bHasBaseClass && m_pBaseClassses)
-            return m_pBaseClassses->m_pPrevByClass;
+        if (m_bHasBaseClass && m_pBaseClasses)
+            return m_pBaseClasses->m_pPrevByClass;
         return std::nullopt;
     }
 
@@ -543,9 +543,9 @@ public:
 
     [[nodiscard]] std::string_view GetPrevClassName() const 
     {
-        if (!m_pBaseClassses || !m_pBaseClassses->m_pPrevByClass)
+        if (!m_pBaseClasses || !m_pBaseClasses->m_pPrevByClass)
             return {};
-        return m_pBaseClassses->m_pPrevByClass->GetName();
+        return m_pBaseClasses->m_pPrevByClass->GetName();
     }
 
     [[nodiscard]] bool IsA(CSchemaType* pInheritance) const 
@@ -564,14 +564,14 @@ public:
     [[nodiscard]] bool RecursiveHasVirtualTable() const 
     {
         return HasVirtualTable() ? true :
-            (m_pBaseClassses && m_pBaseClassses->m_pPrevByClass ? m_pBaseClassses->m_pPrevByClass->HasVirtualTable() : false);
+            (m_pBaseClasses && m_pBaseClasses->m_pPrevByClass ? m_pBaseClasses->m_pPrevByClass->HasVirtualTable() : false);
     }
 
     [[nodiscard]] bool IsInherits(const std::string_view from) const 
     {
-        if (!m_bHasBaseClass || !m_pBaseClassses || !m_pBaseClassses->m_pPrevByClass)
+        if (!m_bHasBaseClass || !m_pBaseClasses || !m_pBaseClasses->m_pPrevByClass)
             return false;
-        if (m_pBaseClassses->m_pPrevByClass->GetName() == from)
+        if (m_pBaseClasses->m_pPrevByClass->GetName() == from)
             return true;
         return false;
     }
@@ -580,7 +580,7 @@ public:
     {
         return IsInherits(from) ?
             true :
-            (m_pBaseClassses && m_pBaseClassses->m_pPrevByClass ? m_pBaseClassses->m_pPrevByClass->IsRecursiveInherits(from) : false);
+            (m_pBaseClasses && m_pBaseClasses->m_pPrevByClass ? m_pBaseClasses->m_pPrevByClass->IsRecursiveInherits(from) : false);
     }
 
     [[nodiscard]] int GetSize() const 

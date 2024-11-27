@@ -98,15 +98,15 @@ namespace features::esp
 		}
 	}
 
-	void bomb_timer(const entity_data::bomb_data_t& bomb_data)
+	void bomb_timer(const entity_data::bomb_info_t& bomb_info)
 	{
-		auto bomb_time = bomb_data.m_flC4Blow - g::global_vars->m_curtime;
+		auto bomb_time = bomb_info.m_flC4Blow - g::global_vars->m_curtime;
 		bomb_time = std::clamp<float>(bomb_time, 0.f, 40.f);
 		if (bomb_time <= 0.0f)
 			return;
 
 		Vector pos;
-		if (globals::world2screen(bomb_data.m_vecAbsOrigin, pos))
+		if (globals::world2screen(bomb_info.m_vecAbsOrigin, pos))
 		{
 			ImGui::PushFont(render::fonts::header_buttons);
 			globals::draw_list->AddText(pos.as_vec2(), IM_COL32_BLACK, std::format("Time: {:.1f}", bomb_time).c_str());
@@ -114,10 +114,18 @@ namespace features::esp
 		}
 	}
 
-	void grenades(const entity_data::grenade_data_t& grenade_data)
+	void grenade_projectiles(const entity_data::grenade_info_t& grenade_info)
 	{
 		Vector pos;
-		if (globals::world2screen(grenade_data.m_vecOrigin, pos))
+		if (globals::world2screen(grenade_info.m_vecOrigin, pos))
+			globals::draw_list->AddRect({ pos.x + 10.f, pos.y + 10.f }, { pos.x - 10.f, pos.y - 10.f }, IM_COL32_WHITE);
+	}
+
+	//Dropped entities in the world, such as weapons, C4 and grenades.
+	void dropped_entities(const entity_data::world_entity_info_t& entity_info)
+	{
+		Vector pos;
+		if (globals::world2screen(entity_info.m_vecOrigin, pos))
 			globals::draw_list->AddRect({ pos.x + 10.f, pos.y + 10.f }, { pos.x - 10.f, pos.y - 10.f }, IM_COL32_WHITE);
 	}
 
@@ -134,11 +142,14 @@ namespace features::esp
 
 		for (auto& entry : m_entity_entry_data)
 		{
-			for (auto& bomb_data : entry.bomb_data)
-				bomb_timer(bomb_data);
+			for (auto& bomb_info : entry.bomb_info)
+				bomb_timer(bomb_info);
 
-			for (auto& grenade_data : entry.grenade_data)
-				grenades(grenade_data);
+			for (auto& grenade_info : entry.grenade_info)
+				grenade_projectiles(grenade_info);
+
+			for (auto& dropped_ents_info : entry.dropped_ent_info)
+				dropped_entities(dropped_ents_info);
 		}
 	}
 

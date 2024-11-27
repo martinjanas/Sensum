@@ -70,7 +70,7 @@ namespace entity_data
 		std::list<bone_info_t> bones_w2s;
 	};
 
-	struct bomb_data_t
+	struct bomb_info_t
 	{
 		bool m_bBombTicking;
 		int m_nBombSite;
@@ -78,9 +78,19 @@ namespace entity_data
 		Vector m_vecAbsOrigin;
 	};
 
-	struct grenade_data_t
+	struct generic_entity_info_t
 	{
 		Vector m_vecOrigin;
+	};
+
+	struct grenade_info_t : generic_entity_info_t
+	{
+
+	};
+
+	struct world_entity_info_t : generic_entity_info_t
+	{
+
 	};
 
 	struct player_entry_data_t
@@ -90,8 +100,9 @@ namespace entity_data
 
 	struct entity_entry_data_t
 	{
-		std::list<bomb_data_t> bomb_data;
-		std::list<grenade_data_t> grenade_data;
+		std::list<bomb_info_t> bomb_info;
+		std::list<grenade_info_t> grenade_info;
+		std::list<world_entity_info_t> dropped_ent_info;
 	};
 
 	struct EntityInstance_t

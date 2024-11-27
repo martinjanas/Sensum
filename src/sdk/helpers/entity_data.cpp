@@ -385,23 +385,33 @@ namespace entity_data
 			{
 				auto bomb_entity = reinterpret_cast<CPlantedC4*>(entity);
 
-				bomb_data_t bomb_data;
-				bomb_data.m_bBombTicking = bomb_entity->m_bBombTicking();
-				bomb_data.m_flC4Blow = bomb_entity->m_flC4Blow();
-				bomb_data.m_nBombSite = bomb_entity->m_nBombSite();
-				bomb_data.m_vecAbsOrigin = entity->m_pGameSceneNode()->m_vecAbsOrigin();
+				bomb_info_t data;
+				data.m_bBombTicking = bomb_entity->m_bBombTicking();
+				data.m_flC4Blow = bomb_entity->m_flC4Blow();
+				data.m_nBombSite = bomb_entity->m_nBombSite();
+				data.m_vecAbsOrigin = entity->m_pGameSceneNode()->m_vecAbsOrigin();
 
-				entry_data.bomb_data.push_back(std::move(bomb_data));
+				entry_data.bomb_info.push_back(std::move(data));
 			}
-			
-			if (entity->IsGrenade() || entity->IsGrenadeProjectile())
+
+			if (entity->IsGrenadeProjectile()) 
 			{
 				auto grenade_entity = reinterpret_cast<CGrenadeProjectile*>(entity);
 
-				grenade_data_t grenade_data;
-				grenade_data.m_vecOrigin = grenade_entity->m_pGameSceneNode()->m_vecOrigin();
+				grenade_info_t data;
+				data.m_vecOrigin = grenade_entity->m_pGameSceneNode()->m_vecOrigin();
 				
-				entry_data.grenade_data.push_back(grenade_data);
+				entry_data.grenade_info.push_back(data);
+			}
+
+			if (entity->IsDroppedWorldEntity())
+			{
+				auto dropped_entity = reinterpret_cast<CBaseEntity*>(entity);
+
+				world_entity_info_t data;
+				data.m_vecOrigin = dropped_entity->m_pGameSceneNode()->m_vecOrigin();
+
+				entry_data.dropped_ent_info.push_back(data);
 			}
 		}
 
