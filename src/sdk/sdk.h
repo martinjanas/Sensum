@@ -17,6 +17,7 @@
 #include "../sdk/interfaces/CNetworkGameService.h"
 #include "../sdk/interfaces/CGameType.h"
 #include "../sdk/interfaces/CHudChat.h"
+#include "../sdk/interfaces/IVEngineCVar.h"
 #include "../sdk/math/Viewmatrix.h"
 
 namespace sdk
@@ -30,6 +31,7 @@ namespace sdk
 
 namespace interfaces //move to interfaces.h ?
 {
+	extern IVEngineCVar* cvar;
 	extern IVEngineClient* engine_client;
 	extern CSource2Client* client;
 	extern CSchemaSystem* schema_system;

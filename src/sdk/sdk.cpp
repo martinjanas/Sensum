@@ -108,6 +108,7 @@ namespace sdk
 		g::input_system = modules::input_sys.get_interface_from_list<CInputSystem*>("InputSystemVersion001");
 		g::network_game_service = modules::engine.get_interface_from_list<CNetworkGameService*>("NetworkClientService_001");
 		g::game_type = modules::matchmaking.get_interface_from_list<CGameType*>("GameTypes001");
+		g::cvar = modules::tier0.get_interface_from_list<IVEngineCVar*>("VEngineCvar007");
 
 		g::csgo_input = modules::client.get_sig_addr(FNV("g::csgo_input")).as<CSGOInput*>();
 		g::render_system = **modules::directx11.get_sig_addr(FNV("g::render_system")).as<CRenderSystem***>();
@@ -135,12 +136,14 @@ namespace sdk
 		print_status(g::engine_trace);
 		print_status(g::network_game_service);
 		print_status(g::game_rules);
+		print_status(g::cvar);
 		//print_status(g::hud_chat);
 	}
 }
 
 namespace interfaces
 {
+	IVEngineCVar* cvar{};
 	IVEngineClient* engine_client{};
 	CSource2Client* client{};
 	CSchemaSystem* schema_system{};

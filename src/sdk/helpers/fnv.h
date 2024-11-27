@@ -88,6 +88,13 @@ namespace detail
 
 			return result;
 		}
+
+		static auto constexpr __forceinline to_hash(const char* str) -> hash
+		{
+			using fnv = ::detail::fnv_hash<sizeof(void*) * 8>;
+
+			return fnv::hash_runtime(str);
+		}
 	};
 }
 

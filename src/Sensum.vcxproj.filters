@@ -228,6 +228,8 @@
     <ClInclude Include="sdk\interfaces\CHudChat.h" />
     <ClInclude Include="sdk\classes\GameTick_t.h" />
     <ClInclude Include="sdk\classes\CGrenadeProjectile.h" />
+    <ClInclude Include="sdk\interfaces\IVEngineCVar.h" />
+    <ClInclude Include="sdk\helpers\CUtlLinkedList.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\classes\CBaseEntity.cpp">
