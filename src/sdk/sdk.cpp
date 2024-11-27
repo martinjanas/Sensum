@@ -10,15 +10,13 @@
 void print_status(const char* name, void* ptr)
 {
 	auto remove_leading_zeros = [](const std::string& input) -> std::string
-		{
-			size_t start = input.find_first_not_of("0x");
-			if (start != std::string::npos)
-			{
-				return "0x" + input.substr(start);
-			}
+	{
+		size_t start = input.find_first_not_of("0x");
+		if (start != std::string::npos)
+			return "0x" + input.substr(start);
 
-			return "0x0";
-		};
+		return "0x0";
+	};
 
 	std::string ptr_str = std::format("{:p}", ptr);
 

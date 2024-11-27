@@ -230,6 +230,9 @@
     <ClInclude Include="sdk\classes\CGrenadeProjectile.h" />
     <ClInclude Include="sdk\interfaces\IVEngineCVar.h" />
     <ClInclude Include="sdk\helpers\CUtlLinkedList.h" />
+    <ClInclude Include="sdk\helpers\json.hpp" />
+    <ClInclude Include="sdk\helpers\json_fwd.hpp" />
+    <ClInclude Include="sdk\helpers\config_system.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\classes\CBaseEntity.cpp">
@@ -334,6 +337,7 @@
     <ClCompile Include="sdk\interfaces\ClientModeCSNormal.h" />
     <ClCompile Include="features\bhop.cpp" />
     <ClCompile Include="sdk\classes\CPlantedC4.h" />
+    <ClCompile Include="sdk\helpers\config_system.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\freetype.lib" />
