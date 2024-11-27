@@ -1,27 +1,46 @@
 #include "ShadowVMT.h"
 
-ShadowVMT::ShadowVMT(void* object)
-	: m_ptr_object(object), m_ptr_object_vtable(*reinterpret_cast<uintptr_t**>(object)), m_object_vtable_size(0), m_ptr_object_fake_vtable(nullptr) {
-	// Calculate the VMT Size
-	m_object_vtable_size = GetVTableSize();
+ShadowVMT::ShadowVMT(void* interface_obj)
+{
+	m_pInterfaceObj = interface_obj;
+	m_pOriginalVtable = *static_cast<uintptr_t**>(m_pInterfaceObj);
 
-	// Create the Fake VMT
-	m_ptr_object_fake_vtable = new uintptr_t[m_object_vtable_size];
+	m_nVtableSize = get_vtable_size();
 
-	// Fill the Fake Virtual Method Table with the Function Pointers from Original
-	for (size_t i = 0; i < m_object_vtable_size; ++i)
-		m_ptr_object_fake_vtable[i] = m_ptr_object_vtable[i];
+	m_pFakeVtable = new uintptr_t[m_nVtableSize];
+	for (size_t i = 0; i < m_nVtableSize; i++)
+		m_pFakeVtable[i] = m_pOriginalVtable[i];
 
-	// Swap VTable Pointer
-	*reinterpret_cast<uintptr_t**>(m_ptr_object) = m_ptr_object_fake_vtable;
+	*static_cast<uintptr_t**>(m_pInterfaceObj) = m_pFakeVtable;
 }
 
-size_t ShadowVMT::GetVTableSize()
+bool ShadowVMT::apply(uint32_t index, uintptr_t* hook_func, void** original_fn)
 {
-	MEMORY_BASIC_INFORMATION mbi{};
+	//Get the pointer to original fn
+	*original_fn = reinterpret_cast<void*>(m_pOriginalVtable[index]);
 
+	// Replace the function pointer in the fake VMT with the hook function
+	m_pFakeVtable[index] = reinterpret_cast<uintptr_t>(hook_func);
+
+	return true;
+}
+
+bool ShadowVMT::restore_vtable()
+{
+	*static_cast<uintptr_t**>(m_pInterfaceObj) = m_pOriginalVtable;
+
+	delete[] m_pFakeVtable;
+	m_pFakeVtable = nullptr;
+
+	return true;
+}
+
+size_t ShadowVMT::get_vtable_size()
+{
 	size_t size = 0;
-	while (LI_FN(VirtualQuery).cached()(reinterpret_cast<const void*>(this->m_ptr_object_vtable[size]), &mbi, sizeof(mbi)))
+	MEMORY_BASIC_INFORMATION mbi{};
+	const DWORD PAGE_EXECUTABLE = (PAGE_EXECUTE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY);
+	while (LI_FN(VirtualQuery).cached()(reinterpret_cast<const void*>(this->m_pOriginalVtable[size]), &mbi, sizeof(mbi)))
 	{
 		if (mbi.State != MEM_COMMIT)
 			break;
@@ -36,25 +55,4 @@ size_t ShadowVMT::GetVTableSize()
 	}
 
 	return size;
-}
-
-bool ShadowVMT::Apply(int index, uintptr_t* hook_function, void** original_fn) 
-{
-	// Get the Pointer to Original Func
-	*original_fn = reinterpret_cast<void*>(m_ptr_object_fake_vtable[index]);
-
-	// Swap pointer to Original Function to Hook Function Pointer
-	*reinterpret_cast<uintptr_t**>(&m_ptr_object_fake_vtable[index]) = hook_function;
-
-	// Insert the hook function to the list
-	m_object_hooks[index] = *(uintptr_t**)*original_fn;
-
-	return true;
-}
-
-void ShadowVMT::RestoreTable()
-{
-	// Restore the original VMT pointer
-	*reinterpret_cast<uintptr_t**>(m_ptr_object) = m_ptr_object_vtable;
-	delete[] m_ptr_object_fake_vtable;
 }

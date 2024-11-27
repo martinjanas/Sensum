@@ -130,23 +130,6 @@ namespace features
             return fov;
         }
 
-        Vector angle_to_pixel(const QAngle& aimAngle, const QAngle& currentAngle, int screenWidth, int screenHeight)
-        {
-            auto delta = aimAngle - currentAngle;
-            delta.normalize_clamp();
-
-            // Map delta angles to pixel coordinates on the screen
-            float screenX = (-delta.yaw / 360.0f) * screenWidth; // Map yaw to [0, screenWidth]
-            float screenY = (delta.pitch / 90.0f) * screenHeight; // Map pitch to [0, screenHeight]
-
-            return Vector(screenX, screenY, 0.f);
-        }
-
-        void move_mouse(int screenX, int screenY) 
-        {
-            mouse_event(MOUSEEVENTF_MOVE, screenX, screenY, 0, 0);
-        }
-
         void smooth(float amount, const QAngle& current_angles, const QAngle& aim_angles, QAngle& out_angles)
         {
             float smoothing_factor = amount;
@@ -228,7 +211,7 @@ namespace features
                 smooth(1.1f, viewangles, compensated_angle, output);
 
                 g::client->SetViewAngles(output);
-
+                
                 last_punch = current_punch;
             }
             else

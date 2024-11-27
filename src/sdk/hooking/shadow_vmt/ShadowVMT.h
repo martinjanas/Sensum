@@ -5,23 +5,20 @@
 #include "../../helpers/importer.h"
 #include <unordered_map>
 
-#define PAGE_EXECUTABLE ( PAGE_EXECUTE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY )
-
-class ShadowVMT 
+class ShadowVMT
 {
 public:
-	ShadowVMT(void* object);
-	ShadowVMT() {};
+	ShadowVMT(void* inteface_obj);
+	ShadowVMT() = default;
 
-	bool Apply(int index, uintptr_t* hook_function, void** original_fn);
-	void RestoreTable();
+	bool apply(uint32_t index, uintptr_t* hook_func, void** original_fn);
+	bool restore_vtable();
 
 private:
-	void* m_ptr_object;
-	uintptr_t* m_ptr_object_vtable;
-	size_t m_object_vtable_size;
-	uintptr_t* m_ptr_object_fake_vtable;
-	std::unordered_map<int, uintptr_t*> m_object_hooks;
+	void* m_pInterfaceObj;
+	uintptr_t* m_pOriginalVtable;
+	uintptr_t* m_pFakeVtable;
+	size_t m_nVtableSize;
 
-	size_t GetVTableSize();
+	size_t get_vtable_size();
 };
