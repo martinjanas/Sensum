@@ -4,6 +4,7 @@
 #include "../render/imgui_custom.h"
 
 #include "../settings/settings.h"
+#include "../sdk/helpers/config_system.h"
 
 
 void ShowMultiSelectPopup(const char* label, int& current, const std::vector<std::string>& items) {
@@ -72,6 +73,12 @@ void draw_menu_debug()
 
 	ImGui::Checkbox("Bhop", &settings::misc::bhop);
 	ImGui::Checkbox("Fov changer", &settings::misc::fov_changer);
+
+	if (ImGui::Button("Save config"))
+		config_system::save();
+
+	if (ImGui::Button("Load config"))
+		config_system::load();
 
 	if (settings::misc::fov_changer)
 		ImGui::SliderInt("Fov slider", &settings::misc::fov, 10, 200);

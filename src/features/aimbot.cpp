@@ -15,6 +15,7 @@ namespace features
         std::list<entity_data::player_data_t> m_player_data;
 
         static QAngle last_punch = { 0.f, 0.f, 0.f };
+        settings::aimbot::weapon_config_t weapon_config;
 
         //Add hitbox target priority?
         std::unordered_set<int> GetTargetHitboxes(const entity_data::player_data_t& data) 
@@ -22,7 +23,7 @@ namespace features
             static std::unordered_set<int> list;
             static int previous_hitbox_value = -1;
 
-            int current_hitbox_value = settings::aimbot::hitboxes;
+            int current_hitbox_value = weapon_config.hitboxes;
 
             if (current_hitbox_value != previous_hitbox_value)
             {
@@ -295,6 +296,36 @@ namespace features
             if (!localpawn)
                 return;
 
+            const auto& active_wpn_handle = localpawn->m_pWeaponServices()->m_hActiveWeapon();
+            if (!active_wpn_handle.IsValid())
+                return;
+
+            auto active_wpn = reinterpret_cast<CBasePlayerWeapon*>(g::entity_system->GetEntityFromHandle(active_wpn_handle));
+            if (!active_wpn)
+                return;
+
+            const auto& wep_data = active_wpn->m_pWpnData();
+            if (!wep_data)
+                return;
+
+            int index = active_wpn->m_iItemDefinitionIndex();
+
+            weapon_config = settings::aimbot::weapon_configs[index];
+
+            if (index == WEAPON_AK47)
+            {
+                weapon_config.fov = 60.f;
+                weapon_config.smooth = 1.f;
+                weapon_config.smooth_mode = 0;
+            }
+            
+            if (index == WEAPON_M4A1_S)
+            {
+                weapon_config.fov = 20.f;
+                weapon_config.smooth = 3.5f;
+                weapon_config.smooth_mode = 1;
+            }
+
             const auto& eye_pos = localpawn->GetEyePos();
             for (auto& data : m_player_data)
             {
@@ -343,18 +374,6 @@ namespace features
                     if (!(cmd->nButtons.nValue & IN_ATTACK))
                         continue;
 
-                    const auto& active_wpn_handle = localpawn->m_pWeaponServices()->m_hActiveWeapon();
-                    if (!active_wpn_handle.IsValid())
-                        continue;
-
-                    auto active_wpn = reinterpret_cast<CBasePlayerWeapon*>(g::entity_system->GetEntityFromHandle(active_wpn_handle));
-                    if (!active_wpn)
-                        continue;
-
-                    const auto& wep_data = active_wpn->m_pWpnData();
-                    if (!wep_data)
-                        continue;
-
                     if (!is_weapon_valid(active_wpn))
                         continue;
 
@@ -371,14 +390,14 @@ namespace features
 
                     //printf("[%s: %s]: fov: %.1f, best_fov: %.1f, dist: %.1f\n", data.m_szPlayerName, hitbox_index_to_name(hitbox_data->index), fov, best_fov, distance);
 
-                    if (best_fov > settings::aimbot::fov)
+                    if (best_fov > weapon_config.fov)
                         continue;
 
                     QAngle output;
-                    if (settings::aimbot::smooth_mode == 0)
-                        smooth(settings::aimbot::smooth, viewangles, best_angle, output);
-                    else if (settings::aimbot::smooth_mode == 1)
-                        smooth_constant(settings::aimbot::smooth, viewangles, best_angle, output);
+                    if (weapon_config.smooth_mode == 0)
+                        smooth(weapon_config.smooth, viewangles, best_angle, output);
+                    else if (weapon_config.smooth_mode == 1)
+                        smooth_constant(weapon_config.smooth, viewangles, best_angle, output);
 
                     g::client->SetViewAngles(output);
                 }

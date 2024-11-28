@@ -1,5 +1,15 @@
 #pragma once
 #include "../thirdparty/ImGui/imgui.h"
+#include <map>
+
+enum ETargetSelection
+{
+	TARGET_HEAD = (1 << 0),
+	TARGET_CHEST = (1 << 1),
+	TARGET_ARMS = (1 << 2),
+	TARGET_LEGS = (1 << 3),
+	TARGET_NEAREST_IN_AIR = (1 << 4)
+};
 
 namespace settings
 {
@@ -11,6 +21,25 @@ namespace settings
 		extern float smooth;
 		extern float pitch;
 		extern float yaw;
+
+		struct weapon_config_t
+		{
+			bool enabled = true;
+			bool nearest_hitbox_in_air_override = true;
+			float fov = 20.f;
+			float smooth = 3.5f;
+			int smooth_mode = 1;
+			int hitboxes = TARGET_HEAD | TARGET_CHEST;
+
+			struct
+			{
+				bool enabled = true;
+				float pitch = 1.5f;
+				float yaw = 1.5f;
+			} recoil;
+		};
+
+		extern std::map<int, weapon_config_t> weapon_configs;
 	}
 
 	namespace misc

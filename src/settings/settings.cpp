@@ -1,5 +1,4 @@
 #include "../settings/settings.h"
-#include "../features/features.h"
 
 namespace settings
 {
@@ -11,6 +10,8 @@ namespace settings
 		float smooth = 3.5f;
 		float pitch = 1.5f;
 		float yaw = 1.5f;
+
+		std::map<int, weapon_config_t> weapon_configs;
 	}
 
 	namespace misc
