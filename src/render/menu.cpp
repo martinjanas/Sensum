@@ -5,6 +5,10 @@
 
 #include "../settings/settings.h"
 #include "../sdk/helpers/config_system.h"
+#include "../sdk/classes/CCSPlayerController.h"
+#include "../sdk/classes/CCSPlayerPawn.h"
+#include "../sdk/classes/CBasePlayerWeapon.h"
+#include "../sdk/sdk.h"
 
 
 void ShowMultiSelectPopup(const char* label, int& current, const std::vector<std::string>& items) {
@@ -48,9 +52,35 @@ void ShowMultiSelectPopup(const char* label, int& current, const std::vector<std
 	}
 }
 
+void get_def_index(int& index)
+{
+	CCSPlayerController* localplayer = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
+	if (!localplayer)
+		return;
+
+	CCSPlayerPawn* localpawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(localplayer->m_hPlayerPawn());  //localplayer->m_hPlayerPawn().Get<CCSPlayerPawn*>();
+	if (!localpawn)
+		return;
+
+	const auto& active_wpn_handle = localpawn->m_pWeaponServices()->m_hActiveWeapon();
+	if (!active_wpn_handle.IsValid())
+		return;
+
+	auto active_wpn = reinterpret_cast<CBasePlayerWeapon*>(g::entity_system->GetEntityFromHandle(active_wpn_handle));
+	if (!active_wpn)
+		return;
+
+	const auto& wep_data = active_wpn->m_pWpnData();
+	if (!wep_data)
+		return;
+
+	index = active_wpn->m_iItemDefinitionIndex();
+}
+
 void draw_menu_debug()
 {
 	static std::vector<std::string> hitbox_items = { "Head", "Chest", "Arms", "Legs", "Nearest In Air" };
+	static const char* items[] = { "Linear", "Constant" };
 
 	ImGui::PushFont(render::fonts::selector);
 	ImGui::Checkbox("Visible Only", &settings::esp::visible_only);
@@ -63,13 +93,22 @@ void draw_menu_debug()
 	ImGui::Checkbox("Bone esp", &settings::esp::bone_esp); ImGui::SameLine();
 	ImGui::ColorEdit3("###bonecolor", (float*)&settings::esp::bone_clr, ImGuiColorEditFlags_NoInputs);
 
-	ImGui::SliderInt("Aimbot FOV", &settings::aimbot::fov, 0, 180);
+	{
+		static int definition_index = 7;
 
-	ShowMultiSelectPopup("Hitboxes", settings::aimbot::hitboxes, hitbox_items);
-	ImGui::SliderFloat("###AimbotSmooth", &settings::aimbot::smooth, 1.f, 10.f, "Smooth: %.1f");
-	
-	ImGui::SliderFloat("Recoil Pitch", &settings::aimbot::pitch, 0.f, 2.f, "Recoil Pitch: %.1f");
-	ImGui::SliderFloat("Recoil Yaw", &settings::aimbot::yaw, 0.f, 2.f, "Recoil Yaw: %.1f");
+		get_def_index(definition_index);
+
+		auto settings = &settings::aimbot::weapon_configs[definition_index];
+
+		ImGui::SliderFloat("Aimbot FOV", &settings->fov, 0, 180, "%.1f");
+
+		ShowMultiSelectPopup("Hitboxes", settings->hitboxes, hitbox_items);
+		ImGui::SliderFloat("###AimbotSmooth", &settings->smooth, 1.f, 10.f, "Smooth: %.1f");
+		imc::selector("Smoothing Mode", items, 2, &settings->smooth_mode);
+
+		ImGui::SliderFloat("Recoil Pitch", &settings->recoil.pitch, 0.f, 2.f, "Recoil Pitch: %.1f");
+		ImGui::SliderFloat("Recoil Yaw", &settings->recoil.yaw, 0.f, 2.f, "Recoil Yaw: %.1f");
+	}
 
 	ImGui::Checkbox("Bhop", &settings::misc::bhop);
 	ImGui::Checkbox("Fov changer", &settings::misc::fov_changer);
@@ -165,7 +204,7 @@ namespace menu
 
 					if (current_tab == 0)
 					{
-						imc::selector("Smoothing Mode", items, 2, &settings::aimbot::smooth_mode);
+						//imc::selector("Smoothing Mode", items, 2, &settings::aimbot::smooth_mode);
 					}
 					else if (current_tab == 1)
 						imgui::GetForegroundDrawList()->AddText(window_center, IM_COL32_WHITE, "Visuals Tab");

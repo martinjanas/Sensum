@@ -6,7 +6,7 @@ namespace config_system
 {
 	void load_weapon_configs(nlohmann::ordered_json& config)
 	{
-		if (config.contains("Legitbot"))
+		if (!config.contains("Legitbot"))
 			return;
 
 		settings::aimbot::weapon_config_t weapon_config;
