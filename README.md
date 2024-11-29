@@ -1,5 +1,5 @@
 # Sensum - Internal legit cheat for Counter Strike 2 (WIP)<br>
-***Copyright © Martin Janás***
+***Copyright © Martin Janás***<br>**GitHub:** [github.com/martinjanas](https://github.com/martinjanas)
 
 ***This work is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0)***.<br> 
 ***You can view the full license text [here](https://github.com/martinjanas/Sensum/blob/master/LICENSE).***<br>
@@ -12,9 +12,6 @@
 * **Commercial Use**: You cannot use, distribute, or create derivative works from this project for commercial purposes or financial gain.
 * **Imply Endorsement**: You cannot imply or suggest that the project creator endorses your use or any derivative work you create.
 * **Apply Additional Restrictions**: You cannot impose legal or technological measures that restrict others from using the project under the terms of this license.
-
-**Author:** Martin Janás<br> 
-**GitHub:** [github.com/martinjanas](https://github.com/martinjanas)
 
 ---
 
