@@ -35,7 +35,7 @@ namespace config_system
 
 	void save_weapon_configs(nlohmann::ordered_json& config)
 	{
-		for (const auto& data : settings::aimbot::weapon_configs) //saves null when saving in the menu/saves only m_hActiveWeapon guns
+		for (const auto& data : settings::aimbot::weapon_configs)
 		{
 			const auto& weapon_name = weapon_names[data.first];
 			if (weapon_name.empty())

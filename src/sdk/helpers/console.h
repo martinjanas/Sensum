@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <fstream>
 #include <list>
+#include <memory>
 
 enum ELogLevel
 {
@@ -80,6 +81,6 @@ private:
 
     std::list<std::string> log_data;
 };
-extern inline Console* g_Console = nullptr;
+extern inline std::unique_ptr<Console> g_Console = nullptr;
 
 

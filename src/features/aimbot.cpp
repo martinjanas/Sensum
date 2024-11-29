@@ -312,20 +312,6 @@ namespace features
 
             weapon_config = settings::aimbot::weapon_configs[index];
 
-            if (index == WEAPON_AK47)
-            {
-                weapon_config.fov = 60.f;
-                weapon_config.smooth = 1.f;
-                weapon_config.smooth_mode = 0;
-            }
-            
-            if (index == WEAPON_M4A1_S)
-            {
-                weapon_config.fov = 20.f;
-                weapon_config.smooth = 3.5f;
-                weapon_config.smooth_mode = 1;
-            }
-
             const auto& eye_pos = localpawn->GetEyePos();
             for (auto& data : m_player_data)
             {

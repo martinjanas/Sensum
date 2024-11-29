@@ -8,7 +8,10 @@ DWORD __stdcall on_attach(void* base)
 {
     //Sleep(5000);
 
-    g_Console = new Console();
+    if (!modules::nav_system.base)
+        Sleep(50);
+
+    g_Console = std::make_unique<Console>();
     g_Console->attach();
 
     sdk::init_modules();
@@ -17,17 +20,12 @@ DWORD __stdcall on_attach(void* base)
     netvars::init();
     hooks::init();
 
-    //MJ: TODO: Implement getting localplayer by sig, probably use dwPlayerController, since every player is controller
-    //Also implement team & entity == localplayer check in esp
-
     while (!globals::can_unhook)
         Sleep(50);
 
     hooks::detach();
     g_Console->detach();
 
-    delete g_Console;
-    
     FreeLibraryAndExitThread(static_cast<HMODULE>(base), EXIT_SUCCESS);
 
     return TRUE;
@@ -35,14 +33,15 @@ DWORD __stdcall on_attach(void* base)
 
 BOOL APIENTRY DllMain(HMODULE module, DWORD reason, void* reserved)
 {
-    if (reason != DLL_PROCESS_ATTACH)
-        return false;
-    
-    DisableThreadLibraryCalls(module);
+    if (reason == DLL_PROCESS_ATTACH)
+    {
+        DisableThreadLibraryCalls(module);
 
-    auto thread = LI_FN(CreateThread)(nullptr, 0, on_attach, module, 0, nullptr);
-    if (thread)
-        LI_FN(CloseHandle)(thread);
+        auto thread = LI_FN(CreateThread)(nullptr, 0, on_attach, module, 0, nullptr);
+        if (thread)
+            LI_FN(CloseHandle)(thread);
+    }
+
 
     return TRUE;
 }
