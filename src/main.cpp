@@ -44,8 +44,7 @@ BOOL APIENTRY DllMain(HMODULE module, DWORD reason, void* reserved)
         if (thread)
             LI_FN(CloseHandle)(thread);
     }
-
-
+      
     return TRUE;
 }
 

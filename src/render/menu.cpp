@@ -191,7 +191,7 @@ namespace menu
 			imgui::BeginChild("##tabscontent", { 0, 0 }, false, ImGuiWindowFlags_AlwaysUseWindowPadding);
 			{
 				// Start a table with 3 columns and optional flags
-				ImGui::BeginTable("##tabs_table", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable);
+				if (ImGui::BeginTable("##tabs_table", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable))
 				{
 					// Column 1
 					ImGui::TableNextColumn();
@@ -219,8 +219,8 @@ namespace menu
 						imgui::GetForegroundDrawList()->AddText(window_center, IM_COL32_WHITE, "Skins Tab");
 
 					// Add more columns as needed
+					ImGui::EndTable();
 				}
-				ImGui::EndTable();
 			}
 			imgui::EndChild();
 		}
