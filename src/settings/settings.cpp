@@ -4,13 +4,6 @@ namespace settings
 {
 	namespace aimbot
 	{
-		int fov = 20;
-		int hitboxes = TARGET_HEAD | TARGET_CHEST;
-		int smooth_mode = 1;
-		float smooth = 3.5f;
-		float pitch = 1.5f;
-		float yaw = 1.5f;
-
 		std::map<int, weapon_config_t> weapon_configs;
 	}
 

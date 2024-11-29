@@ -13,15 +13,8 @@ enum ETargetSelection
 
 namespace settings
 {
-	namespace aimbot //just for now, gonna move to weapon based settings later
+	namespace aimbot
 	{
-		extern int fov;
-		extern int hitboxes;
-		extern int smooth_mode;
-		extern float smooth;
-		extern float pitch;
-		extern float yaw;
-
 		struct weapon_config_t
 		{
 			bool enabled = true;

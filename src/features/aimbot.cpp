@@ -194,15 +194,15 @@ namespace features
                 return;
 
             QAngle current_punch = punch_cache[punch_cache.Count() - 1];
-            current_punch.pitch *= settings::aimbot::pitch;
-            current_punch.yaw *= settings::aimbot::yaw;
+            current_punch.pitch *= weapon_config.recoil.pitch;
+            current_punch.yaw *= weapon_config.recoil.yaw;
             current_punch.normalize_clamp();
 
             if (localpawn->m_iShotsFired() > 1 && g::input_system->IsButtonDown(ButtonCode::MouseLeft))
             {
                 QAngle recoil_delta = current_punch - last_punch;
-                recoil_delta.pitch *= settings::aimbot::pitch;
-                recoil_delta.yaw *= settings::aimbot::yaw;
+                recoil_delta.pitch *= weapon_config.recoil.pitch;
+                recoil_delta.yaw *= weapon_config.recoil.yaw;
                 recoil_delta.normalize_clamp();
 
                 QAngle compensated_angle = viewangles - recoil_delta;
