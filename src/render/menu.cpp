@@ -104,7 +104,7 @@ void draw_menu_debug()
 
 		ShowMultiSelectPopup("Hitboxes", settings->hitboxes, hitbox_items);
 		ImGui::SliderFloat("###AimbotSmooth", &settings->smooth, 1.f, 10.f, "Smooth: %.1f");
-		imc::selector("Smoothing Mode", items, 2, &settings->smooth_mode);
+		imc::Selector("Smoothing Mode", items, 2, &settings->smooth_mode);
 
 		ImGui::SliderFloat("Recoil Pitch", &settings->recoil.pitch, 0.f, 2.f, "Recoil Pitch: %.1f");
 		ImGui::SliderFloat("Recoil Yaw", &settings->recoil.yaw, 0.f, 2.f, "Recoil Yaw: %.1f");
@@ -172,11 +172,9 @@ namespace menu
 		draw_background();
 
 		auto* style = &ImGui::GetStyle();
-
 		const auto old_alpha = style->Alpha;
-		
-		ImGui::GetStyle().Alpha = window_alpha;
 
+		ImGui::GetStyle().Alpha = window_alpha;
 		static auto window_pos_center = ImVec2(window_center.x - (window_size.x / 2.f), window_center.y - (window_size.y / 2.f));
 
 		ImGui::SetNextWindowPos(window_pos_center, ImGuiCond_Once);
@@ -188,36 +186,41 @@ namespace menu
 		ImGui::Begin("Sensum", nullptr, flags);
 		{
 			render_header();
-
 			style->WindowPadding = old_window_padding;
 
 			imgui::BeginChild("##tabscontent", { 0, 0 }, false, ImGuiWindowFlags_AlwaysUseWindowPadding);
 			{
-				imgui::Columns(3, nullptr, false);
+				// Start a table with 3 columns and optional flags
+				ImGui::BeginTable("##tabs_table", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable);
 				{
-					static const char* items[] = { "Linear", "Constant" };
+					// Column 1
+					ImGui::TableNextColumn();
 
 					if (was_logo_pressed)
 					{
 						draw_menu_debug();
 					}
 
+
 					if (current_tab == 0)
 					{
-						//imc::selector("Smoothing Mode", items, 2, &settings::aimbot::smooth_mode);
 					}
 					else if (current_tab == 1)
 						imgui::GetForegroundDrawList()->AddText(window_center, IM_COL32_WHITE, "Visuals Tab");
-					else if (current_tab == 2)
+
+					// Column 2
+					ImGui::TableNextColumn();
+					if (current_tab == 2)
 						imgui::GetForegroundDrawList()->AddText(window_center, IM_COL32_WHITE, "Misc Tab");
-					else if (current_tab == 3)
+
+					// Column 3
+					ImGui::TableNextColumn();
+					if (current_tab == 3)
 						imgui::GetForegroundDrawList()->AddText(window_center, IM_COL32_WHITE, "Skins Tab");
-					else if (current_tab == 4)
-						imgui::GetForegroundDrawList()->AddText(window_center, IM_COL32_WHITE, "Players Tab");
-					else if (current_tab == 5)
-						imgui::GetForegroundDrawList()->AddText(window_center, IM_COL32_WHITE, "Config Tab");
+
+					// Add more columns as needed
 				}
-				imgui::Columns(1);
+				ImGui::EndTable();
 			}
 			imgui::EndChild();
 		}
