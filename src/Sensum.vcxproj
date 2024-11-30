@@ -169,6 +169,7 @@
     <ClInclude Include="sdk\helpers\entity_data.h" />
     <ClInclude Include="sdk\helpers\Hitbox_t.h" />
     <ClInclude Include="sdk\helpers\matrix.h" />
+    <ClInclude Include="sdk\helpers\ScopedTimer.h" />
     <ClInclude Include="sdk\hooking\safetyhook\safetyhook.hpp" />
     <ClInclude Include="sdk\hooking\safetyhook\Zydis.h" />
     <ClInclude Include="sdk\interfaces\CGameRules.h" />
@@ -222,6 +223,7 @@
     <ClInclude Include="thirdparty\ImGui\imstb_rectpack.h" />
     <ClInclude Include="thirdparty\ImGui\imstb_textedit.h" />
     <ClInclude Include="thirdparty\ImGui\imstb_truetype.h" />
+    <ClInclude Include="sdk\helpers\utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\helpers\config_system.cpp" />
@@ -275,6 +277,7 @@
     <ClCompile Include="thirdparty\ImGui\imgui_freetype.cpp" />
     <ClCompile Include="thirdparty\ImGui\imgui_tables.cpp" />
     <ClCompile Include="thirdparty\ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="sdk\helpers\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\freetype.lib" />

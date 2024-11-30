@@ -7,6 +7,7 @@
 #include "../sdk/math/math.h"
 #include "../sdk/helpers/entity_data.h"
 #include "../sdk/sdk.h"
+#include "../sdk/helpers/utils.h"
 
 namespace features
 {
@@ -18,7 +19,7 @@ namespace features
         settings::aimbot::weapon_config_t weapon_config;
 
         //Add hitbox target priority?
-        std::unordered_set<int> GetTargetHitboxes(const entity_data::player_data_t& data) 
+        std::unordered_set<int> GetTargetHitboxes(const entity_data::player_data_t& data) //takes 1300 ns
         {
             static std::unordered_set<int> list;
             static int previous_hitbox_value = -1;
@@ -194,15 +195,13 @@ namespace features
                 return;
 
             QAngle current_punch = punch_cache[punch_cache.Count() - 1];
-            current_punch.pitch *= weapon_config.recoil.pitch;
-            current_punch.yaw *= weapon_config.recoil.yaw;
+            current_punch.pitch *= (weapon_config.recoil.pitch * 1.25f);
+            current_punch.yaw *= (weapon_config.recoil.yaw * 1.25f);
             current_punch.normalize_clamp();
 
             if (localpawn->m_iShotsFired() > 1 && g::input_system->IsButtonDown(ButtonCode::MouseLeft))
             {
                 QAngle recoil_delta = current_punch - last_punch;
-                recoil_delta.pitch *= weapon_config.recoil.pitch;
-                recoil_delta.yaw *= weapon_config.recoil.yaw;
                 recoil_delta.normalize_clamp();
 
                 QAngle compensated_angle = viewangles - recoil_delta;
@@ -212,60 +211,14 @@ namespace features
                 smooth(1.1f, viewangles, compensated_angle, output);
 
                 g::client->SetViewAngles(output);
-                
-                last_punch = current_punch;
             }
             else
             {
                 last_punch = { 0.0f, 0.0f, 0.f };
             }
+            last_punch = current_punch;
         }
         
-        const char* hitbox_index_to_name(int index) 
-        {
-            switch (index) 
-            {
-                case HITBOX_HEAD:            
-                    return "Head";
-                case HITBOX_NECK:            
-                    return "Neck";
-                case HITBOX_PELVIS:          
-                    return "Pelvis";
-                case HITBOX_BELLY:           
-                    return "Belly";
-                case HITBOX_THORAX:          
-                    return "Thorax";
-                case HITBOX_LOWER_CHEST:     
-                    return "Lower Chest";
-                case HITBOX_UPPER_CHEST:     
-                    return "Upper Chest";
-                case HITBOX_RIGHT_THIGH:      
-                    return "Right Thigh";
-                case HITBOX_LEFT_THIGH:       
-                    return "Left Thigh";
-                case HITBOX_RIGHT_CALF:       
-                    return "Right Calf";
-                case HITBOX_LEFT_CALF:        
-                    return "Left Calf";
-                case HITBOX_RIGHT_FOOT:       
-                    return "Right Foot";
-                case HITBOX_LEFT_FOOT:        
-                    return "Left Foot";
-                case HITBOX_RIGHT_HAND:       
-                    return "Right Hand";
-                case HITBOX_LEFT_HAND:        
-                    return "Left Hand";
-                case HITBOX_RIGHT_UPPER_ARM:  
-                    return "Right Upper Arm";
-                case HITBOX_RIGHT_FOREARM:    
-                    return "Right Forearm";
-                case HITBOX_LEFT_UPPER_ARM:   
-                    return "Left Upper Arm";
-                case HITBOX_LEFT_FOREARM:     
-                    return "Left Forearm";
-            }
-        }
-
         bool is_weapon_valid(CBasePlayerWeapon* weapon)
         {
             return !(weapon->IsKnife() || weapon->IsC4() || weapon->IsTaser() || weapon->IsGrenade() || weapon->IsHealthshot());
@@ -324,14 +277,14 @@ namespace features
                 if (data.hitboxes.empty())
                     continue;
 
+                const auto& hitbox_ids = GetTargetHitboxes(data);
+                if (hitbox_ids.empty())
+                    continue;
+
                 for (int i = 0; i < data.hitboxes.size(); i++)
                 {
                     auto* hitbox_data = &data.hitboxes[i];
                     if (!hitbox_data)
-                        continue;
-
-                    const auto& hitbox_ids = GetTargetHitboxes(data);
-                    if (hitbox_ids.empty())
                         continue;
 
                     if (hitbox_ids.find(hitbox_data->index) == hitbox_ids.end())
@@ -374,7 +327,7 @@ namespace features
                     if (next_attack_tick <= localplayer->m_nTickBase() && !active_wpn->IsSniper()) //temp fix
                         continue;
 
-                    //printf("[%s: %s]: fov: %.1f, best_fov: %.1f, dist: %.1f\n", data.m_szPlayerName, hitbox_index_to_name(hitbox_data->index), fov, best_fov, distance);
+                    //printf("[%s: %s]: fov: %.1f, best_fov: %.1f, dist: %.1f\n", data.m_szPlayerName, utils::hitbox_index_to_name(hitbox_data->index), fov, best_fov, distance);
 
                     if (best_fov > weapon_config.fov)
                         continue;

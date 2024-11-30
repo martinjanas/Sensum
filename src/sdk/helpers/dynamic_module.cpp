@@ -26,9 +26,11 @@ void DynamicModule::scan_and_cache_sig(const std::string_view& sig, const std::s
 {
 	const auto& hash = fnv::hash_runtime(sig_name.data());
 
+	auto scanned_result = scan(sig, sig_name);
+
 	if (abs)
-		sig_addr_cacher.cache_sig(hash, scan(sig, sig_name).add(offset).abs());
-	else sig_addr_cacher.cache_sig(hash, scan(sig, sig_name));
+		sig_addr_cacher.cache_sig(hash, scanned_result.add(offset).abs());
+	else sig_addr_cacher.cache_sig(hash, scanned_result);
 }
 
 PatternScanner& DynamicModule::get_sig_addr(const fnv::hash& hash, const char* func_name)

@@ -1,6 +1,7 @@
 #pragma once
 #include "../math/Vector.h"
 #include "../helpers/CUtlVector.h"
+#include "../helpers/netvars.h"
 
 enum EHitboxes
 {
