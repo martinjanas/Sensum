@@ -11,7 +11,7 @@ DWORD __stdcall on_attach(void* base)
 
     g_Console = std::make_unique<Console>();
     
-#ifdef _DEBUG
+#if defined(DEBUG) || defined(RELEASE_CONSOLE)
     g_Console->attach();
 #endif
 
@@ -26,9 +26,10 @@ DWORD __stdcall on_attach(void* base)
 
     hooks::detach();
 
-#ifdef _DEBUG
+#if defined(DEBUG) || defined(RELEASE_CONSOLE)
     g_Console->detach();
 #endif
+
     FreeLibraryAndExitThread(static_cast<HMODULE>(base), EXIT_SUCCESS);
 
     return TRUE;
