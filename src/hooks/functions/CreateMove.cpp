@@ -76,7 +76,7 @@ std::string* SetMessageData(void* move_crc, void* msg, void* nHasBits)
 
     auto set_message_data = reinterpret_cast<fn>(addr);
     if (set_message_data)
-        return set_message_data(move_crc, msg, nHasBits); //move_crc is bad
+        return set_message_data(move_crc, msg, nHasBits);
 }
 
 void* Alloc(std::size_t size)
@@ -103,7 +103,7 @@ void Free(const void* p)
         free(p);
 }
 
-bool CalculateCRC(CBaseUserCmdPB* base_cmd)
+bool CalculateCRC(CBaseUserCmdPB* base_cmd) //CCSGOUserCmdPB
 {
     CUtlBuffer buffer(0, 0, 0);
     auto crc_size = base_cmd->CalculateCmdCRCSize();
@@ -155,6 +155,9 @@ bool __fastcall hooks::createmove_csgoinput21::hooked(void* rcx, int slot, CUser
 
     if (cmd && cmd->csgoUserCmd.pBaseCmd)
     {
+        if (cmd->csgoUserCmd.pBaseCmd->pInButtonState->nValue & IN_JUMP)
+            g_Console->println("Jump");
+
         save_cmd(cmd);
         if (CalculateCRC(cmd->csgoUserCmd.pBaseCmd))
             apply_cmd(cmd);

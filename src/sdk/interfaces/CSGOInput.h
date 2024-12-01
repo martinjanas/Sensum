@@ -100,9 +100,12 @@ enum ECSGOUserCmdBits : std::uint32_t
 {
 	CSGOUSERCMD_BITS_BASECMD = 0x1U,
 	CSGOUSERCMD_BITS_LEFTHAND = 0x2U,
-	CSGOUSERCMD_BITS_ATTACK3START = 0x4U,
-	CSGOUSERCMD_BITS_ATTACK1START = 0x8U,
-	CSGOUSERCMD_BITS_ATTACK2START = 0x10U
+	CSGOUSERCMD_BITS_PREDICTING_BODY_SHOT = 0x4U,
+	CSGOUSERCMD_BITS_PREDICTING_HEAD_SHOT = 0x8U,
+	CSGOUSERCMD_BITS_PREDICTING_KILL_RAGDOLLS = 0x10U,
+	CSGOUSERCMD_BITS_ATTACK3START = 0x20U,
+	CSGOUSERCMD_BITS_ATTACK1START = 0x40U,
+	CSGOUSERCMD_BITS_ATTACK2START = 0x80U
 };
 
 template <typename T>
@@ -144,8 +147,8 @@ class CCSGOInterpolationInfoPB : public CBasePB
 {
 public:
 	float flFraction; // 0x18
-	int nSrcTick; // 0x1C
-	int nDstTick; // 0x20
+	//int nSrcTick; // 0x1C
+	//int nDstTick; // 0x20
 };
 
 class CCSGOInputHistoryEntryPB : public CBasePB
@@ -189,7 +192,7 @@ class CBaseUserCmdPB : public CBasePB
 {
 public:
 	RepeatedPtrField_t<CSubtickMoveStep> subtickMovesField; //0x18
-	std::string* strMoveCrc; //0x20
+	std::string* strMoveCrc; //0x30
 	CInButtonStatePB* pInButtonState; //0x38
 	CMsgQAngle* pViewAngles;
 	std::int32_t nLegacyCommandNumber;
@@ -221,6 +224,9 @@ public:
 	RepeatedPtrField_t<CCSGOInputHistoryEntryPB> inputHistoryField; //0xC
 	CBaseUserCmdPB* pBaseCmd; //0x14 //0x40
 	bool bLeftHandDesired; //0x1C
+	bool bIsPredictingBodyShotFX;
+	bool bIsPredictingHeadShotFX;
+	bool bIsPredictingKillRagdolls;
 	std::int32_t nAttack3StartHistoryIndex; //0x20
 	std::int32_t nAttack1StartHistoryIndex; //0x24
 	std::int32_t nAttack2StartHistoryIndex; //0x28
@@ -282,56 +288,34 @@ public:
 	}
 };
 
-class CTinyMoveStepData
-{
-public:
-	float flWhen; //0x0000
-	std::byte pad01[0x4];
-	std::uint64_t nButton; //0x0008
-	bool bPressed; //0x0010
-	std::byte pad02[0x7];
-}; //Size: 0x0018
-
-class CMoveStepButtons
-{
-public:
-	std::uint64_t nKeyboardPressed; //0x0000
-	std::uint64_t nMouseWheelheelPressed; //0x0008
-	std::uint64_t nUnPressed; //0x0010
-	std::uint64_t nKeyboardCopy; //0x0018
-}; //Size: 0x0020
-
-// @credits: www.unknowncheats.me/forum/members/2943409.html
-class CExtendedMoveData : public CMoveStepButtons
-{
-public:
-	float flForwardMove; //0x0020
-	float flSideMove; //0x0024
-	float flUpMove; //0x0028
-	std::int32_t nMouseDeltaX; //0x002C
-	std::int32_t nMouseDeltaY; //0x0030
-	std::int32_t nAdditionalStepMovesCount; //0x0034
-	CTinyMoveStepData tinyMoveStepData[12]; //0x0038
-	QAngle vecViewAngle; //0x0158
-	std::int32_t nTargetHandle; //0x0164
-}; //Size:0x0168
-
 class CSGOInput
 {
 public:
-	std::byte pad01[0x1];
-	bool bInThirdPerson;
-	std::byte pad02[0x6];
-	QAngle angThirdPersonAngles;
-	std::byte pad03[0x10];
-	std::int32_t nSequenceNumber;
-	double m_dbSomeTimer;
-	CExtendedMoveData currentMoveData;
-	std::int32_t nWeaponSwitchTick;
-	std::byte pad04[0x1C4];
-	CExtendedMoveData* pExtendedMoveData;
-	std::byte pad05[0x48];
-	int32_t nAttackStartHistoryIndex1;
-	int32_t nAttackStartHistoryIndex2;
-	int32_t nAttackStartHistoryIndex3;
+	char pad_0000[0x250]; //0x0000
+	bool block_shot; //0x0250
+	bool in_thirdperson; //0x0251
+	char pad_0252[0x6]; //0x0252
+	Vector third_person_angles; //0x0258
+	char pad_0264[0x14]; //0x0264
+	uint64_t button_pressed; //0x0278
+	uint64_t mouse_button_pressed; //0x0280
+	uint64_t button_un_pressed; //0x0288
+	uint64_t keyboard_copy; //0x0290
+	float forward_move; //0x0298
+	float left_move; //0x029C
+	float up_move; //0x02A0
+	int mouse_delta_x;
+	int mouse_delta_y;
+	int32_t subtick_count; //0x02AC
+	void* subticks[0xC];//c_subtick_input subticks[12]; //0x02B0
+	Vector view_angles; //0x03D0
+	int32_t target_entity_index; //0x03DC
+	char pad_03E0[0x230]; //0x03E0
+	int32_t attack_history_1; //0x0610
+	int32_t attack_history_2; //0x0614
+	int32_t attack_history_3; //0x0618
+	char pad_061C[0x4]; //0x061C
+	int32_t message_size; //0x0620
+	char pad_0624[0x4]; //0x0624
+	void* message;//c_cs_input_message* message; //0x0628
 };
