@@ -9,9 +9,17 @@
 * **Adapt**: You can remix, transform, and build upon the project for non-commercial purposes.
 
 ***This license doesn't allow you to:***
-* **Commercial Use**: You cannot use, distribute, or create derivative works from this project for commercial purposes or financial gain.
+* **Commercial Use**: You cannot use or distribute this project for commercial purposes or financial gain.
 * **Imply Endorsement**: You cannot imply or suggest that the project creator endorses your use or any derivative work you create.
 * **Apply Additional Restrictions**: You cannot impose legal or technological measures that restrict others from using the project under the terms of this license.
+
+***Important Requirements:***
+* **Attribution: You must give appropriate credit to the original creator (Martin Janás), provide a link to the license, and clearly indicate if changes were made to the original work.**
+* **Irrevocability: This license is international and cannot be revoked as long as you comply with its terms.**
+
+**In addition to the terms of the CC BY-NC 4.0 license, I, Martin Janás, grant permission for others to:**
+* **Learn from this code: Use the concepts, ideas, and methods presented in this project without restriction.**
+* **Reuse code snippets: You may incorporate small pieces of this source code into your own projects.**
 
 ---
 
