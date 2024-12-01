@@ -126,19 +126,13 @@ public:
 	std::byte pad01[0x8];
 	std::uint32_t nHasBits; // 0x8
 	std::uint64_t nCachedBits; // 0xC
-
-	void SetBits(std::uint64_t nBits)
-	{
-		// @note: you don't need to check if the bits are already set as bitwise OR will not change the value if the bit is already set
-		nCachedBits |= nBits;
-	}
-};
+};//size: 0x18
 
 class CMsgQAngle : public CBasePB
 {
 public:
 	QAngle angValue; // 0x18
-};
+}; //size: 0x28
 
 class CMsgVector : public CBasePB
 {
@@ -194,9 +188,9 @@ public:
 class CBaseUserCmdPB : public CBasePB
 {
 public:
-	RepeatedPtrField_t<CSubtickMoveStep> subtickMovesField;
-	std::string* strMoveCrc;
-	CInButtonStatePB* pInButtonState;
+	RepeatedPtrField_t<CSubtickMoveStep> subtickMovesField; //0x18
+	std::string* strMoveCrc; //0x20
+	CInButtonStatePB* pInButtonState; //0x38
 	CMsgQAngle* pViewAngles;
 	std::int32_t nLegacyCommandNumber;
 	std::int32_t nClientTick;
@@ -216,19 +210,20 @@ public:
 	{
 		return VTable::GetThiscall<int>(this, 7);
 	}
-};
+
+}; //size: 0x68?
 
 class CCSGOUserCmdPB
 {
 public:
-	std::uint32_t nHasBits;
-	std::uint64_t nCachedSize;
-	RepeatedPtrField_t<CCSGOInputHistoryEntryPB> inputHistoryField;
-	CBaseUserCmdPB* pBaseCmd;
-	bool bLeftHandDesired;
-	std::int32_t nAttack3StartHistoryIndex;
-	std::int32_t nAttack1StartHistoryIndex;
-	std::int32_t nAttack2StartHistoryIndex;
+	std::uint32_t nHasBits; //0x0
+	std::uint64_t nCachedSize; //0x4
+	RepeatedPtrField_t<CCSGOInputHistoryEntryPB> inputHistoryField; //0xC
+	CBaseUserCmdPB* pBaseCmd; //0x14 //0x40
+	bool bLeftHandDesired; //0x1C
+	std::int32_t nAttack3StartHistoryIndex; //0x20
+	std::int32_t nAttack1StartHistoryIndex; //0x24
+	std::int32_t nAttack2StartHistoryIndex; //0x28
 
 	// @note: this function is used to check if the bits are set and set them if they are not
 	void CheckAndSetBits(std::uint32_t nBits)
@@ -274,18 +269,16 @@ public:
 				continue;
 
 			pInputEntry->pViewAngles->angValue = angView;
-			pInputEntry->SetBits(EInputHistoryBits::INPUT_HISTORY_BITS_VIEWANGLES);
+			//pInputEntry->SetBits(EInputHistoryBits::INPUT_HISTORY_BITS_VIEWANGLES);
 		}
 	}
 
 	bool IsButtonPressed(uint64_t button) const
 	{
-		return false; //TODO: Broken
-
-		/*if (!csgoUserCmd.pBaseCmd)
+		if (!csgoUserCmd.pBaseCmd)
 			return false;
 
-		return csgoUserCmd.pBaseCmd->pInButtonState->nValue & button;*/
+		return csgoUserCmd.pBaseCmd->pInButtonState->nValue & button;
 	}
 };
 

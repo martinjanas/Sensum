@@ -198,6 +198,7 @@
     <ClInclude Include="render\render.h" />
     <ClInclude Include="sdk\classes\CGrenadeProjectile.h" />
     <ClInclude Include="sdk\classes\GameTick_t.h" />
+    <ClInclude Include="sdk\helpers\CUtlBuffer.h" />
     <ClInclude Include="sdk\helpers\CUtlLinkedList.h" />
     <ClInclude Include="sdk\helpers\interfaces.h" />
     <ClInclude Include="sdk\helpers\json.hpp" />

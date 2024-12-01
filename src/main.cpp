@@ -11,7 +11,7 @@ DWORD __stdcall on_attach(void* base)
 
     g_Console = std::make_unique<Console>();
     
-#if defined(DEBUG) || defined(RELEASE_CONSOLE)
+#if defined(_DEBUG) || defined(RELEASE_CONSOLE)
     g_Console->attach();
 #endif
 
@@ -26,7 +26,7 @@ DWORD __stdcall on_attach(void* base)
 
     hooks::detach();
 
-#if defined(DEBUG) || defined(RELEASE_CONSOLE)
+#if defined(_DEBUG) || defined(RELEASE_CONSOLE)
     g_Console->detach();
 #endif
 

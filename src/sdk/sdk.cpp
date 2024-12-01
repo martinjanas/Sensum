@@ -63,6 +63,10 @@ namespace sdk
 
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "E8 ? ? ? ? 0F 28 F8 44 0F 28 54 24 ?", "IsInSmoke", 0x1, true));
 
+		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 18 55 56 57 48 81 EC 90", "SerializePartialToArray", 0, false));
+		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 10 48 89 6C 24 18 48 89 7C 24 20 41 56 48 83 EC 20 48 BF", "WriteMessage", 0, false));
+		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 20 55 56 57 48 83 EC 30 49", "SetMessageData", 0, false));
+
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "E8 ? ? ? ? F3 0F 11 45 ? 48 8B 5C 24 ?", "hooks::GetFov", 0x1, true));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "40 53 48 81 EC ? ? ? ? 49 8B C1", "hooks::GetMatricesForView", 0, false));
 

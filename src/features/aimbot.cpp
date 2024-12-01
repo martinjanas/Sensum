@@ -134,6 +134,9 @@ namespace features
 
         void smooth(float amount, const QAngle& current_angles, const QAngle& aim_angles, QAngle& out_angles)
         {
+            if (amount == 1.0f)
+                return;
+
             float smoothing_factor = amount;
 
             QAngle delta = aim_angles - current_angles;
@@ -145,6 +148,9 @@ namespace features
     
         void smooth_constant(float speed, const QAngle& current_angles, const QAngle& target_angles, QAngle& smoothed_angles)
         {
+            if (speed == 1.0f)
+                return;
+
             QAngle current_angle_normalized = current_angles;
             current_angle_normalized.normalize_clamp();
 
@@ -209,6 +215,7 @@ namespace features
 
                 QAngle output;
                 smooth(1.1f, viewangles, compensated_angle, output);
+                output.normalize_clamp();
 
                 g::client->SetViewAngles(output);
             }
@@ -337,6 +344,8 @@ namespace features
                         smooth(weapon_config.smooth, viewangles, best_angle, output);
                     else if (weapon_config.smooth_mode == 1)
                         smooth_constant(weapon_config.smooth, viewangles, best_angle, output);
+
+                    output.normalize_clamp();
 
                     g::client->SetViewAngles(output);
                 }
