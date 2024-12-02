@@ -12,6 +12,9 @@ namespace settings
 		bool fov_changer = false;
 		int fov = 90;
 		bool bhop = false;
+		float rotation_x = 0;
+		float rotation_y = 0;
+		float rotation_z = 0;
 	}
 
 	namespace esp

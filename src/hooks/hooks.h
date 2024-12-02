@@ -31,6 +31,14 @@ namespace hooks
 		LRESULT __stdcall hooked(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 	}
 
+	struct getviewmodel_fov
+	{
+		using fn = int64_t(__fastcall*)(void* rcx, Vector& pos, float fov, float a3);
+		static int64_t __fastcall hooked(void* rcx, Vector& pos, float fov, float a3);
+
+		inline static SafetyHookInline safetyhook;
+	};
+
 	struct createmove_csgoinput21
 	{
 		static const int index = 21; //rcs not working correctly with this one, why?

@@ -40,6 +40,9 @@ namespace settings
 		extern bool fov_changer;
 		extern int fov;
 		extern bool bhop;
+		extern float rotation_x;
+		extern float rotation_y;
+		extern float rotation_z;
 	}
 
 	namespace esp
