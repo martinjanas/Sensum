@@ -85,6 +85,8 @@ namespace sdk
 		modules::input_sys = DynamicModule("inputsystem.dll");
 		modules::matchmaking = DynamicModule("matchmaking.dll");
 		modules::gameoverlay = DynamicModule("GameOverlayRenderer64.dll");
+		modules::materialsys = DynamicModule("materialsystem2.dll");
+		modules::scenesys = DynamicModule("scenesystem.dll");
 
 		scan_and_cache_sigs();
 	}
@@ -118,6 +120,7 @@ namespace sdk
 		g::engine_trace = *modules::client.get_sig_addr(FNV("g::engine_trace")).as<CGameTrace**>();
 		g::client_mode_csnormal = modules::client.get_sig_addr(FNV("g::clientmode_csnormal")).as<CClientModeCSNormal*>();
 		g::game_rules = *modules::client.get_sig_addr(FNV("g::game_rules")).as<CGameRules**>();
+		g::mat_system = modules::materialsys.get_interface_from_list<CMaterialSystem*>("VMaterialSystem2_001");
 
 		g::entity_system = g::game_resource_service->GetEntitySystem();
 
@@ -139,6 +142,7 @@ namespace sdk
 		print_status(g::network_game_service);
 		print_status(g::game_rules);
 		print_status(g::cvar);
+		print_status(g::mat_system);
 		//print_status(g::hud_chat);
 	}
 }
@@ -162,5 +166,6 @@ namespace interfaces
 	CGameType* game_type{};
 	CHudChat* hud_chat{};
 	CGameRules* game_rules{};
+	CMaterialSystem* mat_system{};
 }
 

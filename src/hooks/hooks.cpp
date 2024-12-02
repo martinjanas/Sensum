@@ -73,7 +73,7 @@ namespace hooks
 
 		client_mode.apply(level_init::index, reinterpret_cast<uintptr_t*>(&level_init::hooked), reinterpret_cast<void**>(&level_init::original_fn));
 		client_mode.apply(level_shutdown::index, reinterpret_cast<uintptr_t*>(&level_shutdown::hooked), reinterpret_cast<void**>(&level_shutdown::original_fn));
-
+		
 		//Todo: get_fov: ClientModeCSNormal at index 27?
 		//get_fov::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::GetFov"), __FUNCTION__).as(), reinterpret_cast<void*>(get_fov::hooked));
 		get_matrices_for_view::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::GetMatricesForView"), __FUNCTION__).as(), reinterpret_cast<void*>(get_matrices_for_view::hooked));

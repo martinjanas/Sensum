@@ -11,4 +11,6 @@ namespace modules
 	DynamicModule input_sys;
 	DynamicModule matchmaking;
 	DynamicModule gameoverlay;
+	DynamicModule materialsys;
+	DynamicModule scenesys;
 }

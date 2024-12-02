@@ -29,6 +29,29 @@ namespace sdk
 	void scan_and_cache_sigs();
 }
 
+class IMaterial
+{
+public:
+	const char* GetName()
+	{
+		return VTable::GetThiscall<const char*>(this, 0); //working
+	}
+
+	const char* GetShareName()
+	{
+		return VTable::GetThiscall<const char*>(this, 1); //working aswell
+	}
+};
+
+class CMaterialSystem
+{
+public:
+	IMaterial* FindMaterial(IMaterial*** material, const char* name) //working fine
+	{
+		return VTable::GetThiscall<IMaterial*>(this, 14, material, name);
+	}
+};
+
 namespace interfaces //move to interfaces.h ?
 {
 	extern IVEngineCVar* cvar;
@@ -48,6 +71,7 @@ namespace interfaces //move to interfaces.h ?
 	extern CGameType* game_type;
 	extern CHudChat* hud_chat;
 	extern CGameRules* game_rules;
+	extern CMaterialSystem* mat_system;
 }
 
 namespace g = interfaces;

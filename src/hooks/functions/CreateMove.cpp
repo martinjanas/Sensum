@@ -155,8 +155,21 @@ bool __fastcall hooks::createmove_csgoinput21::hooked(void* rcx, int slot, CUser
 
     if (cmd && cmd->csgoUserCmd.pBaseCmd)
     {
-        if (cmd->csgoUserCmd.pBaseCmd->pInButtonState->nValue & IN_JUMP)
-            g_Console->println("Jump");
+        /*if (g::mat_system)
+        {
+            IMaterial** material = nullptr;
+            static auto mat = g::mat_system->FindMaterial(&material, "materials/dev/primary_white.vmat");
+
+            if (material)
+            {
+                IMaterial* mat2 = *material;
+
+                if (mat2)
+                {
+                    g_Console->println("name: %s, %s", mat2->GetName(), mat2->GetShareName());
+                }
+            }
+        }*/
 
         save_cmd(cmd);
         if (CalculateCRC(cmd->csgoUserCmd.pBaseCmd))
