@@ -77,11 +77,11 @@ namespace hooks
 		//Todo: get_fov: ClientModeCSNormal at index 27?
 		//get_fov::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::GetFov"), __FUNCTION__).as(), reinterpret_cast<void*>(get_fov::hooked));
 		get_matrices_for_view::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::GetMatricesForView"), __FUNCTION__).as(), reinterpret_cast<void*>(get_matrices_for_view::hooked));
+		calcviewmodel::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::CalcViewModel"), __FUNCTION__).as(), reinterpret_cast<void*>(calcviewmodel::hooked));
+		onrenderstart::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::OnRenderStart"), __FUNCTION__).as(), reinterpret_cast<void*>(onrenderstart::hooked));
 
 		//swap_chain.Apply(directx::resize_buffers::index, reinterpret_cast<uintptr_t*>(&directx::resize_buffers::hooked), reinterpret_cast<void**>(&directx::resize_buffers::original_fn));
 		//dxgi.Apply(directx::create_swapchain::index, reinterpret_cast<uintptr_t*>(&directx::create_swapchain::hooked), reinterpret_cast<void**>(&directx::create_swapchain::original_fn));
-
-		getviewmodel_fov::safetyhook = safetyhook::create_inline(modules::client.scan("48 89 5C 24 10 48 89 74 24 18 55 57 41 54 41 56 41 57 48 8B EC 48 83 EC 20", "viewmodelfov").as(), reinterpret_cast<void*>(getviewmodel_fov::hooked));
 
 		return true;
 	}
@@ -100,15 +100,21 @@ namespace hooks
 		return true;
 	}
 
-	int64_t __fastcall getviewmodel_fov::hooked(void* rcx, Vector& pos, float fov, float a3)
+	void __fastcall calcviewmodel::hooked(void* rcx, Vector& pos, float a2, float a3)
 	{	
-		int64_t ret = safetyhook.original<int64_t(SAFETYHOOK_FASTCALL*)(void*, Vector&, float, float)>()(rcx, pos, fov, a3);
-		
-		pos.x += settings::misc::rotation_x;
-		pos.y += settings::misc::rotation_y;
-		pos.z += settings::misc::rotation_z;
+		if (rcx && g::engine_client->IsInGame())
+		{
+			pos.x += settings::misc::rotation_x;
+			pos.y += settings::misc::rotation_y;
+			pos.z += settings::misc::rotation_z;
+		}
 
-		return ret;
+		safetyhook.fastcall<void>(rcx, pos, a2, a3);
+	}
+
+	void __fastcall onrenderstart::hooked(CViewRender* rcx)
+	{
+		safetyhook.fastcall<void>(rcx);
 	}
 }
 
