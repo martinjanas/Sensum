@@ -110,9 +110,9 @@ void draw_menu_debug()
 		ImGui::SliderFloat("Recoil Yaw", &settings->recoil.yaw, 0.f, 2.f, "Recoil Yaw: %.1f");
 	}
 
-	ImGui::SliderFloat("pos x", &settings::misc::rotation_x, -180, 180.f);
-	ImGui::SliderFloat("pos y", &settings::misc::rotation_y, -180, 180.f);
-	ImGui::SliderFloat("pos z", &settings::misc::rotation_z, -180, 180.f);
+	ImGui::SliderFloat("posx", &settings::misc::rotation_x, -3.f, 3.f);
+	ImGui::SliderFloat("posy", &settings::misc::rotation_y, -3.f, 3.f);
+	ImGui::SliderFloat("posz", &settings::misc::rotation_z, -3.f, 3.f);
 	
 	ImGui::Checkbox("Bhop", &settings::misc::bhop);
 	ImGui::Checkbox("Fov changer", &settings::misc::fov_changer);

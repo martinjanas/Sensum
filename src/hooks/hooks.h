@@ -5,6 +5,7 @@
 #include "../sdk/classes/CHandle.h"
 #include "../sdk/classes/CEntityInstance.h"
 #include "../sdk/helpers/console.h"
+#include "../sdk/helpers/CViewRender.h"
 #include "../thirdparty/ImGui/imgui.h"
 #include "../thirdparty/ImGui/imgui_internal.h"
 #include "../thirdparty/ImGui/backends/imgui_impl_dx11.h"
@@ -30,50 +31,6 @@ namespace hooks
 		inline WNDPROC original;
 		LRESULT __stdcall hooked(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 	}
-
-	class CViewSetup
-	{
-	public:
-		std::byte pad01[0x494]; //0x494 ?
-		float m_flOrthoLeft; // 0x0494
-		float m_flOrthoTop; // 0x0498
-		float m_flOrthoRight; // 0x049C
-		float m_flOrthoBottom; // 0x04A0
-		std::byte pad02[0x34]; //0x34?
-		float m_flFov; // 0x04D8
-		float m_flFovViewmodel; // 0x04DC
-		Vector m_vecOrigin; // 0x04E0
-		std::byte pad03[0xC];
-		QAngle m_angView; // 0x04F8
-		std::byte pad04[0x14];
-		float m_flAspectRatio; // 0x0518
-		std::byte pad05[0x71];
-		BYTE nSomeFlags;
-	};
-
-	struct CViewRender
-	{
-		std::byte pad01[0x8];
-		CViewSetup m_viewSetup; // 0x0008
-
-		virtual void func0() = 0;
-	};
-
-	struct onrenderstart
-	{
-		using fn = void(__thiscall*)(CViewRender*);
-		static void __fastcall hooked(CViewRender* rcx);
-
-		static inline SafetyHookInline safetyhook;
-	};
-
-	struct calcviewmodel
-	{
-		using fn = void(__fastcall*)(void* rcx, Vector& pos, float a2, float a3);
-		static void __fastcall hooked(void* rcx, Vector& pos, float a2, float a3);
-
-		inline static SafetyHookInline safetyhook;
-	};
 
 	struct createmove_csgoinput21
 	{
@@ -167,19 +124,25 @@ namespace hooks
 
 		inline static fn original_fn;
 	};
-
-	struct get_fov
-	{
-		using fn = float(__fastcall*)(void*);
-		static float __fastcall hooked(void* camera);
-
-		inline static SafetyHookInline safetyhook;
-	};
 	
 	struct get_matrices_for_view
 	{
 		using fn = void(__fastcall*)(void*, CViewSetup* rdx, VMatrix* world_to_view, VMatrix* view_to_projection, VMatrix* world_to_projection, VMatrix* world_to_pixels);
 		static void __fastcall hooked(void* rcx, CViewSetup*, VMatrix* world_to_view, VMatrix* view_to_projection, VMatrix* world_to_projection, VMatrix* world_to_pixels);
+
+		inline static SafetyHookInline safetyhook;
+	};
+
+	struct onrenderstart
+	{
+		static void __fastcall hooked(CViewRender* rcx);
+
+		static inline SafetyHookInline safetyhook;
+	};
+
+	struct calcviewmodel
+	{
+		static void __fastcall hooked(void* rcx, Vector& pos, float* fov, int a3);
 
 		inline static SafetyHookInline safetyhook;
 	};

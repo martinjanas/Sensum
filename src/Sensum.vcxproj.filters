@@ -236,6 +236,7 @@
     <ClInclude Include="sdk\helpers\ScopedTimer.h" />
     <ClInclude Include="sdk\helpers\utils.h" />
     <ClInclude Include="sdk\helpers\CUtlBuffer.h" />
+    <ClInclude Include="sdk\helpers\CViewRender.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\classes\CBaseEntity.cpp">
@@ -326,7 +327,6 @@
     <ClCompile Include="sdk\hooking\safetyhook\safetyhook.cpp" />
     <ClCompile Include="sdk\hooking\safetyhook\Zydis.c" />
     <ClCompile Include="hooks\functions\GetMatricesForView.cpp" />
-    <ClCompile Include="hooks\functions\GetFov.cpp" />
     <ClCompile Include="features\aimbot.cpp" />
     <ClCompile Include="sdk\classes\CHandle.cpp" />
     <ClCompile Include="sdk\interfaces\CGameTrace.cpp" />

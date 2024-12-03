@@ -74,11 +74,9 @@ namespace hooks
 		client_mode.apply(level_init::index, reinterpret_cast<uintptr_t*>(&level_init::hooked), reinterpret_cast<void**>(&level_init::original_fn));
 		client_mode.apply(level_shutdown::index, reinterpret_cast<uintptr_t*>(&level_shutdown::hooked), reinterpret_cast<void**>(&level_shutdown::original_fn));
 		
-		//Todo: get_fov: ClientModeCSNormal at index 27?
-		//get_fov::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::GetFov"), __FUNCTION__).as(), reinterpret_cast<void*>(get_fov::hooked));
 		get_matrices_for_view::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::GetMatricesForView"), __FUNCTION__).as(), reinterpret_cast<void*>(get_matrices_for_view::hooked));
 		calcviewmodel::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::CalcViewModel"), __FUNCTION__).as(), reinterpret_cast<void*>(calcviewmodel::hooked));
-		onrenderstart::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::OnRenderStart"), __FUNCTION__).as(), reinterpret_cast<void*>(onrenderstart::hooked));
+		//onrenderstart::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::OnRenderStart"), __FUNCTION__).as(), reinterpret_cast<void*>(onrenderstart::hooked));
 
 		//swap_chain.Apply(directx::resize_buffers::index, reinterpret_cast<uintptr_t*>(&directx::resize_buffers::hooked), reinterpret_cast<void**>(&directx::resize_buffers::original_fn));
 		//dxgi.Apply(directx::create_swapchain::index, reinterpret_cast<uintptr_t*>(&directx::create_swapchain::hooked), reinterpret_cast<void**>(&directx::create_swapchain::original_fn));
@@ -100,16 +98,20 @@ namespace hooks
 		return true;
 	}
 
-	void __fastcall calcviewmodel::hooked(void* rcx, Vector& pos, float a2, float a3)
-	{	
-		if (rcx && g::engine_client->IsInGame())
-		{
-			pos.x += settings::misc::rotation_x;
-			pos.y += settings::misc::rotation_y;
-			pos.z += settings::misc::rotation_z;
-		}
+	void __fastcall calcviewmodel::hooked(void* rcx, Vector& pos, float* fov, int a3)
+	{
+		static const auto ret = safetyhook.original<void(__fastcall*)(void*, Vector&, float*, int)>();
 
-		safetyhook.fastcall<void>(rcx, pos, a2, a3);
+		ret(rcx, pos, fov, a3);
+
+		*fov = settings::misc::fov_changer ? settings::misc::fov : 90.f;
+		
+		if (g::engine_client->IsInGame() && settings::misc::bhop)
+		{
+			pos.x += settings::misc::rotation_x == 0 ? 0 : settings::misc::rotation_x;
+			pos.y += settings::misc::rotation_y == 0 ? 0 : settings::misc::rotation_y;
+			pos.z += settings::misc::rotation_z == 0 ? 0 : settings::misc::rotation_z;
+		}
 	}
 
 	void __fastcall onrenderstart::hooked(CViewRender* rcx)
