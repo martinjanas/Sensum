@@ -146,4 +146,11 @@ namespace hooks
 
 		inline static SafetyHookInline safetyhook;
 	};
+
+	struct draw_array_ex
+	{
+		static void __fastcall hooked(void* rcx, void* rdx, CSceneData* scene_data, int a4, void* scene_view, void* scene_layer, void* a7, IMaterial* material);
+
+		inline static SafetyHookInline safetyhook;
+	};
 }

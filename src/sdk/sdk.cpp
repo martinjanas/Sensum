@@ -69,7 +69,8 @@ namespace sdk
 
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "40 53 48 81 EC ? ? ? ? 49 8B C1", "hooks::GetMatricesForView", 0, false));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 10 48 89 74 24 18 55 57 41 54 41 56 41 57 48 8B EC 48 83 EC 20", "hooks::CalcViewModel", 0, false));
-		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 ? 48 89 6C 24 ? 56 57 41 56 48 81 EC ? ? ? ? 4C 8B F1 48 8D 94 24", "hooks::OnRenderStart", 0, false));
+		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 ? 48 89 6C 24 ? 56 57 41 56 48 81 EC ? ? ? ? 4C 8B F1 48 8D 94 24", "hooks::OnRenderStart", 0, false));	
+		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::scenesys, "48 8B C4 48 89 50 10 53", "hooks::DrawArrayEx", 0, false));
 
 		for (auto& future : futures)
 			future.get();

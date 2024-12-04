@@ -52,6 +52,25 @@ public:
 	}
 };
 
+class CMaterialDrawDescription
+{
+public:
+
+};
+
+class CSceneData
+{
+public:
+	std::byte pad01[0x8]; //0x0
+	CMaterialDrawDescription* mat_desc; //0x8
+	std::byte pad02[0x4]; //0xC
+	CHandle handle; //0x10
+	std::byte pad03[0x8]; //0x18
+	IMaterial* material; //0x20
+	std::byte pad04[0x18]; //0x38
+	std::array<byte, 4> color; //0x40
+}; //0x47
+
 namespace interfaces //move to interfaces.h ?
 {
 	extern IVEngineCVar* cvar;

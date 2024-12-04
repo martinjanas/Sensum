@@ -75,9 +75,10 @@ namespace hooks
 		client_mode.apply(level_shutdown::index, reinterpret_cast<uintptr_t*>(&level_shutdown::hooked), reinterpret_cast<void**>(&level_shutdown::original_fn));
 		
 		get_matrices_for_view::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::GetMatricesForView"), __FUNCTION__).as(), reinterpret_cast<void*>(get_matrices_for_view::hooked));
-		calcviewmodel::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::CalcViewModel"), __FUNCTION__).as(), reinterpret_cast<void*>(calcviewmodel::hooked));
+		//calcviewmodel::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::CalcViewModel"), __FUNCTION__).as(), reinterpret_cast<void*>(calcviewmodel::hooked));
 		//onrenderstart::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::OnRenderStart"), __FUNCTION__).as(), reinterpret_cast<void*>(onrenderstart::hooked));
-
+		draw_array_ex::safetyhook = safetyhook::create_inline(modules::scenesys.get_sig_addr(FNV("hooks::DrawArrayEx"), __FUNCTION__).as(), reinterpret_cast<void*>(draw_array_ex::hooked));
+		
 		//swap_chain.Apply(directx::resize_buffers::index, reinterpret_cast<uintptr_t*>(&directx::resize_buffers::hooked), reinterpret_cast<void**>(&directx::resize_buffers::original_fn));
 		//dxgi.Apply(directx::create_swapchain::index, reinterpret_cast<uintptr_t*>(&directx::create_swapchain::hooked), reinterpret_cast<void**>(&directx::create_swapchain::original_fn));
 
@@ -118,6 +119,26 @@ namespace hooks
 	{
 		safetyhook.fastcall<void>(rcx);
 	}
+
+	void __fastcall draw_array_ex::hooked(void* rcx, void* rdx, CSceneData* scene_data, int a4, void* scene_view, void* scene_layer, void* a7, IMaterial* material)
+	{
+		if (scene_data && scene_data->material && g::engine_client->IsInGame())
+		{
+			if (strstr(scene_data->material->GetName(), "characters/models") && !strstr(scene_data->material->GetName(), "characters/models/shared"))
+			{
+				static IMaterial** m = nullptr;
+				static auto mat = g::mat_system->FindMaterial(&m, "materials/dev/primary_white.vmat");
+
+				if (m)
+				{
+					scene_data->material = *m;
+				}
+			}
+		}
+
+		safetyhook.fastcall<void>(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
+	}
+
 }
 
 
