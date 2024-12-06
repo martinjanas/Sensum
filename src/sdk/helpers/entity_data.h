@@ -46,6 +46,11 @@ namespace entity_data
 
 	};
 
+	struct persisten_data_t
+	{
+
+	};
+
 	struct player_data_t
 	{
 		const char* m_szPlayerName;
@@ -65,6 +70,8 @@ namespace entity_data
 		CCSPlayerPawn* m_PlayerPawn;
 		Transform_t hitbox_transform[HITBOX_MAX];
 		std::bitset<32> flags;
+
+		float render_alpha = 0.f;
 
 		std::array<hitbox_info_t, HITBOX_MAX> hitboxes;
 		std::list<bone_info_t> bones_w2s;
@@ -110,6 +117,7 @@ namespace entity_data
 		CEntityInstance* entity;
 		CHandle handle;
 	};
+
 
 	extern std::list<EntityInstance_t> player_instances;
 	extern std::list<EntityInstance_t> entity_instances;

@@ -19,6 +19,7 @@
 #include "../sdk/interfaces/CHudChat.h"
 #include "../sdk/interfaces/IVEngineCVar.h"
 #include "../sdk/math/Viewmatrix.h"
+#include "../sdk/helpers/CUtlBuffer.h"
 
 namespace sdk
 {
@@ -28,6 +29,64 @@ namespace sdk
 	void invalidate_interfaces_on_map_unload();
 	void scan_and_cache_sigs();
 }
+
+struct KV3ID_t
+{
+	const char* encoding_type; //0x0
+	uint64_t key1; //0x8
+	uint64_t key2; //0x10
+
+	KV3ID_t(const char* encoding_type, uint64_t key1, uint64_t key2)
+	{
+		this->encoding_type = encoding_type;
+		this->key1 = key1;
+		this->key2 = key2;
+	}
+};
+
+// encodings
+const KV3ID_t g_KV3Encoding_Text = { "text", 0x41C58A33E21C7F3C, 0xDAA323A6DA77799 };
+const KV3ID_t g_KV3Encoding_Binary = { "binary", 0x40C1F7D81B860500, 0x14E76782A47582AD };
+const KV3ID_t g_KV3Encoding_BinaryLZ4 = { "binary_lz4", 0x4F5C63A16847348A, 0x19B1D96F805397A1 };
+const KV3ID_t g_KV3Encoding_BinaryZSTD = { "binary_zstd", 0x4305FEF06F620A00, 0x29DBB14623045FA3 };
+const KV3ID_t g_KV3Encoding_BinaryBC = { "binary_bc", 0x4F6C95BC95791A46, 0xD2DFB7A1BC050BA7 };
+const KV3ID_t g_KV3Encoding_BinaryAuto = { "binary_auto", 0x45836B856EB109E6, 0x8C06046E3A7012A3 };
+
+// formats
+const KV3ID_t g_KV3Format_Generic = { "generic", 0x469806E97412167C, 0xE73790B53EE6F2AF };
+
+class KeyValues
+{
+public:
+	std::byte pad01[0x100];
+	std::uint64_t uKey;
+	void* pValue;
+	std::byte pad02[0x8];
+
+	bool LoadKV3(CUtlBuffer* buffer, const char* kv3_name)
+	{
+		using fn = bool(__thiscall*)(void* thisptr, void* utlstring, CUtlBuffer* buffer, const KV3ID_t& format, const char* kv_name);
+		static const auto& addr = modules::tier0.get_export("?LoadKV3@@YA_NPEAVKeyValues3@@PEAVCUtlString@@PEAVCUtlBuffer@@AEBUKV3ID_t@@PEBD@Z").as();
+		if (!addr)
+			return false;
+
+		const auto load_kv3 = reinterpret_cast<fn>(addr);
+
+		return load_kv3(this, nullptr, buffer, g_KV3Format_Generic, ""); //returns false
+	}
+
+	bool LoadFromBuffer(const char* str, const char* kv3_name)
+	{
+		CUtlBuffer buffer = {0, 0, 0};
+		buffer.EnsureCapacity(strlen(str) + 1);
+		buffer.PutString(str);
+
+		if (LoadKV3(&buffer, kv3_name))
+			return true;
+
+		return false;
+	}
+};
 
 class IMaterial
 {
@@ -50,6 +109,11 @@ public:
 	{
 		return VTable::GetThiscall<IMaterial*>(this, 14, material, name);
 	}
+
+	IMaterial* CreateMaterial(IMaterial*** material, const char* mat_name, KeyValues key_value, uint32_t num1, uint8_t num2)
+	{
+		return VTable::GetThiscall<IMaterial*>(this, 29, material, mat_name, key_value, num1, num2);
+	}
 };
 
 class CMaterialDrawDescription
@@ -58,18 +122,39 @@ public:
 
 };
 
+class CSceneObject
+{
+public:
+	char pad_01[0xB8]; //0x0
+	std::array<byte, 4> color; //0xB8
+	CHandle owner_handle; //0xBC
+}; //Size: 0x0180
+
+//class CSceneData
+//{
+//public:
+//	std::byte pad01[0x8]; //0x0
+//	CMaterialDrawDescription* mat_desc; //0x8
+//	std::byte pad02[0x4]; //0xC
+//	CHandle handle; //0x10
+//	std::byte pad03[0x8]; //0x18
+//	IMaterial* material; //0x20
+//	std::byte pad04[0x18]; //0x38
+//	std::array<byte, 4> color; //0x40
+//}; //0x47
+
 class CSceneData
 {
 public:
-	std::byte pad01[0x8]; //0x0
-	CMaterialDrawDescription* mat_desc; //0x8
-	std::byte pad02[0x4]; //0xC
-	CHandle handle; //0x10
-	std::byte pad03[0x8]; //0x18
-	IMaterial* material; //0x20
-	std::byte pad04[0x18]; //0x38
-	std::array<byte, 4> color; //0x40
-}; //0x47
+	std::byte pad01[0x8];                // 0x0
+	CMaterialDrawDescription* mat_desc;	 // 0x8
+	CHandle handle;                      // 0x10
+	std::byte pad02[0x4];                // 0x14
+	CSceneObject* scene_object;          // 0x18
+	IMaterial* material;                 // 0x20
+	std::byte pad04[0x18];               // 0x28
+	std::array<std::byte, 4> color;      // 0x40
+}; // Size: 0x48
 
 namespace interfaces //move to interfaces.h ?
 {

@@ -127,13 +127,21 @@ namespace features::esp
 		if (!entity_data::player_entry_data.empty())
 			std::copy(entity_data::player_entry_data.front().player_data.begin(), entity_data::player_entry_data.front().player_data.end(), std::back_inserter(m_player_data));
 
-		static Vector head_pos_out;
-		static Vector origin_out;
+		Vector head_pos_out;
+		Vector origin_out;
 
 		for (auto& data : m_player_data)
 		{
-			if (settings::esp::visible_only && (!data.flags.test(PLAYER_VISIBLE) || data.flags.test(PLAYER_IN_SMOKE)))
+			//if (settings::esp::visible_only && (!data.flags.test(PLAYER_VISIBLE) || data.flags.test(PLAYER_IN_SMOKE)))
+				//continue;
+
+			bool is_visible = data.flags.test(PLAYER_VISIBLE) && !data.flags.test(PLAYER_IN_SMOKE);
+			
+			g_Console->println("alpha: %.4f", data.render_alpha);
+			if (settings::esp::visible_only && !is_visible && data.render_alpha <= 0.01f)
 				continue;
+
+			ImU32 box_color = ImColor(settings::esp::box_clr.x, settings::esp::box_clr.y, settings::esp::box_clr.z, data.render_alpha);
 
 			const Vector& head_pos = data.hitboxes[HITBOX_HEAD].hitbox_pos;
 
@@ -141,28 +149,13 @@ namespace features::esp
 			bool got_head_pos = globals::world2screen(head_pos, head_pos_out);
 
 			if (settings::esp::box_esp)
-				globals::draw_list->AddRect(data.bbox.m_Mins.as_vec2(), data.bbox.m_Maxs.as_vec2(), ImColor(settings::esp::box_clr.x, settings::esp::box_clr.y, settings::esp::box_clr.z, settings::esp::box_clr.w), 0.f, 0);
+				globals::draw_list->AddRect(data.bbox.m_Mins.as_vec2(), data.bbox.m_Maxs.as_vec2(), box_color, 0.f, 0);
 			
 			esp::name_esp(data, data.bbox);
 
 			//Draw3DBox(data.bbox);
 
 			esp::bone_esp(data);
-
-			/*if (!data.hitboxes.empty())
-			{
-				Vector hitbox_w2s;	
-				for (auto& hitbox_data : data.hitboxes)
-				{
-					Vector hitbox_pos = hitbox_data.hitbox_pos;
-
-					//if (globals::world2screen(hitbox_pos, hitbox_w2s))
-						//globals::draw_list->AddText(hitbox_w2s.as_vec2(), IM_COL32_WHITE, utils::hitbox_index_to_name(hitbox_data.index));
-
-					if (globals::world2screen(hitbox_pos, hitbox_w2s))
-						globals::draw_list->AddCircle(hitbox_w2s.as_vec2(), 8.f, IM_COL32_WHITE, 255);
-				}
-			}*/
 		}
 	}
 

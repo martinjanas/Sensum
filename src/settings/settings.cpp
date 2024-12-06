@@ -20,7 +20,7 @@ namespace settings
 	namespace esp
 	{
 		bool bone_esp = true;
-		bool box_esp = false;
+		bool box_esp = true;
 		bool name_esp = false;
 		bool health_esp = false;
 		bool visible_only = true;

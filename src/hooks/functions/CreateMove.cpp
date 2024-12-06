@@ -129,7 +129,7 @@ bool CalculateCRC(CBaseUserCmdPB* base_cmd) //CCSGOUserCmdPB
 
         return true;
     }
-    return false;
+    return false; //stack around buffer was corrupted
 }
 
 static inline CUserCmd* g_cmd = nullptr;
@@ -171,9 +171,9 @@ bool __fastcall hooks::createmove_csgoinput21::hooked(void* rcx, int slot, CUser
             }
         }*/
 
-        save_cmd(cmd);
+        /*save_cmd(cmd);
         if (CalculateCRC(cmd->csgoUserCmd.pBaseCmd))
-            apply_cmd(cmd);
+            apply_cmd(cmd);*/
     }
 
     return original_fn(rcx, slot, cmd, curtime);

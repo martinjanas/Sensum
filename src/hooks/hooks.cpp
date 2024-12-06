@@ -2,8 +2,9 @@
 #include "../settings/settings.h"
 #include "../sdk/helpers/entity_data.h"
 #include <memory>
+#include "../sdk/helpers/CUtlBuffer.h"
 
-void get_dxgi(IDXGIFactory*& dxgi_factory)
+static void get_dxgi(IDXGIFactory*& dxgi_factory)
 {
 	dxgi_factory = nullptr;
 
@@ -40,6 +41,36 @@ void get_dxgi(IDXGIFactory*& dxgi_factory)
 	dxgi_adapter->Release();
 	dxgi_device->Release();
 	d3d11_device->Release();
+}
+
+static const char* material_latex_vis = R"#(<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d}
+			format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+			{
+                shader = "csgo_character.vfx"
+                F_BLEND_MODE = 1
+                g_vColorTint = [1.0, 1.0, 1.0, 1.0]
+                g_bFogEnabled = 0
+                g_flMetalness = 0.000
+                g_tMetalness = resource:"materials/default/default_metal_tga_8fbc2820.vtex"
+                g_tColor = resource:"materials/dev/primary_white_color_tga_21186c76.vtex"
+                g_tAmbientOcclusion = resource:"materials/default/default_ao_tga_79a2e0d0.vtex"
+                g_tNormal = resource:"materials/default/default_normal_tga_1b833b2a.vtex"
+			} )#";
+
+IMaterial* create_material(const char* material_vmat, const char* mat_name)
+{
+	CUtlBuffer buffer{ 0, 0, 0 };
+	buffer.PutString(material_vmat);
+
+	KeyValues kv;
+	bool loaded = kv.LoadKV3(&buffer, mat_name);
+	if (!loaded)
+		return nullptr;
+
+	IMaterial** mat_out = nullptr;
+	g::mat_system->CreateMaterial(&mat_out, mat_name, kv, 0, 1);
+
+	return *mat_out;
 }
 
 namespace hooks
@@ -105,7 +136,8 @@ namespace hooks
 
 		ret(rcx, pos, fov, a3);
 
-		*fov = settings::misc::fov_changer ? settings::misc::fov : 90.f;
+		static Convar* viewmodel_fov = g::cvar->find(FNV("viewmodel_fov"));
+		*fov = settings::misc::fov_changer ? settings::misc::fov : (viewmodel_fov ? viewmodel_fov->value.as_float : 68.f);
 		
 		if (g::engine_client->IsInGame() && settings::misc::bhop)
 		{
@@ -122,19 +154,27 @@ namespace hooks
 
 	void __fastcall draw_array_ex::hooked(void* rcx, void* rdx, CSceneData* scene_data, int a4, void* scene_view, void* scene_layer, void* a7, IMaterial* material)
 	{
-		if (scene_data && scene_data->material && g::engine_client->IsInGame())
-		{
-			if (strstr(scene_data->material->GetName(), "characters/models") && !strstr(scene_data->material->GetName(), "characters/models/shared"))
-			{
-				static IMaterial** m = nullptr;
-				static auto mat = g::mat_system->FindMaterial(&m, "materials/dev/primary_white.vmat");
+		//IMaterial* latex_mat = nullptr;
+		//if (g::engine_client->IsInGame())
+		//{
+		//	//static bool done = false;
 
-				if (m)
-				{
-					scene_data->material = *m;
-				}
-			}
-		}
+		//	latex_mat = create_material(material_latex_vis, "material_latex_vis");
+		//}
+
+		//if (scene_data && scene_data->material && g::engine_client->IsInGame())
+		//{
+		//	if (strstr(scene_data->material->GetName(), "characters/models") && !strstr(scene_data->material->GetName(), "characters/models/shared"))
+		//	{
+		//		/*static IMaterial** m = nullptr;
+		//		static auto mat = g::mat_system->FindMaterial(&m, "materials/dev/primary_white.vmat");*/
+
+		//		if (latex_mat)
+		//		{
+		//			scene_data->material = latex_mat;
+		//		}
+		//	}
+		//}
 
 		safetyhook.fastcall<void>(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
 	}

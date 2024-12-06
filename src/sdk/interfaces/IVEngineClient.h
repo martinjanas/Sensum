@@ -44,6 +44,11 @@ public:
         return VTable::GetThiscall<bool>(this, 36);
     }
 
+    void ExecuteClientCmd(const char* cmd)
+    {
+        VTable::GetThiscall<void>(this, 45, 0, cmd, 0x7FFEF001);
+    }
+
     int GetLocalPlayer()
     {
         int index = -1;

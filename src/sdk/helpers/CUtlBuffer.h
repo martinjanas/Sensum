@@ -7,14 +7,14 @@ class CUtlBuffer
 public:
 	std::byte pad01[0x80];
 
-	CUtlBuffer(int a1, int size, int a3)
+	CUtlBuffer(int grow_size, int init_size, int flags)
 	{
 		using fn = void(__thiscall*)(void*, int, int, int);
-		static const auto& addr = modules::tier0.get_export("CUtlBuffer::CUtlBuffer").as();
+		static const auto& addr = modules::tier0.get_export("??0CUtlBuffer@@QEAA@HHH@Z").as();
 
 		const auto constructor = reinterpret_cast<fn>(addr);
 		if (constructor)
-			constructor(this, a1, size, a3);
+			constructor(this, grow_size, init_size, flags);
 	}
 
 	void PutString(const char* string)
