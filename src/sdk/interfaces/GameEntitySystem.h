@@ -1,4 +1,4 @@
-   #pragma once
+#pragma once
 #include "../classes/CEntityInstance.h"
 #include "../helpers/modules.h"
 #include "../classes/CBaseEntity.h"
@@ -70,6 +70,6 @@ public:
 
 	int GetHighestEntityIndex()
 	{
-		return *reinterpret_cast<int*>(this + 0x1520);
+		return *reinterpret_cast<int*>(this + 0x20F0);
 	}
 };
