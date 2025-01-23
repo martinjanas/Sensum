@@ -20,6 +20,9 @@ public:
 	void normalize_clamp();
 	bool is_zero();
 
+    QAngle lerp_angle(QAngle& other, float speed);
+    QAngle lerp_angle_const(QAngle& other, float speed);
+
 	Vector to_vector() const;
     
     QAngle operator-() const

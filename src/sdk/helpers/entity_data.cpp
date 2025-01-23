@@ -241,22 +241,6 @@ namespace entity_data
 		update_visibility(player_data, local_pawn);
 	}
 
-	void update_render_alpha(entity_data::player_data_t& data)
-	{
-		bool is_visible = data.flags.test(PLAYER_VISIBLE) && !data.flags.test(PLAYER_IN_SMOKE);
-		auto delta_time = ImGui::GetIO().DeltaTime;
-
-		constexpr float fade_duration = 0.5f;
-		constexpr float fade_rate = (1.0f / fade_duration);
-
-		if (is_visible && data.render_alpha < 1.0f)
-			data.render_alpha += fade_rate * delta_time;
-		else if (!is_visible && data.render_alpha > 0.0f)
-			data.render_alpha -= fade_rate * delta_time;
-
-		data.render_alpha = std::clamp(data.render_alpha, 0.0f, 1.0f);
-	}
-
 	void fetch_player_data()
 	{
 		if (!g::engine_client->IsInGame())
@@ -364,7 +348,6 @@ namespace entity_data
 				get_hitboxes(player_data, eye_pos, localpawn, on_screen);
 				get_bbox(scene_node, collision, player_data.bbox);
 				get_bones_w2s(player_data);
-				//update_render_alpha(player_data);
 			}
 
 			player_data.m_vecOldOrigin = scene_node->m_vecOrigin();

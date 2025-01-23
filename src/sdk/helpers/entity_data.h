@@ -71,8 +71,6 @@ namespace entity_data
 		Transform_t hitbox_transform[HITBOX_MAX];
 		std::bitset<32> flags;
 
-		float render_alpha = 0.f;
-
 		std::array<hitbox_info_t, HITBOX_MAX> hitboxes;
 		std::list<bone_info_t> bones_w2s;
 	};

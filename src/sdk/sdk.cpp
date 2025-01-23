@@ -129,6 +129,8 @@ namespace sdk
 		g::mem_alloc = modules::tier0.get_export("g_pMemAlloc").as<IMemAlloc*>();
 		mem_alloc_in::mem_alloc = modules::tier0.get_export("g_pMemAlloc").as<IMemAlloc*>();
 
+		g::hud_chat = *reinterpret_cast<CHudChat**>(globals::find_hud_element("HudChatDelegate"));
+
 		print_status(g::engine_client);
 		print_status(g::client);
 		print_status(g::schema_system);
@@ -145,7 +147,7 @@ namespace sdk
 		print_status(g::game_rules);
 		print_status(g::cvar);
 		print_status(g::mat_system);
-		//print_status(g::hud_chat);
+		print_status(g::hud_chat);
 	}
 }
 

@@ -50,6 +50,48 @@ bool QAngle::is_zero()
 	return pitch == 0.f && yaw == 0.f && roll == 0.f;
 }
 
+QAngle QAngle::lerp_angle(QAngle& aim_angle, float speed)
+{
+	QAngle out_angle;
+
+	if (speed <= 1.f)
+		return aim_angle;
+
+	QAngle delta = aim_angle - *this;
+	delta.normalize_clamp();
+
+	out_angle = *this + delta / speed;
+	out_angle.normalize_clamp();
+
+	return out_angle;
+}
+
+QAngle QAngle::lerp_angle_const(QAngle& aim_angle, float speed)
+{
+	QAngle out_angle = *this;
+
+	if (speed <= 1.f)
+		return aim_angle;
+
+	float max_smooth_step = 10.0f;
+	float smooth_step = (max_smooth_step / (speed + 0.1f)) * 0.015625f;
+
+	for (int i = 0; i < 3; ++i) 
+	{
+		float current = out_angle[i];
+		float target = aim_angle[i];
+		float delta = target - current;
+
+		if (std::fabs(delta) < smooth_step)
+			out_angle[i] = aim_angle[i]; 
+		else out_angle[i] += (delta > 0 ? smooth_step : -smooth_step);
+	}
+
+	out_angle.normalize_clamp();
+
+	return out_angle;
+}
+
 Vector QAngle::to_vector() const
 {
 	float pitch_rad = this->pitch * math::deg2rad;

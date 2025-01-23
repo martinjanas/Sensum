@@ -132,69 +132,7 @@ namespace features
             return fov;
         }
 
-        void smooth(float amount, const QAngle& current_angles, const QAngle& aim_angles, QAngle& out_angles)
-        {
-            if (amount == 1.0f)
-                return;
-
-            float smoothing_factor = amount;
-
-            QAngle delta = aim_angles - current_angles;
-            delta.normalize_clamp();
-
-            out_angles = current_angles + delta / smoothing_factor;
-            out_angles.normalize_clamp();
-        }
-    
-        void smooth_constant(float speed, const QAngle& current_angles, const QAngle& target_angles, QAngle& smoothed_angles)
-        {
-            if (speed == 1.0f)
-                return;
-
-            QAngle current_angle_normalized = current_angles;
-            current_angle_normalized.normalize_clamp();
-
-            QAngle target_angle_normalized = target_angles;
-            target_angle_normalized.normalize_clamp();
-
-            QAngle delta = target_angle_normalized - current_angle_normalized;
-            delta.normalize_clamp();
-
-            float max_smooth_step = 10.0f;
-            float smooth_step = (max_smooth_step / (speed + 0.1f)) * (1.0f / 64.0f);
-
-            smoothed_angles = current_angle_normalized;
-
-            if (std::fabs(delta.pitch) < smooth_step) 
-            {
-                smoothed_angles.pitch = target_angle_normalized.pitch;
-            }
-            else 
-            {
-                smoothed_angles.pitch += (delta.pitch > 0 ? smooth_step : -smooth_step);
-            }
-
-            if (std::fabs(delta.yaw) < smooth_step) 
-            {
-                smoothed_angles.yaw = target_angle_normalized.yaw;
-            }
-            else {
-                smoothed_angles.yaw += (delta.yaw > 0 ? smooth_step : -smooth_step);
-            }
-
-            if (std::fabs(delta.roll) < smooth_step) 
-            {
-                smoothed_angles.roll = target_angle_normalized.roll;
-            }
-            else 
-            {
-                smoothed_angles.roll += (delta.roll > 0 ? smooth_step : -smooth_step);
-            }
-
-            smoothed_angles.normalize_clamp();
-        }
-
-        void rcs(CCSPlayerPawn* localpawn, const QAngle& viewangles, CUserCmd* cmd)
+        void rcs(CCSPlayerPawn* localpawn, QAngle& viewangles, CUserCmd* cmd)
         {
             const auto& punch_cache = localpawn->m_aimPunchCache();
             if (punch_cache.Count() <= 1 || punch_cache.Count() >= 0xFFFF)
@@ -213,8 +151,7 @@ namespace features
                 QAngle compensated_angle = viewangles - recoil_delta;
                 compensated_angle.normalize_clamp();
 
-                QAngle output;
-                smooth(1.1f, viewangles, compensated_angle, output);
+                QAngle output = viewangles.lerp_angle(compensated_angle, 1.1f);
                 output.normalize_clamp();
 
                 g::client->SetViewAngles(output);
@@ -341,9 +278,9 @@ namespace features
 
                     QAngle output;
                     if (weapon_config.smooth_mode == 0)
-                        smooth(weapon_config.smooth, viewangles, best_angle, output);
+                        output = viewangles.lerp_angle(best_angle, weapon_config.smooth);
                     else if (weapon_config.smooth_mode == 1)
-                        smooth_constant(weapon_config.smooth, viewangles, best_angle, output);
+                        output = viewangles.lerp_angle_const(best_angle, weapon_config.smooth);
 
                     output.normalize_clamp();
 

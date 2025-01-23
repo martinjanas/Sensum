@@ -132,16 +132,10 @@ namespace features::esp
 
 		for (auto& data : m_player_data)
 		{
-			//if (settings::esp::visible_only && (!data.flags.test(PLAYER_VISIBLE) || data.flags.test(PLAYER_IN_SMOKE)))
-				//continue;
-
-			bool is_visible = data.flags.test(PLAYER_VISIBLE) && !data.flags.test(PLAYER_IN_SMOKE);
-			
-			g_Console->println("alpha: %.4f", data.render_alpha);
-			if (settings::esp::visible_only && !is_visible && data.render_alpha <= 0.01f)
+			if (settings::esp::visible_only && (!data.flags.test(PLAYER_VISIBLE) || data.flags.test(PLAYER_IN_SMOKE)))
 				continue;
 
-			ImU32 box_color = ImColor(settings::esp::box_clr.x, settings::esp::box_clr.y, settings::esp::box_clr.z, data.render_alpha);
+			ImU32 box_color = ImColor(settings::esp::box_clr.x, settings::esp::box_clr.y, settings::esp::box_clr.z, settings::esp::box_clr.w);
 
 			const Vector& head_pos = data.hitboxes[HITBOX_HEAD].hitbox_pos;
 
