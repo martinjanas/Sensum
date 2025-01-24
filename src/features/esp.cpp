@@ -103,7 +103,7 @@ namespace features::esp
 		if (!entity_data::entity_entry_data.empty())
 			std::copy(entity_data::entity_entry_data.begin(), entity_data::entity_entry_data.end(), std::back_inserter(m_entity_entry_data));
 
-		for (auto& entry : m_entity_entry_data)
+		/*for (auto& entry : m_entity_entry_data)
 		{
 			for (auto& bomb_info : entry.bomb_info)
 				bomb_timer(bomb_info);
@@ -113,7 +113,7 @@ namespace features::esp
 
 			for (auto& dropped_ents_info : entry.dropped_ent_info)
 				dropped_entities(dropped_ents_info);
-		}
+		}*/
 	}
 
 	void render()

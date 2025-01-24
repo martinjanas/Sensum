@@ -41,7 +41,11 @@ namespace hooks
 
 			ID3D11Texture2D* pBackBuffer;
 			swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
-			g_pDevice->CreateRenderTargetView(pBackBuffer, NULL, &g_pRenderTargetView);
+
+			D3D11_RENDER_TARGET_VIEW_DESC rtv_desc = {};
+			rtv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			rtv_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
+			g_pDevice->CreateRenderTargetView(pBackBuffer, &rtv_desc, &g_pRenderTargetView);
 			pBackBuffer->Release();
 		}
 
