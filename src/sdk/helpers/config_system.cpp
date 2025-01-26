@@ -16,17 +16,18 @@ namespace config_system
 			const auto& wpn_data = data.value();
 
 			weapon_config.enabled = wpn_data.value("enabled", false);
-			weapon_config.fov = wpn_data.value("fov", 0.f);
-			weapon_config.smooth = wpn_data.value("smooth", 0.0f);
-			weapon_config.smooth_mode = wpn_data.value("smooth_mode", 0);
-			weapon_config.hitboxes = wpn_data.value("hitboxes", 0);
+			weapon_config.fov = wpn_data.value("fov", 20.f);
+			weapon_config.smooth = wpn_data.value("smooth", 3.5f);
+			weapon_config.smooth_time = wpn_data.value("smooth_time", 1.f);
+			weapon_config.smooth_mode = wpn_data.value("smooth_mode", 1);
+			weapon_config.hitboxes = wpn_data.value("hitboxes", 3);
 			weapon_config.nearest_hitbox_in_air_override = wpn_data.value("nearest_hitbox_in_air_override", false);
 			
 			if (wpn_data.contains("recoil"))
 			{
-				weapon_config.recoil.enabled = wpn_data["recoil"].value("enabled", false);
-				weapon_config.recoil.pitch = wpn_data["recoil"].value("pitch", 0.0f);
-				weapon_config.recoil.yaw = wpn_data["recoil"].value("yaw", 0.0f);
+				weapon_config.recoil.enabled = wpn_data["recoil"].value("enabled", true);
+				weapon_config.recoil.pitch = wpn_data["recoil"].value("pitch", 2.0f);
+				weapon_config.recoil.yaw = wpn_data["recoil"].value("yaw", 2.0f);
 			}
 
 			settings::aimbot::weapon_configs[wpn_index] = weapon_config;
@@ -46,6 +47,7 @@ namespace config_system
 			config["Legitbot"][weapon_name.c_str()]["enabled"] = aimbot_data.enabled;
 			config["Legitbot"][weapon_name.c_str()]["fov"] = aimbot_data.fov;
 			config["Legitbot"][weapon_name.c_str()]["smooth"] = aimbot_data.smooth;
+			config["Legitbot"][weapon_name.c_str()]["smooth_time"] = aimbot_data.smooth_time;
 			config["Legitbot"][weapon_name.c_str()]["smooth_mode"] = aimbot_data.smooth_mode;
 			config["Legitbot"][weapon_name.c_str()]["hitboxes"] = aimbot_data.hitboxes;
 			config["Legitbot"][weapon_name.c_str()]["nearest_hitbox_in_air_override"] = aimbot_data.nearest_hitbox_in_air_override;

@@ -232,7 +232,7 @@ namespace entity_data
 
 			auto hitbox_pos = (mins + maxs) * 0.5f;
 
-			player_data.hitboxes[i] = { hitbox_pos, hitbox->m_nHitBoxIndex(), false };
+			player_data.hitboxes[i] = { hitbox_pos, hitbox->m_nHitBoxIndex(), false, 0.f };
 		}
 
 		if (!on_screen)

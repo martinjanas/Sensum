@@ -237,6 +237,7 @@
     <ClInclude Include="sdk\helpers\utils.h" />
     <ClInclude Include="sdk\helpers\CUtlBuffer.h" />
     <ClInclude Include="sdk\helpers\CViewRender.h" />
+    <ClInclude Include="sdk\helpers\Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\classes\CBaseEntity.cpp">
@@ -342,6 +343,7 @@
     <ClCompile Include="sdk\classes\CPlantedC4.h" />
     <ClCompile Include="sdk\helpers\config_system.cpp" />
     <ClCompile Include="sdk\helpers\utils.cpp" />
+    <ClCompile Include="sdk\helpers\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\freetype.lib" />

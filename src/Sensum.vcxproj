@@ -288,6 +288,7 @@
     <ClInclude Include="thirdparty\ImGui\imstb_textedit.h" />
     <ClInclude Include="thirdparty\ImGui\imstb_truetype.h" />
     <ClInclude Include="sdk\helpers\utils.h" />
+    <ClInclude Include="sdk\helpers\Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\helpers\config_system.cpp" />
@@ -341,6 +342,7 @@
     <ClCompile Include="thirdparty\ImGui\imgui_tables.cpp" />
     <ClCompile Include="thirdparty\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="sdk\helpers\utils.cpp" />
+    <ClCompile Include="sdk\helpers\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\freetype.lib" />

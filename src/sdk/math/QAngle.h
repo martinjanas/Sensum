@@ -20,8 +20,9 @@ public:
 	void normalize_clamp();
 	bool is_zero();
 
-    QAngle lerp_angle(QAngle& other, float speed);
-    QAngle lerp_angle_const(QAngle& other, float speed);
+    QAngle lerp(QAngle& aim_angle, float t);
+    QAngle lerp_angle(QAngle& aim_angle, float speed);
+    QAngle lerp_angle_const(QAngle& aim_angle, float speed);
 
 	Vector to_vector() const;
     
@@ -111,14 +112,6 @@ public:
         this->yaw += other.yaw;
         
         return *this;
-    }
-
-    static QAngle lerp(const QAngle& a, const QAngle& b, float t) {
-        return QAngle(
-            a.pitch + (b.pitch - a.pitch) * t,
-            a.yaw + (b.yaw - a.yaw) * t,
-            a.roll + (b.roll - a.roll) * t
-        );
     }
 
     float length() const 

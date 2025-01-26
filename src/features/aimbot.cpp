@@ -8,6 +8,7 @@
 #include "../sdk/helpers/entity_data.h"
 #include "../sdk/sdk.h"
 #include "../sdk/helpers/utils.h"
+#include "../sdk/helpers/Timer.h"
 
 namespace features
 {
@@ -151,7 +152,7 @@ namespace features
                 QAngle compensated_angle = viewangles - recoil_delta;
                 compensated_angle.normalize_clamp();
 
-                QAngle output = viewangles.lerp_angle(compensated_angle, 1.1f);
+                QAngle output = viewangles.lerp_angle(compensated_angle, 1.23f);
                 output.normalize_clamp();
 
                 g::client->SetViewAngles(output);
@@ -276,13 +277,32 @@ namespace features
                     if (best_fov > weapon_config.fov)
                         continue;
 
+                    weapon_config.smooth_time = std::clamp(weapon_config.smooth_time, 0.0f, 1.0f);
+
+                    static Timer timer(weapon_config.smooth_time);
+                    timer.set_duration(weapon_config.smooth_time);
+                    timer.has_finished();
+
+                    float elapsed_time = timer.get_time_remaining();
+                    float t = elapsed_time / weapon_config.smooth_time;
+                    t = std::clamp(t, 0.0f, 1.0f);
+
+                    QAngle rcs_delta = best_angle - viewangles;
+                    rcs_delta.normalize_clamp();
+                    bool is_spraying = rcs_delta.length() > 0.01f && localpawn->m_iShotsFired() > 1;
+
                     QAngle output;
                     if (weapon_config.smooth_mode == 0)
                         output = viewangles.lerp_angle(best_angle, weapon_config.smooth);
                     else if (weapon_config.smooth_mode == 1)
                         output = viewangles.lerp_angle_const(best_angle, weapon_config.smooth);
+                    else if (weapon_config.smooth_mode == 2)
+                        output = viewangles.lerp(best_angle, t);
 
                     output.normalize_clamp();
+
+                    if (t >= 1.0f)
+                        timer.reset();
 
                     g::client->SetViewAngles(output);
                 }

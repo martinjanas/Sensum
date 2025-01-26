@@ -21,14 +21,15 @@ namespace settings
 			bool nearest_hitbox_in_air_override = true;
 			float fov = 20.f;
 			float smooth = 3.5f;
+			float smooth_time = 1.f;
 			int smooth_mode = 1;
 			int hitboxes = TARGET_HEAD | TARGET_CHEST;
 
 			struct
 			{
 				bool enabled = true;
-				float pitch = 1.5f;
-				float yaw = 1.5f;
+				float pitch = 2.f;
+				float yaw = 2.f;
 			} recoil;
 		};
 

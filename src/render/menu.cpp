@@ -80,7 +80,7 @@ void get_def_index(int& index)
 void draw_menu_debug()
 {
 	static std::vector<std::string> hitbox_items = { "Head", "Chest", "Arms", "Legs", "Nearest In Air" };
-	static const char* items[] = { "Linear", "Constant" };
+	static const char* items[] = { "Linear", "Constant", "Lerp" };
 
 	ImGui::PushFont(render::fonts::selector);
 	ImGui::Checkbox("Visible Only", &settings::esp::visible_only);
@@ -103,8 +103,11 @@ void draw_menu_debug()
 		ImGui::SliderFloat("Aimbot FOV", &settings->fov, 0, 180, "%.1f");
 
 		ShowMultiSelectPopup("Hitboxes", settings->hitboxes, hitbox_items);
-		ImGui::SliderFloat("###AimbotSmooth", &settings->smooth, 1.f, 10.f, "Smooth: %.1f");
-		imc::Selector("Smoothing Mode", items, 2, &settings->smooth_mode);
+		if (settings->smooth_mode != 2)
+			ImGui::SliderFloat("###smooth", &settings->smooth, 1.f, 10.f, "Smooth: %.1f");
+		else ImGui::SliderFloat("###smooth_time", &settings->smooth_time, 0.f, 1.f, "Smooth Time: %.2f");
+
+		imc::Selector("Smoothing Mode", items, ARRAYSIZE(items), &settings->smooth_mode);
 
 		ImGui::SliderFloat("Recoil Pitch", &settings->recoil.pitch, 0.f, 2.f, "Recoil Pitch: %.1f");
 		ImGui::SliderFloat("Recoil Yaw", &settings->recoil.yaw, 0.f, 2.f, "Recoil Yaw: %.1f");
