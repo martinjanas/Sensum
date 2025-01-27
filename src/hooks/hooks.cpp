@@ -152,29 +152,53 @@ namespace hooks
 		safetyhook.fastcall<void>(rcx);
 	}
 
+	void chams(void* rcx, void* rdx, CSceneData* scene_data, int a4, void* scene_view, void* scene_layer, void* a7, IMaterial* material)
+	{
+		if (!g::engine_client->IsInGame())
+			return;
+
+		CCSPlayerController* local_controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
+		if (!local_controller)
+			return;
+
+		CCSPlayerPawn* local_pawn = reinterpret_cast<CCSPlayerPawn*>(g::entity_system->GetEntityFromHandle(local_controller->m_hPawn()));
+		if (!local_pawn)
+			return;
+
+		if (!scene_data || !scene_data->material)
+			return;
+
+		CCSPlayerController* player = reinterpret_cast<CCSPlayerController*>(g::entity_system->GetEntityFromHandle(scene_data->scene_object->owner_handle));
+		if (!player)
+			return;
+
+		auto* pawn = reinterpret_cast<CCSPlayerPawn*>(g::entity_system->GetEntityFromHandle(player->m_hPawn()));
+		if (!pawn)
+			return;
+
+		if (pawn == local_pawn)
+			return;
+
+		if (!g::game_type->IsDeathmatch() && pawn->m_iTeamNum() == local_pawn->m_iTeamNum())
+			return;
+
+		const char* mat_name = scene_data->material->GetName();
+		if (!strstr(mat_name, "characters/models"))
+			return;
+
+		static IMaterial** m = nullptr;
+		static auto mat = g::mat_system->FindMaterial(&m, "materials/dev/primary_white.vmat");
+
+		/*IMaterial* latex_mat = nullptr;
+		latex_mat = create_material(material_latex_vis, "material_latex_vis");*/ //not working properly
+
+		scene_data->material = *m;
+	}
+
 	void __fastcall draw_array_ex::hooked(void* rcx, void* rdx, CSceneData* scene_data, int a4, void* scene_view, void* scene_layer, void* a7, IMaterial* material)
 	{
-		//IMaterial* latex_mat = nullptr;
-		//if (g::engine_client->IsInGame())
-		//{
-		//	//static bool done = false;
-
-		//	latex_mat = create_material(material_latex_vis, "material_latex_vis");
-		//}
-
-		//if (scene_data && scene_data->material && g::engine_client->IsInGame())
-		//{
-		//	if (strstr(scene_data->material->GetName(), "characters/models") && !strstr(scene_data->material->GetName(), "characters/models/shared"))
-		//	{
-		//		/*static IMaterial** m = nullptr;
-		//		static auto mat = g::mat_system->FindMaterial(&m, "materials/dev/primary_white.vmat");*/
-
-		//		if (latex_mat)
-		//		{
-		//			scene_data->material = latex_mat;
-		//		}
-		//	}
-		//}
+		//Bug: chams rendering on local team
+		//chams(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
 
 		safetyhook.fastcall<void>(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
 	}

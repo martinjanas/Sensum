@@ -21,8 +21,8 @@ public:
 	bool is_zero();
 
     QAngle lerp(QAngle& aim_angle, float t);
-    QAngle lerp_angle(QAngle& aim_angle, float speed);
-    QAngle lerp_angle_const(QAngle& aim_angle, float speed);
+    QAngle linear_smooth(QAngle& aim_angle, float speed);
+    QAngle const_smooth(QAngle& aim_angle, float speed);
 
 	Vector to_vector() const;
     
@@ -144,4 +144,3 @@ public:
 		this->Clamp();
 	}*/
 };
-

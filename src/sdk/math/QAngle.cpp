@@ -62,7 +62,7 @@ QAngle QAngle::lerp(QAngle& aim_angle, float t)
 	return out_angle;
 }
 
-QAngle QAngle::lerp_angle(QAngle& aim_angle, float speed)
+QAngle QAngle::linear_smooth(QAngle& aim_angle, float speed)
 {
 	QAngle out_angle;
 
@@ -78,7 +78,7 @@ QAngle QAngle::lerp_angle(QAngle& aim_angle, float speed)
 	return out_angle;
 }
 
-QAngle QAngle::lerp_angle_const(QAngle& aim_angle, float speed)
+QAngle QAngle::const_smooth(QAngle& aim_angle, float speed)
 {
 	QAngle out_angle = *this;
 

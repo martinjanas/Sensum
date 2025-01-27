@@ -152,7 +152,7 @@ namespace features
                 QAngle compensated_angle = viewangles - recoil_delta;
                 compensated_angle.normalize_clamp();
 
-                QAngle output = viewangles.lerp_angle(compensated_angle, 1.23f);
+                QAngle output = viewangles.linear_smooth(compensated_angle, 1.23f);
                 output.normalize_clamp();
 
                 g::client->SetViewAngles(output);
@@ -293,9 +293,9 @@ namespace features
 
                     QAngle output;
                     if (weapon_config.smooth_mode == 0)
-                        output = viewangles.lerp_angle(best_angle, weapon_config.smooth);
+                        output = viewangles.linear_smooth(best_angle, weapon_config.smooth);
                     else if (weapon_config.smooth_mode == 1)
-                        output = viewangles.lerp_angle_const(best_angle, weapon_config.smooth);
+                        output = viewangles.const_smooth(best_angle, weapon_config.smooth);
                     else if (weapon_config.smooth_mode == 2)
                         output = viewangles.lerp(best_angle, t);
 
