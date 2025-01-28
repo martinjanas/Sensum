@@ -8,34 +8,52 @@
 #include "../sdk/helpers/entity_data.h"
 #include "../sdk/sdk.h"
 #include "../sdk/helpers/Timer.h"
+#include "../sdk/helpers/utils.h"
 
 namespace features
 {
-    /*
-        To be implemented:
-        States - (is spraying, has target, etc...)
-
-        Current problem: Targets are not players, but hitboxes.
-    
-        Solution?:
-            - Some map of targets - players? 
-            - Calculate aimbot targets in entity_data ?
-
-        Make fetch_aimbot_targets function dedicated for aimbot?
-            - From there create & calculate aimbot target map/list/array etc...
-
-
-    */
-
     namespace aimbot
     {
+        struct target_info_t
+        {
+            bool operator<(const target_info_t& other) const
+            {
+                if (fov != other.fov)
+                    return fov < other.fov;
+                
+                return distance < other.distance;
+            }
+
+            CCSPlayerPawn* pawn;
+            entity_data::player_data_t* player_data;
+
+            float fov;
+            float distance;
+            bool in_air;
+
+            QAngle target_angle;
+            const char* name;
+        };
+        
         std::list<entity_data::player_data_t> m_player_data;
 
         static QAngle last_punch = { 0.f, 0.f, 0.f };
         settings::aimbot::weapon_config_t weapon_config;
+        
+        float distance_based_fov(const QAngle& delta, const float& distance)
+        {
+            float pitch_diff = std::sinf(fabsf(delta.pitch) * math::deg2rad) * distance;
+            float yaw_diff = std::sinf(fabsf(delta.yaw) * math::deg2rad) * distance;
+
+            float fov = std::hypotf(pitch_diff, yaw_diff);
+
+            fov = std::clamp<float>(fov, 0.f, 180.f);
+
+            return fov;
+        }
 
         //Add hitbox target priority?
-        std::unordered_set<int> GetTargetHitboxes(const entity_data::player_data_t& data) //takes 1300 ns
+        std::unordered_set<int> GetTargetHitboxes(const entity_data::player_data_t& player_data) //takes 1300 ns
         {
             static std::unordered_set<int> list;
             static int previous_hitbox_value = -1;
@@ -76,7 +94,7 @@ namespace features
                 }
             }
 
-            if (current_hitbox_value & TARGET_NEAREST_IN_AIR && data.flags.test(PLAYER_IN_AIR))
+            if (current_hitbox_value & TARGET_NEAREST_IN_AIR && player_data.flags.test(PLAYER_IN_AIR))
             {
                 list.clear();
 
@@ -94,7 +112,7 @@ namespace features
                 list.emplace(HITBOX_LEFT_CALF);
                 list.emplace(HITBOX_RIGHT_CALF);
             }
-            else if (!data.flags.test(PLAYER_IN_AIR))
+            else if (!player_data.flags.test(PLAYER_IN_AIR))
             {
                 list.clear();
 
@@ -135,21 +153,72 @@ namespace features
 
             return list;
         }
-
-        float distance_based_fov(const QAngle& delta, const float& distance)
+        
+        std::vector<target_info_t> fetch_targets(const Vector& eye_pos, const QAngle& viewangles)
         {
-            float pitch_diff = std::sinf(fabsf(delta.pitch) * math::deg2rad) * distance;
-            float yaw_diff = std::sinf(fabsf(delta.yaw) * math::deg2rad) * distance;
+            std::vector<target_info_t> targets;
 
-            float fov = std::hypotf(pitch_diff, yaw_diff);
+            float best_fov = 9999.f;
+            QAngle best_angle;
+            
+            for (auto& player_data : m_player_data)
+            {
+                if (!player_data.m_PlayerPawn || player_data.m_iHealth <= 0)
+                    continue;
 
-            fov = std::clamp<float>(fov, 0.f, 180.f);
+                if (!player_data.flags.test(PLAYER_VISIBLE) || player_data.flags.test(PLAYER_IN_SMOKE))
+                    continue;
 
-            return fov;
+                target_info_t info;
+                info.pawn = player_data.m_PlayerPawn;
+                
+                for (auto& hitbox_data : player_data.hitboxes)
+                {
+                    const auto& hitbox_ids = GetTargetHitboxes(player_data);
+                    if (hitbox_ids.empty())
+                        continue;
+                    
+                    if (!hitbox_ids.contains(hitbox_data.index))
+                        continue;
+                    
+                    if (!hitbox_data.visible)
+                        continue;
+                        
+                    QAngle target_angle = (hitbox_data.hitbox_pos - eye_pos).to_qangle();
+                    target_angle.normalize_clamp();
+                    
+                    auto delta = target_angle - viewangles;
+                    delta.normalize_clamp();
+
+                    float distance = hitbox_data.hitbox_pos.dist_to(eye_pos);
+                    info.distance = player_data.m_vecOrigin.dist_to(eye_pos);
+
+                    float fov = distance_based_fov(delta, distance);
+                    if (fov < best_fov)
+                    {
+                        best_fov = fov;
+                        best_angle = target_angle;
+                    }
+
+                    info.target_angle = best_angle;
+                    info.fov = fov;
+                    info.player_data = &player_data;
+                    info.in_air = player_data.flags.test(PLAYER_IN_AIR);
+                    info.name = player_data.m_szPlayerName;
+
+                    targets.push_back(info);
+                    //targets.emplace_back(target_info_t{player_data.m_PlayerPawn, &player_data, fov, distance, player_data.flags.test(PLAYER_IN_AIR), target_angle, player_data.m_szPlayerName});
+                }
+            }
+
+            return targets;
         }
-
-        void rcs(CCSPlayerPawn* localpawn, QAngle& viewangles, CUserCmd* cmd)
+        
+        void rcs(CCSPlayerPawn* localpawn, QAngle& viewangles, CUserCmd* cmd, bool in_fov)
         {
+            if (weapon_config.recoil.fov_based && !in_fov)
+                return;
+                
             const auto& punch_cache = localpawn->m_aimPunchCache();
             if (punch_cache.Count() <= 1 || punch_cache.Count() >= 0xFFFF)
                 return;
@@ -183,7 +252,7 @@ namespace features
         {
             return !(weapon->IsKnife() || weapon->IsC4() || weapon->IsTaser() || weapon->IsGrenade() || weapon->IsHealthshot());
         }
-
+        
         void handle(CUserCmd* cmd)
         {
             if (!g::engine_client->IsInGame())
@@ -195,12 +264,6 @@ namespace features
             if (!entity_data::player_entry_data.empty())
                 std::copy(entity_data::player_entry_data.front().player_data.begin(), entity_data::player_entry_data.front().player_data.end(), std::back_inserter(m_player_data));
 
-            QAngle viewangles;
-            g::client->GetViewAngles(&viewangles);
-
-            float best_fov = 9999.f;
-            QAngle best_angle;
-
             CCSPlayerController* localplayer = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
             if (!localplayer)
                 return;
@@ -208,7 +271,18 @@ namespace features
             CCSPlayerPawn* localpawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(localplayer->m_hPlayerPawn());  //localplayer->m_hPlayerPawn().Get<CCSPlayerPawn*>();
             if (!localpawn)
                 return;
+            
+            QAngle viewangles;
+            g::client->GetViewAngles(&viewangles);
 
+            const auto eye_pos = localpawn->GetEyePos();
+            
+            auto targets = fetch_targets(eye_pos, viewangles);
+            if (targets.empty())
+                return;
+
+            std::sort(targets.begin(), targets.end());
+            
             const auto& active_wpn_handle = localpawn->m_pWeaponServices()->m_hActiveWeapon();
             if (!active_wpn_handle.IsValid())
                 return;
@@ -225,105 +299,65 @@ namespace features
 
             weapon_config = settings::aimbot::weapon_configs[index];
 
-            const auto& eye_pos = localpawn->GetEyePos();
-            for (auto& data : m_player_data)
+            bool in_fov = false;
+            
+            for (auto& target : targets)
             {
-                if (!data.m_PlayerPawn || data.m_iHealth <= 0)
+                if (!is_weapon_valid(active_wpn))
                     continue;
 
-                if (data.flags.test(PLAYER_IN_SMOKE) || !data.flags.test(PLAYER_VISIBLE))
+                if (active_wpn->IsSniper() && !localpawn->m_bIsScoped())
                     continue;
 
-                const auto& hitbox_ids = GetTargetHitboxes(data);
-                if (hitbox_ids.empty())
+                if (active_wpn->m_bInReload())
                     continue;
 
-                for (int i = 0; i < data.hitboxes.size(); i++)
-                {
-                    auto* hitbox_data = &data.hitboxes[i];
-                    if (!hitbox_data)
-                        continue;
+                //TODO: Implement proper next_attack check using more stuff?
+                int next_attack_tick = active_wpn->m_nNextPrimaryAttackTick().m_Value(); //This next shot attack checker works poorly on awp - needs fix!
+                if (next_attack_tick <= localplayer->m_nTickBase() && !active_wpn->IsSniper()) //temp fix
+                    continue;
 
-                    if (!hitbox_ids.contains(hitbox_data->index))
-                        continue;
+                g_Console->println("[ %s ]: fov: %.1f, dist: %.1f", target.name, target.fov, target.distance);
+
+                if (!(cmd->nButtons.nValue & IN_ATTACK))
+                    continue;
+
+                if (target.fov > weapon_config.fov)
+                    continue;
+                
+                in_fov = true;
+                
+                weapon_config.smooth_time = std::clamp(weapon_config.smooth_time, 0.0f, 1.0f);
                     
-                    /*if (hitbox_ids.find(hitbox_data->index) == hitbox_ids.end())
-                        continue;*/
+                static Timer timer(weapon_config.smooth_time);
+                timer.set_duration(weapon_config.smooth_time);
+                timer.has_finished();
 
-                    //reset the target when not visible, etc... ?
-                    if (!hitbox_data->visible)
-                        continue;
+                float elapsed_time = timer.get_time_remaining();
+                float t = elapsed_time / weapon_config.smooth_time;
+                t = std::clamp(t, 0.0f, 1.0f);
 
-                    QAngle target_angle = (hitbox_data->hitbox_pos - eye_pos).to_qangle();
-                    target_angle.normalize_clamp();
+                if (t >= 1.0f)
+                    timer.reset();
 
-                    auto delta = target_angle - viewangles;
-                    delta.normalize_clamp();
-
-                    float distance = hitbox_data->hitbox_pos.dist_to(eye_pos);
-                    //float distance = data.m_vecOrigin.dist_to(eye_pos);
-
-                    float fov = distance_based_fov(delta, distance);
-                    if (fov < best_fov)
-                    {
-                        best_fov = fov;
-                        best_angle = target_angle;
-                    }
-
-                    if (!(cmd->nButtons.nValue & IN_ATTACK))
-                        continue;
-
-                    if (!is_weapon_valid(active_wpn))
-                        continue;
-
-                    if (active_wpn->IsSniper() && !localpawn->m_bIsScoped())
-                        continue;
-
-                    if (active_wpn->m_bInReload())
-                        continue;
-
-                    //TODO: Implement proper next_attack check using more stuff?
-                    int next_attack_tick = active_wpn->m_nNextPrimaryAttackTick().m_Value(); //This next shot attack checker works poorly on awp - needs fix!
-                    if (next_attack_tick <= localplayer->m_nTickBase() && !active_wpn->IsSniper()) //temp fix
-                        continue;
-
-                    //printf("[%s: %s]: fov: %.1f, best_fov: %.1f, dist: %.1f\n", data.m_szPlayerName, utils::hitbox_index_to_name(hitbox_data->index), fov, best_fov, distance);
-
-                    if (best_fov > weapon_config.fov)
-                        continue;
-
-                    weapon_config.smooth_time = std::clamp(weapon_config.smooth_time, 0.0f, 1.0f);
-
-                    static Timer timer(weapon_config.smooth_time);
-                    timer.set_duration(weapon_config.smooth_time);
-                    timer.has_finished();
-
-                    float elapsed_time = timer.get_time_remaining();
-                    float t = elapsed_time / weapon_config.smooth_time;
-                    t = std::clamp(t, 0.0f, 1.0f);
-
-                    QAngle rcs_delta = best_angle - viewangles;
-                    rcs_delta.normalize_clamp();
-                    bool is_spraying = rcs_delta.length() > 0.01f && localpawn->m_iShotsFired() > 1;
-
-                    QAngle output;
-                    if (weapon_config.smooth_mode == 0)
-                        output = viewangles.linear_smooth(best_angle, weapon_config.smooth);
-                    else if (weapon_config.smooth_mode == 1)
-                        output = viewangles.const_smooth(best_angle, weapon_config.smooth);
-                    else if (weapon_config.smooth_mode == 2)
-                        output = viewangles.lerp(best_angle, t);
-
-                    output.normalize_clamp();
-
-                    if (t >= 1.0f)
-                        timer.reset();
-
-                    g::client->SetViewAngles(output);
-                }
+                QAngle rcs_delta = target.target_angle - viewangles;
+                rcs_delta.normalize_clamp();
+                bool is_spraying = rcs_delta.length() > 0.01f && localpawn->m_iShotsFired() > 1;
+                
+                QAngle smoothed_angle;
+                if (weapon_config.smooth_mode == 0)
+                    smoothed_angle = viewangles.linear_smooth(target.target_angle, weapon_config.smooth);
+                else if (weapon_config.smooth_mode == 1)
+                    smoothed_angle = viewangles.const_smooth(target.target_angle, weapon_config.smooth);
+                else if (weapon_config.smooth_mode == 2)
+                    smoothed_angle = viewangles.lerp(target.target_angle, t);
+                
+                smoothed_angle.normalize_clamp();
+                
+                g::client->SetViewAngles(smoothed_angle);
             }
 
-            rcs(localpawn, viewangles, cmd);
+            rcs(localpawn, viewangles, cmd, in_fov);
         }
     }
 }

@@ -31,7 +31,6 @@ namespace entity_data
 		Vector hitbox_pos;
 		uint16_t index;
 		bool visible;
-		float curtime;
 	};
 
 	struct bone_info_t

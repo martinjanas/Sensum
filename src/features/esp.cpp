@@ -1,6 +1,7 @@
 ﻿#include "features.h"
 #include "../render/render.h"
 #include "../sdk/classes/CPlantedC4.h"
+#include "../sdk/helpers/Timer.h"
 #include <format>
 
 namespace features::esp
@@ -147,11 +148,48 @@ namespace features::esp
 			esp::name_esp(data, data.bbox);
 
 			//Draw3DBox(data.bbox);
-
+			draw_fov(data);
 			esp::bone_esp(data);
 		}
 	}
+	
+	void draw_fov(entity_data::player_data_t& data)
+	{
+		CCSPlayerController* controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
+		if (!controller)
+			return;
 
+		CCSPlayerPawn* pawn = reinterpret_cast<CCSPlayerPawn*>(g::entity_system->GetEntityFromHandle(controller->m_hPawn()));
+		if (!pawn)
+			return;
+		
+		auto head_hitbox = &data.hitboxes[HITBOX_HEAD];
+		if (!head_hitbox)
+			return;
+		
+		Vector head_w2s;
+		if (!globals::world2screen(head_hitbox->hitbox_pos, head_w2s))
+			return;
+
+		auto wpn = reinterpret_cast<CBasePlayerWeapon*>(g::entity_system->GetEntityFromHandle(pawn->m_pWeaponServices()->m_hActiveWeapon()));
+		if (!wpn)
+			return;
+		
+		auto weapon_config = settings::aimbot::weapon_configs[wpn->m_iItemDefinitionIndex()];
+		float fov = weapon_config.fov;
+		
+		Vector hitbox_offset = head_hitbox->hitbox_pos + Vector(0, 0, 10);
+		Vector offset_w2s;
+		if (!globals::world2screen(hitbox_offset, offset_w2s))
+			return;
+		
+		float screen_radius = head_w2s.dist_to(offset_w2s);
+		
+		screen_radius *= (fov / 10.0f);
+		
+		globals::draw_list->AddCircle(head_w2s.as_vec2(), screen_radius, IM_COL32(255, 255, 255, 255), 64, 1.5f);
+	}
+	
 	void bone_esp(entity_data::player_data_t& data)
 	{
 		if (!settings::esp::bone_esp)

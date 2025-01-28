@@ -12,6 +12,7 @@ namespace features
 
 		void bone_esp(entity_data::player_data_t& data);
 		void name_esp(entity_data::player_data_t& data, const BBox_t& bbox);
+		void draw_fov(entity_data::player_data_t& data);
 	}
 
 	namespace aimbot

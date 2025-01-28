@@ -55,7 +55,7 @@ QAngle QAngle::lerp(QAngle& aim_angle, float t)
 	QAngle out_angle;
 
 	t = std::clamp(t, 0.0f, 1.0f);
-
+	
 	out_angle.pitch = std::lerp(this->pitch, aim_angle.pitch, t);
 	out_angle.yaw = std::lerp(this->yaw, aim_angle.yaw, t);
 	out_angle.normalize_clamp();

@@ -100,17 +100,18 @@ void draw_menu_debug()
 
 		auto settings = &settings::aimbot::weapon_configs[definition_index];
 
-		ImGui::SliderFloat("Aimbot FOV", &settings->fov, 0, 180, "%.1f");
+		ImGui::SliderFloat("Aimbot FOV", &settings->fov, 0, 100, "%.1f");
 
 		ShowMultiSelectPopup("Hitboxes", settings->hitboxes, hitbox_items);
 		if (settings->smooth_mode != 2)
 			ImGui::SliderFloat("###smooth", &settings->smooth, 1.f, 10.f, "Smooth: %.1f");
-		else ImGui::SliderFloat("###smooth_time", &settings->smooth_time, 0.f, 1.f, "Smooth Time: %.2f");
+		else ImGui::SliderFloat("###smooth_time", &settings->smooth_time, 0.1f, 1.f, "Smooth Time: %.2f");
 
 		imc::Selector("Smoothing Mode", items, ARRAYSIZE(items), &settings->smooth_mode);
 
 		ImGui::SliderFloat("Recoil Pitch", &settings->recoil.pitch, 0.f, 2.f, "Recoil Pitch: %.1f");
 		ImGui::SliderFloat("Recoil Yaw", &settings->recoil.yaw, 0.f, 2.f, "Recoil Yaw: %.1f");
+		ImGui::Checkbox("Fov Based", &settings->recoil.fov_based);
 	}
 
 	ImGui::SliderFloat("posx", &settings::misc::rotation_x, -3.f, 3.f);

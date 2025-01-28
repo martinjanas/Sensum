@@ -30,6 +30,8 @@ namespace settings
 				bool enabled = true;
 				float pitch = 2.f;
 				float yaw = 2.f;
+
+				bool fov_based = true;
 			} recoil;
 		};
 
