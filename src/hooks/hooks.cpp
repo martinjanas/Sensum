@@ -1,7 +1,6 @@
 #include "hooks.h"
 #include "../settings/settings.h"
 #include "../sdk/helpers/entity_data.h"
-#include <memory>
 #include "../sdk/helpers/CUtlBuffer.h"
 
 static void get_dxgi(IDXGIFactory*& dxgi_factory)

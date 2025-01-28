@@ -59,8 +59,8 @@ void __fastcall hooks::frame_stage_notify::hooked(void* rcx, EClientFrameStage s
 	case FRAME_NET_UPDATE_POSTDATAUPDATE_END:
 		break;
 	case FRAME_NET_UPDATE_END:
-		entity_data::fetch_player_data();
-		entity_data::fetch_entity_info();
+		/*entity_data::fetch_player_data();
+		entity_data::fetch_entity_info();*/
 		break;
 	case FRAME_RENDER_START:
 		break;

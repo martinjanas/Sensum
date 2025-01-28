@@ -11,7 +11,6 @@
 #include "../helpers/CUtlVector.h"
 #include "../helpers/CUtlMap.h"
 #include "../helpers/vfunc.h"
-#include "../helpers/CThreadSpinRWLock.h"
 
 // Copyright (C) 2023 neverlosecc
 // See end of file for extended copyright information.
@@ -858,13 +857,13 @@ public:
         return VTable::GetThiscall<bool>(this, 26);
     }
 
-    [[nodiscard]] void PrintSchemaStats() 
+    void PrintSchemaStats() 
     {
         VTable::GetThiscall<void>(this, 30);
     }
 
     // @note: @og: there 2 options, "enum" or "class"
-    [[nodiscard]] void PrintSchemaMetaStats(const char* pszOptions) 
+    void PrintSchemaMetaStats(const char* pszOptions) 
     {
         VTable::GetThiscall<void>(this, 31, pszOptions);
     }

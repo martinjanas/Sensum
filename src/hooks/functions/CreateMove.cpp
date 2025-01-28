@@ -53,6 +53,8 @@ bool SerializePartialToArray(CBaseUserCmdPB* base_cmd, const CUtlBuffer& buffer,
     auto serialize_partial_to_array = reinterpret_cast<fn>(addr);
     if (serialize_partial_to_array)
         return serialize_partial_to_array(base_cmd, buffer, crc_size);
+
+    return false;
 }
 
 void WriteMessage(void* msg, const CUtlBuffer& buffer, int crc_size)
@@ -77,6 +79,8 @@ std::string* SetMessageData(void* move_crc, void* msg, void* nHasBits)
     auto set_message_data = reinterpret_cast<fn>(addr);
     if (set_message_data)
         return set_message_data(move_crc, msg, nHasBits);
+
+    return nullptr;
 }
 
 void* Alloc(std::size_t size)
@@ -89,6 +93,8 @@ void* Alloc(std::size_t size)
     auto alloc = reinterpret_cast<fn>(addr);
     if (alloc)
         return alloc(size);
+
+    return nullptr;
 }
 
 void Free(const void* p)
@@ -114,8 +120,8 @@ bool CalculateCRC(CBaseUserCmdPB* base_cmd) //CCSGOUserCmdPB
     if (serialize_result)
     {
         //uintptr_t* msg = static_cast<uintptr_t*>(g::mem_alloc->Alloc(0x18));
-        void* msg{};
-        msg = Alloc(0x18);
+        //void* msg{};
+        void* msg = Alloc(0x18);
 
         base_cmd->nCachedBits |= 1;
 
@@ -124,7 +130,7 @@ bool CalculateCRC(CBaseUserCmdPB* base_cmd) //CCSGOUserCmdPB
             has_bits = static_cast<uint32_t>(has_bits);
         
         WriteMessage(msg, buffer, crc_size);
-        base_cmd->strMoveCrc = SetMessageData(&base_cmd->strMoveCrc, msg, &has_bits);
+        base_cmd->strMoveCrc = SetMessageData((void*)&base_cmd->strMoveCrc, msg, &has_bits);
         Free(msg);
 
         return true;
@@ -138,6 +144,9 @@ void __fastcall hooks::createmove_csgoinput::hooked(void* rcx, int slot, bool ac
 {
     if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
         original_fn(rcx, slot, active);
+
+    entity_data::fetch_player_data();
+    entity_data::fetch_entity_info();
 
     if (g_cmd && g_cmd->csgoUserCmd.pBaseCmd && g_cmd->csgoUserCmd.pBaseCmd->nWeaponSelect == 0)
     {

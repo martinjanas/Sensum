@@ -7,11 +7,26 @@
 #include "../sdk/math/math.h"
 #include "../sdk/helpers/entity_data.h"
 #include "../sdk/sdk.h"
-#include "../sdk/helpers/utils.h"
 #include "../sdk/helpers/Timer.h"
 
 namespace features
 {
+    /*
+        To be implemented:
+        States - (is spraying, has target, etc...)
+
+        Current problem: Targets are not players, but hitboxes.
+    
+        Solution?:
+            - Some map of targets - players? 
+            - Calculate aimbot targets in entity_data ?
+
+        Make fetch_aimbot_targets function dedicated for aimbot?
+            - From there create & calculate aimbot target map/list/array etc...
+
+
+    */
+
     namespace aimbot
     {
         std::list<entity_data::player_data_t> m_player_data;
@@ -219,9 +234,6 @@ namespace features
                 if (data.flags.test(PLAYER_IN_SMOKE) || !data.flags.test(PLAYER_VISIBLE))
                     continue;
 
-                if (data.hitboxes.empty())
-                    continue;
-
                 const auto& hitbox_ids = GetTargetHitboxes(data);
                 if (hitbox_ids.empty())
                     continue;
@@ -232,8 +244,11 @@ namespace features
                     if (!hitbox_data)
                         continue;
 
-                    if (hitbox_ids.find(hitbox_data->index) == hitbox_ids.end())
+                    if (!hitbox_ids.contains(hitbox_data->index))
                         continue;
+                    
+                    /*if (hitbox_ids.find(hitbox_data->index) == hitbox_ids.end())
+                        continue;*/
 
                     //reset the target when not visible, etc... ?
                     if (!hitbox_data->visible)

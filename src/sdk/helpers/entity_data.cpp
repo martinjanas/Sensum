@@ -293,7 +293,7 @@ namespace entity_data
 			if (!controller->m_hPawn().IsValid())
 				continue;
 
-			const auto& pawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(controller->m_hPawn()); //was m_hPlayerPawn
+			const auto& pawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(controller->m_hPawn());
 			if (!pawn || !pawn->IsAlive() || pawn->m_bGunGameImmunity() || pawn == localpawn || (!g::game_type->IsDeathmatch() && pawn->m_iTeamNum() == local_team))
 				continue;
 

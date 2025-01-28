@@ -118,29 +118,4 @@ public:
     {
         return std::sqrt(pitch * pitch + yaw * yaw + roll * roll);
     }
-
-	/*void Clamp()
-	{
-		pitch = std::clamp(pitch, -89.0f, 89.0f);
-		yaw = std::clamp(yaw, -180.0f, 180.0f);
-		roll = std::clamp(roll, 0.0f, 0.0f);
-	}
-
-	void Normalize()
-	{
-		for (auto& angle : { std::ref(pitch), std::ref(yaw), std::ref(roll) })
-		{
-			while (angle < -180.0f)
-				angle += 360.0f;
-
-			while (angle >= 180.0f)
-				angle -= 360.0f;
-		}
-	}
-
-	void ClampNormalize()
-	{
-		this->Normalize();
-		this->Clamp();
-	}*/
 };

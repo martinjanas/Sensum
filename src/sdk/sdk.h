@@ -1,6 +1,5 @@
 #pragma once
 #include <dxgi.h>
-#include <d3d11.h>
 #include <cstddef>
 #include "../sdk/interfaces/IVEngineClient.h"
 #include "../sdk/interfaces/SchemaSystem.h"
@@ -18,7 +17,6 @@
 #include "../sdk/interfaces/CGameType.h"
 #include "../sdk/interfaces/CHudChat.h"
 #include "../sdk/interfaces/IVEngineCVar.h"
-#include "../sdk/math/Viewmatrix.h"
 #include "../sdk/helpers/CUtlBuffer.h"
 
 namespace sdk
@@ -78,7 +76,7 @@ public:
 	bool LoadFromBuffer(const char* str, const char* kv3_name)
 	{
 		CUtlBuffer buffer = {0, 0, 0};
-		buffer.EnsureCapacity(strlen(str) + 1);
+		buffer.EnsureCapacity((int)strlen(str) + 1);
 		buffer.PutString(str);
 
 		if (LoadKV3(&buffer, kv3_name))
@@ -110,7 +108,7 @@ public:
 		return VTable::GetThiscall<IMaterial*>(this, 14, material, name);
 	}
 
-	IMaterial* CreateMaterial(IMaterial*** material, const char* mat_name, KeyValues key_value, uint32_t num1, uint8_t num2)
+	IMaterial* CreateMaterial(IMaterial*** material, const char* mat_name, const KeyValues& key_value, uint32_t num1, uint8_t num2)
 	{
 		return VTable::GetThiscall<IMaterial*>(this, 29, material, mat_name, key_value, num1, num2);
 	}

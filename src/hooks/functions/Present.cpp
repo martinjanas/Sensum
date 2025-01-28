@@ -4,6 +4,8 @@
 #include "../../sdk/helpers/entity_data.h"
 #include "../../render/menu.h"
 #include "../../features/features.h"
+#include "../../thirdparty/ImGui/backends/imgui_impl_dx11.h"
+#include "../../thirdparty/ImGui/backends/imgui_impl_win32.h"
 
 namespace hooks
 {
