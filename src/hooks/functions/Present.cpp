@@ -78,7 +78,7 @@ namespace hooks
 			menu::draw();
 
 			features::esp::render();
-			features::esp::render_entities();
+			features::esp::render_entities(g_pDevice, g_pContext);
 		}
 		ImGui::EndFrame();
 		ImGui::Render();

@@ -27,6 +27,9 @@ public:
     template <ELogLevel log_level = LOG_INFO>
     void println(const char* format, ...)
     {
+        if (!is_attached)
+            return;
+        
         va_list args;
         va_start(args, format);
 
@@ -80,6 +83,8 @@ private:
     void log_output(const char* msg);
 
     std::list<std::string> log_data;
+
+    bool is_attached = false;
 };
 extern inline std::unique_ptr<Console> g_Console = nullptr;
 

@@ -9,6 +9,8 @@ void Console::detach()
 
     FreeConsole();
     PostMessageA(hwnd, WM_QUIT, 0, 0);
+
+    is_attached = false;
 }
 
 void Console::attach()
@@ -20,6 +22,8 @@ void Console::attach()
     freopen_s(&file, "CONIN$", "r", stdin);
     freopen_s(&file, "CONOUT$", "w", stdout);
     freopen_s(&file, "CONOUT$", "w", stderr);
+
+    is_attached = true;
 }
 
 void Console::log_output(const char* msg)

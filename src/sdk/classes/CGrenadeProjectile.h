@@ -15,3 +15,10 @@ class CGrenadeProjectile : public CGrenade
 public:
 
 };
+
+class CSmokeProjectile
+{
+public:
+	NETVAR(int, m_nSmokeEffectTickBegin, "C_SmokeGrenadeProjectile", "m_nSmokeEffectTickBegin")
+	NETVAR(bool, m_bDidSmokeEffect, "C_SmokeGrenadeProjectile", "m_bDidSmokeEffect")
+};

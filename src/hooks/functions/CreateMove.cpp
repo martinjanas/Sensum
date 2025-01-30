@@ -144,7 +144,7 @@ void __fastcall hooks::createmove_csgoinput::hooked(void* rcx, int slot, bool ac
 {
     if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
         original_fn(rcx, slot, active);
-
+    
     entity_data::fetch_player_data();
     entity_data::fetch_entity_info();
 

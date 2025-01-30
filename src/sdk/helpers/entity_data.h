@@ -90,7 +90,9 @@ namespace entity_data
 
 	struct grenade_info_t : generic_entity_info_t
 	{
-
+		int spawn_tick;
+		bool did_spawn;
+		float time_remaining;
 	};
 
 	struct world_entity_info_t : generic_entity_info_t

@@ -267,7 +267,6 @@ public:
 
 	void SetSubTickAngle(const QAngle& angView)
 	{
-		//Doesnt work
 		for (int i = 0; i < this->csgoUserCmd.inputHistoryField.pRep->nAllocatedSize; i++)
 		{
 			CCSGOInputHistoryEntryPB* pInputEntry = this->GetInputHistoryEntry(i);

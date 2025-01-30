@@ -65,6 +65,12 @@ public:
         return class_two_hash == FNV("C_BaseCSGrenadeProjectile");
     }
 
+    bool IsSmokeProjectile()
+    {
+        const auto& class_two_hash = GetClassNameHash<>();
+        return class_two_hash == FNV("C_SmokeGrenadeProjectile");
+    }
+
     //returns dropped weapon or grenade entities in the world
     bool IsDroppedWorldEntity()
     {

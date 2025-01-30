@@ -14,14 +14,17 @@ namespace features
 {
     namespace aimbot
     {
+        namespace delays
+        {
+            float aiming_time;
+            
+        }
+        
         struct target_info_t
         {
             bool operator<(const target_info_t& other) const
             {
-                if (fov != other.fov)
-                    return fov < other.fov;
-                
-                return distance < other.distance;
+                return fov < other.fov;
             }
 
             CCSPlayerPawn* pawn;
@@ -216,19 +219,20 @@ namespace features
         
         void rcs(CCSPlayerPawn* localpawn, QAngle& viewangles, CUserCmd* cmd, bool in_fov)
         {
-            if (weapon_config.recoil.fov_based && !in_fov)
-                return;
+             if (weapon_config.recoil.fov_based && !in_fov)
+                 return;
                 
             const auto& punch_cache = localpawn->m_aimPunchCache();
             if (punch_cache.Count() <= 1 || punch_cache.Count() >= 0xFFFF)
                 return;
 
             QAngle current_punch = punch_cache[punch_cache.Count() - 1];
-            current_punch.pitch *= (weapon_config.recoil.pitch * 1.25f);
-            current_punch.yaw *= (weapon_config.recoil.yaw * 1.25f);
+            current_punch.pitch *= (weapon_config.recoil.pitch);
+            current_punch.yaw *= (weapon_config.recoil.yaw);
             current_punch.normalize_clamp();
-
-            if (localpawn->m_iShotsFired() > 1 && g::input_system->IsButtonDown(ButtonCode::MouseLeft))
+            
+            //g::input_system->IsButtonDown(ButtonCode::MouseLeft)
+            if (localpawn->m_iShotsFired() > 1 && cmd->nButtons.nValue & IN_ATTACK)
             {
                 QAngle recoil_delta = current_punch - last_punch;
                 recoil_delta.normalize_clamp();
@@ -236,7 +240,7 @@ namespace features
                 QAngle compensated_angle = viewangles - recoil_delta;
                 compensated_angle.normalize_clamp();
 
-                QAngle output = viewangles.linear_smooth(compensated_angle, 1.23f);
+                QAngle output = viewangles.linear_smooth(compensated_angle, 1.1f);
                 output.normalize_clamp();
 
                 g::client->SetViewAngles(output);
@@ -275,12 +279,13 @@ namespace features
             QAngle viewangles;
             g::client->GetViewAngles(&viewangles);
 
+            // viewangles -= localpawn->m_aimPunchCache()[localpawn->m_aimPunchCache().Count() - 1];
+            // viewangles.normalize_clamp();
+
             const auto eye_pos = localpawn->GetEyePos();
             
             auto targets = fetch_targets(eye_pos, viewangles);
-            if (targets.empty())
-                return;
-
+ 
             std::sort(targets.begin(), targets.end());
             
             const auto& active_wpn_handle = localpawn->m_pWeaponServices()->m_hActiveWeapon();
@@ -300,7 +305,6 @@ namespace features
             weapon_config = settings::aimbot::weapon_configs[index];
 
             bool in_fov = false;
-            
             for (auto& target : targets)
             {
                 if (!is_weapon_valid(active_wpn))
@@ -317,7 +321,7 @@ namespace features
                 if (next_attack_tick <= localplayer->m_nTickBase() && !active_wpn->IsSniper()) //temp fix
                     continue;
 
-                g_Console->println("[ %s ]: fov: %.1f, dist: %.1f", target.name, target.fov, target.distance);
+                //g_Console->println("[ %s ]: fov: %.1f, dist: %.1f", target.name, target.fov, target.distance);
 
                 if (!(cmd->nButtons.nValue & IN_ATTACK))
                     continue;
@@ -332,18 +336,20 @@ namespace features
                 static Timer timer(weapon_config.smooth_time);
                 timer.set_duration(weapon_config.smooth_time);
                 timer.has_finished();
-
+                
                 float elapsed_time = timer.get_time_remaining();
                 float t = elapsed_time / weapon_config.smooth_time;
                 t = std::clamp(t, 0.0f, 1.0f);
-
+                
                 if (t >= 1.0f)
                     timer.reset();
+
+                //g_Console->println("t: %.2f, elapsed_time: %.2f", t, elapsed_time);
 
                 QAngle rcs_delta = target.target_angle - viewangles;
                 rcs_delta.normalize_clamp();
                 bool is_spraying = rcs_delta.length() > 0.01f && localpawn->m_iShotsFired() > 1;
-                
+
                 QAngle smoothed_angle;
                 if (weapon_config.smooth_mode == 0)
                     smoothed_angle = viewangles.linear_smooth(target.target_angle, weapon_config.smooth);

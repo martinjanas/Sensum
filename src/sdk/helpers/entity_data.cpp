@@ -360,6 +360,21 @@ namespace entity_data
 		player_entry_data.push_back(std::move(entry_data));
 	}
 
+	#define TIME_TO_TICKS( dt )	( ( int )( 0.5f + ( float )( dt ) / 0.015625 ) )
+    #define TICKS_TO_TIME(t) ( 0.015625 * (t) )
+
+	void calculate_smoke_time(grenade_info_t& data)
+	{
+		static float expire_time = 21.f;
+		auto spawn_time = (float)TICKS_TO_TIME(data.spawn_tick);
+		float total_time_alive = g::global_vars->m_curtime - spawn_time;
+					
+		float time_remaining = expire_time - total_time_alive;
+		time_remaining = std::clamp(time_remaining, 0.f, 21.f);
+					
+		data.time_remaining = time_remaining;
+	}
+	
 	void fetch_entity_info()
 	{
 		if (!g::engine_client->IsInGame())
@@ -400,6 +415,15 @@ namespace entity_data
 
 				grenade_info_t data;
 				data.m_vecOrigin = grenade_entity->m_pGameSceneNode()->m_vecOrigin();
+
+				if (grenade_entity->IsSmokeProjectile())
+				{
+					auto smoke_entity = reinterpret_cast<CSmokeProjectile*>(grenade_entity);
+					data.spawn_tick = smoke_entity->m_nSmokeEffectTickBegin();
+					data.did_spawn = smoke_entity->m_bDidSmokeEffect();
+
+					calculate_smoke_time(data);
+				}
 				
 				entry_data.grenade_info.push_back(data);
 			}
