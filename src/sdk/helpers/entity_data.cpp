@@ -7,6 +7,8 @@
 #include "../classes/CGrenadeProjectile.h"
 #include <queue>
 
+#include "../../render/render.h"
+
 namespace entity_data
 {
 	std::list<EntityInstance_t> player_instances;
@@ -325,7 +327,7 @@ namespace entity_data
 			const auto on_screen = globals::world2screen(scene_node->m_vecOrigin(), origin_w2s);
 
 			player_data_t player_data;
-			player_data.m_szPlayerName = controller->m_sSanitizedPlayerName();
+			player_data.m_szPlayerName = "Martin";//controller->m_sSanitizedPlayerName();
 			player_data.m_iPlayerIndex = index;
 			player_data.m_vecOrigin = scene_node->m_vecOrigin();
 			player_data.m_vecAbsOrigin = scene_node->m_vecAbsOrigin();
@@ -363,16 +365,16 @@ namespace entity_data
 	#define TIME_TO_TICKS( dt )	( ( int )( 0.5f + ( float )( dt ) / 0.015625 ) )
     #define TICKS_TO_TIME(t) ( 0.015625 * (t) )
 
-	void calculate_smoke_time(grenade_info_t& data)
+	void calculate_smoke_time(smoke_info_t& data)
 	{
 		static float expire_time = 21.f;
-		auto spawn_time = (float)TICKS_TO_TIME(data.spawn_tick);
+		auto spawn_time = (float)TICKS_TO_TIME(data.m_nSmokeEffectTickBegin);
 		float total_time_alive = g::global_vars->m_curtime - spawn_time;
 					
 		float time_remaining = expire_time - total_time_alive;
 		time_remaining = std::clamp(time_remaining, 0.f, 21.f);
 					
-		data.time_remaining = time_remaining;
+		data.remaining_smoke_time = time_remaining;
 	}
 	
 	void fetch_entity_info()
@@ -415,14 +417,58 @@ namespace entity_data
 
 				grenade_info_t data;
 				data.m_vecOrigin = grenade_entity->m_pGameSceneNode()->m_vecOrigin();
-
+				
 				if (grenade_entity->IsSmokeProjectile())
 				{
 					auto smoke_entity = reinterpret_cast<CSmokeProjectile*>(grenade_entity);
-					data.spawn_tick = smoke_entity->m_nSmokeEffectTickBegin();
-					data.did_spawn = smoke_entity->m_bDidSmokeEffect();
+					data.type = GRENADE_SMOKE;
+					data.icon_data = icon_fetcher::get(EIconType::SMOKE);
+					data.icon_data.w *= 1.55f;
+					data.icon_data.h *= 1.55f;
+					data.icon_data.tint = ImVec4(0.51f, 0.53f, 0.51f, 0.95f); //smoke-y color
 
-					calculate_smoke_time(data);
+					smoke_info_t smoke_info;
+					smoke_info.m_nSmokeEffectTickBegin = smoke_entity->m_nSmokeEffectTickBegin();
+					smoke_info.m_bDidSmokeEffect = smoke_entity->m_bDidSmokeEffect();
+					calculate_smoke_time(smoke_info);
+					
+					data.specific_data = smoke_info;
+				}
+
+				if (grenade_entity->IsMolotovProjectile())
+				{
+					data.type = GRENADE_MOLOTOV;
+					data.icon_data = icon_fetcher::get(EIconType::MOLOTOV);
+					data.icon_data.tint = ImVec4(1.f, 0.49f, 0.15f, 1.f); //orange color
+				}
+
+				if (grenade_entity->IsFlashProjectile())
+				{
+					data.type = GRENADE_FLASH;
+					data.icon_data = icon_fetcher::get(EIconType::FLASHBANG);
+					data.icon_data.tint = ImVec4(1.f, 1.f, 0.f, 1.f); //yellow color
+				}
+
+				if (grenade_entity->IsHEProjectile())
+				{
+					auto he_entity = reinterpret_cast<CHEGrenadeProjectile*>(grenade_entity);
+					data.type = GRENADE_HE;
+					data.icon_data = icon_fetcher::get(EIconType::HEGRENADE);
+					data.icon_data.w *= 0.7f;
+					data.icon_data.h *= 0.7f;
+					data.icon_data.tint = ImVec4(1.f, 0.f, 0.f, 1.f);
+					
+					hegrenade_info_t he_info;
+					he_info.m_nExplodeEffectTickBegin = he_entity->m_nExplodeEffectTickBegin();
+
+					data.specific_data = he_info;
+				}
+
+				if (grenade_entity->IsDecoyProjectile())
+				{
+					data.type = GRENADE_DECOY;
+					data.icon_data = icon_fetcher::get(EIconType::DECOY);
+					data.icon_data.tint = ImVec4(0.f, 1.f, 0.f, 1.f);
 				}
 				
 				entry_data.grenade_info.push_back(data);
@@ -436,8 +482,7 @@ namespace entity_data
 				world_entity_info_t data;
 				data.m_vecOrigin = dropped_entity->m_pGameSceneNode()->m_vecOrigin();
 				data.name = dropped_entity->m_pEntity()->m_designerName();
-
-		
+				
 				entry_data.dropped_ent_info.push_back(data);
 			}
 		}

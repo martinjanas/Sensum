@@ -9,6 +9,8 @@ namespace render
 		ImFont* header_title;
 		ImFont* header_buttons;
 		ImFont* selector;
+		ImFont* esp;
+		ImFont* grenade_time;
 	}
 
 	void init_fonts()
@@ -31,6 +33,8 @@ namespace render
 		fonts::header_title = io->Fonts->AddFontFromMemoryCompressedTTF(droidsans_compressed_data, droidsans_compressed_size, 34.f, &font_config);
 		fonts::header_buttons = io->Fonts->AddFontFromMemoryCompressedTTF(droidsans_compressed_data, droidsans_compressed_size, 18.5f, &font_config, ranges); //17.f
 		fonts::selector = io->Fonts->AddFontFromMemoryCompressedTTF(droidsans_compressed_data, droidsans_compressed_size, 17.f, &font_config, ranges); //17.f
+		fonts::esp = io->Fonts->AddFontFromMemoryCompressedTTF(droidsans_compressed_data, droidsans_compressed_size, 16.f, &font_config, ranges); //17.f
+		fonts::grenade_time = io->Fonts->AddFontFromMemoryCompressedTTF(droidsans_compressed_data, droidsans_compressed_size, 16.f, &font_config, ranges); //17.f
 	}
 
     void init_style()

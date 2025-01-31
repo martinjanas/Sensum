@@ -22,3 +22,9 @@ public:
 	NETVAR(int, m_nSmokeEffectTickBegin, "C_SmokeGrenadeProjectile", "m_nSmokeEffectTickBegin")
 	NETVAR(bool, m_bDidSmokeEffect, "C_SmokeGrenadeProjectile", "m_bDidSmokeEffect")
 };
+
+class CHEGrenadeProjectile
+{
+public:
+	NETVAR(int, m_nExplodeEffectTickBegin, "C_BaseCSGrenadeProjectile", "m_nExplodeEffectTickBegin")
+};

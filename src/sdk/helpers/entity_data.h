@@ -6,6 +6,9 @@
 #include <map>
 #include <array>
 #include <bitset>
+#include <variant>
+
+#include "IconFetcher.h"
 #include "../classes/CCSPlayerController.h"
 #include "../classes/CCSPlayerPawn.h"
 #include "../classes/CBasePlayerWeapon.h"
@@ -88,11 +91,43 @@ namespace entity_data
 		Vector m_vecOrigin;
 	};
 
+	enum EGrenadeType
+	{
+		GRENADE_SMOKE,
+		GRENADE_FLASH,
+		GRENADE_MOLOTOV,
+		GRENADE_HE,
+		GRENADE_DECOY
+	};
+
+	struct smoke_info_t
+	{
+		int m_nSmokeEffectTickBegin;
+		bool m_bDidSmokeEffect;
+		float remaining_smoke_time;
+	};
+
+	struct molotov_info_t
+	{
+		float burn_time;
+	};
+
+	struct hegrenade_info_t
+	{
+		int m_nExplodeEffectTickBegin;
+	};
+
+	struct flashbang_info_t
+	{
+		float flash_time;
+	};
+	
 	struct grenade_info_t : generic_entity_info_t
 	{
-		int spawn_tick;
-		bool did_spawn;
-		float time_remaining;
+		EGrenadeType type;
+		icon_data_t icon_data;
+
+		std::variant<std::monostate, hegrenade_info_t, flashbang_info_t, smoke_info_t, molotov_info_t> specific_data;
 	};
 
 	struct world_entity_info_t : generic_entity_info_t

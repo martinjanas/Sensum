@@ -11,6 +11,8 @@ namespace render
 		extern ImFont* header_title;
 		extern ImFont* header_buttons;
 		extern ImFont* selector;
+		extern ImFont* esp;
+		extern ImFont* grenade_time;
 	}
 
 	void init_fonts();

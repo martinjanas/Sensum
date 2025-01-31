@@ -67,10 +67,34 @@ public:
 
     bool IsSmokeProjectile()
     {
-        const auto& class_two_hash = GetClassNameHash<>();
-        return class_two_hash == FNV("C_SmokeGrenadeProjectile");
+        const auto& class_one_hash = GetClassNameHash<>();
+        return class_one_hash == FNV("C_SmokeGrenadeProjectile");
     }
 
+    bool IsMolotovProjectile()
+    {
+        const auto& class_one_hash = GetClassNameHash<>();
+        return class_one_hash == FNV("C_MolotovProjectile");
+    }
+    
+    bool IsFlashProjectile()
+    {
+        const auto& class_one_hash = GetClassNameHash<>();
+        return class_one_hash == FNV("C_FlashbangProjectile");
+    }
+
+    bool IsHEProjectile()
+    {
+        const auto& class_one_hash = GetClassNameHash<>();
+        return class_one_hash == FNV("C_HEGrenadeProjectile");
+    }
+
+    bool IsDecoyProjectile()
+    {
+        const auto& class_one_hash = GetClassNameHash<>();
+        return class_one_hash == FNV("C_DecoyProjectile");
+    }
+    
     //returns dropped weapon or grenade entities in the world
     bool IsDroppedWorldEntity()
     {

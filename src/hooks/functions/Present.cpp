@@ -4,9 +4,10 @@
 #include "../../sdk/helpers/entity_data.h"
 #include "../../render/menu.h"
 #include "../../features/features.h"
+#include "../../sdk/helpers/IconFetcher.h"
 #include "../../thirdparty/ImGui/backends/imgui_impl_dx11.h"
 #include "../../thirdparty/ImGui/backends/imgui_impl_win32.h"
-
+#include <algorithm>
 namespace hooks
 {
 	ID3D11Device* g_pDevice = nullptr;
@@ -70,6 +71,9 @@ namespace hooks
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 
+		std::once_flag fetch_icon_flag;
+		std::call_once(fetch_icon_flag, &icon_fetcher::fetch_icon_data, g_pDevice);
+		
 		ImGui::NewFrame();
 		{
 			globals::draw_list = ImGui::GetBackgroundDrawList();

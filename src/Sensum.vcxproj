@@ -201,6 +201,8 @@
     <ClInclude Include="sdk\helpers\CUtlBuffer.h" />
     <ClInclude Include="sdk\helpers\CUtlLinkedList.h" />
     <ClInclude Include="sdk\helpers\CViewRender.h" />
+    <ClInclude Include="sdk\helpers\IconFetcher.h" />
+    <ClInclude Include="sdk\helpers\Icons.h" />
     <ClInclude Include="sdk\helpers\interfaces.h" />
     <ClInclude Include="sdk\helpers\json.hpp" />
     <ClInclude Include="sdk\helpers\json_fwd.hpp" />
@@ -301,6 +303,7 @@
     <ClCompile Include="render\imgui_custom.cpp" />
     <ClCompile Include="render\menu.cpp" />
     <ClCompile Include="sdk\classes\CPlantedC4.h" />
+    <ClCompile Include="sdk\helpers\IconFetcher.cpp" />
     <ClCompile Include="sdk\helpers\interfaces.cpp" />
     <ClCompile Include="sdk\helpers\notify_system.cpp" />
     <ClCompile Include="render\render.cpp" />
@@ -346,6 +349,9 @@
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\freetype.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="todo.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
