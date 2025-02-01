@@ -48,12 +48,7 @@ namespace entity_data
 	{
 
 	};
-
-	struct persisten_data_t
-	{
-
-	};
-
+	
 	struct player_data_t
 	{
 		const char* m_szPlayerName;
@@ -74,6 +69,9 @@ namespace entity_data
 		Transform_t hitbox_transform[HITBOX_MAX];
 		std::bitset<32> flags;
 
+		icon_t weapon_icon;
+		const char* weapon_text;
+		
 		std::array<hitbox_info_t, HITBOX_MAX> hitboxes;
 		std::list<bone_info_t> bones_w2s;
 	};
@@ -84,6 +82,7 @@ namespace entity_data
 		int m_nBombSite;
 		float m_flC4Blow;
 		Vector m_vecAbsOrigin;
+		icon_t bomb_icon;
 	};
 
 	struct generic_entity_info_t
@@ -125,7 +124,7 @@ namespace entity_data
 	struct grenade_info_t : generic_entity_info_t
 	{
 		EGrenadeType type;
-		icon_data_t icon_data;
+		icon_t icon;
 
 		std::variant<std::monostate, hegrenade_info_t, flashbang_info_t, smoke_info_t, molotov_info_t> specific_data;
 	};
@@ -133,6 +132,7 @@ namespace entity_data
 	struct world_entity_info_t : generic_entity_info_t
 	{
 		const char* name;
+		icon_t icon;
 	};
 
 	struct player_entry_data_t

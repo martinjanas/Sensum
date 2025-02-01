@@ -6,7 +6,6 @@
 #include "../classes/CPlantedC4.h"
 #include "../classes/CGrenadeProjectile.h"
 #include <queue>
-
 #include "../../render/render.h"
 
 namespace entity_data
@@ -28,8 +27,8 @@ namespace entity_data
 	{
 		player_entry_data.clear();
 	}
-
-	void get_bones_w2s(entity_data::player_data_t& data)
+	
+	void set_bones_w2s(entity_data::player_data_t& data)
 	{
 		if (!data.bones_w2s.empty())
 			return;
@@ -78,8 +77,8 @@ namespace entity_data
 			data.bones_w2s.push_back(esp_data);
 		}
 	}
-
-	bool get_bbox(CGameSceneNode* scene_node, CCollisionProperty* collision, BBox_t& out)
+	
+	bool get_collision_bbox(CGameSceneNode* scene_node, CCollisionProperty* collision, BBox_t& out)
 	{
 		Vector mins = collision->m_vecMins();
 		Vector maxs = collision->m_vecMaxs();
@@ -101,15 +100,16 @@ namespace entity_data
 		out.m_Maxs = out.m_Vertices[0];
 		for (int i = 1; i < 8; i++)
 		{
-			out.m_Mins.x = std::min(out.m_Mins.x, out.m_Vertices[i].x);
-			out.m_Mins.y = std::min(out.m_Mins.y, out.m_Vertices[i].y);
-			out.m_Maxs.x = std::max(out.m_Maxs.x, out.m_Vertices[i].x);
-			out.m_Maxs.y = std::max(out.m_Maxs.y, out.m_Vertices[i].y);
+			out.m_Mins.x = (std::min)(out.m_Mins.x, out.m_Vertices[i].x);
+			out.m_Mins.y = (std::min)(out.m_Mins.y, out.m_Vertices[i].y);
+			out.m_Maxs.x = (std::max)(out.m_Maxs.x, out.m_Vertices[i].x);
+			out.m_Maxs.y = (std::max)(out.m_Maxs.y, out.m_Vertices[i].y);
 		}
 
 		return true;
 	}
 
+	//TODO: Move to utils
 	bool is_in_smoke(const Vector& start, const Vector& end, const float& max_density)
 	{
 		using fn = float(__fastcall*)(const Vector&, const Vector&, void*);
@@ -339,7 +339,18 @@ namespace entity_data
 			player_data.m_ModelState = model_state;
 			player_data.m_hModel = model;
 			player_data.m_PlayerPawn = pawn;
-			
+
+			const EIconType& type = icon_fetcher::get_icon_type_by_weapon_index(active_wpn->m_iItemDefinitionIndex());
+			player_data.weapon_icon = icon_fetcher::get(type);
+
+			if (active_wpn->IsKnife())
+				player_data.weapon_icon.SetScale(0.45f);
+			else if (active_wpn->IsSniper())
+				player_data.weapon_icon.SetScale(0.4f);
+			else if (active_wpn->IsPistol())
+				player_data.weapon_icon.SetScale(0.45f);
+			else player_data.weapon_icon.SetScale(0.4f);
+
 			player_data.flags.reset();
 
 			pawn->m_iHealth() > 0 ? player_data.flags.set(PLAYER_ALIVE) : player_data.flags.reset(PLAYER_ALIVE);
@@ -348,8 +359,8 @@ namespace entity_data
 			if (player_data.m_vecOldOrigin != scene_node->m_vecOrigin() || (player_data.m_vecOldEyeAngles.pitch != pawn->m_angEyeAngles().pitch || player_data.m_vecOldEyeAngles.yaw != pawn->m_angEyeAngles().yaw))
 			{
 				get_hitboxes(player_data, eye_pos, localpawn, on_screen);
-				get_bbox(scene_node, collision, player_data.bbox);
-				get_bones_w2s(player_data);
+				get_collision_bbox(scene_node, collision, player_data.bbox);
+				set_bones_w2s(player_data);
 			}
 
 			player_data.m_vecOldOrigin = scene_node->m_vecOrigin();
@@ -408,6 +419,8 @@ namespace entity_data
 				data.m_nBombSite = bomb_entity->m_nBombSite();
 				data.m_vecAbsOrigin = entity->m_pGameSceneNode()->m_vecAbsOrigin();
 
+				data.bomb_icon = icon_fetcher::get(EIconType::PLANTED_C4);
+
 				entry_data.bomb_info.push_back(std::move(data));
 			}
 
@@ -422,11 +435,10 @@ namespace entity_data
 				{
 					auto smoke_entity = reinterpret_cast<CSmokeProjectile*>(grenade_entity);
 					data.type = GRENADE_SMOKE;
-					data.icon_data = icon_fetcher::get(EIconType::SMOKE);
-					data.icon_data.w *= 1.55f;
-					data.icon_data.h *= 1.55f;
-					data.icon_data.tint = ImVec4(0.51f, 0.53f, 0.51f, 0.95f); //smoke-y color
 
+					data.icon = icon_fetcher::get(EIconType::SMOKE);
+					data.icon.SetScale(1.2f);
+					
 					smoke_info_t smoke_info;
 					smoke_info.m_nSmokeEffectTickBegin = smoke_entity->m_nSmokeEffectTickBegin();
 					smoke_info.m_bDidSmokeEffect = smoke_entity->m_bDidSmokeEffect();
@@ -438,25 +450,27 @@ namespace entity_data
 				if (grenade_entity->IsMolotovProjectile())
 				{
 					data.type = GRENADE_MOLOTOV;
-					data.icon_data = icon_fetcher::get(EIconType::MOLOTOV);
-					data.icon_data.tint = ImVec4(1.f, 0.49f, 0.15f, 1.f); //orange color
+
+					data.icon = icon_fetcher::get(EIconType::MOLOTOV);
+					data.icon.tint = ImVec4(1.f, 0.49f, 0.15f, 1.f); //orange color
 				}
 
 				if (grenade_entity->IsFlashProjectile())
 				{
 					data.type = GRENADE_FLASH;
-					data.icon_data = icon_fetcher::get(EIconType::FLASHBANG);
-					data.icon_data.tint = ImVec4(1.f, 1.f, 0.f, 1.f); //yellow color
+
+					data.icon = icon_fetcher::get(EIconType::FLASHBANG);
+					data.icon.tint = ImVec4(1.f, 1.f, 0.f, 1.f); //yellow color	
 				}
 
 				if (grenade_entity->IsHEProjectile())
 				{
 					auto he_entity = reinterpret_cast<CHEGrenadeProjectile*>(grenade_entity);
 					data.type = GRENADE_HE;
-					data.icon_data = icon_fetcher::get(EIconType::HEGRENADE);
-					data.icon_data.w *= 0.7f;
-					data.icon_data.h *= 0.7f;
-					data.icon_data.tint = ImVec4(1.f, 0.f, 0.f, 1.f);
+
+					data.icon = icon_fetcher::get(EIconType::HEGRENADE);
+					data.icon.SetScale(0.7f);
+					data.icon.tint = ImVec4(1.f, 0.f, 0.f, 1.f);	
 					
 					hegrenade_info_t he_info;
 					he_info.m_nExplodeEffectTickBegin = he_entity->m_nExplodeEffectTickBegin();
@@ -467,8 +481,9 @@ namespace entity_data
 				if (grenade_entity->IsDecoyProjectile())
 				{
 					data.type = GRENADE_DECOY;
-					data.icon_data = icon_fetcher::get(EIconType::DECOY);
-					data.icon_data.tint = ImVec4(0.f, 1.f, 0.f, 1.f);
+
+					data.icon = icon_fetcher::get(EIconType::DECOY);
+					data.icon.tint = ImVec4(0.f, 1.f, 0.f, 1.f);	
 				}
 				
 				entry_data.grenade_info.push_back(data);
@@ -482,6 +497,21 @@ namespace entity_data
 				world_entity_info_t data;
 				data.m_vecOrigin = dropped_entity->m_pGameSceneNode()->m_vecOrigin();
 				data.name = dropped_entity->m_pEntity()->m_designerName();
+				
+				if (auto weapon_entity = reinterpret_cast<CBasePlayerWeapon*>(dropped_entity); weapon_entity)
+				{
+					uint16_t weapon_index = weapon_entity->m_iItemDefinitionIndex();
+					
+					const EIconType& icon_type = icon_fetcher::get_icon_type_by_weapon_index(weapon_index);
+					data.icon = icon_fetcher::get(icon_type);	
+
+					//TODO: set scale accordingly with the distance between the entity and localplayer,
+					if (weapon_entity->IsGrenade())
+						data.icon.SetScale(0.95f);
+					else if (weapon_entity->IsC4())
+						data.icon.SetScale(1.1f);
+					else data.icon.SetScale(0.55f);
+				}
 				
 				entry_data.dropped_ent_info.push_back(data);
 			}

@@ -30,6 +30,7 @@ namespace hooks
 		return original_fn(swap_chain, buffer_count, width, height, new_format, swap_chain_flags);
 	}
 
+	static std::once_flag fetch_icon_flag;
 	long __stdcall directx::present::hooked(IDXGISwapChain* swap_chain, uint32_t sync_interval, uint32_t flags)
 	{
 		if (!g_pDevice || !g_pContext || !g_pRenderTargetView)
@@ -68,11 +69,16 @@ namespace hooks
 			init_imgui_done = true;
 		}
 
+		if (g_pDevice)
+		{
+			std::call_once(fetch_icon_flag, []()
+			{
+				icon_fetcher::fetch_icon_data(g_pDevice);
+			});	
+		}
+		
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
-
-		std::once_flag fetch_icon_flag;
-		std::call_once(fetch_icon_flag, &icon_fetcher::fetch_icon_data, g_pDevice);
 		
 		ImGui::NewFrame();
 		{

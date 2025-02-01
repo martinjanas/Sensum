@@ -57,51 +57,6 @@ namespace features::esp
 		globals::draw_list->AddLine(bbox.m_Vertices[TOP_RIGHT_BACK].as_vec2(), bbox.m_Vertices[BOTTOM_RIGHT_BACK].as_vec2(), IM_COL32_WHITE);
 	}
 
-	//bomb_timer, grenade_projectiles and dropped_entities functions are in wip/prototype stage, they will be redone properly later
-	void bomb_timer(const entity_data::bomb_info_t& bomb_info)
-	{
-		auto bomb_time = bomb_info.m_flC4Blow - g::global_vars->m_curtime;
-		bomb_time = std::clamp<float>(bomb_time, 0.f, 40.f);
-		if (bomb_time <= 0.0f)
-			return;
-
-		Vector pos;
-		if (globals::world2screen(bomb_info.m_vecAbsOrigin, pos))
-		{
-			ImGui::PushFont(render::fonts::header_buttons);
-			globals::draw_list->AddText(pos.as_vec2(), IM_COL32_BLACK, std::format("Time: {:.1f}", bomb_time).c_str());
-			ImGui::PopFont();
-		}
-	}
-
-	void AddRadialGradient(ImDrawList* draw_list, const ImVec2& center, float radius, ImU32 col_in, ImU32 col_out)
-	{
-		if (((col_in | col_out) & IM_COL32_A_MASK) == 0 || radius < 0.5f)
-			return;
-	
-		// Use arc with automatic segment count
-		draw_list->_PathArcToFastEx(center, radius, 0, IM_DRAWLIST_ARCFAST_SAMPLE_MAX, 0);
-		const int count = draw_list->_Path.Size - 1;
-	
-		unsigned int vtx_base = draw_list->_VtxCurrentIdx;
-		draw_list->PrimReserve(count * 3, count + 1);
-	
-		// Submit vertices
-		const ImVec2 uv = draw_list->_Data->TexUvWhitePixel;
-		draw_list->PrimWriteVtx(center, uv, col_in);
-		for (int n = 0; n < count; n++)
-			draw_list->PrimWriteVtx(draw_list->_Path[n], uv, col_out);
-	
-		// Submit a fan of triangles
-		for (int n = 0; n < count; n++)
-		{
-			draw_list->PrimWriteIdx((ImDrawIdx)(vtx_base));
-			draw_list->PrimWriteIdx((ImDrawIdx)(vtx_base + 1 + n));
-			draw_list->PrimWriteIdx((ImDrawIdx)(vtx_base + 1 + ((n + 1) % count)));
-		}
-		draw_list->_Path.Size = 0;
-	}
-
 	void outlined_text(const char* text, const ImVec2& pos, const ImU32& color, const ImU32& outlined_color)
 	{
 		globals::draw_list->AddText(ImVec2((pos.x) + 1.f, (pos.y) + 1.f), outlined_color, text);
@@ -118,6 +73,28 @@ namespace features::esp
 		outlined_text(text, pos, color, black_color);
 	}
 	
+	//bomb_timer, grenade_projectiles and dropped_entities functions are in wip/prototype stage, they will be redone properly later
+	void bomb_timer(const entity_data::bomb_info_t& bomb_info)
+	{
+		auto bomb_time = bomb_info.m_flC4Blow - g::global_vars->m_curtime;
+		bomb_time = std::clamp<float>(bomb_time, 0.f, 40.f);
+		if (bomb_time <= 0.0f)
+			return;
+		
+		const auto& icon = bomb_info.bomb_icon;
+		if (Vector pos; icon.texture && globals::world2screen(bomb_info.m_vecAbsOrigin, pos))
+		{
+			ImVec2 image_start = ImVec2(pos.x - icon.w / 2, pos.y - icon.h / 2 - 3.f);
+			ImVec2 image_end = ImVec2(image_start.x + icon.w, image_start.y + icon.h);
+
+			globals::draw_list->AddImage(icon.texture, image_start, image_end, ImVec2(0, 0), ImVec2(1, 1), imgui::ColorConvertFloat4ToU32(icon.tint));
+
+			ImGui::PushFont(render::fonts::esp_small);
+			outlined_text(std::format("{:.1f}", bomb_time).c_str(), {pos.as_vec2().x, pos.as_vec2().y + 25.f}, IM_COL32_WHITE);
+			ImGui::PopFont();
+		}
+	}
+	
 	void grenade_projectiles(const entity_data::grenade_info_t& grenade_info, ID3D11Device* device, ID3D11DeviceContext* context)
 	{
 		const bool is_smoke = grenade_info.type == entity_data::GRENADE_SMOKE;
@@ -126,11 +103,11 @@ namespace features::esp
 		const bool is_flashbang = grenade_info.type == entity_data::GRENADE_FLASH;
 		const bool is_decoy = grenade_info.type == entity_data::GRENADE_DECOY;
 		
-		const auto& icon_data = grenade_info.icon_data;
-		if (Vector pos; icon_data.texture && globals::world2screen(grenade_info.m_vecOrigin, pos))
+		const auto& icon = grenade_info.icon;
+		if (Vector pos; icon.texture && globals::world2screen(grenade_info.m_vecOrigin, pos))
 		{
-			ImVec2 image_start = ImVec2(pos.x - icon_data.w / 2, pos.y - icon_data.h / 2 - 3.f);
-			ImVec2 image_end = ImVec2(image_start.x + icon_data.w, image_start.y + icon_data.h);
+			ImVec2 image_start = ImVec2(pos.x - icon.w / 2, pos.y - icon.h / 2 - 3.f);
+			ImVec2 image_end = ImVec2(image_start.x + icon.w, image_start.y + icon.h);
 
 			bool should_draw_image = true;
 			if (is_he)
@@ -147,7 +124,7 @@ namespace features::esp
 			}
 
 			if (should_draw_image)
-				globals::draw_list->AddImage(icon_data.texture, image_start, image_end, ImVec2(0, 0), ImVec2(1, 1), imgui::ColorConvertFloat4ToU32(icon_data.tint));
+				globals::draw_list->AddImage(icon.texture, image_start, image_end, ImVec2(0, 0), ImVec2(1, 1), imgui::ColorConvertFloat4ToU32(icon.tint));
 			
 			if (is_smoke)
 			{
@@ -155,7 +132,7 @@ namespace features::esp
 
 				if (smoke_info.remaining_smoke_time > 0.f)
 				{
-					imgui::PushFont(render::fonts::grenade_time);
+					imgui::PushFont(render::fonts::esp_small);
 					{
 						ImVec2 center = pos.as_vec2();
 						
@@ -178,14 +155,13 @@ namespace features::esp
 	//Dropped entities in the world, such as weapons, C4 and grenades.
 	void dropped_entities(const entity_data::world_entity_info_t& entity_info)
 	{
-		Vector pos;
-		if (globals::world2screen(entity_info.m_vecOrigin, pos))
+		const auto& icon = entity_info.icon;
+		if (Vector pos; icon.texture && globals::world2screen(entity_info.m_vecOrigin, pos))
 		{
-			globals::draw_list->AddRect({ pos.x + 10.f, pos.y + 10.f }, { pos.x - 10.f, pos.y - 10.f }, IM_COL32_WHITE);
+			ImVec2 image_start = ImVec2(pos.x - icon.w / 2, pos.y - icon.h / 2 - 3.f);
+			ImVec2 image_end = ImVec2(image_start.x + icon.w, image_start.y + icon.h);
 
-			ImGui::PushFont(render::fonts::header_buttons);
-			globals::draw_list->AddText(pos.as_vec2(), IM_COL32_WHITE, entity_info.name);
-			ImGui::PopFont();
+			globals::draw_list->AddImage(icon.texture, image_start, image_end, ImVec2(0, 0), ImVec2(1, 1), imgui::ColorConvertFloat4ToU32(icon.tint));
 		}
 	}
 
@@ -202,14 +178,14 @@ namespace features::esp
 
 		for (auto& entry : m_entity_entry_data)
 		{
-			// for (auto& bomb_info : entry.bomb_info)
-			// 	bomb_timer(bomb_info);
+			for (auto& bomb_info : entry.bomb_info)
+				bomb_timer(bomb_info);
 
 			for (auto& grenade_info : entry.grenade_info)
 				grenade_projectiles(grenade_info, device, context);
 
-			// for (auto& dropped_ents_info : entry.dropped_ent_info)
-			// 	dropped_entities(dropped_ents_info);
+			for (auto& dropped_ents_info : entry.dropped_ent_info)
+				dropped_entities(dropped_ents_info);
 		}
 	}
 
@@ -247,6 +223,7 @@ namespace features::esp
 			//Draw3DBox(data.bbox);
 			//draw_fov(data);
 			esp::bone_esp(data);
+			esp::weapon_esp(data);
 		}
 	}
 	
@@ -327,13 +304,23 @@ namespace features::esp
 		// Determine the final render position
 		ImVec2 render_pos(top_mid.x - text_size_mid, top_mid.y - adjusted_text_size.y - y_padding);
 
-		static const auto smoke_color = ImGui::GetColorU32(ImVec4(1.f, 1.f, 1.f, 0.4f));
-		
-		
-		// Render the text
-		imgui::PushFont(render::fonts::esp); // Apply adjusted font size
+		imgui::PushFont(render::fonts::esp);
 		outlined_text(data.m_szPlayerName, render_pos, IM_COL32(255, 255, 255, 255));
-		//globals::draw_list->AddText(render_pos, color, data.m_szPlayerName);
-		imgui::PopFont(); // Reset font
+		imgui::PopFont();
+	}
+
+	//TODO: Calculate and set the image size to the bbox width, currently it looks ugly when changing distance
+	void weapon_esp(entity_data::player_data_t& data)
+	{
+		Vector bottom_mid = data.bbox.GetBottomMid();
+
+		const auto& icon = data.weapon_icon;
+		if (icon.texture)
+		{
+			ImVec2 image_start = ImVec2(bottom_mid.x - icon.w / 2, bottom_mid.y - icon.h / 2 + 6.f);
+			ImVec2 image_end = ImVec2(image_start.x + icon.w, image_start.y + icon.h);
+
+			globals::draw_list->AddImage(icon.texture, image_start, image_end, ImVec2(0, 0), ImVec2(1, 1), imgui::ColorConvertFloat4ToU32(icon.tint));
+		}
 	}
 }

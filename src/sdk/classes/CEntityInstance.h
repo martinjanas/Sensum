@@ -96,12 +96,15 @@ public:
     }
     
     //returns dropped weapon or grenade entities in the world
-    bool IsDroppedWorldEntity()
+    bool IsDroppedWorldEntity() //replace with more precise version?
     {
         //C_AK47 : C_CSWeaponBaseGun : C_CSWeaponBase
         //C_C4 : C_CSWeaponBase
+        //C_IncendiaryGrenade : C_MolotovGrenade : C_BaseCSGrenade : C_CSWeaponBase
+        
+        const auto& class_four_hash = GetClassNameHash<4>(); //inheritance level for Incendiary grenade
         const auto& class_three_hash = GetClassNameHash<3>(); //the inheritance level for guns and grenades
         const auto& class_two_hash = GetClassNameHash<2>(); //inheritance level for C4 on the ground
-        return class_three_hash == FNV("C_CSWeaponBase") || class_two_hash == FNV("C_CSWeaponBase");
+        return class_four_hash == FNV("C_CSWeaponBase") || class_three_hash == FNV("C_CSWeaponBase") || class_two_hash == FNV("C_CSWeaponBase");
     }
 };

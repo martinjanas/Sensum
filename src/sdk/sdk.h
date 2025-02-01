@@ -128,19 +128,6 @@ public:
 	CHandle owner_handle; //0xBC
 }; //Size: 0x0180
 
-//class CSceneData
-//{
-//public:
-//	std::byte pad01[0x8]; //0x0
-//	CMaterialDrawDescription* mat_desc; //0x8
-//	std::byte pad02[0x4]; //0xC
-//	CHandle handle; //0x10
-//	std::byte pad03[0x8]; //0x18
-//	IMaterial* material; //0x20
-//	std::byte pad04[0x18]; //0x38
-//	std::array<byte, 4> color; //0x40
-//}; //0x47
-
 class CSceneData
 {
 public:
@@ -150,9 +137,9 @@ public:
 	std::byte pad02[0x4];                // 0x14
 	CSceneObject* scene_object;          // 0x18
 	IMaterial* material;                 // 0x20
-	std::byte pad04[0x18];               // 0x28
-	std::array<std::byte, 4> color;      // 0x40
-}; // Size: 0x48
+	std::byte pad04[0x28];               // 0x28 //previous offset: 0x18
+	std::array<std::byte, 4> color;      // 0x50 //previously at 0x40
+}; // Size: 0x58
 
 namespace interfaces //move to interfaces.h ?
 {
