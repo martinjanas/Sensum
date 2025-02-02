@@ -69,6 +69,8 @@ namespace entity_data
 		Transform_t hitbox_transform[HITBOX_MAX];
 		std::bitset<32> flags;
 
+		float distance;
+		
 		icon_t weapon_icon;
 		const char* weapon_text;
 		

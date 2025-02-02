@@ -44,12 +44,17 @@ struct BBox_t
 
     void Invalidate()
     {
-        m_Mins.x = m_Mins.y = FLT_MAX;
-        m_Maxs.x = m_Maxs.y = -FLT_MAX;
-
+        m_Mins = Vector(FLT_MAX, FLT_MAX);
+        m_Maxs = Vector(-FLT_MAX, -FLT_MAX);
         std::fill(std::begin(m_Vertices), std::end(m_Vertices), Vector(-FLT_MAX, -FLT_MAX));
     }
 
+    bool IsValid()
+    {
+        return !isnan(m_Mins.x) && !isnan(m_Mins.y) && !isnan(m_Mins.z) && 
+               !isnan(m_Maxs.x) && !isnan(m_Maxs.y) && !isnan(m_Maxs.z);
+    }
+    
     float GetWidth() const
     {
         return m_Maxs.x - m_Mins.x;
@@ -60,28 +65,35 @@ struct BBox_t
         return m_Maxs.y - m_Mins.y;
     }
 
-    Vector GetTopMid() const {
-        return Vector((m_Mins.x + m_Maxs.x) * 0.5f, m_Mins.y);  // Midpoint between top-left and top-right
+    // Get center of the top face (top edge)
+    Vector GetTop() const {
+        return Vector((m_Mins.x + m_Maxs.x) * 0.5f, m_Mins.y);
     }
 
-    // Get the midpoint of the bottom edge
-    Vector GetBottomMid() const {
-        return Vector((m_Mins.x + m_Maxs.x) * 0.5f, m_Maxs.y);  // Midpoint between bottom-left and bottom-right
+    // Get center of the bottom face (bottom edge)
+    Vector GetBottom() const {
+        return Vector((m_Mins.x + m_Maxs.x) * 0.5f, m_Maxs.y);
     }
 
-    // Get the midpoint of the left edge
-    Vector GetLeftMid() const {
-        return Vector(m_Mins.x, (m_Mins.y + m_Maxs.y) * 0.5f);  // Midpoint between top-left and bottom-left
+    // Get center of the left face (left edge)
+    Vector GetLeft() const {
+        return Vector(m_Mins.x, (m_Mins.y + m_Maxs.y) * 0.5f);
     }
 
-    // Get the midpoint of the right edge
-    Vector GetRightMid() const {
-        return Vector(m_Maxs.x, (m_Mins.y + m_Maxs.y) * 0.5f);  // Midpoint between top-right and bottom-right
+    // Get center of the right face (right edge)
+    Vector GetRight() const {
+        return Vector(m_Maxs.x, (m_Mins.y + m_Maxs.y) * 0.5f);
     }
 
-    // Corner points (using m_Mins and m_Maxs directly)
+    // Get the top-left corner
     Vector GetTopLeft() const { return Vector(m_Mins.x, m_Mins.y); }
+
+    // Get the top-right corner
     Vector GetTopRight() const { return Vector(m_Maxs.x, m_Mins.y); }
+
+    // Get the bottom-left corner
     Vector GetBottomLeft() const { return Vector(m_Mins.x, m_Maxs.y); }
+
+    // Get the bottom-right corner
     Vector GetBottomRight() const { return Vector(m_Maxs.x, m_Maxs.y); }
 };

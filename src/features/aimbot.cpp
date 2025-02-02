@@ -340,9 +340,6 @@ namespace features
                 float elapsed_time = timer.get_time_remaining();
                 float t = elapsed_time / weapon_config.smooth_time;
                 t = std::clamp(t, 0.0f, 1.0f);
-                
-                if (t >= 1.0f)
-                    timer.reset();
 
                 //g_Console->println("t: %.2f, elapsed_time: %.2f", t, elapsed_time);
 
@@ -361,6 +358,9 @@ namespace features
                 smoothed_angle.normalize_clamp();
                 
                 g::client->SetViewAngles(smoothed_angle);
+                
+                if (t >= 1.0f)
+                    timer.reset();
             }
 
             rcs(localpawn, viewangles, cmd, in_fov);

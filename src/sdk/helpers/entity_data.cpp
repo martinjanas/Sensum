@@ -86,25 +86,34 @@ namespace entity_data
 		const matrix3x4_t& matrix = scene_node->m_nodeToWorld().ToMatrix3x4();
 
 		bool valid = true;
+
+		// Start with extreme values for min/max
+		Vector screen_min(FLT_MAX, FLT_MAX);
+		Vector screen_max(-FLT_MAX, -FLT_MAX);
+
 		for (int i = 0; i < 8; i++)
 		{
-			Vector point = Vector{ i & 1 ? maxs.x : mins.x, i & 2 ? maxs.y : mins.y, i & 4 ? maxs.z : mins.z }.transform(matrix);
+			Vector point = Vector{
+				i & 1 ? maxs.x : mins.x,
+				i & 2 ? maxs.y : mins.y,
+				i & 4 ? maxs.z : mins.z
+			}.transform(matrix);
 
+			// Convert to screen space
 			valid &= globals::world2screen(point, out.m_Vertices[i]);
+
+			// Update bounding box limits
+			screen_min.x = (std::min)(screen_min.x, out.m_Vertices[i].x);
+			screen_min.y = (std::min)(screen_min.y, out.m_Vertices[i].y);
+			screen_max.x = (std::max)(screen_max.x, out.m_Vertices[i].x);
+			screen_max.y = (std::max)(screen_max.y, out.m_Vertices[i].y);
 		}
 
 		if (!valid)
 			return false;
 
-		out.m_Mins = out.m_Vertices[0];
-		out.m_Maxs = out.m_Vertices[0];
-		for (int i = 1; i < 8; i++)
-		{
-			out.m_Mins.x = (std::min)(out.m_Mins.x, out.m_Vertices[i].x);
-			out.m_Mins.y = (std::min)(out.m_Mins.y, out.m_Vertices[i].y);
-			out.m_Maxs.x = (std::max)(out.m_Maxs.x, out.m_Vertices[i].x);
-			out.m_Maxs.y = (std::max)(out.m_Maxs.y, out.m_Vertices[i].y);
-		}
+		out.m_Mins = screen_min;
+		out.m_Maxs = screen_max;
 
 		return true;
 	}
@@ -339,6 +348,7 @@ namespace entity_data
 			player_data.m_ModelState = model_state;
 			player_data.m_hModel = model;
 			player_data.m_PlayerPawn = pawn;
+			player_data.distance = player_data.m_vecOrigin.dist_to(localpawn->m_pGameSceneNode()->m_vecOrigin());
 
 			const EIconType& type = icon_fetcher::get_icon_type_by_weapon_index(active_wpn->m_iItemDefinitionIndex());
 			player_data.weapon_icon = icon_fetcher::get(type);
@@ -369,6 +379,8 @@ namespace entity_data
 			entry_data.player_data.push_back(std::move(player_data));
 		}
 
+		entry_data.player_data.sort([](const player_data_t& a, const player_data_t& b) { return a.distance > b.distance; });
+		
 		player_entry_data.clear();
 		player_entry_data.push_back(std::move(entry_data));
 	}

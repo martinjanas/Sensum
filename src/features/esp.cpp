@@ -184,8 +184,8 @@ namespace features::esp
 			for (auto& grenade_info : entry.grenade_info)
 				grenade_projectiles(grenade_info, device, context);
 
-			for (auto& dropped_ents_info : entry.dropped_ent_info)
-				dropped_entities(dropped_ents_info);
+			// for (auto& dropped_ents_info : entry.dropped_ent_info)
+			// 	dropped_entities(dropped_ents_info);
 		}
 	}
 
@@ -215,7 +215,7 @@ namespace features::esp
 			bool got_origin = globals::world2screen(data.m_vecAbsOrigin, origin_out);
 			bool got_head_pos = globals::world2screen(head_pos, head_pos_out);
 
-			if (settings::esp::box_esp)
+			if (settings::esp::box_esp && data.bbox.IsValid())
 				globals::draw_list->AddRect(data.bbox.m_Mins.as_vec2(), data.bbox.m_Maxs.as_vec2(), box_color, 0.f, 0);
 			
 			esp::name_esp(data, data.bbox);
@@ -281,46 +281,147 @@ namespace features::esp
 		if (!settings::esp::name_esp)
 			return;
 
-		// Scale the size/positioning to the bounding box width
-		float width = bbox.GetWidth();
+		Vector head_pos = data.hitboxes[HITBOX_HEAD].hitbox_pos;
 
-		// Get the middle-top position of the bounding box
-		Vector top_mid = bbox.GetTopMid();
-
-		// Text color
-		ImU32 color = ImColor(settings::esp::name_clr.x, settings::esp::name_clr.y, settings::esp::name_clr.z, settings::esp::name_clr.w);
-
-		// Vertical padding between the text and the top of the box
-		float y_padding = 2.0f;
-
-		// Calculate text size again with the adjusted font size
-		imgui::PushFont(render::fonts::esp); // Set font
-		auto adjusted_text_size = imgui::CalcTextSize(data.m_szPlayerName);
-		imgui::PopFont();
-
-		// Calculate the horizontal center of the text
-		float text_size_mid = adjusted_text_size.x * 0.5f;
-
-		// Determine the final render position
-		ImVec2 render_pos(top_mid.x - text_size_mid, top_mid.y - adjusted_text_size.y - y_padding);
-
-		imgui::PushFont(render::fonts::esp);
-		outlined_text(data.m_szPlayerName, render_pos, IM_COL32(255, 255, 255, 255));
-		imgui::PopFont();
+		Vector vec10 = head_pos + Vector(0.f, 0.f, 10.f);
+		if (Vector v10; globals::world2screen(vec10, v10))
+			outlined_text("Vec10", v10.as_vec2(), IM_COL32_WHITE);
 	}
 
-	//TODO: Calculate and set the image size to the bbox width, currently it looks ugly when changing distance
+	// void name_esp(entity_data::player_data_t& data, const BBox_t& bbox)
+	// {
+	// 	if (!settings::esp::name_esp)
+	// 		return;
+	// 	
+	// 	Vector top_mid = bbox.GetTopMid();
+	// 	Vector t;
+	// 	if (!globals::world2screen(data.hitboxes[HITBOX_HEAD].hitbox_pos+Vector(0, 0, 10), t))
+	// 		return;
+	// 	
+	// 	ImU32 color = ImColor(settings::esp::name_clr.x, settings::esp::name_clr.y, settings::esp::name_clr.z, settings::esp::name_clr.w);
+	// 	float y_padding = 20.0f;
+	// 	
+	// 	imgui::PushFont(render::fonts::esp);
+	// 	auto adjusted_text_size = imgui::CalcTextSize(data.m_szPlayerName);
+	// 	imgui::PopFont();
+	// 	
+	// 	float text_size_mid = adjusted_text_size.x * 0.5f;
+	//
+	// 	ImVec2 render_pos(top_mid.x - text_size_mid, top_mid.y - y_padding);
+	//
+	// 	ImVec2 render_pos2(t.x - text_size_mid, t.y);
+	// 	
+	// 	imgui::PushFont(render::fonts::esp);
+	// 	outlined_text(data.m_szPlayerName, render_pos, IM_COL32(255, 255, 255, 255));
+	// 	imgui::PopFont();
+	//
+	// 	imgui::PushFont(render::fonts::esp);
+	// 	outlined_text(data.m_szPlayerName, render_pos2, IM_COL32(255, 0, 0, 255));
+	// 	imgui::PopFont();
+	// }
+	
+	// void weapon_esp(entity_data::player_data_t& data)
+	// {
+	//     Vector bottom_mid = data.bbox.GetBottom();
+	//
+	//     const auto& icon = data.weapon_icon;
+	//     if (icon.texture)
+	//     {
+	//         auto controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
+	//         if (!controller)
+	//             return;
+	//
+	//         auto pawn = reinterpret_cast<CCSPlayerPawn*>(g::entity_system->GetEntityFromHandle(controller->m_hPawn()));
+	//         if (!pawn)
+	//             return;
+	//
+	//         // Calculate distance between the player's weapon and the camera
+	//         float distance = data.m_vecOrigin.dist_to(pawn->m_pGameSceneNode()->m_vecOrigin());
+	//
+	//         // Debug distance output
+	//         g_Console->println("distance: %.1f", distance);
+	//
+	//         // Set the scaling factor, keep it at 1.0 when far, scale slightly as you approach
+	//         float scale_factor = 1.0f;
+	//
+	//         // If you're within a certain range, scale the icon slightly based on the distance
+	//         if (distance < 500.0f)
+	//         {
+	//             scale_factor = std::clamp(1000.0f / distance, 1.0f, 1.2f);
+	//         }
+	//
+	//         // Debug output for scale_factor
+	//         g_Console->println("scale_factor: %.2f", scale_factor);
+	//
+	//         // Apply the scale factor to width and height
+	//         float scaled_w = icon.w * scale_factor;
+	//         float scaled_h = icon.h * scale_factor;
+	//
+	//         // Ensure a minimum size so the icon doesn't disappear at long distances
+	//         scaled_w = std::max(scaled_w, 10.0f);
+	//         scaled_h = std::max(scaled_h, 10.0f);
+	//
+	//         // Debug output for scaled width and height
+	//         g_Console->println("scaled_w: %.1f, scaled_h: %.1f", scaled_w, scaled_h);
+	//
+	//         // Position the icon based on bounding box center and scale
+	//         ImVec2 image_start = ImVec2(bottom_mid.x - scaled_w / 2, bottom_mid.y - scaled_h / 2 + 6.f);
+	//         ImVec2 image_end = ImVec2(image_start.x + scaled_w, image_start.y + scaled_h);
+	//
+	//         globals::draw_list->AddImage(icon.texture, image_start, image_end, ImVec2(0, 0), ImVec2(1, 1), imgui::ColorConvertFloat4ToU32(icon.tint));
+	//     }
+	// }
+
 	void weapon_esp(entity_data::player_data_t& data)
 	{
-		Vector bottom_mid = data.bbox.GetBottomMid();
+	    Vector bottom_mid = data.bbox.GetBottom();
 
-		const auto& icon = data.weapon_icon;
-		if (icon.texture)
-		{
-			ImVec2 image_start = ImVec2(bottom_mid.x - icon.w / 2, bottom_mid.y - icon.h / 2 + 6.f);
-			ImVec2 image_end = ImVec2(image_start.x + icon.w, image_start.y + icon.h);
+	    const auto& icon = data.weapon_icon;
+	    if (icon.texture)
+	    {
+	        auto controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
+	        if (!controller)
+	            return;
 
-			globals::draw_list->AddImage(icon.texture, image_start, image_end, ImVec2(0, 0), ImVec2(1, 1), imgui::ColorConvertFloat4ToU32(icon.tint));
-		}
+	        auto pawn = reinterpret_cast<CCSPlayerPawn*>(g::entity_system->GetEntityFromHandle(controller->m_hPawn()));
+	        if (!pawn)
+	            return;
+
+	        // Calculate distance between the player's weapon and the camera
+	        float distance = data.m_vecOrigin.dist_to(pawn->m_pGameSceneNode()->m_vecOrigin());
+
+	        // Debug distance output
+	        //g_Console->println("distance: %.1f", distance);
+
+	        // Use a smooth falloff for scaling, using a more gradual approach
+	        float scale_factor = 1.0f;
+
+	        // If you're within a certain range, apply scaling
+	        if (distance < 500.0f)
+	        {
+	            // Use a more exponential scaling for closer distances
+	            scale_factor = 1.0f + std::clamp((500.0f - distance) / 500.0f, 0.0f, 0.2f);
+	        }
+
+	        // Debug output for scale_factor
+	        //g_Console->println("scale_factor: %.2f", scale_factor);
+
+	        // Apply the scale factor to width and height
+	        float scaled_w = icon.w * scale_factor;
+	        float scaled_h = icon.h * scale_factor;
+
+	        // Ensure a minimum size so the icon doesn't disappear at long distances
+	        scaled_w = std::max(scaled_w, 10.0f);
+	        scaled_h = std::max(scaled_h, 10.0f);
+
+	        // Debug output for scaled width and height
+	        //g_Console->println("scaled_w: %.1f, scaled_h: %.1f", scaled_w, scaled_h);
+
+	        // Position the icon based on bounding box center and scale
+	        ImVec2 image_start = ImVec2(bottom_mid.x - scaled_w / 2, bottom_mid.y - scaled_h / 2 + 6.f);
+	        ImVec2 image_end = ImVec2(image_start.x + scaled_w, image_start.y + scaled_h);
+
+	        globals::draw_list->AddImage(icon.texture, image_start, image_end, ImVec2(0, 0), ImVec2(1, 1), imgui::ColorConvertFloat4ToU32(icon.tint));
+	    }
 	}
 }

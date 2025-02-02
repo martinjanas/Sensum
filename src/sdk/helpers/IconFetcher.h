@@ -104,7 +104,7 @@ namespace icon_fetcher
 {
     extern std::unordered_map<EIconType, icon_t> icon_data;
 
-    void fetch_icon_data(class ID3D11Device* device);
+    void fetch_icon_data(ID3D11Device* device);
     EIconType get_icon_type_by_weapon_index(uint16_t index);
     icon_t get(const EIconType& type);
 }
