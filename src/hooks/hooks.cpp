@@ -2,6 +2,7 @@
 #include "../settings/settings.h"
 #include "../sdk/helpers/entity_data.h"
 #include "../sdk/helpers/CUtlBuffer.h"
+#pragma comment(lib, "d3d11.lib")
 
 static void get_dxgi(IDXGIFactory*& dxgi_factory)
 {
@@ -74,6 +75,31 @@ IMaterial* create_material(const char* material_vmat, const char* mat_name)
 
 namespace hooks
 {
+	bool CreateDeviceD3D11(HWND hWnd, ID3D11Device*& device, IDXGISwapChain*& swap_chain)
+	{
+		DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
+		swapChainDesc.Windowed = TRUE;
+		swapChainDesc.BufferCount = 2;
+		swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		swapChainDesc.OutputWindow = hWnd;
+		swapChainDesc.SampleDesc.Count = 1;
+
+		const D3D_FEATURE_LEVEL featureLevels[] = {
+			D3D_FEATURE_LEVEL_11_0,
+			D3D_FEATURE_LEVEL_10_0,
+		};
+
+		HRESULT hr = D3D11CreateDeviceAndSwapChain(
+			NULL, D3D_DRIVER_TYPE_NULL, NULL, 0, featureLevels, ARRAYSIZE(featureLevels), D3D11_SDK_VERSION,
+			&swapChainDesc, &swap_chain, &device, nullptr, nullptr);
+
+		if (FAILED(hr))
+			return false;
+    
+		return true;
+	}
+	
 	bool init()
 	{
 		IDXGIFactory* dxgi_factory = nullptr;
@@ -84,11 +110,13 @@ namespace hooks
 			dxgi = ShadowVMT(dxgi_factory);
 			dxgi_factory->Release();
 		}
-
+		
+		HWND hwnd = FindWindow(nullptr, L"Counter-Strike 2");
+		CreateDeviceD3D11(hwnd, hooks::g_pRealDevice, hooks::g_pSwapChain);
+		
 		entity_system = ShadowVMT(g::entity_system);
 		csgo_input = ShadowVMT(g::csgo_input);
 		client = ShadowVMT(g::client);
-		swap_chain = ShadowVMT(g::render_system->swap_chain);
 		client_mode = ShadowVMT(g::client_mode_csnormal);
 
 		entity_system.apply(on_add_entity::index, reinterpret_cast<uintptr_t*>(&on_add_entity::hooked), reinterpret_cast<void**>(&on_add_entity::original_fn));
@@ -98,19 +126,21 @@ namespace hooks
 		csgo_input.apply(createmove_csgoinput21::index, reinterpret_cast<uintptr_t*>(&createmove_csgoinput21::hooked), reinterpret_cast<void**>(&createmove_csgoinput21::original_fn));
 
 		client.apply(frame_stage_notify::index, reinterpret_cast<uintptr_t*>(&frame_stage_notify::hooked), reinterpret_cast<void**>(&frame_stage_notify::original_fn));
-
-		swap_chain.apply(directx::present::index, reinterpret_cast<uintptr_t*>(&directx::present::hooked), reinterpret_cast<void**>(&directx::present::original_fn));
-
+		
 		client_mode.apply(level_init::index, reinterpret_cast<uintptr_t*>(&level_init::hooked), reinterpret_cast<void**>(&level_init::original_fn));
 		client_mode.apply(level_shutdown::index, reinterpret_cast<uintptr_t*>(&level_shutdown::hooked), reinterpret_cast<void**>(&level_shutdown::original_fn));
-		
+
+		auto vtable = *reinterpret_cast<void***>(hooks::g_pSwapChain);
+		auto addr = vtable[8];
+		directx::present::safetyhook = safetyhook::create_inline((void*)addr, reinterpret_cast<void*>(directx::present::hooked));
 		get_matrices_for_view::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::GetMatricesForView"), __FUNCTION__).as(), reinterpret_cast<void*>(get_matrices_for_view::hooked));
 		//calcviewmodel::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::CalcViewModel"), __FUNCTION__).as(), reinterpret_cast<void*>(calcviewmodel::hooked));
 		//onrenderstart::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::OnRenderStart"), __FUNCTION__).as(), reinterpret_cast<void*>(onrenderstart::hooked));
 		draw_array_ex::safetyhook = safetyhook::create_inline(modules::scenesys.get_sig_addr(FNV("hooks::DrawArrayEx"), __FUNCTION__).as(), reinterpret_cast<void*>(draw_array_ex::hooked));
-		
+
+		//swap_chain.apply(directx::present::index, reinterpret_cast<uintptr_t*>(&directx::present::hooked), reinterpret_cast<void**>(&directx::present::original_fn));
 		//swap_chain.Apply(directx::resize_buffers::index, reinterpret_cast<uintptr_t*>(&directx::resize_buffers::hooked), reinterpret_cast<void**>(&directx::resize_buffers::original_fn));
-		//dxgi.Apply(directx::create_swapchain::index, reinterpret_cast<uintptr_t*>(&directx::create_swapchain::hooked), reinterpret_cast<void**>(&directx::create_swapchain::original_fn));
+		dxgi.apply(directx::create_swapchain::index, reinterpret_cast<uintptr_t*>(&directx::create_swapchain::hooked), reinterpret_cast<void**>(&directx::create_swapchain::original_fn));
 
 		return true;
 	}
@@ -123,7 +153,7 @@ namespace hooks
 		entity_system.restore_vtable();
 		csgo_input.restore_vtable();
 		client.restore_vtable();
-		swap_chain.restore_vtable();
+		//swap_chain.restore_vtable();
 		client_mode.restore_vtable();
 
 		return true;

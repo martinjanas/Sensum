@@ -95,7 +95,7 @@ namespace features::esp
 		}
 	}
 	
-	void grenade_projectiles(const entity_data::grenade_info_t& grenade_info, ID3D11Device* device, ID3D11DeviceContext* context)
+	void grenade_projectiles(const entity_data::grenade_info_t& grenade_info)
 	{
 		const bool is_smoke = grenade_info.type == entity_data::GRENADE_SMOKE;
 		const bool is_molotov = grenade_info.type == entity_data::GRENADE_MOLOTOV;
@@ -165,7 +165,7 @@ namespace features::esp
 		}
 	}
 
-	void render_entities(ID3D11Device* device, ID3D11DeviceContext* context)
+	void render_entities()
 	{
 		if (!g::engine_client->IsInGame())
 			return;
@@ -182,7 +182,7 @@ namespace features::esp
 				bomb_timer(bomb_info);
 
 			for (auto& grenade_info : entry.grenade_info)
-				grenade_projectiles(grenade_info, device, context);
+				grenade_projectiles(grenade_info);
 
 			// for (auto& dropped_ents_info : entry.dropped_ent_info)
 			// 	dropped_entities(dropped_ents_info);
@@ -198,8 +198,8 @@ namespace features::esp
 
 		m_player_data.clear();
 		if (!entity_data::player_entry_data.empty())
-			std::copy(entity_data::player_entry_data.front().player_data.begin(), entity_data::player_entry_data.front().player_data.end(), std::back_inserter(m_player_data));
-
+			std::ranges::copy(entity_data::player_entry_data.front().player_data.begin(), entity_data::player_entry_data.front().player_data.end(),  std::back_inserter(m_player_data));
+		
 		Vector head_pos_out;
 		Vector origin_out;
 
@@ -275,50 +275,38 @@ namespace features::esp
 				globals::draw_list->AddLine(x.bone.as_vec2(), x.bone_parent.as_vec2(), ImColor(settings::esp::bone_clr.x, settings::esp::bone_clr.y, settings::esp::bone_clr.z, settings::esp::bone_clr.w));
 		}
 	}
-
+	
 	void name_esp(entity_data::player_data_t& data, const BBox_t& bbox)
 	{
 		if (!settings::esp::name_esp)
 			return;
-
-		Vector head_pos = data.hitboxes[HITBOX_HEAD].hitbox_pos;
-
-		Vector vec10 = head_pos + Vector(0.f, 0.f, 10.f);
-		if (Vector v10; globals::world2screen(vec10, v10))
-			outlined_text("Vec10", v10.as_vec2(), IM_COL32_WHITE);
+		
+		Vector top_mid = bbox.GetTop();
+		Vector t;
+		if (!globals::world2screen(data.hitboxes[HITBOX_HEAD].hitbox_pos+Vector(0, 0, 10), t))
+			return;
+		
+		ImU32 color = ImColor(settings::esp::name_clr.x, settings::esp::name_clr.y, settings::esp::name_clr.z, settings::esp::name_clr.w);
+		float y_padding = 20.0f;
+		
+		imgui::PushFont(render::fonts::esp);
+		auto adjusted_text_size = imgui::CalcTextSize(data.m_szPlayerName);
+		imgui::PopFont();
+		
+		float text_size_mid = adjusted_text_size.x * 0.5f;
+	
+		ImVec2 render_pos(top_mid.x - text_size_mid, top_mid.y - y_padding);
+	
+		ImVec2 render_pos2(t.x - text_size_mid, t.y);
+		
+		imgui::PushFont(render::fonts::esp);
+		outlined_text(data.m_szPlayerName, render_pos, IM_COL32(255, 255, 255, 255));
+		imgui::PopFont();
+	
+		imgui::PushFont(render::fonts::esp);
+		outlined_text(data.m_szPlayerName, render_pos2, IM_COL32(255, 0, 0, 255));
+		imgui::PopFont();
 	}
-
-	// void name_esp(entity_data::player_data_t& data, const BBox_t& bbox)
-	// {
-	// 	if (!settings::esp::name_esp)
-	// 		return;
-	// 	
-	// 	Vector top_mid = bbox.GetTopMid();
-	// 	Vector t;
-	// 	if (!globals::world2screen(data.hitboxes[HITBOX_HEAD].hitbox_pos+Vector(0, 0, 10), t))
-	// 		return;
-	// 	
-	// 	ImU32 color = ImColor(settings::esp::name_clr.x, settings::esp::name_clr.y, settings::esp::name_clr.z, settings::esp::name_clr.w);
-	// 	float y_padding = 20.0f;
-	// 	
-	// 	imgui::PushFont(render::fonts::esp);
-	// 	auto adjusted_text_size = imgui::CalcTextSize(data.m_szPlayerName);
-	// 	imgui::PopFont();
-	// 	
-	// 	float text_size_mid = adjusted_text_size.x * 0.5f;
-	//
-	// 	ImVec2 render_pos(top_mid.x - text_size_mid, top_mid.y - y_padding);
-	//
-	// 	ImVec2 render_pos2(t.x - text_size_mid, t.y);
-	// 	
-	// 	imgui::PushFont(render::fonts::esp);
-	// 	outlined_text(data.m_szPlayerName, render_pos, IM_COL32(255, 255, 255, 255));
-	// 	imgui::PopFont();
-	//
-	// 	imgui::PushFont(render::fonts::esp);
-	// 	outlined_text(data.m_szPlayerName, render_pos2, IM_COL32(255, 0, 0, 255));
-	// 	imgui::PopFont();
-	// }
 	
 	// void weapon_esp(entity_data::player_data_t& data)
 	// {

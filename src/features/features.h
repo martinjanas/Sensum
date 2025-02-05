@@ -8,7 +8,7 @@ namespace features
 	namespace esp
 	{
 		void render();
-		void render_entities(ID3D11Device* device, ID3D11DeviceContext* context);
+		void render_entities();
 
 		void bone_esp(entity_data::player_data_t& data);
 		void name_esp(entity_data::player_data_t& data, const BBox_t& bbox);
@@ -18,6 +18,24 @@ namespace features
 
 	namespace aimbot
 	{
+		struct target_info_t
+		{
+			bool operator<(const target_info_t& other) const
+			{
+				return fov < other.fov;
+			}
+
+			CCSPlayerPawn* pawn;
+			entity_data::player_data_t* player_data;
+
+			float fov;
+			float distance;
+			bool in_air;
+
+			QAngle target_angle;
+			const char* name;
+		};
+		
 		void handle(CUserCmd* cmd);
 	}
 

@@ -8,20 +8,34 @@
 #include "../../thirdparty/ImGui/backends/imgui_impl_dx11.h"
 #include "../../thirdparty/ImGui/backends/imgui_impl_win32.h"
 #include <algorithm>
+#include "../../sdk/helpers/Timer.h"
+
 namespace hooks
 {
-	ID3D11Device* g_pDevice = nullptr;
-	ID3D11DeviceContext* g_pContext = nullptr;
-	ID3D11RenderTargetView* g_pRenderTargetView;
-	DXGI_SWAP_CHAIN_DESC swap_desc;
-	D3D11_RENDER_TARGET_VIEW_DESC rtv_desc;
+	ID3D11RenderTargetView* g_pRenderTargetView = nullptr;
 
-	bool init_imgui_done = false;
-
-	//bug: imgui not rendering if changing from windowed to fullscreen or when changing resolution
-
+	std::once_flag fetch_icon_flag;
+	bool imgui_initialized = false;
+	bool device_reset_required = false;
+	
 	long __stdcall directx::create_swapchain::hooked(IDXGIFactory* factory, IUnknown* device, DXGI_SWAP_CHAIN_DESC* swap_desc, IDXGISwapChain** swap_chain)
 	{
+		HWND hwnd = FindWindow(nullptr, L"Counter-Strike 2");
+		hooks::CreateDeviceD3D11(hwnd, hooks::g_pRealDevice, hooks::g_pSwapChain);
+		
+		auto vtable = *reinterpret_cast<void***>(hooks::g_pSwapChain);
+		auto addr = vtable[8];
+		directx::present::safetyhook.reset();
+		directx::present::safetyhook = safetyhook::create_inline((void*)addr, reinterpret_cast<void*>(directx::present::hooked));
+
+		if (g_pRenderTargetView)
+		{
+			g_pRenderTargetView->Release();
+			g_pRenderTargetView = nullptr;
+		}
+		
+		device_reset_required = true;
+		
 		return original_fn(factory, device, swap_desc, swap_chain);
 	}
 
@@ -29,53 +43,60 @@ namespace hooks
 	{
 		return original_fn(swap_chain, buffer_count, width, height, new_format, swap_chain_flags);
 	}
-
-	static std::once_flag fetch_icon_flag;
+	
 	long __stdcall directx::present::hooked(IDXGISwapChain* swap_chain, uint32_t sync_interval, uint32_t flags)
 	{
-		if (!g_pDevice || !g_pContext || !g_pRenderTargetView)
+		ID3D11Device* device;
+		swap_chain->GetDevice(__uuidof(ID3D11Device), (void**)&device);
+		
+		ID3D11DeviceContext* device_context;
+		device->GetImmediateContext(&device_context);
+
+		DXGI_SWAP_CHAIN_DESC swap_desc{};
+		swap_chain->GetDesc(&swap_desc);
+		globals::hwnd = swap_desc.OutputWindow;
+		globals::width = swap_desc.BufferDesc.Width;
+		globals::height = swap_desc.BufferDesc.Height;
+
+		if (!g_pRenderTargetView) 
 		{
-			swap_chain->GetDevice(__uuidof(ID3D11Device), (void**)&g_pDevice);
-			g_pDevice->GetImmediateContext(&g_pContext);
+			ID3D11Texture2D* back_buffer;
+			if (SUCCEEDED(swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&back_buffer)))
+			{
+				D3D11_RENDER_TARGET_VIEW_DESC rtv_desc{};
+				rtv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				rtv_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
+				
+				device->CreateRenderTargetView(back_buffer, &rtv_desc, &g_pRenderTargetView);
 
-			swap_chain->GetDesc(&swap_desc);
-			globals::hwnd = swap_desc.OutputWindow;
-			globals::width = swap_desc.BufferDesc.Width;
-			globals::height = swap_desc.BufferDesc.Height;
-
-			ID3D11Texture2D* pBackBuffer;
-			swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
-
-			D3D11_RENDER_TARGET_VIEW_DESC rtv_desc = {};
-			rtv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-			rtv_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
-			g_pDevice->CreateRenderTargetView(pBackBuffer, &rtv_desc, &g_pRenderTargetView);
-			pBackBuffer->Release();
+				back_buffer->Release();
+			}
 		}
-
-		if (!init_imgui_done && (g_pDevice && g_pContext))
+		
+		if (!imgui_initialized)
 		{
 			hooks::wndproc::original = reinterpret_cast<WNDPROC>(SetWindowLongPtr(globals::hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(hooks::wndproc::hooked)));
-
+			
 			ImGui::CreateContext();
-			ImGuiIO& io = ImGui::GetIO();
-			io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
 			ImGui_ImplWin32_Init(globals::hwnd);
-			ImGui_ImplDX11_Init(g_pDevice, g_pContext);
+			ImGui_ImplDX11_Init(device, device_context);
 
 			render::init_fonts();
 			render::init_style();
-
-			init_imgui_done = true;
+			
+			imgui_initialized = true;;
 		}
 
-		if (g_pDevice)
+		if (device_reset_required)
 		{
-			std::call_once(fetch_icon_flag, []()
-			{
-				icon_fetcher::fetch_icon_data(g_pDevice);
-			});	
+			ImGui_ImplDX11_InvalidateDeviceObjects();
+			ImGui_ImplDX11_CreateDeviceObjects();
+			
+			device_reset_required = false;
 		}
+		
+		//if (device)
+		//	std::call_once(fetch_icon_flag, [&]() { icon_fetcher::fetch_icon_data(device); }); //is causing crashes
 		
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
@@ -83,19 +104,19 @@ namespace hooks
 		ImGui::NewFrame();
 		{
 			globals::draw_list = ImGui::GetBackgroundDrawList();
-
+			
 			menu::modulate_window_alpha();
 			menu::draw();
-
+		
 			features::esp::render();
-			features::esp::render_entities(g_pDevice, g_pContext);
+			features::esp::render_entities();
 		}
 		ImGui::EndFrame();
 		ImGui::Render();
-
-		g_pContext->OMSetRenderTargets(1, &g_pRenderTargetView, nullptr);
+		
+		device_context->OMSetRenderTargets(1, &g_pRenderTargetView, nullptr);
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-		return original_fn(swap_chain, sync_interval, flags);
+		
+		return safetyhook.stdcall<long>(swap_chain, sync_interval, flags);
 	}
 }

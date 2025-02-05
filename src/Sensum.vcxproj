@@ -329,6 +329,7 @@
     <ClCompile Include="sdk\hooking\safetyhook\Zydis.c" />
     <ClCompile Include="sdk\interfaces\CGameTrace.cpp" />
     <ClCompile Include="sdk\interfaces\ClientModeCSNormal.h" />
+    <ClCompile Include="sdk\math\math.cpp" />
     <ClCompile Include="sdk\math\QAngle.cpp" />
     <ClCompile Include="sdk\sdk.cpp" />
     <ClCompile Include="main.cpp" />

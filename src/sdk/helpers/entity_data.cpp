@@ -266,7 +266,7 @@ namespace entity_data
 		CCSPlayerPawn* localpawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(local_controller->m_hPawn());
 		if (!localpawn)
 		{
-			destroy();
+			//destroy();
 			return;
 		}
 

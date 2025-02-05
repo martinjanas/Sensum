@@ -1,4 +1,5 @@
 #include "ShadowVMT.h"
+#include "../../../sdk/helpers/console.h"
 
 ShadowVMT::ShadowVMT(void* interface_obj)
 {
@@ -21,7 +22,7 @@ bool ShadowVMT::apply(uint32_t index, uintptr_t* hook_func, void** original_fn)
 
 	// Replace the function pointer in the fake VMT with the hook function
 	m_pFakeVtable[index] = reinterpret_cast<uintptr_t>(hook_func);
-
+	
 	return true;
 }
 

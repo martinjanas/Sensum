@@ -3,6 +3,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <numbers>
+#include "QAngle.h"
 
 namespace math //temp placement, move to cpp later
 {
@@ -11,4 +12,6 @@ namespace math //temp placement, move to cpp later
 
 	constexpr float deg2rad = (pi_f / 180.0f);
 	constexpr float rad2deg = (180.0f / pi_f);
+
+	float distance_based_fov(const QAngle& delta, const float& distance);
 }
