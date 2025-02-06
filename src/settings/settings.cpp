@@ -25,6 +25,10 @@ namespace settings
 		bool health_esp = false;
 		bool visible_only = true;
 
+		
+		float box_thickness = 1.f;
+		float box_rounding = 0.f;
+		
 		ImVec4 bone_clr = ImVec4(255, 255, 255, 255);
 		ImVec4 box_clr = ImVec4(255, 255, 255, 255);
 		ImVec4 health_clr = ImVec4(255, 255, 255, 255);

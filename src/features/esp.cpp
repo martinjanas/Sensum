@@ -63,7 +63,7 @@ namespace features::esp
 		//globals::draw_list->AddText(ImVec2((pos.x) - 1.f, (pos.y) - 1.f), outlined_color, text);
 		globals::draw_list->AddText(ImVec2((pos.x) + 1.f, (pos.y) - 1.f), outlined_color, text);
 		//globals::draw_list->AddText(ImVec2((pos.x) - 1.f, (pos.y) + 1.f), outlined_color, text);
-
+		
 		globals::draw_list->AddText(pos, color, text);
 	}
 	
@@ -196,27 +196,26 @@ namespace features::esp
 
 		std::shared_lock<std::shared_mutex> lock(entity_data::player_locker);
 
-		m_player_data.clear();
+		//m_player_data.clear();
 		if (!entity_data::player_entry_data.empty())
-			std::ranges::copy(entity_data::player_entry_data.front().player_data.begin(), entity_data::player_entry_data.front().player_data.end(),  std::back_inserter(m_player_data));
+			m_player_data.assign(entity_data::player_entry_data.front().player_data.begin(), entity_data::player_entry_data.front().player_data.end());
 		
-		Vector head_pos_out;
-		Vector origin_out;
-
 		for (auto& data : m_player_data)
 		{
 			if (settings::esp::visible_only && (!data.flags.test(PLAYER_VISIBLE) || data.flags.test(PLAYER_IN_SMOKE)))
 				continue;
 
 			ImU32 box_color = ImColor(settings::esp::box_clr.x, settings::esp::box_clr.y, settings::esp::box_clr.z, settings::esp::box_clr.w);
-
-			const Vector& head_pos = data.hitboxes[HITBOX_HEAD].hitbox_pos;
-
-			bool got_origin = globals::world2screen(data.m_vecAbsOrigin, origin_out);
-			bool got_head_pos = globals::world2screen(head_pos, head_pos_out);
-
 			if (settings::esp::box_esp && data.bbox.IsValid())
-				globals::draw_list->AddRect(data.bbox.m_Mins.as_vec2(), data.bbox.m_Maxs.as_vec2(), box_color, 0.f, 0);
+			{
+				globals::draw_list->AddRect(data.bbox.m_Mins.as_vec2(), data.bbox.m_Maxs.as_vec2(), box_color, 0.f, 0, 1.2f);
+
+				// ImColor col_alpha0 = ImColor(settings::esp::box_clr.x, settings::esp::box_clr.y, settings::esp::box_clr.z, 0.f);
+				// ImColor col_alpha180 = ImColor(settings::esp::box_clr.x, settings::esp::box_clr.y, settings::esp::box_clr.z, 180 / 255.f);
+				// globals::draw_list->AddRectFilledMultiColor(data.bbox.m_Mins.as_vec2(), data.bbox.m_Maxs.as_vec2(), col_alpha0, col_alpha0, col_alpha180, col_alpha180); 
+				
+				globals::draw_list->AddRect(data.bbox.m_Mins.as_vec2() - ImVec2(1, 1), data.bbox.m_Maxs.as_vec2() + ImVec2(1, 1), ImColor(0, 0, 0, 180), 1.2f);
+			}
 			
 			esp::name_esp(data, data.bbox);
 
@@ -282,84 +281,23 @@ namespace features::esp
 			return;
 		
 		Vector top_mid = bbox.GetTop();
-		Vector t;
-		if (!globals::world2screen(data.hitboxes[HITBOX_HEAD].hitbox_pos+Vector(0, 0, 10), t))
-			return;
 		
 		ImU32 color = ImColor(settings::esp::name_clr.x, settings::esp::name_clr.y, settings::esp::name_clr.z, settings::esp::name_clr.w);
 		float y_padding = 20.0f;
 		
 		imgui::PushFont(render::fonts::esp);
-		auto adjusted_text_size = imgui::CalcTextSize(data.m_szPlayerName);
+		auto text_size = imgui::CalcTextSize(data.m_szPlayerName);
 		imgui::PopFont();
 		
-		float text_size_mid = adjusted_text_size.x * 0.5f;
+		float text_size_mid = text_size.x * 0.5f;
 	
 		ImVec2 render_pos(top_mid.x - text_size_mid, top_mid.y - y_padding);
-	
-		ImVec2 render_pos2(t.x - text_size_mid, t.y);
 		
 		imgui::PushFont(render::fonts::esp);
 		outlined_text(data.m_szPlayerName, render_pos, IM_COL32(255, 255, 255, 255));
 		imgui::PopFont();
-	
-		imgui::PushFont(render::fonts::esp);
-		outlined_text(data.m_szPlayerName, render_pos2, IM_COL32(255, 0, 0, 255));
-		imgui::PopFont();
 	}
 	
-	// void weapon_esp(entity_data::player_data_t& data)
-	// {
-	//     Vector bottom_mid = data.bbox.GetBottom();
-	//
-	//     const auto& icon = data.weapon_icon;
-	//     if (icon.texture)
-	//     {
-	//         auto controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
-	//         if (!controller)
-	//             return;
-	//
-	//         auto pawn = reinterpret_cast<CCSPlayerPawn*>(g::entity_system->GetEntityFromHandle(controller->m_hPawn()));
-	//         if (!pawn)
-	//             return;
-	//
-	//         // Calculate distance between the player's weapon and the camera
-	//         float distance = data.m_vecOrigin.dist_to(pawn->m_pGameSceneNode()->m_vecOrigin());
-	//
-	//         // Debug distance output
-	//         g_Console->println("distance: %.1f", distance);
-	//
-	//         // Set the scaling factor, keep it at 1.0 when far, scale slightly as you approach
-	//         float scale_factor = 1.0f;
-	//
-	//         // If you're within a certain range, scale the icon slightly based on the distance
-	//         if (distance < 500.0f)
-	//         {
-	//             scale_factor = std::clamp(1000.0f / distance, 1.0f, 1.2f);
-	//         }
-	//
-	//         // Debug output for scale_factor
-	//         g_Console->println("scale_factor: %.2f", scale_factor);
-	//
-	//         // Apply the scale factor to width and height
-	//         float scaled_w = icon.w * scale_factor;
-	//         float scaled_h = icon.h * scale_factor;
-	//
-	//         // Ensure a minimum size so the icon doesn't disappear at long distances
-	//         scaled_w = std::max(scaled_w, 10.0f);
-	//         scaled_h = std::max(scaled_h, 10.0f);
-	//
-	//         // Debug output for scaled width and height
-	//         g_Console->println("scaled_w: %.1f, scaled_h: %.1f", scaled_w, scaled_h);
-	//
-	//         // Position the icon based on bounding box center and scale
-	//         ImVec2 image_start = ImVec2(bottom_mid.x - scaled_w / 2, bottom_mid.y - scaled_h / 2 + 6.f);
-	//         ImVec2 image_end = ImVec2(image_start.x + scaled_w, image_start.y + scaled_h);
-	//
-	//         globals::draw_list->AddImage(icon.texture, image_start, image_end, ImVec2(0, 0), ImVec2(1, 1), imgui::ColorConvertFloat4ToU32(icon.tint));
-	//     }
-	// }
-
 	void weapon_esp(entity_data::player_data_t& data)
 	{
 	    Vector bottom_mid = data.bbox.GetBottom();

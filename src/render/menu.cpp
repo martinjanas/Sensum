@@ -85,7 +85,7 @@ void draw_menu_debug()
 	ImGui::PushFont(render::fonts::selector);
 	ImGui::Checkbox("Visible Only", &settings::esp::visible_only);
 	ImGui::Checkbox("Box", &settings::esp::box_esp); ImGui::SameLine();
-	ImGui::ColorEdit3("###boxcolor", (float*)&settings::esp::box_esp, ImGuiColorEditFlags_NoInputs);
+	ImGui::ColorEdit3("###boxcolor", (float*)&settings::esp::box_clr, ImGuiColorEditFlags_NoInputs);
 	ImGui::Checkbox("Name", &settings::esp::name_esp); ImGui::SameLine();
 	ImGui::ColorEdit3("###namecolor", (float*)&settings::esp::name_clr, ImGuiColorEditFlags_NoInputs);
 	ImGui::Checkbox("Health", &settings::esp::health_esp); ImGui::SameLine();
@@ -93,6 +93,9 @@ void draw_menu_debug()
 	ImGui::Checkbox("Bone esp", &settings::esp::bone_esp); ImGui::SameLine();
 	ImGui::ColorEdit3("###bonecolor", (float*)&settings::esp::bone_clr, ImGuiColorEditFlags_NoInputs);
 
+	ImGui::SliderFloat("###Boxrounding", &settings::esp::box_rounding, 0, 100, "Box rounding: %.1f");
+	ImGui::SliderFloat("###Boxthickness", &settings::esp::box_thickness, 0, 100, "Box thickness: %.1f");
+	
 	{
 		static int definition_index = 7;
 

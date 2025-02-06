@@ -61,16 +61,16 @@ public:
 	void* pValue;
 	std::byte pad02[0x8];
 
-	bool LoadKV3(CUtlBuffer* buffer, const char* kv3_name)
+	static bool LoadKV3(KeyValues* kv, CUtlBuffer* buffer, const char* kv3_name)
 	{
-		using fn = bool(__thiscall*)(void* thisptr, void* utlstring, CUtlBuffer* buffer, const KV3ID_t& format, const char* kv_name);
+		using fn = bool(__thiscall*)(void* thisptr, void* utlstring, CUtlBuffer* buffer, const KV3ID_t* format, const char* kv_name);
 		static const auto& addr = modules::tier0.get_export("?LoadKV3@@YA_NPEAVKeyValues3@@PEAVCUtlString@@PEAVCUtlBuffer@@AEBUKV3ID_t@@PEBD@Z").as();
 		if (!addr)
 			return false;
 
 		const auto load_kv3 = reinterpret_cast<fn>(addr);
 
-		return load_kv3(this, nullptr, buffer, g_KV3Format_Generic, ""); //returns false
+		return load_kv3(kv, nullptr, buffer, &g_KV3Format_Generic, nullptr); //returns false
 	}
 
 	bool LoadFromBuffer(const char* str, const char* kv3_name)
@@ -79,7 +79,7 @@ public:
 		buffer.EnsureCapacity((int)strlen(str) + 1);
 		buffer.PutString(str);
 
-		if (LoadKV3(&buffer, kv3_name))
+		if (LoadKV3(this, &buffer, kv3_name))
 			return true;
 
 		return false;
@@ -108,7 +108,7 @@ public:
 		return VTable::GetThiscall<IMaterial*>(this, 14, material, name);
 	}
 
-	IMaterial* CreateMaterial(IMaterial*** material, const char* mat_name, const KeyValues& key_value, uint32_t num1, uint8_t num2)
+	IMaterial* CreateMaterial(IMaterial*** material, const char* mat_name, KeyValues* key_value, uint32_t num1, uint8_t num2)
 	{
 		return VTable::GetThiscall<IMaterial*>(this, 29, material, mat_name, key_value, num1, num2);
 	}
@@ -136,9 +136,9 @@ public:
 	CHandle handle;                      // 0x10
 	std::byte pad02[0x4];                // 0x14
 	CSceneObject* scene_object;          // 0x18
-	IMaterial* material;                 // 0x20
-	std::byte pad04[0x28];               // 0x28 //previous offset: 0x18
-	std::array<std::byte, 4> color;      // 0x50 //previously at 0x40
+	IMaterial* material;                 // 0x20, - material2 at 0x28
+	std::byte pad04[0x28];               // 0x28
+	std::array<std::byte, 4> color;      // 0x50
 }; // Size: 0x58
 
 namespace interfaces //move to interfaces.h ?

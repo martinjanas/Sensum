@@ -336,7 +336,7 @@ namespace entity_data
 			const auto on_screen = globals::world2screen(scene_node->m_vecOrigin(), origin_w2s);
 
 			player_data_t player_data;
-			player_data.m_szPlayerName = "Martin";//controller->m_sSanitizedPlayerName();
+			player_data.m_szPlayerName = controller->m_sSanitizedPlayerName();
 			player_data.m_iPlayerIndex = index;
 			player_data.m_vecOrigin = scene_node->m_vecOrigin();
 			player_data.m_vecAbsOrigin = scene_node->m_vecAbsOrigin();

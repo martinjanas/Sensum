@@ -17,6 +17,8 @@ namespace hooks
 	std::once_flag fetch_icon_flag;
 	bool imgui_initialized = false;
 	bool device_reset_required = false;
+
+	std::shared_mutex icon_mutex;
 	
 	long __stdcall directx::create_swapchain::hooked(IDXGIFactory* factory, IUnknown* device, DXGI_SWAP_CHAIN_DESC* swap_desc, IDXGISwapChain** swap_chain)
 	{
@@ -94,9 +96,18 @@ namespace hooks
 			
 			device_reset_required = false;
 		}
-		
-		//if (device)
-		//	std::call_once(fetch_icon_flag, [&]() { icon_fetcher::fetch_icon_data(device); }); //is causing crashes
+
+		{
+			std::unique_lock<std::shared_mutex> lock(icon_mutex);
+
+			static bool done = false;
+			if (!done && device)
+			{
+				icon_fetcher::fetch_icon_data(device); //is causing crashes (in fullscreen?)
+				
+				done = true;
+			}
+		}
 		
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();

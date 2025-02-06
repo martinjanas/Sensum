@@ -43,7 +43,7 @@ static void get_dxgi(IDXGIFactory*& dxgi_factory)
 	d3d11_device->Release();
 }
 
-static const char* material_latex_vis = R"#(<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d}
+static const char material_latex_vis[] = R"(<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d}
 			format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
 			{
                 shader = "csgo_character.vfx"
@@ -55,22 +55,112 @@ static const char* material_latex_vis = R"#(<!-- kv3 encoding:text:version{e21c7
                 g_tColor = resource:"materials/dev/primary_white_color_tga_21186c76.vtex"
                 g_tAmbientOcclusion = resource:"materials/default/default_ao_tga_79a2e0d0.vtex"
                 g_tNormal = resource:"materials/default/default_normal_tga_1b833b2a.vtex"
-			} )#";
+			} )";
 
-IMaterial* create_material(const char* material_vmat, const char* mat_name)
+static const char szGlowVmatBuffer[] = R"(<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d}
+format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
 {
-	CUtlBuffer buffer{ 0, 0, 0 };
-	buffer.PutString(material_vmat);
+	shader = "csgo_effects.vfx"
+    g_tColor = resource:"materials/dev/primary_white_color_tga_21186c76.vtex"
+    g_tNormal = resource:"materials/default/default_normal_tga_7652cb.vtex"
+    g_tMask1 = resource:"materials/default/default_mask_tga_344101f8.vtex"
+    g_tMask2 = resource:"materials/default/default_mask_tga_344101f8.vtex"
+    g_tMask3 = resource:"materials/default/default_mask_tga_344101f8.vtex"
+    g_tRoughness = resource:"materials/default/default_normal_tga_b3f4ec4c.vtex"
+	g_tMetalness = resource:"materials/default/default_normal_tga_b3f4ec4c.vtex"
+	g_tAmbientOcclusion = resource:"materials/default/default_normal_tga_b3f4ec4c.vtex"
+ 
+    g_flOpacityScale = 7.55
+    g_flFresnelExponent = 7.75
+    g_flFresnelFalloff = 5
+    g_flFresnelMax = 0.0
+    g_flFresnelMin = 9
+    F_ADDITIVE_BLEND = 1
+    F_BLEND_MODE = 1
+    F_TRANSLUCENT = 1
+    F_IGNOREZ = 0
+    F_DISABLE_Z_WRITE = 0
+    F_DISABLE_Z_BUFFERING = 0
+    F_RENDER_BACKFACES = 0
+    g_vColorTint = [7.0, 7.0, 7.0, 0.37522]
+} )";
 
-	KeyValues kv;
-	bool loaded = kv.LoadKV3(&buffer, mat_name);
-	if (!loaded)
+const char vmat_buffer[] = R"(<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+shader = "csgo_unlitgeneric.vfx"
+F_DISABLE_Z_BUFFERING = 1
+g_flBumpStrength = 1
+g_vColorTint = [1.000000, 1.000000, 1.000000, 0.000000]
+g_vGlossinessRange = [0.000000, 1.000000, 0.000000, 0.000000]
+g_vNormalTexCoordScale = [1.000000, 1.000000, 0.000000, 0.000000]
+g_vTexCoordOffset = [0.000000, 0.000000, 0.000000, 0.000000]
+g_vTexCoordScale = [1.000000, 1.000000, 0.000000, 0.000000]
+g_tColor = resource:"materials/dev/primary_white_color_tga_f7b257f6.vtex"
+g_tNormal = resource:"materials/default/default_normal_tga_7652cb.vtex"
+g_tRoughness = resource:"materials/default/default_normal_tga_b3f4ec4c.vtex"
+})";
+
+static void* Alloc(std::size_t size)
+{
+	using fn = void* (__thiscall*)(std::size_t);
+	static const auto& addr = modules::tier0.get_export("MemAlloc_AllocFunc").as();
+	if (!addr)
 		return nullptr;
 
-	IMaterial** mat_out = nullptr;
-	g::mat_system->CreateMaterial(&mat_out, mat_name, kv, 0, 1);
+	auto alloc = reinterpret_cast<fn>(addr);
+	if (alloc)
+		return alloc(size);
 
-	return *mat_out;
+	return nullptr;
+}
+
+static void Free(const void* p)
+{
+	using fn = void(__thiscall*)(const void*);
+	static const auto& addr = modules::tier0.get_export("MemAlloc_FreeFunc").as();
+	if (!addr)
+		return;
+
+	auto free = reinterpret_cast<fn>(addr);
+	if (free)
+		free(p);
+}
+
+bool lpLoadKV3(KeyValues* kv, const char* material_vmat, const char* kv_name)
+{
+	using fn = bool(__fastcall*)(KeyValues* kv, void* utlstring, const char* buffer, const KV3ID_t* format, const char* kv_name);
+	static const auto& load_kv3 = modules::tier0.get_export("?LoadKV3@@YA_NPEAVKeyValues3@@PEAVCUtlString@@PEBDAEBUKV3ID_t@@2@Z").as<fn>();
+	if (!load_kv3)
+		return false;
+
+	bool ret = load_kv3(kv, nullptr, material_vmat, &g_KV3Format_Generic, kv_name);
+
+	return ret;
+}
+
+static IMaterial* CreateMaterial(const char* material_vmat, const char* mat_name)
+{
+	IMaterial** material_out;
+
+	void* p_buffer = Alloc(0x100 + sizeof(KeyValues));
+	KeyValues* kv = (KeyValues*)((uint8_t*)p_buffer + 0x100);
+
+	if (kv)
+	{
+		if (!lpLoadKV3(kv, material_vmat, mat_name))
+		{
+			Free(p_buffer);
+
+			return nullptr;
+		}
+
+		g::mat_system->CreateMaterial(&material_out, mat_name, kv, 0, 1);
+
+		Free(p_buffer);
+
+		return *material_out;
+	}
+	return nullptr;
 }
 
 namespace hooks
@@ -113,7 +203,7 @@ namespace hooks
 		
 		HWND hwnd = FindWindow(nullptr, L"Counter-Strike 2");
 		CreateDeviceD3D11(hwnd, hooks::g_pRealDevice, hooks::g_pSwapChain);
-		
+	
 		entity_system = ShadowVMT(g::entity_system);
 		csgo_input = ShadowVMT(g::csgo_input);
 		client = ShadowVMT(g::client);
@@ -197,6 +287,7 @@ namespace hooks
 		if (!scene_data || !scene_data->material)
 			return;
 
+		//BUG: returns the world entity
 		CCSPlayerController* player = reinterpret_cast<CCSPlayerController*>(g::entity_system->GetEntityFromHandle(scene_data->scene_object->owner_handle));
 		if (!player)
 			return;
@@ -215,21 +306,23 @@ namespace hooks
 		if (!strstr(mat_name, "characters/models"))
 			return;
 
-		static IMaterial** m = nullptr;
-		static auto mat = g::mat_system->FindMaterial(&m, "materials/dev/primary_white.vmat");
+		static IMaterial* latex_mat = CreateMaterial(material_latex_vis, "material_latex_vis");
 
-		/*IMaterial* latex_mat = nullptr;
-		latex_mat = create_material(material_latex_vis, "material_latex_vis");*/ //not working properly
-
-		scene_data->material = *m;
+		if (latex_mat)
+		{
+			scene_data->material = latex_mat;
+			scene_data->color = { std::byte(255), std::byte(0), std::byte(0), std::byte(180.f) };
+		}
 	}
 
 	void __fastcall draw_array_ex::hooked(void* rcx, void* rdx, CSceneData* scene_data, int a4, void* scene_view, void* scene_layer, void* a7, IMaterial* material)
 	{
+		static const auto ret = safetyhook.original<void(__fastcall*)(void*, void*, CSceneData*, int, void*, void*, void*, IMaterial*)>();
+		
 		//Bug: chams rendering on local team
-		//chams(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
+		chams(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
 
-		safetyhook.fastcall<void>(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
+		ret(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
 	}
 
 }

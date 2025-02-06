@@ -56,6 +56,9 @@ namespace settings
 		extern bool health_esp;
 		extern bool visible_only;
 
+		extern float box_thickness;
+		extern float box_rounding;
+		
 		extern ImVec4 bone_clr;
 		extern ImVec4 box_clr;
 		extern ImVec4 health_clr;
