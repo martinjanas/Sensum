@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include "../../sdk/math/Viewmatrix.h"
 #include "../../sdk/math/Vector.h"
+#include <mutex>
 
 namespace globals
 {
@@ -16,7 +17,7 @@ namespace globals
 	extern int height;
 
 	extern bool can_unhook;
-
+	
 	bool world2screen(const Vector& in, Vector& out);
 
 	void* find_hud_element(const char* hud);

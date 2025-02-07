@@ -6,7 +6,6 @@
 namespace globals
 {
 	ImDrawList* draw_list = nullptr;
-
 	HWND hwnd = NULL;
 
 	int width = -1;

@@ -349,6 +349,7 @@ namespace entity_data
 			player_data.m_hModel = model;
 			player_data.m_PlayerPawn = pawn;
 			player_data.distance = player_data.m_vecOrigin.dist_to(localpawn->m_pGameSceneNode()->m_vecOrigin());
+			player_data.sim_time = pawn->m_flSimulationTime();
 
 			const EIconType& type = icon_fetcher::get_icon_type_by_weapon_index(active_wpn->m_iItemDefinitionIndex());
 			player_data.weapon_icon = icon_fetcher::get(type);

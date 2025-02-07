@@ -16,4 +16,9 @@ public:
 		//   @ida: #STR: "Requesting full game update (%s)...\n"
 		VTable::GetThiscall<void>(this, 28, "unk");
 	}
+
+	float GetClientInterp()
+	{
+		return VTable::GetThiscall<float>(this, 62);
+	}
 };

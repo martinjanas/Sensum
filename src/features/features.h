@@ -30,6 +30,7 @@ namespace features
 
 			float fov;
 			float distance;
+			float sim_time;
 			bool in_air;
 
 			QAngle target_angle;

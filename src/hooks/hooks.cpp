@@ -44,18 +44,69 @@ static void get_dxgi(IDXGIFactory*& dxgi_factory)
 }
 
 static const char material_latex_vis[] = R"(<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d}
+format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+	shader = "csgo_character.vfx"
+    F_BLEND_MODE = 1
+	F_DISABLE_Z_WRITE = 0
+    F_RENDER_BACKFACES = 0
+    g_vColorTint = [1.0, 1.0, 1.0, 1.0]
+    g_bFogEnabled = 0
+    g_flMetalness = 0.000
+    g_tMetalness = resource:"materials/default/default_metal_tga_8fbc2820.vtex"
+    g_tColor = resource:"materials/dev/primary_white_color_tga_21186c76.vtex"
+    g_tAmbientOcclusion = resource:"materials/default/default_ao_tga_79a2e0d0.vtex"
+    g_tNormal = resource:"materials/default/default_normal_tga_1b833b2a.vtex"
+} )";
+
+static const char material_latex_invis[] = R"(<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d}
+format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+	shader = "csgo_character.vfx"
+    F_BLEND_MODE = 1
+    F_DISABLE_Z_BUFFERING = 1
+	F_DISABLE_Z_WRITE = 0
+    F_RENDER_BACKFACES = 0
+    g_vColorTint = [1.0, 1.0, 1.0, 1.0]
+    g_bFogEnabled = 0
+    g_flMetalness = 0.000
+    g_tMetalness = resource:"materials/default/default_metal_tga_8fbc2820.vtex"
+    g_tColor = resource:"materials/dev/primary_white_color_tga_21186c76.vtex"
+    g_tAmbientOcclusion = resource:"materials/default/default_ao_tga_79a2e0d0.vtex"
+    g_tNormal = resource:"materials/default/default_normal_tga_1b833b2a.vtex"
+} )";
+
+static const char material_bloom_vis[] = R"#(<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d}
 			format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
 			{
-                shader = "csgo_character.vfx"
-                F_BLEND_MODE = 1
-                g_vColorTint = [1.0, 1.0, 1.0, 1.0]
-                g_bFogEnabled = 0
-                g_flMetalness = 0.000
-                g_tMetalness = resource:"materials/default/default_metal_tga_8fbc2820.vtex"
+                shader = "solidcolor.vfx"
                 g_tColor = resource:"materials/dev/primary_white_color_tga_21186c76.vtex"
-                g_tAmbientOcclusion = resource:"materials/default/default_ao_tga_79a2e0d0.vtex"
-                g_tNormal = resource:"materials/default/default_normal_tga_1b833b2a.vtex"
-			} )";
+                g_tNormal = resource:"materials/default/default_normal_tga_7652cb.vtex"
+                g_tRoughness = resource:"materials/default/default_normal_tga_b3f4ec4c.vtex"
+                g_tMetalness = resource:"materials/default/default_normal_tga_b3f4ec4c.vtex"
+                g_tAmbientOcclusion = resource:"materials/default/default_normal_tga_b3f4ec4c.vtex"
+                F_IGNOREZ = 0
+                F_DISABLE_Z_WRITE = 0
+                F_DISABLE_Z_BUFFERING = 0
+                F_RENDER_BACKFACES = 1
+                g_vColorTint = [9.0, 9.0, 9.0, 9.0]
+			} )#";
+
+static const char material_bloom_invis[] = R"#(<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d}
+			format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+			{
+				shader = "solidcolor.vfx"
+				g_tColor = resource:"materials/dev/primary_white_color_tga_21186c76.vtex"
+				g_tNormal = resource:"materials/default/default_normal_tga_7652cb.vtex"
+				g_tRoughness = resource:"materials/default/default_normal_tga_b3f4ec4c.vtex"
+				g_tMetalness = resource:"materials/default/default_normal_tga_b3f4ec4c.vtex"
+				g_tAmbientOcclusion = resource:"materials/default/default_normal_tga_b3f4ec4c.vtex"
+				F_IGNOREZ = 1
+				F_DISABLE_Z_WRITE = 1
+				F_DISABLE_Z_BUFFERING = 1
+				F_RENDER_BACKFACES = 1
+				g_vColorTint = [9.0, 9.0, 9.0, 9.0]
+			} )#";
 
 static const char szGlowVmatBuffer[] = R"(<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d}
 format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
@@ -87,17 +138,32 @@ format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
 
 const char vmat_buffer[] = R"(<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
 {
-shader = "csgo_unlitgeneric.vfx"
-F_DISABLE_Z_BUFFERING = 1
-g_flBumpStrength = 1
-g_vColorTint = [1.000000, 1.000000, 1.000000, 0.000000]
-g_vGlossinessRange = [0.000000, 1.000000, 0.000000, 0.000000]
-g_vNormalTexCoordScale = [1.000000, 1.000000, 0.000000, 0.000000]
-g_vTexCoordOffset = [0.000000, 0.000000, 0.000000, 0.000000]
-g_vTexCoordScale = [1.000000, 1.000000, 0.000000, 0.000000]
-g_tColor = resource:"materials/dev/primary_white_color_tga_f7b257f6.vtex"
-g_tNormal = resource:"materials/default/default_normal_tga_7652cb.vtex"
-g_tRoughness = resource:"materials/default/default_normal_tga_b3f4ec4c.vtex"
+	shader = "csgo_unlitgeneric.vfx"
+	F_DISABLE_Z_BUFFERING = 0
+	g_flBumpStrength = 1
+	g_vColorTint = [1.000000, 1.000000, 1.000000, 0.000000]
+	g_vGlossinessRange = [0.000000, 1.000000, 0.000000, 0.000000]
+	g_vNormalTexCoordScale = [1.000000, 1.000000, 0.000000, 0.000000]
+	g_vTexCoordOffset = [0.000000, 0.000000, 0.000000, 0.000000]
+	g_vTexCoordScale = [1.000000, 1.000000, 0.000000, 0.000000]
+	g_tColor = resource:"materials/dev/primary_white_color_tga_f7b257f6.vtex"
+	g_tNormal = resource:"materials/default/default_normal_tga_7652cb.vtex"
+	g_tRoughness = resource:"materials/default/default_normal_tga_b3f4ec4c.vtex"
+})";
+
+const char vmat_buffer_invis[] = R"(<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+	shader = "csgo_unlitgeneric.vfx"
+	F_DISABLE_Z_BUFFERING = 1
+	g_flBumpStrength = 1
+	g_vColorTint = [1.000000, 1.000000, 1.000000, 0.000000]
+	g_vGlossinessRange = [0.000000, 1.000000, 0.000000, 0.000000]
+	g_vNormalTexCoordScale = [1.000000, 1.000000, 0.000000, 0.000000]
+	g_vTexCoordOffset = [0.000000, 0.000000, 0.000000, 0.000000]
+	g_vTexCoordScale = [1.000000, 1.000000, 0.000000, 0.000000]
+	g_tColor = resource:"materials/dev/primary_white_color_tga_f7b257f6.vtex"
+	g_tNormal = resource:"materials/default/default_normal_tga_7652cb.vtex"
+	g_tRoughness = resource:"materials/default/default_normal_tga_b3f4ec4c.vtex"
 })";
 
 static void* Alloc(std::size_t size)
@@ -126,7 +192,7 @@ static void Free(const void* p)
 		free(p);
 }
 
-bool lpLoadKV3(KeyValues* kv, const char* material_vmat, const char* kv_name)
+static bool lpLoadKV3(KeyValues* kv, const char* material_vmat, const char* kv_name)
 {
 	using fn = bool(__fastcall*)(KeyValues* kv, void* utlstring, const char* buffer, const KV3ID_t* format, const char* kv_name);
 	static const auto& load_kv3 = modules::tier0.get_export("?LoadKV3@@YA_NPEAVKeyValues3@@PEAVCUtlString@@PEBDAEBUKV3ID_t@@2@Z").as<fn>();
@@ -138,32 +204,33 @@ bool lpLoadKV3(KeyValues* kv, const char* material_vmat, const char* kv_name)
 
 static IMaterial* CreateMaterial(const char* material_vmat, const char* mat_name)
 {
-	IMaterial** material_out;
-	
-	void* buffer = Alloc(0x100 + sizeof(KeyValues));
-	if (auto kv = reinterpret_cast<KeyValues*>((uint8_t*)buffer + 0x100); kv)
+	IMaterial** material_out = nullptr;
+		
+	uint8_t* buffer = new uint8_t[0x100 + sizeof(KeyValues)];
+	KeyValues* kv = reinterpret_cast<KeyValues*>(buffer + 0x100);
+
+	if (kv)
 	{
 		if (!lpLoadKV3(kv, material_vmat, mat_name))
 		{
-			Free(buffer);
-
+			delete[] buffer;
 			return nullptr;
 		}
-
+			
 		g::mat_system->CreateMaterial(&material_out, mat_name, kv, 0, 1);
-
-		Free(buffer);
-
-		g_Console->println("Created material %s", mat_name);
-		
-		return *material_out;
+			
+		if (material_out)
+			return *material_out;
 	}
+
+	delete[] buffer;
 	return nullptr;
 }
 
 namespace hooks
 {
-	IMaterial* g_pLatexMat = nullptr;
+	IMaterial* g_pLatexMat_vis = nullptr;
+	IMaterial* g_pLatexMat_invis = nullptr;
 	static bool done = false;
 	bool CreateDeviceD3D11(HWND hWnd, ID3D11Device*& device, IDXGISwapChain*& swap_chain)
 	{
@@ -203,7 +270,8 @@ namespace hooks
 		
 		HWND hwnd = FindWindow(nullptr, L"Counter-Strike 2");
 		CreateDeviceD3D11(hwnd, hooks::g_pRealDevice, hooks::g_pSwapChain);
-	
+
+		//TODO: Add manual reset function to ShadowVMT ?
 		entity_system = ShadowVMT(g::entity_system);
 		csgo_input = ShadowVMT(g::csgo_input);
 		client = ShadowVMT(g::client);
@@ -219,19 +287,17 @@ namespace hooks
 		
 		client_mode.apply(level_init::index, reinterpret_cast<uintptr_t*>(&level_init::hooked), reinterpret_cast<void**>(&level_init::original_fn));
 		client_mode.apply(level_shutdown::index, reinterpret_cast<uintptr_t*>(&level_shutdown::hooked), reinterpret_cast<void**>(&level_shutdown::original_fn));
-
+		
+		dxgi.apply(directx::create_swapchain::index, reinterpret_cast<uintptr_t*>(&directx::create_swapchain::hooked), reinterpret_cast<void**>(&directx::create_swapchain::original_fn));
+		//swap_chain.apply(directx::present::index, reinterpret_cast<uintptr_t*>(&directx::present::hooked), reinterpret_cast<void**>(&directx::present::original_fn));
+		
 		auto vtable = *reinterpret_cast<void***>(hooks::g_pSwapChain);
-		auto addr = vtable[8];
-		directx::present::safetyhook = safetyhook::create_inline((void*)addr, reinterpret_cast<void*>(directx::present::hooked));
+		directx::present::safetyhook = safetyhook::create_inline((void*)vtable[8], reinterpret_cast<void*>(directx::present::hooked));
 		get_matrices_for_view::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::GetMatricesForView"), __FUNCTION__).as(), reinterpret_cast<void*>(get_matrices_for_view::hooked));
+		draw_array_ex::safetyhook = safetyhook::create_inline(modules::scenesys.get_sig_addr(FNV("hooks::DrawArrayEx"), __FUNCTION__).as(), reinterpret_cast<void*>(draw_array_ex::hooked));
 		//calcviewmodel::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::CalcViewModel"), __FUNCTION__).as(), reinterpret_cast<void*>(calcviewmodel::hooked));
 		//onrenderstart::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::OnRenderStart"), __FUNCTION__).as(), reinterpret_cast<void*>(onrenderstart::hooked));
-		draw_array_ex::safetyhook = safetyhook::create_inline(modules::scenesys.get_sig_addr(FNV("hooks::DrawArrayEx"), __FUNCTION__).as(), reinterpret_cast<void*>(draw_array_ex::hooked));
-
-		//swap_chain.apply(directx::present::index, reinterpret_cast<uintptr_t*>(&directx::present::hooked), reinterpret_cast<void**>(&directx::present::original_fn));
-		//swap_chain.Apply(directx::resize_buffers::index, reinterpret_cast<uintptr_t*>(&directx::resize_buffers::hooked), reinterpret_cast<void**>(&directx::resize_buffers::original_fn));
-		dxgi.apply(directx::create_swapchain::index, reinterpret_cast<uintptr_t*>(&directx::create_swapchain::hooked), reinterpret_cast<void**>(&directx::create_swapchain::original_fn));
-
+		
 		return true;
 	}
 
@@ -246,6 +312,13 @@ namespace hooks
 		//swap_chain.restore_vtable();
 		client_mode.restore_vtable();
 
+		hooks::directx::present::safetyhook.reset();
+		hooks::draw_array_ex::safetyhook.reset();
+		hooks::get_matrices_for_view::safetyhook.reset();
+
+		//hooks::onrenderstart::safetyhook.reset();
+		//hooks::calcviewmodel::safetyhook.reset();
+		
 		return true;
 	}
 
@@ -276,6 +349,8 @@ namespace hooks
 		if (!g::engine_client->IsInGame())
 			return;
 
+		static const auto ret = hooks::draw_array_ex::safetyhook.original<void(__fastcall*)(void*, void*, CSceneData*, int, void*, void*, void*, IMaterial*)>();
+		
 		CCSPlayerController* local_controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
 		if (!local_controller)
 			return;
@@ -287,30 +362,44 @@ namespace hooks
 		if (!scene_data || !scene_data->material)
 			return;
 		
+		if (local_pawn->GetHandle() == scene_data->scene_object->owner_handle)
+			return;
+		
 		const char* mat_name = scene_data->material->GetName();
 		if (!strstr(mat_name, "characters/models"))
 			return;
-		
-		if (g_pLatexMat)
+
+		if (!settings::esp::visible_only)
 		{
-			scene_data->material = g_pLatexMat;
-			scene_data->color = { 255, 0, 0, 255 };
+			if (g_pLatexMat_invis)
+			{
+				scene_data->material = g_pLatexMat_invis;
+				scene_data->color = { 255, 0, 0, 255 };
+			}
+
+			ret(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
+		}
+		if (g_pLatexMat_vis)
+		{
+			scene_data->material = g_pLatexMat_vis;
+			scene_data->color = { 0, 255, 0, 255 };
 		}
 	}
 
-	//rcx: CAnimatableSceneObject, rdx: DX11
+	//rcx: CAnimatableSceneObjectDesc, rdx: DX11
 	void __fastcall draw_array_ex::hooked(void* rcx, void* rdx, CSceneData* scene_data, int a4, void* scene_view, void* scene_layer, void* a7, IMaterial* material)
 	{
-		static const auto& ret = safetyhook.original<void(__fastcall*)(void*, void*, CSceneData*, int, void*, void*, void*, IMaterial*)>();
-		
-		//Bug: chams rendering on local team
-		chams(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
+		static const auto ret = safetyhook.original<void(__fastcall*)(void*, void*, CSceneData*, int, void*, void*, void*, IMaterial*)>();
 		
 		if (!done)
 		{
 			done = true;
-			g_pLatexMat = CreateMaterial(material_latex_vis, "material_latex_vis");
+			g_pLatexMat_vis = CreateMaterial(material_latex_vis, "material_latex_vis");
+			g_pLatexMat_invis = CreateMaterial(material_latex_invis, "material_latex_invis");
 		}
+
+		//Bug: chams rendering on local team
+		chams(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
 		
 		ret(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
 	}

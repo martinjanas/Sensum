@@ -10,6 +10,9 @@
 #include "../sdk/helpers/Timer.h"
 #include "../sdk/helpers/utils.h"
 
+#define TIME_TO_TICKS( dt )	( ( int )( 0.5f + ( float )( dt ) / 0.015625 ) )
+#define TICKS_TO_TIME(t) ( 0.015625 * (t) )
+
 namespace features::aimbot
 {
     target_info_t* current_target = nullptr;
@@ -18,7 +21,7 @@ namespace features::aimbot
     static QAngle last_punch;
     
     std::list<entity_data::player_data_t> m_player_data;
-
+    
     //Add hitbox target priority?
     std::unordered_set<int> GetTargetHitboxes(const entity_data::player_data_t& player_data) //takes 1300 ns
     {
@@ -127,7 +130,7 @@ namespace features::aimbot
 
         float best_fov = 9999.f;
         QAngle best_angle;
-            
+        
         for (auto& player_data : m_player_data)
         {
             if (!player_data.m_PlayerPawn || player_data.m_iHealth <= 0)
@@ -135,8 +138,7 @@ namespace features::aimbot
 
             if (!player_data.flags.test(PLAYER_VISIBLE) || player_data.flags.test(PLAYER_IN_SMOKE))
                 continue;
-
-  
+            
             const auto& hitbox_ids = GetTargetHitboxes(player_data);
             if (hitbox_ids.empty())
                 continue;
@@ -161,7 +163,7 @@ namespace features::aimbot
                     best_angle = target_angle;
                 }
 
-                targets.emplace_back(player_data.m_PlayerPawn, &player_data, fov, player_data.m_vecOrigin.dist_to(eye_pos), player_data.flags.test(PLAYER_IN_AIR), best_angle, player_data.m_szPlayerName);
+                targets.emplace_back(player_data.m_PlayerPawn, &player_data, fov, player_data.m_vecOrigin.dist_to(eye_pos), player_data.sim_time, player_data.flags.test(PLAYER_IN_AIR), best_angle, player_data.m_szPlayerName);
             }
         }
         return targets;
@@ -213,11 +215,11 @@ namespace features::aimbot
             return;
 
         std::lock_guard<std::mutex> lock(entity_data::player_locker);
-
+        
         m_player_data.clear();
         if (!entity_data::player_entry_data.empty())
             std::copy(entity_data::player_entry_data.front().player_data.begin(), entity_data::player_entry_data.front().player_data.end(), std::back_inserter(m_player_data));
-
+        
         CCSPlayerController* localplayer = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
         if (!localplayer)
             return;
@@ -234,7 +236,7 @@ namespace features::aimbot
         auto targets = fetch_targets(eye_pos, viewangles);
  
         std::sort(targets.begin(), targets.end());
-            
+        
         const auto& active_wpn_handle = localpawn->m_pWeaponServices()->m_hActiveWeapon();
         if (!active_wpn_handle.IsValid())
             return;
@@ -248,7 +250,7 @@ namespace features::aimbot
             return;
         
         weapon_config = settings::aimbot::weapon_configs[active_wpn->m_iItemDefinitionIndex()];
-
+        
         bool in_fov = false;
         for (auto& target : targets)
         {
@@ -267,7 +269,7 @@ namespace features::aimbot
                 continue;
 
             //g_Console->println("[ %s ]: fov: %.1f, dist: %.1f", target.name, target.fov, target.distance);
-
+            
             if (!(cmd->nButtons.nValue & IN_ATTACK))
                 continue;
 
@@ -303,7 +305,7 @@ namespace features::aimbot
             smoothed_angle.normalize_clamp();
                 
             g::client->SetViewAngles(smoothed_angle);
-                
+            
             if (t >= 1.0f)
                 timer.reset();
         }

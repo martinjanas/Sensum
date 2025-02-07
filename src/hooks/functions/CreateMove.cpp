@@ -147,7 +147,7 @@ void __fastcall hooks::createmove_csgoinput::hooked(void* rcx, int slot, bool ac
     
     entity_data::fetch_player_data();
     entity_data::fetch_entity_info();
-
+    
     if (g_cmd && g_cmd->csgoUserCmd.pBaseCmd && g_cmd->csgoUserCmd.pBaseCmd->nWeaponSelect == 0)
     {
         features::aimbot::handle(g_cmd);

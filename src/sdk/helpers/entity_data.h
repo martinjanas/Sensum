@@ -70,6 +70,7 @@ namespace entity_data
 		std::bitset<32> flags;
 
 		float distance;
+		float sim_time;
 		
 		icon_t weapon_icon;
 		const char* weapon_text;

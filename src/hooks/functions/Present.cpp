@@ -17,8 +17,6 @@ namespace hooks
 	std::once_flag fetch_icon_flag;
 	bool imgui_initialized = false;
 	bool device_reset_required = false;
-
-	std::shared_mutex icon_mutex;
 	
 	long __stdcall directx::create_swapchain::hooked(IDXGIFactory* factory, IUnknown* device, DXGI_SWAP_CHAIN_DESC* swap_desc, IDXGISwapChain** swap_chain)
 	{
@@ -98,8 +96,6 @@ namespace hooks
 		}
 
 		{
-			std::unique_lock<std::shared_mutex> lock(icon_mutex);
-
 			static bool done = false;
 			if (!done && device)
 			{

@@ -103,6 +103,7 @@ public:
     NETVAR(Vector, m_vecViewOffset, "C_BaseModelEntity", "m_vecViewOffset");
     NETVAR(uint32_t, m_fFlags, "C_BaseEntity", "m_fFlags");   
     NETVAR(uint32_t, m_nSubclassID, "C_BaseEntity", "m_nSubclassID");
+    NETVAR(float, m_flSimulationTime, "C_BaseEntity", "m_flSimulationTime");
 
     CHandle m_hGroundEntity();
     CHandle m_hOwnerEntity();

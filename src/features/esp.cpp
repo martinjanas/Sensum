@@ -169,9 +169,12 @@ namespace features::esp
 	{
 		if (!g::engine_client->IsInGame())
 			return;
-
+		
 		std::lock_guard<std::mutex> lock(entity_data::entity_locker);
 
+		if (entity_data::entity_entry_data.empty())
+			return;
+		
 		m_entity_entry_data.clear();
 		if (!entity_data::entity_entry_data.empty())
 			std::copy(entity_data::entity_entry_data.begin(), entity_data::entity_entry_data.end(), std::back_inserter(m_entity_entry_data));
@@ -195,10 +198,13 @@ namespace features::esp
 			return;
 
 		std::lock_guard<std::mutex> lock(entity_data::player_locker);
-		
-		//m_player_data.clear();
+
+		if (entity_data::player_entry_data.empty())
+			return;
+
+		m_player_data.clear();
 		if (!entity_data::player_entry_data.empty())
-			m_player_data.assign(entity_data::player_entry_data.back().player_data.begin(), entity_data::player_entry_data.back().player_data.end());
+			std::copy(entity_data::player_entry_data.front().player_data.begin(), entity_data::player_entry_data.front().player_data.end(), std::back_inserter(m_player_data));
 		
 		for (auto& data : m_player_data)
 		{
@@ -209,14 +215,14 @@ namespace features::esp
 			if (settings::esp::box_esp && data.bbox.IsValid())
 			{
 				globals::draw_list->AddRect(data.bbox.m_Mins.as_vec2(), data.bbox.m_Maxs.as_vec2(), box_color, 0.f, 0, 1.2f);
-
+			
 				ImColor col_alpha0 = ImColor(settings::esp::box_clr.x, settings::esp::box_clr.y, settings::esp::box_clr.z, 0.f);
 				ImColor col_alpha180 = ImColor(settings::esp::box_clr.x, settings::esp::box_clr.y, settings::esp::box_clr.z, 180 / 255.f);
 				globals::draw_list->AddRectFilledMultiColor(data.bbox.m_Mins.as_vec2(), data.bbox.m_Maxs.as_vec2(), col_alpha0, col_alpha0, col_alpha180, col_alpha180); 
 				
 				globals::draw_list->AddRect(data.bbox.m_Mins.as_vec2() - ImVec2(1, 1), data.bbox.m_Maxs.as_vec2() + ImVec2(1, 1), ImColor(0, 0, 0, 180), 1.2f);
 			}
-
+			
 			//health esp
 			{
 				float hp = static_cast<float>(data.m_iHealth);
