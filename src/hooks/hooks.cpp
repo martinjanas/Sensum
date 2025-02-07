@@ -130,34 +130,32 @@ bool lpLoadKV3(KeyValues* kv, const char* material_vmat, const char* kv_name)
 {
 	using fn = bool(__fastcall*)(KeyValues* kv, void* utlstring, const char* buffer, const KV3ID_t* format, const char* kv_name);
 	static const auto& load_kv3 = modules::tier0.get_export("?LoadKV3@@YA_NPEAVKeyValues3@@PEAVCUtlString@@PEBDAEBUKV3ID_t@@2@Z").as<fn>();
-	if (!load_kv3)
-		return false;
+	if (load_kv3)
+		return load_kv3(kv, nullptr, material_vmat, &g_KV3Format_Generic, kv_name);
 
-	bool ret = load_kv3(kv, nullptr, material_vmat, &g_KV3Format_Generic, kv_name);
-
-	return ret;
+	return false;
 }
 
 static IMaterial* CreateMaterial(const char* material_vmat, const char* mat_name)
 {
 	IMaterial** material_out;
-
-	void* p_buffer = Alloc(0x100 + sizeof(KeyValues));
-	KeyValues* kv = (KeyValues*)((uint8_t*)p_buffer + 0x100);
-
-	if (kv)
+	
+	void* buffer = Alloc(0x100 + sizeof(KeyValues));
+	if (auto kv = reinterpret_cast<KeyValues*>((uint8_t*)buffer + 0x100); kv)
 	{
 		if (!lpLoadKV3(kv, material_vmat, mat_name))
 		{
-			Free(p_buffer);
+			Free(buffer);
 
 			return nullptr;
 		}
 
 		g::mat_system->CreateMaterial(&material_out, mat_name, kv, 0, 1);
 
-		Free(p_buffer);
+		Free(buffer);
 
+		g_Console->println("Created material %s", mat_name);
+		
 		return *material_out;
 	}
 	return nullptr;
@@ -165,6 +163,8 @@ static IMaterial* CreateMaterial(const char* material_vmat, const char* mat_name
 
 namespace hooks
 {
+	IMaterial* g_pLatexMat = nullptr;
+	static bool done = false;
 	bool CreateDeviceD3D11(HWND hWnd, ID3D11Device*& device, IDXGISwapChain*& swap_chain)
 	{
 		DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
@@ -286,45 +286,34 @@ namespace hooks
 
 		if (!scene_data || !scene_data->material)
 			return;
-
-		//BUG: returns the world entity
-		CCSPlayerController* player = reinterpret_cast<CCSPlayerController*>(g::entity_system->GetEntityFromHandle(scene_data->scene_object->owner_handle));
-		if (!player)
-			return;
-
-		auto* pawn = reinterpret_cast<CCSPlayerPawn*>(g::entity_system->GetEntityFromHandle(player->m_hPawn()));
-		if (!pawn)
-			return;
-
-		if (pawn == local_pawn)
-			return;
-
-		if (!g::game_type->IsDeathmatch() && pawn->m_iTeamNum() == local_pawn->m_iTeamNum())
-			return;
-
+		
 		const char* mat_name = scene_data->material->GetName();
 		if (!strstr(mat_name, "characters/models"))
 			return;
-
-		static IMaterial* latex_mat = CreateMaterial(material_latex_vis, "material_latex_vis");
-
-		if (latex_mat)
+		
+		if (g_pLatexMat)
 		{
-			scene_data->material = latex_mat;
-			scene_data->color = { std::byte(255), std::byte(0), std::byte(0), std::byte(180.f) };
+			scene_data->material = g_pLatexMat;
+			scene_data->color = { 255, 0, 0, 255 };
 		}
 	}
 
+	//rcx: CAnimatableSceneObject, rdx: DX11
 	void __fastcall draw_array_ex::hooked(void* rcx, void* rdx, CSceneData* scene_data, int a4, void* scene_view, void* scene_layer, void* a7, IMaterial* material)
 	{
-		static const auto ret = safetyhook.original<void(__fastcall*)(void*, void*, CSceneData*, int, void*, void*, void*, IMaterial*)>();
+		static const auto& ret = safetyhook.original<void(__fastcall*)(void*, void*, CSceneData*, int, void*, void*, void*, IMaterial*)>();
 		
 		//Bug: chams rendering on local team
 		chams(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
-
+		
+		if (!done)
+		{
+			done = true;
+			g_pLatexMat = CreateMaterial(material_latex_vis, "material_latex_vis");
+		}
+		
 		ret(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
 	}
-
 }
 
 

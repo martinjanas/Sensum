@@ -212,7 +212,7 @@ namespace features::aimbot
         if (!g::engine_client->IsInGame())
             return;
 
-        std::shared_lock<std::shared_mutex> lock(entity_data::player_locker);
+        std::lock_guard<std::mutex> lock(entity_data::player_locker);
 
         m_player_data.clear();
         if (!entity_data::player_entry_data.empty())

@@ -161,8 +161,8 @@ namespace entity_data
 	extern std::list<player_entry_data_t> player_entry_data;
 	extern std::list<entity_entry_data_t> entity_entry_data;
 
-	extern std::shared_mutex player_locker;
-	extern std::shared_mutex entity_locker;
+	extern std::mutex player_locker;
+	extern std::mutex entity_locker;
 	
 	namespace view_matrix
 	{

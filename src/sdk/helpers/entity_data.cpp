@@ -15,8 +15,8 @@ namespace entity_data
 	std::list<player_entry_data_t> player_entry_data;
 	std::list<entity_entry_data_t> entity_entry_data;
 
-	std::shared_mutex player_locker;
-	std::shared_mutex entity_locker;
+	std::mutex player_locker;
+	std::mutex entity_locker;
 
 	namespace view_matrix
 	{
@@ -257,7 +257,7 @@ namespace entity_data
 		if (!g::engine_client->IsInGame())
 			return;
 	
-		std::unique_lock<std::shared_mutex> lock(player_locker);
+		std::lock_guard<std::mutex> lock(player_locker);
 
 		const auto& local_controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
 		if (!local_controller)
@@ -266,7 +266,7 @@ namespace entity_data
 		CCSPlayerPawn* localpawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(local_controller->m_hPawn());
 		if (!localpawn)
 		{
-			//destroy();
+			destroy();
 			return;
 		}
 
@@ -376,13 +376,13 @@ namespace entity_data
 			player_data.m_vecOldOrigin = scene_node->m_vecOrigin();
 			player_data.m_vecOldEyeAngles = pawn->m_angEyeAngles();
 
-			entry_data.player_data.push_back(std::move(player_data));
+			entry_data.player_data.push_back(player_data);
 		}
 
 		entry_data.player_data.sort([](const player_data_t& a, const player_data_t& b) { return a.distance > b.distance; });
 		
 		player_entry_data.clear();
-		player_entry_data.push_back(std::move(entry_data));
+		player_entry_data.push_back(entry_data);
 	}
 
 	#define TIME_TO_TICKS( dt )	( ( int )( 0.5f + ( float )( dt ) / 0.015625 ) )
@@ -405,7 +405,7 @@ namespace entity_data
 		if (!g::engine_client->IsInGame())
 			return;
 
-		std::unique_lock<std::shared_mutex> lock(entity_locker);
+		std::lock_guard<std::mutex> lock(entity_locker);
 
 		entity_entry_data_t entry_data;
 		for (const auto& instance : entity_instances)

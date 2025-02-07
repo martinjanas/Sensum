@@ -170,7 +170,7 @@ namespace features::esp
 		if (!g::engine_client->IsInGame())
 			return;
 
-		std::shared_lock<std::shared_mutex> lock(entity_data::entity_locker);
+		std::lock_guard<std::mutex> lock(entity_data::entity_locker);
 
 		m_entity_entry_data.clear();
 		if (!entity_data::entity_entry_data.empty())
@@ -194,11 +194,11 @@ namespace features::esp
 		if (!g::engine_client->IsInGame())
 			return;
 
-		std::shared_lock<std::shared_mutex> lock(entity_data::player_locker);
-
+		std::lock_guard<std::mutex> lock(entity_data::player_locker);
+		
 		//m_player_data.clear();
 		if (!entity_data::player_entry_data.empty())
-			m_player_data.assign(entity_data::player_entry_data.front().player_data.begin(), entity_data::player_entry_data.front().player_data.end());
+			m_player_data.assign(entity_data::player_entry_data.back().player_data.begin(), entity_data::player_entry_data.back().player_data.end());
 		
 		for (auto& data : m_player_data)
 		{
@@ -210,11 +210,31 @@ namespace features::esp
 			{
 				globals::draw_list->AddRect(data.bbox.m_Mins.as_vec2(), data.bbox.m_Maxs.as_vec2(), box_color, 0.f, 0, 1.2f);
 
-				// ImColor col_alpha0 = ImColor(settings::esp::box_clr.x, settings::esp::box_clr.y, settings::esp::box_clr.z, 0.f);
-				// ImColor col_alpha180 = ImColor(settings::esp::box_clr.x, settings::esp::box_clr.y, settings::esp::box_clr.z, 180 / 255.f);
-				// globals::draw_list->AddRectFilledMultiColor(data.bbox.m_Mins.as_vec2(), data.bbox.m_Maxs.as_vec2(), col_alpha0, col_alpha0, col_alpha180, col_alpha180); 
+				ImColor col_alpha0 = ImColor(settings::esp::box_clr.x, settings::esp::box_clr.y, settings::esp::box_clr.z, 0.f);
+				ImColor col_alpha180 = ImColor(settings::esp::box_clr.x, settings::esp::box_clr.y, settings::esp::box_clr.z, 180 / 255.f);
+				globals::draw_list->AddRectFilledMultiColor(data.bbox.m_Mins.as_vec2(), data.bbox.m_Maxs.as_vec2(), col_alpha0, col_alpha0, col_alpha180, col_alpha180); 
 				
 				globals::draw_list->AddRect(data.bbox.m_Mins.as_vec2() - ImVec2(1, 1), data.bbox.m_Maxs.as_vec2() + ImVec2(1, 1), ImColor(0, 0, 0, 180), 1.2f);
+			}
+
+			//health esp
+			{
+				float hp = static_cast<float>(data.m_iHealth);
+				auto bottom_left = data.bbox.GetBottomLeft();
+				float health_height = (data.bbox.GetHeight() * hp) / 100.0f;
+				
+				ImVec2 rect_start = ImVec2(bottom_left.x - 6, bottom_left.y);
+				ImVec2 rect_end = ImVec2(bottom_left.x - 2, bottom_left.y - health_height);
+				
+				// Black background (fixed size from bottom to top)
+				ImVec2 background_rect_start = ImVec2(bottom_left.x - 7, bottom_left.y);  // Extend left by 1 pixel
+				ImVec2 background_rect_end = ImVec2(data.bbox.GetTopLeft().x - 1, data.bbox.GetTopLeft().y); // Full height of the bbox
+				
+				// Draw the black background (fixed size, from bottom to top)
+				globals::draw_list->AddRectFilled(background_rect_start, background_rect_end, IM_COL32_BLACK);
+				
+				// Draw the health bar on top (colored, variable height)
+				globals::draw_list->AddRectFilled(rect_start, rect_end, ImColor(255 - (hp * 2.55), hp * 2.55, 0, 255));
 			}
 			
 			esp::name_esp(data, data.bbox);

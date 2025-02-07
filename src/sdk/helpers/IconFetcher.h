@@ -12,6 +12,9 @@ struct icon_t
 
     void SetScale(float scale)
     {
+        if (!texture)
+            return;
+        
         w *= scale;
         h *= scale;
     }

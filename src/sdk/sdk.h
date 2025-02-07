@@ -124,7 +124,7 @@ class CSceneObject
 {
 public:
 	char pad_01[0xB8]; //0x0
-	std::array<byte, 4> color; //0xB8
+	std::array<uint8_t, 4> color; //0xB8
 	CHandle owner_handle; //0xBC
 }; //Size: 0x0180
 
@@ -138,7 +138,7 @@ public:
 	CSceneObject* scene_object;          // 0x18
 	IMaterial* material;                 // 0x20, - material2 at 0x28
 	std::byte pad04[0x28];               // 0x28
-	std::array<std::byte, 4> color;      // 0x50
+	std::array<uint8_t, 4> color;      // 0x50
 }; // Size: 0x58
 
 namespace interfaces //move to interfaces.h ?
