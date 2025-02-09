@@ -232,6 +232,7 @@ namespace hooks
 	IMaterial* g_pLatexMat_vis = nullptr;
 	IMaterial* g_pLatexMat_invis = nullptr;
 	static bool done = false;
+	
 	bool CreateDeviceD3D11(HWND hWnd, ID3D11Device*& device, IDXGISwapChain*& swap_chain)
 	{
 		DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
@@ -267,9 +268,12 @@ namespace hooks
 			dxgi = ShadowVMT(dxgi_factory);
 			dxgi_factory->Release();
 		}
+
+		ID3D11Device* device = nullptr;
+		IDXGISwapChain* swapchain = nullptr;
 		
 		HWND hwnd = FindWindow(nullptr, L"Counter-Strike 2");
-		CreateDeviceD3D11(hwnd, hooks::g_pRealDevice, hooks::g_pSwapChain);
+		CreateDeviceD3D11(hwnd, device, swapchain);
 
 		//TODO: Add manual reset function to ShadowVMT ?
 		entity_system = ShadowVMT(g::entity_system);
@@ -290,9 +294,9 @@ namespace hooks
 		
 		dxgi.apply(directx::create_swapchain::index, reinterpret_cast<uintptr_t*>(&directx::create_swapchain::hooked), reinterpret_cast<void**>(&directx::create_swapchain::original_fn));
 		//swap_chain.apply(directx::present::index, reinterpret_cast<uintptr_t*>(&directx::present::hooked), reinterpret_cast<void**>(&directx::present::original_fn));
-		
-		auto vtable = *reinterpret_cast<void***>(hooks::g_pSwapChain);
-		directx::present::safetyhook = safetyhook::create_inline((void*)vtable[8], reinterpret_cast<void*>(directx::present::hooked));
+
+		auto vtable = *reinterpret_cast<void***>(swapchain);
+		directx::present::safetyhook = safetyhook::create_inline((void*)vtable[8], reinterpret_cast<void*>(directx::present::hooked));	
 		get_matrices_for_view::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::GetMatricesForView"), __FUNCTION__).as(), reinterpret_cast<void*>(get_matrices_for_view::hooked));
 		draw_array_ex::safetyhook = safetyhook::create_inline(modules::scenesys.get_sig_addr(FNV("hooks::DrawArrayEx"), __FUNCTION__).as(), reinterpret_cast<void*>(draw_array_ex::hooked));
 		//calcviewmodel::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::CalcViewModel"), __FUNCTION__).as(), reinterpret_cast<void*>(calcviewmodel::hooked));
@@ -397,7 +401,7 @@ namespace hooks
 			g_pLatexMat_vis = CreateMaterial(material_latex_vis, "material_latex_vis");
 			g_pLatexMat_invis = CreateMaterial(material_latex_invis, "material_latex_invis");
 		}
-
+		
 		//Bug: chams rendering on local team
 		chams(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
 		
