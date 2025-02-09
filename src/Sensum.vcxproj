@@ -189,6 +189,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="render\tabs\tabs.h" />
     <ClInclude Include="sdk\helpers\config_system.h" />
     <ClInclude Include="features\features.h" />
     <ClInclude Include="render\fonts\droidsans.hpp" />
@@ -293,6 +294,7 @@
     <ClInclude Include="sdk\helpers\Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="render\tabs\aimbot_tab.cpp" />
     <ClCompile Include="sdk\helpers\config_system.cpp" />
     <ClCompile Include="features\aimbot.cpp" />
     <ClCompile Include="features\bhop.cpp" />
