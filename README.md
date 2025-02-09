@@ -53,6 +53,7 @@ Config system is not finished, but works, but if you wish to not overwrite your 
 
 <details>
   <summary>Sensum for CSGO</summary>
+ 
 You can find the CSGO version under the [**CSGO Branch**](https://github.com/martinjanas/Sensum/tree/csgo) if you wish to learn from it.
 </details>
 
