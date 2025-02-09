@@ -17,7 +17,6 @@
 #include "../sdk/interfaces/CGameType.h"
 #include "../sdk/interfaces/CHudChat.h"
 #include "../sdk/interfaces/IVEngineCVar.h"
-#include "../sdk/helpers/CUtlBuffer.h"
 
 namespace sdk
 {
@@ -61,26 +60,12 @@ public:
 	void* pValue;
 	std::byte pad02[0x8];
 
-	static bool LoadKV3(KeyValues* kv, CUtlBuffer* buffer, const char* kv3_name)
+	__declspec(noinline) static bool LoadKV3(KeyValues* kv, const char* material_vmat, const char* kv_name)
 	{
-		using fn = bool(__thiscall*)(void* thisptr, void* utlstring, CUtlBuffer* buffer, const KV3ID_t* format, const char* kv_name);
-		static const auto& addr = modules::tier0.get_export("?LoadKV3@@YA_NPEAVKeyValues3@@PEAVCUtlString@@PEAVCUtlBuffer@@AEBUKV3ID_t@@PEBD@Z").as();
-		if (!addr)
-			return false;
-
-		const auto load_kv3 = reinterpret_cast<fn>(addr);
-
-		return load_kv3(kv, nullptr, buffer, &g_KV3Format_Generic, nullptr); //returns false
-	}
-
-	bool LoadFromBuffer(const char* str, const char* kv3_name)
-	{
-		CUtlBuffer buffer = {0, 0, 0};
-		buffer.EnsureCapacity((int)strlen(str) + 1);
-		buffer.PutString(str);
-
-		if (LoadKV3(this, &buffer, kv3_name))
-			return true;
+		using fn = bool(__fastcall*)(void* thisptr, void* utlstring, const char* buffer, const KV3ID_t* format, const char* kv_name);
+		const auto load_kv3 = modules::tier0.get_export("?LoadKV3@@YA_NPEAVKeyValues3@@PEAVCUtlString@@PEBDAEBUKV3ID_t@@2@Z").as<fn>();
+		if (load_kv3)
+			return load_kv3(kv, nullptr, material_vmat, &g_KV3Format_Generic, kv_name);
 
 		return false;
 	}

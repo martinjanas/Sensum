@@ -33,11 +33,11 @@ namespace sdk
 	{
 		std::vector<std::future<void>> futures;
 
-		static auto scan_and_cache_sig = [&](DynamicModule* module, const std::string_view& sig, const std::string_view& name, const uintptr_t& offset, bool abs)
+		auto scan_and_cache_sig = [&](DynamicModule* module, const std::string_view& sig, const std::string_view& name, const uintptr_t& offset, bool abs)
 		{
 			module->scan_and_cache_sig(sig, name, offset, abs);
 		};
-
+		
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 8B 05 ? ? ? ? 48 85 C0 74 53", "g::localplayer", 0x3, true));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 05 ? ? ? ? 0F 57 C0 0F 11 05 ? ? ? ?", "g::csgo_input", 0x3, true));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::directx11, "66 0F 7F 0D ? ? ? ? 48 8B F7 66 0F 7F 05", "g::render_system", 0x4, true));

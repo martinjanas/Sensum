@@ -542,7 +542,7 @@ public:
         std::scoped_lock lock{m_mutex};
         return m_trampoline ? original<RetT(SAFETYHOOK_FASTCALL*)(Args...)>()(args...) : RetT();
     }
-
+    
     /// @brief Calls the original function.
     /// @tparam RetT The return type of the function.
     /// @tparam ...Args The argument types of the function.

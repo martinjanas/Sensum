@@ -1,7 +1,7 @@
 #include "hooks.h"
 #include "../settings/settings.h"
 #include "../sdk/helpers/entity_data.h"
-#include "../sdk/helpers/CUtlBuffer.h"
+
 #pragma comment(lib, "d3d11.lib")
 
 static void get_dxgi(IDXGIFactory*& dxgi_factory)
@@ -166,71 +166,32 @@ const char vmat_buffer_invis[] = R"(<!-- kv3 encoding:text:version{e21c7f3c-8a33
 	g_tRoughness = resource:"materials/default/default_normal_tga_b3f4ec4c.vtex"
 })";
 
-static void* Alloc(std::size_t size)
+//noinline on LoadKV3 fixed the nonsense crashes? Cause it wouldnt crash at all in debug.
+__declspec(noinline) IMaterial* CreateMaterial(const char* material_vmat, const char* mat_name)
 {
-	using fn = void* (__thiscall*)(std::size_t);
-	static const auto& addr = modules::tier0.get_export("MemAlloc_AllocFunc").as();
-	if (!addr)
-		return nullptr;
-
-	auto alloc = reinterpret_cast<fn>(addr);
-	if (alloc)
-		return alloc(size);
-
-	return nullptr;
-}
-
-static void Free(const void* p)
-{
-	using fn = void(__thiscall*)(const void*);
-	static const auto& addr = modules::tier0.get_export("MemAlloc_FreeFunc").as();
-	if (!addr)
-		return;
-
-	auto free = reinterpret_cast<fn>(addr);
-	if (free)
-		free(p);
-}
-
-static bool lpLoadKV3(KeyValues* kv, const char* material_vmat, const char* kv_name)
-{
-	using fn = bool(__fastcall*)(KeyValues* kv, void* utlstring, const char* buffer, const KV3ID_t* format, const char* kv_name);
-	static const auto& load_kv3 = modules::tier0.get_export("?LoadKV3@@YA_NPEAVKeyValues3@@PEAVCUtlString@@PEBDAEBUKV3ID_t@@2@Z").as<fn>();
-	if (load_kv3)
-		return load_kv3(kv, nullptr, material_vmat, &g_KV3Format_Generic, kv_name);
-
-	return false;
-}
-
-static IMaterial* CreateMaterial(const char* material_vmat, const char* mat_name)
-{
-	IMaterial** material_out = nullptr;
+	IMaterial** material_out{};
 		
 	uint8_t* buffer = new uint8_t[0x100 + sizeof(KeyValues)];
 	KeyValues* kv = reinterpret_cast<KeyValues*>(buffer + 0x100);
+	if (!kv)
+		return nullptr;
 
-	if (kv)
+	if (!KeyValues::LoadKV3(kv, material_vmat, mat_name))
 	{
-		if (!lpLoadKV3(kv, material_vmat, mat_name))
-		{
-			delete[] buffer;
-			return nullptr;
-		}
-			
-		g::mat_system->CreateMaterial(&material_out, mat_name, kv, 0, 1);
-			
-		if (material_out)
-			return *material_out;
+		delete[] buffer;
+		return nullptr;
 	}
 
+	g::mat_system->CreateMaterial(&material_out, mat_name, kv, 0, 1);
+
 	delete[] buffer;
-	return nullptr;
+	return *material_out;
 }
 
 namespace hooks
 {
-	IMaterial* g_pLatexMat_vis = nullptr;
-	IMaterial* g_pLatexMat_invis = nullptr;
+	inline IMaterial* g_pLatexMat_vis = nullptr;
+	inline IMaterial* g_pLatexMat_invis = nullptr;
 	static bool done = false;
 	
 	bool CreateDeviceD3D11(HWND hWnd, ID3D11Device*& device, IDXGISwapChain*& swap_chain)
@@ -353,7 +314,7 @@ namespace hooks
 		if (!g::engine_client->IsInGame())
 			return;
 
-		static const auto ret = hooks::draw_array_ex::safetyhook.original<void(__fastcall*)(void*, void*, CSceneData*, int, void*, void*, void*, IMaterial*)>();
+		static const auto& original_fn = hooks::draw_array_ex::safetyhook.original<void(__fastcall*)(void*, void*, CSceneData*, int, void*, void*, void*, IMaterial*)>();
 		
 		CCSPlayerController* local_controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
 		if (!local_controller)
@@ -365,14 +326,24 @@ namespace hooks
 
 		if (!scene_data || !scene_data->material)
 			return;
+
+		//doesnt really return the material's owner, but C_World entity...
+		auto entity = reinterpret_cast<CCSPlayerController*>(g::entity_system->GetEntityFromHandle(scene_data->scene_object->owner_handle));
+		if (!entity)
+			return;
+
+		auto pawn = reinterpret_cast<CCSPlayerPawn*>(g::entity_system->GetEntityFromHandle(entity->m_hPawn()));
+		if (!pawn)
+			return;
 		
-		if (local_pawn->GetHandle() == scene_data->scene_object->owner_handle)
+		//somehow prevents chams being applied on viewmodel, huh?, but localpawn is being chammed when in thirdperson.
+		if (local_pawn == pawn)
 			return;
 		
 		const char* mat_name = scene_data->material->GetName();
-		if (!strstr(mat_name, "characters/models"))
+		if (!strstr(mat_name, "characters/models/"))
 			return;
-
+		
 		if (!settings::esp::visible_only)
 		{
 			if (g_pLatexMat_invis)
@@ -381,19 +352,20 @@ namespace hooks
 				scene_data->color = { 255, 0, 0, 255 };
 			}
 
-			ret(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
+			original_fn(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
 		}
+		
 		if (g_pLatexMat_vis)
 		{
 			scene_data->material = g_pLatexMat_vis;
 			scene_data->color = { 0, 255, 0, 255 };
 		}
 	}
-
-	//rcx: CAnimatableSceneObjectDesc, rdx: DX11
-	void __fastcall draw_array_ex::hooked(void* rcx, void* rdx, CSceneData* scene_data, int a4, void* scene_view, void* scene_layer, void* a7, IMaterial* material)
+	
+	//rcx: CAnimatableSceneObjectDesc, rdx: some custom DX11 related class/manager?
+	__declspec(noinline) void __fastcall draw_array_ex::hooked(void* rcx, void* rdx, CSceneData* scene_data, int a4, void* scene_view, void* scene_layer, void* a7, IMaterial* material)
 	{
-		static const auto ret = safetyhook.original<void(__fastcall*)(void*, void*, CSceneData*, int, void*, void*, void*, IMaterial*)>();
+		static const auto original_fn = safetyhook.original<decltype(&draw_array_ex::hooked)>();
 		
 		if (!done)
 		{
@@ -404,8 +376,14 @@ namespace hooks
 		
 		//Bug: chams rendering on local team
 		chams(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
-		
-		ret(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
+
+		//This fucker has chance to crash when reinjecting, but if i dont cache the original_fn and...
+		//...instead call safetyhook.fastcall it eats roughly 30 fps.
+		//Also looks like it is only crashing in release modes
+		//Edit: added noinline, this doesnt solve the crashes at all, but reduces them slightly.
+		//This is retarded, im losing my nerves... I would reinject 5 times - no crash.
+		//Then I restart the game, reinject 4 times no crash, another restart and 2 reinjects later - crash
+		original_fn(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
 	}
 }
 

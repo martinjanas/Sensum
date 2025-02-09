@@ -6,9 +6,6 @@
 
 DWORD __stdcall on_attach(void* base)
 {
-    if (!modules::nav_system.base)
-        Sleep(50);
-
     g_Console = std::make_unique<Console>();
     
 #if defined(_DEBUG) || defined(RELEASE_CONSOLE)
@@ -18,6 +15,9 @@ DWORD __stdcall on_attach(void* base)
     sdk::init_modules();
     sdk::init_interfaces();
 
+    if (!modules::nav_system.base)
+        Sleep(50);
+    
     netvars::init();
     hooks::init();
 
@@ -40,7 +40,7 @@ BOOL APIENTRY DllMain(HMODULE module, DWORD reason, void* reserved)
     if (reason == DLL_PROCESS_ATTACH)
     {
         DisableThreadLibraryCalls(module);
-
+        
         auto thread = LI_FN(CreateThread)(nullptr, 0, on_attach, module, 0, nullptr);
         if (thread)
             LI_FN(CloseHandle)(thread);

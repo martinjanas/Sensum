@@ -118,9 +118,12 @@ public:
 
 	PatternScanner& abs()
 	{
-		const int relative = *reinterpret_cast<int*>(this->addr);
+		if (this->addr)
+		{
+			const int relative = *reinterpret_cast<int*>(this->addr);
 
-		this->addr += relative + sizeof(relative);
+			this->addr += relative + sizeof(relative);
+		}
 
 		return *this;
 	}
