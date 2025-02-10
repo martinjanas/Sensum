@@ -2,6 +2,9 @@
 #include <Windows.h>
 #include <iostream>
 
+#include "menu.h"
+#include "../sdk/helpers/globals.h"
+
 namespace render
 {
 	namespace fonts

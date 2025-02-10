@@ -14,9 +14,10 @@ namespace render
 		extern ImFont* esp;
 		extern ImFont* esp_small;
 	}
-
+	
 	void init_fonts();
 	void init_style();
+	
 }
 
 namespace imgui = ImGui;
