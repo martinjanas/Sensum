@@ -19,9 +19,6 @@ namespace hooks
 	inline static ShadowVMT swap_chain;
 	inline static ShadowVMT client_mode;
 
-	inline ID3D11Device* g_pRealDevice;
-	inline IDXGISwapChain* g_pSwapChain;
-
 	bool CreateDeviceD3D11(HWND hWnd, ID3D11Device*& device, IDXGISwapChain*& swap_chain);
 	
 	bool init();
@@ -98,15 +95,6 @@ namespace hooks
 			inline static fn original_fn;
 
 			inline static SafetyHookInline safetyhook;
-		};
-
-		struct resize_buffers
-		{
-			static const int index = 13;
-			using fn = long(__stdcall*)(void* swap_chain, uint32_t buffer_count, uint32_t width, uint32_t height, DXGI_FORMAT new_format, uint32_t swap_chain_flags);
-			static long __stdcall hooked(IDXGISwapChain* swap_chain, uint32_t buffer_count, uint32_t width, uint32_t height, DXGI_FORMAT new_format, uint32_t swap_chain_flags);
-
-			inline static fn original_fn;
 		};
 
 		struct create_swapchain

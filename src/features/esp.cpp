@@ -106,8 +106,13 @@ namespace features::esp
 		const auto& icon = grenade_info.icon;
 		if (Vector pos; icon.texture && globals::world2screen(grenade_info.m_vecOrigin, pos))
 		{
-			ImVec2 image_start = ImVec2(pos.x - icon.w / 2, pos.y - icon.h / 2 - 3.f);
-			ImVec2 image_end = ImVec2(image_start.x + icon.w, image_start.y + icon.h);
+			ImVec2 image_size(icon.w, icon.h);
+
+			/*ImVec2 image_start = ImVec2(pos.x - icon.w / 2, pos.y - icon.h / 2 - 3.f);
+			ImVec2 image_end = ImVec2(image_start.x + icon.w, image_start.y + icon.h);*/
+
+			ImVec2 image_start = pos.as_vec2();
+			ImVec2 image_end = ImVec2(pos.x + image_size.x, pos.y + image_size.y);
 
 			bool should_draw_image = true;
 			if (is_he)
@@ -223,7 +228,7 @@ namespace features::esp
 				globals::draw_list->AddRect(data.bbox.m_Mins.as_vec2() - ImVec2(1, 1), data.bbox.m_Maxs.as_vec2() + ImVec2(1, 1), ImColor(0, 0, 0, 180), 1.2f);
 			}
 			
-			//health esp
+			if (settings::esp::health_esp)
 			{
 				float hp = static_cast<float>(data.m_iHealth);
 				auto bottom_left = data.bbox.GetBottomLeft();

@@ -166,32 +166,25 @@ const char vmat_buffer_invis[] = R"(<!-- kv3 encoding:text:version{e21c7f3c-8a33
 	g_tRoughness = resource:"materials/default/default_normal_tga_b3f4ec4c.vtex"
 })";
 
-//noinline on LoadKV3 fixed the nonsense crashes? Cause it wouldnt crash at all in debug.
-__declspec(noinline) IMaterial* CreateMaterial(const char* material_vmat, const char* mat_name)
+IMaterial* CreateMaterial(const char* material_vmat, const char* mat_name)
 {
-	IMaterial** material_out{};
-		
-	uint8_t* buffer = new uint8_t[0x100 + sizeof(KeyValues)];
+	IMaterial** temp{};
+	uint8_t buffer[0x100 + sizeof(KeyValues)];
+	memset(buffer, 0, sizeof(buffer));
+
 	KeyValues* kv = reinterpret_cast<KeyValues*>(buffer + 0x100);
-	if (!kv)
-		return nullptr;
-
 	if (!KeyValues::LoadKV3(kv, material_vmat, mat_name))
-	{
-		delete[] buffer;
 		return nullptr;
-	}
 
-	g::mat_system->CreateMaterial(&material_out, mat_name, kv, 0, 1);
+	g::mat_system->CreateMaterial(&temp, mat_name, kv, 0, 1);
 
-	delete[] buffer;
-	return *material_out;
+	return *temp;
 }
 
 namespace hooks
 {
-	inline IMaterial* g_pLatexMat_vis = nullptr;
-	inline IMaterial* g_pLatexMat_invis = nullptr;
+	IMaterial* g_pLatexMat_vis = nullptr;
+	IMaterial* g_pLatexMat_invis = nullptr;
 	static bool done = false;
 	
 	bool CreateDeviceD3D11(HWND hWnd, ID3D11Device*& device, IDXGISwapChain*& swap_chain)
@@ -254,8 +247,7 @@ namespace hooks
 		client_mode.apply(level_shutdown::index, reinterpret_cast<uintptr_t*>(&level_shutdown::hooked), reinterpret_cast<void**>(&level_shutdown::original_fn));
 		
 		dxgi.apply(directx::create_swapchain::index, reinterpret_cast<uintptr_t*>(&directx::create_swapchain::hooked), reinterpret_cast<void**>(&directx::create_swapchain::original_fn));
-		//swap_chain.apply(directx::present::index, reinterpret_cast<uintptr_t*>(&directx::present::hooked), reinterpret_cast<void**>(&directx::present::original_fn));
-
+		
 		auto vtable = *reinterpret_cast<void***>(swapchain);
 		directx::present::safetyhook = safetyhook::create_inline((void*)vtable[8], reinterpret_cast<void*>(directx::present::hooked));	
 		get_matrices_for_view::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::GetMatricesForView"), __FUNCTION__).as(), reinterpret_cast<void*>(get_matrices_for_view::hooked));
@@ -274,7 +266,6 @@ namespace hooks
 		entity_system.restore_vtable();
 		csgo_input.restore_vtable();
 		client.restore_vtable();
-		//swap_chain.restore_vtable();
 		client_mode.restore_vtable();
 
 		hooks::directx::present::safetyhook.reset();
@@ -363,7 +354,7 @@ namespace hooks
 	}
 	
 	//rcx: CAnimatableSceneObjectDesc, rdx: some custom DX11 related class/manager?
-	__declspec(noinline) void __fastcall draw_array_ex::hooked(void* rcx, void* rdx, CSceneData* scene_data, int a4, void* scene_view, void* scene_layer, void* a7, IMaterial* material)
+	void __fastcall draw_array_ex::hooked(void* rcx, void* rdx, CSceneData* scene_data, int a4, void* scene_view, void* scene_layer, void* a7, IMaterial* material)
 	{
 		static const auto original_fn = safetyhook.original<decltype(&draw_array_ex::hooked)>();
 		
@@ -377,12 +368,6 @@ namespace hooks
 		//Bug: chams rendering on local team
 		chams(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
 
-		//This fucker has chance to crash when reinjecting, but if i dont cache the original_fn and...
-		//...instead call safetyhook.fastcall it eats roughly 30 fps.
-		//Also looks like it is only crashing in release modes
-		//Edit: added noinline, this doesnt solve the crashes at all, but reduces them slightly.
-		//This is retarded, im losing my nerves... I would reinject 5 times - no crash.
-		//Then I restart the game, reinject 4 times no crash, another restart and 2 reinjects later - crash
 		original_fn(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
 	}
 }

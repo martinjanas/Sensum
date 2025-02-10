@@ -20,10 +20,12 @@ namespace hooks
 	
 	long __stdcall directx::create_swapchain::hooked(IDXGIFactory* factory, IUnknown* device, DXGI_SWAP_CHAIN_DESC* swap_desc, IDXGISwapChain** swap_chain)
 	{
+		ID3D11Device* p_device = nullptr;
+		IDXGISwapChain* swapchain = nullptr;
 		HWND hwnd = FindWindow(nullptr, L"Counter-Strike 2");
-		hooks::CreateDeviceD3D11(hwnd, hooks::g_pRealDevice, hooks::g_pSwapChain);
+		hooks::CreateDeviceD3D11(hwnd, p_device, swapchain);
 		
-		auto vtable = *reinterpret_cast<void***>(hooks::g_pSwapChain);
+		auto vtable = *reinterpret_cast<void***>(swapchain);
 		auto addr = vtable[8];
 		directx::present::safetyhook.reset();
 		directx::present::safetyhook = safetyhook::create_inline((void*)addr, reinterpret_cast<void*>(directx::present::hooked));
@@ -37,11 +39,6 @@ namespace hooks
 		device_reset_required = true;
 		
 		return original_fn(factory, device, swap_desc, swap_chain);
-	}
-
-	long __stdcall directx::resize_buffers::hooked(IDXGISwapChain* swap_chain, uint32_t buffer_count, uint32_t width, uint32_t height, DXGI_FORMAT new_format, uint32_t swap_chain_flags)
-	{
-		return original_fn(swap_chain, buffer_count, width, height, new_format, swap_chain_flags);
 	}
 	
 	long __stdcall directx::present::hooked(IDXGISwapChain* swap_chain, uint32_t sync_interval, uint32_t flags)
@@ -99,7 +96,7 @@ namespace hooks
 			static bool done = false;
 			if (!done && device)
 			{
-				icon_fetcher::fetch_icon_data(device); //is causing crashes (in fullscreen?)
+				icon_fetcher::fetch_icon_data(device);
 				
 				done = true;
 			}

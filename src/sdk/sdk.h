@@ -60,14 +60,16 @@ public:
 	void* pValue;
 	std::byte pad02[0x8];
 
-	__declspec(noinline) static bool LoadKV3(KeyValues* kv, const char* material_vmat, const char* kv_name)
+	static bool LoadKV3(KeyValues* kv, const char* material_vmat, const char* kv_name)
 	{
 		using fn = bool(__fastcall*)(void* thisptr, void* utlstring, const char* buffer, const KV3ID_t* format, const char* kv_name);
-		const auto load_kv3 = modules::tier0.get_export("?LoadKV3@@YA_NPEAVKeyValues3@@PEAVCUtlString@@PEBDAEBUKV3ID_t@@2@Z").as<fn>();
-		if (load_kv3)
-			return load_kv3(kv, nullptr, material_vmat, &g_KV3Format_Generic, kv_name);
+		const auto addr = modules::tier0.get_export("?LoadKV3@@YA_NPEAVKeyValues3@@PEAVCUtlString@@PEBDAEBUKV3ID_t@@2@Z").as();
+		if (!addr)
+			return false;
 
-		return false;
+		auto load_kv3 = reinterpret_cast<fn>(addr);
+
+		return load_kv3(kv, nullptr, material_vmat, &g_KV3Format_Generic, kv_name);
 	}
 };
 
