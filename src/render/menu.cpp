@@ -111,7 +111,7 @@ void draw_menu_debug()
 			ImGui::SliderFloat("###smooth", &settings->smooth, 1.f, 10.f, "Smooth: %.1f");
 		else ImGui::SliderFloat("###smooth_time", &settings->smooth_time, 0.1f, 1.f, "Smooth Time: %.2f");
 
-		imc::Selector("Smoothing Mode", items, ARRAYSIZE(items), &settings->smooth_mode);
+		imc::selector("Smoothing Mode", items, ARRAYSIZE(items), &settings->smooth_mode);
 
 		ImGui::SliderFloat("Recoil Pitch", &settings->recoil.pitch, 0.f, 2.f, "Recoil Pitch: %.1f");
 		ImGui::SliderFloat("Recoil Yaw", &settings->recoil.yaw, 0.f, 2.f, "Recoil Yaw: %.1f");
@@ -200,8 +200,10 @@ namespace menu
 			render_header();
 			style->WindowPadding = old_window_padding;
 
+			imgui::PushFont(render::fonts::header_buttons);
 			imgui::BeginChild("##tabscontent", { 0, 0 }, false, ImGuiWindowFlags_AlwaysUseWindowPadding);
 			{
+				
 				if (was_logo_pressed)
 				{
 					draw_menu_debug();
@@ -226,6 +228,7 @@ namespace menu
 					imgui::GetForegroundDrawList()->AddText(window_center, IM_COL32_WHITE, "Skins Tab");
 			}
 			imgui::EndChild();
+			imgui::PopFont();
 		}
 		ImGui::End();
 
