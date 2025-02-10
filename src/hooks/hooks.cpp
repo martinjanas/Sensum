@@ -169,6 +169,8 @@ const char vmat_buffer_invis[] = R"(<!-- kv3 encoding:text:version{e21c7f3c-8a33
 IMaterial* CreateMaterial(const char* material_vmat, const char* mat_name)
 {
 	IMaterial** temp{};
+	
+	//Stack allocated buffer with memset hopefully fixed the nonsense crashes with LoadKV3
 	uint8_t buffer[0x100 + sizeof(KeyValues)];
 	memset(buffer, 0, sizeof(buffer));
 
