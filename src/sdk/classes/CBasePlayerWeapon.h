@@ -118,7 +118,10 @@ enum CSWeaponType : std::uint32_t //TODO: Refactor, these names are confusing, a
 class CCSWeaponBaseVData //TODO: Add more members later
 {
 public:
+	using CFiringModeFloat = std::float_t[2];
+	
     NETVAR(CSWeaponType, m_WeaponType, "CCSWeaponBaseVData", "m_WeaponType");
+	NETVAR(CFiringModeFloat, m_flSpread, "CCSWeaponBaseVData", "m_flSpread");
 };
 
 class CBasePlayerWeapon : public CBaseEntity
@@ -131,6 +134,32 @@ public:
 	NETVAR(bool, m_bInReload, "C_CSWeaponBase", "m_bInReload")
 	NETVAR_OFFSET(CCSWeaponBaseVData*, m_pWpnData, "C_BaseEntity", "m_nSubclassID", 0x8)
 
+	//TODO: This is temp, cache the sigs later
+	float get_inaccuracy()
+	{
+		float x, y;
+		using fn = float(__fastcall*)(void*, float*, float*);
+		static const auto addr = modules::client.scan("48 89 5C 24 ? 55 56 57 48 81 EC ? ? ? ? 44 0F 29 84 24", "get_inaccuracy").as();
+		if (!addr)
+			return -1.f;
+
+		auto get_inaccuracy = reinterpret_cast<fn>(addr);
+		return get_inaccuracy(this, &x, &y);
+	}
+ 
+	float get_spread()
+	{
+		return m_pWpnData()->m_flSpread()[0];
+		
+		// using fn = float(__fastcall*)(void*);
+		// static const auto addr = modules::client.scan("48 83 EC ? 48 63 91", "get_spread").as();
+		// if (!addr)
+		// 	return -1.f;
+		//
+		// auto get_spread = reinterpret_cast<fn>(addr);
+		// return get_spread(this);
+	}
+	
 	bool IsPistol()
 	{
 		if (!m_pWpnData())

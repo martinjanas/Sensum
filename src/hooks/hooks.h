@@ -23,6 +23,7 @@ namespace hooks
 	
 	bool init();
 	bool detach();
+	void setuphook(SafetyHookMid& hook, void* target, void* hook_func, void** original_fn);
 
 	namespace wndproc
 	{
@@ -89,12 +90,10 @@ namespace hooks
 		struct present
 		{
 			static const int index = 8;
-			using fn = long(__stdcall*)(void*, uint32_t, uint32_t);
-			static long __stdcall hooked(IDXGISwapChain* swap_chain, uint32_t sync_interval, uint32_t flags);
-
+			using fn = long(__stdcall*)(IDXGISwapChain*, uint32_t, uint32_t);
+			static long __stdcall hooked(SafetyHookContext& ctx);
+			inline static SafetyHookMid safetyhook;
 			inline static fn original_fn;
-
-			inline static SafetyHookInline safetyhook;
 		};
 
 		struct create_swapchain
@@ -115,33 +114,37 @@ namespace hooks
 
 		inline static fn original_fn;
 	};
-	
+
 	struct get_matrices_for_view
 	{
-		using fn = void(__fastcall*)(void*, CViewSetup* rdx, VMatrix* world_to_view, VMatrix* view_to_projection, VMatrix* world_to_projection, VMatrix* world_to_pixels);
-		static void __fastcall hooked(void* rcx, CViewSetup*, VMatrix* world_to_view, VMatrix* view_to_projection, VMatrix* world_to_projection, VMatrix* world_to_pixels);
-
-		inline static SafetyHookInline safetyhook;
+		using fn = void(__fastcall*)(void* rcx, CViewSetup* rdx, VMatrix* world_to_view, VMatrix* view_to_projection, VMatrix* world_to_projection, VMatrix* world_to_pixels);
+		static void __fastcall hooked(SafetyHookContext& ctx);
+		inline static SafetyHookMid safetyhook;
+		inline static fn original_fn;
 	};
-
+	
 	struct onrenderstart
 	{
-		static void __fastcall hooked(CViewRender* rcx);
-
-		static inline SafetyHookInline safetyhook;
+		using fn = void(__fastcall*)(CViewRender* rcx);
+		static void __fastcall hooked(SafetyHookContext& ctx);
+		static inline SafetyHookMid safetyhook;
+		inline static fn original_fn;
 	};
 
 	struct calcviewmodel
 	{
-		static void __fastcall hooked(void* rcx, Vector& pos, float* fov, int a3);
-
-		inline static SafetyHookInline safetyhook;
+		using fn = void(__fastcall*)(void* rcx, Vector& pos, float* fov, int a3);
+		static void __fastcall hooked(SafetyHookContext& ctx);
+		inline static SafetyHookMid safetyhook;
+		inline static fn original_fn;
 	};
 
 	struct draw_array_ex
 	{
-		static void __fastcall hooked(void* rcx, void* rdx, CSceneData* scene_data, int a4, void* scene_view, void* scene_layer, void* a7, IMaterial* material);
+		using fn = void(__fastcall*)(void* rcx, void* rdx, CSceneData* scene_data, int a4, void* scene_view, void* scene_layer, void* a7, IMaterial* material);
+		static void __fastcall hooked(SafetyHookContext& ctx);
+		inline static SafetyHookMid safetyhook;
 
-		inline static SafetyHookInline safetyhook;
+		inline static fn original_fn;
 	};
 }

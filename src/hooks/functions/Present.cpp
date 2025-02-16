@@ -8,7 +8,10 @@
 #include "../../thirdparty/ImGui/backends/imgui_impl_dx11.h"
 #include "../../thirdparty/ImGui/backends/imgui_impl_win32.h"
 #include <algorithm>
+#include <random>
+
 #include "../../sdk/helpers/Timer.h"
+#include "../../sdk/helpers/utils.h"
 
 namespace hooks
 {
@@ -28,8 +31,8 @@ namespace hooks
 		auto vtable = *reinterpret_cast<void***>(swapchain);
 		auto addr = vtable[8];
 		directx::present::safetyhook.reset();
-		directx::present::safetyhook = safetyhook::create_inline((void*)addr, reinterpret_cast<void*>(directx::present::hooked));
-
+		setuphook(directx::present::safetyhook, vtable[8], reinterpret_cast<void*>(&directx::present::hooked), reinterpret_cast<void**>(&directx::present::original_fn));
+		
 		if (g_pRenderTargetView)
 		{
 			g_pRenderTargetView->Release();
@@ -41,8 +44,13 @@ namespace hooks
 		return original_fn(factory, device, swap_desc, swap_chain);
 	}
 	
-	long __stdcall directx::present::hooked(IDXGISwapChain* swap_chain, uint32_t sync_interval, uint32_t flags)
+	//IDXGISwapChain* swap_chain, uint32_t sync_interval, uint32_t flags
+	long __stdcall directx::present::hooked(SafetyHookContext& ctx)
 	{
+		IDXGISwapChain* swap_chain = utils::get_context_argument<IDXGISwapChain*, 1>(&ctx);
+		uint32_t sync_interval = utils::get_context_argument<uint32_t, 2>(&ctx);
+		uint32_t flags = utils::get_context_argument<uint32_t, 3>(&ctx);
+		
 		ID3D11Device* device;
 		swap_chain->GetDevice(__uuidof(ID3D11Device), (void**)&device);
 		
@@ -121,6 +129,8 @@ namespace hooks
 		device_context->OMSetRenderTargets(1, &g_pRenderTargetView, nullptr);
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 		
-		return safetyhook.stdcall<long>(swap_chain, sync_interval, flags);
+		//return safetyhook.stdcall<long>(swap_chain, sync_interval, flags);
+		//return original_fn(swap_chain, sync_interval, flags);
+		return 1;
 	}
 }

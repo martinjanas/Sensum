@@ -3,6 +3,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "../../thirdparty/ImGui/stb_image.h"
+#include "../hooking/safetyhook/Zydis.h"
 
 namespace utils
 {
@@ -99,4 +100,26 @@ namespace utils
 
         return srv;
     }
+    
+    uint8_t* calculate_hook_ip(void* target)
+        {
+            ZydisDecoder decoder;
+            ZydisDecoderInit(&decoder, ZYDIS_MACHINE_MODE_LONG_64, ZYDIS_STACK_WIDTH_64);
+
+            auto ip = reinterpret_cast<uint8_t*>(target);
+
+            while (*ip != 0xC3)
+            {
+                ZydisDecodedInstruction ix{};
+                ZydisDecoderDecodeInstruction(&decoder, nullptr, reinterpret_cast<void*>(ip), 15, &ix);
+
+                // Follow JMPs
+                if (ix.opcode == 0xE9) 
+                    ip += ix.length + (int32_t)ix.raw.imm[0].value.s;
+                else ip += ix.length;
+            }
+
+            return ip;
+        }
+    
 }

@@ -1,6 +1,7 @@
 #include "hooks.h"
 #include "../settings/settings.h"
 #include "../sdk/helpers/entity_data.h"
+#include "../sdk/helpers/utils.h"
 
 #pragma comment(lib, "d3d11.lib")
 
@@ -213,6 +214,12 @@ namespace hooks
     
 		return true;
 	}
+
+	void setuphook(SafetyHookMid& hook, void* target, void* hook_func, void** original_fn)
+	{
+		hook = safetyhook::create_mid(target, reinterpret_cast<safetyhook::MidHookFn>(hook_func));
+		*original_fn = target;
+	}
 	
 	bool init()
 	{
@@ -251,12 +258,14 @@ namespace hooks
 		dxgi.apply(directx::create_swapchain::index, reinterpret_cast<uintptr_t*>(&directx::create_swapchain::hooked), reinterpret_cast<void**>(&directx::create_swapchain::original_fn));
 		
 		auto vtable = *reinterpret_cast<void***>(swapchain);
-		directx::present::safetyhook = safetyhook::create_inline((void*)vtable[8], reinterpret_cast<void*>(directx::present::hooked));	
-		get_matrices_for_view::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::GetMatricesForView"), __FUNCTION__).as(), reinterpret_cast<void*>(get_matrices_for_view::hooked));
-		draw_array_ex::safetyhook = safetyhook::create_inline(modules::scenesys.get_sig_addr(FNV("hooks::DrawArrayEx"), __FUNCTION__).as(), reinterpret_cast<void*>(draw_array_ex::hooked));
-		//calcviewmodel::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::CalcViewModel"), __FUNCTION__).as(), reinterpret_cast<void*>(calcviewmodel::hooked));
-		//onrenderstart::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::OnRenderStart"), __FUNCTION__).as(), reinterpret_cast<void*>(onrenderstart::hooked));
-		
+
+		setuphook(directx::present::safetyhook, vtable[8], reinterpret_cast<void*>(&directx::present::hooked), reinterpret_cast<void**>(&directx::present::original_fn));
+		setuphook(get_matrices_for_view::safetyhook, modules::client.get_sig_addr(FNV("hooks::GetMatricesForView"), __FUNCTION__).as(), reinterpret_cast<void*>(get_matrices_for_view::hooked), reinterpret_cast<void**>(&get_matrices_for_view::original_fn));
+		setuphook(draw_array_ex::safetyhook, modules::scenesys.get_sig_addr(FNV("hooks::DrawArrayEx"), __FUNCTION__).as(), reinterpret_cast<void*>(draw_array_ex::hooked), reinterpret_cast<void**>(&draw_array_ex::original_fn));
+
+		//setuphook(calcviewmodel::safetyhook, modules::client.get_sig_addr(FNV("hooks::CalcViewModel"), __FUNCTION__).as(), reinterpret_cast<void*>(calcviewmodel::hooked), reinterpret_cast<void**>(&calcviewmodel::original_fn));
+		//setuphook(onrenderstart::safetyhook, modules::client.get_sig_addr(FNV("hooks::OnRenderStart"), __FUNCTION__).as(), reinterpret_cast<void*>(onrenderstart::hooked), reinterpret_cast<void**>(&onrenderstart::original_fn));
+
 		return true;
 	}
 
@@ -274,32 +283,40 @@ namespace hooks
 		hooks::draw_array_ex::safetyhook.reset();
 		hooks::get_matrices_for_view::safetyhook.reset();
 
-		//hooks::onrenderstart::safetyhook.reset();
-		//hooks::calcviewmodel::safetyhook.reset();
+		hooks::onrenderstart::safetyhook.reset();
+		hooks::calcviewmodel::safetyhook.reset();
 		
 		return true;
 	}
 
-	void __fastcall calcviewmodel::hooked(void* rcx, Vector& pos, float* fov, int a3)
+	// Doesnt work with midhook, cause if we try to call original it crashes due to buffer overflow
+	// void __fastcall calcviewmodel::hooked(SafetyHookContext& ctx)
+	// {
+	// 	void* rcx = utils::get_context_argument<void*, 1>(&ctx);
+	// 	Vector pos = *utils::get_context_argument<Vector*, 2>(&ctx);
+	// 	float* fov = utils::get_context_argument<float*, 3>(&ctx);
+	// 	int a3 = utils::get_context_argument<int, 4>(&ctx);
+	// 	
+	// 	original_fn(rcx, pos, fov, a3);
+	// 	
+	// 	static Convar* viewmodel_fov = g::cvar->find(FNV("viewmodel_fov"));
+	// 	*fov = settings::misc::fov_changer ? settings::misc::fov : (viewmodel_fov ? viewmodel_fov->value.as_float : 68.f);
+	// 	
+	// 	if (g::engine_client->IsInGame() && settings::misc::bhop)
+	// 	{
+	// 		pos.x += settings::misc::rotation_x == 0 ? 0 : settings::misc::rotation_x;
+	// 		pos.y += settings::misc::rotation_y == 0 ? 0 : settings::misc::rotation_y;
+	// 		pos.z += settings::misc::rotation_z == 0 ? 0 : settings::misc::rotation_z;
+	// 	}
+	// }
+	
+	//CViewRender* rcx
+	void __fastcall onrenderstart::hooked(SafetyHookContext& ctx)
 	{
-		static const auto ret = safetyhook.original<void(__fastcall*)(void*, Vector&, float*, int)>();
+		CViewRender* view_render = utils::get_context_argument<CViewRender*, 1>(&ctx);
 
-		ret(rcx, pos, fov, a3);
-
-		static Convar* viewmodel_fov = g::cvar->find(FNV("viewmodel_fov"));
-		*fov = settings::misc::fov_changer ? settings::misc::fov : (viewmodel_fov ? viewmodel_fov->value.as_float : 68.f);
-		
-		if (g::engine_client->IsInGame() && settings::misc::bhop)
-		{
-			pos.x += settings::misc::rotation_x == 0 ? 0 : settings::misc::rotation_x;
-			pos.y += settings::misc::rotation_y == 0 ? 0 : settings::misc::rotation_y;
-			pos.z += settings::misc::rotation_z == 0 ? 0 : settings::misc::rotation_z;
-		}
-	}
-
-	void __fastcall onrenderstart::hooked(CViewRender* rcx)
-	{
-		safetyhook.fastcall<void>(rcx);
+		view_render->m_viewSetup.m_flAspectRatio = 1.2f;
+		view_render->m_viewSetup.nSomeFlags |= 2;
 	}
 
 	void chams(void* rcx, void* rdx, CSceneData* scene_data, int a4, void* scene_view, void* scene_layer, void* a7, IMaterial* material)
@@ -307,7 +324,7 @@ namespace hooks
 		if (!g::engine_client->IsInGame())
 			return;
 
-		static const auto& original_fn = hooks::draw_array_ex::safetyhook.original<void(__fastcall*)(void*, void*, CSceneData*, int, void*, void*, void*, IMaterial*)>();
+		static const auto& original_fn = hooks::draw_array_ex::original_fn;
 		
 		CCSPlayerController* local_controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
 		if (!local_controller)
@@ -356,21 +373,26 @@ namespace hooks
 	}
 	
 	//rcx: CAnimatableSceneObjectDesc, rdx: some custom DX11 related class/manager?
-	void __fastcall draw_array_ex::hooked(void* rcx, void* rdx, CSceneData* scene_data, int a4, void* scene_view, void* scene_layer, void* a7, IMaterial* material)
+	void __fastcall draw_array_ex::hooked(SafetyHookContext& ctx)
 	{
-		static const auto original_fn = safetyhook.original<decltype(&draw_array_ex::hooked)>();
-		
 		if (!done)
 		{
 			done = true;
 			g_pLatexMat_vis = CreateMaterial(material_latex_vis, "material_latex_vis");
 			g_pLatexMat_invis = CreateMaterial(material_latex_invis, "material_latex_invis");
 		}
+
+		void* rcx = utils::get_context_argument<void*, 1>(&ctx);
+		void* rdx = utils::get_context_argument<void*, 2>(&ctx);
+		CSceneData* scene_data = utils::get_context_argument<CSceneData*, 3>(&ctx);
+		int a4 = utils::get_context_argument<int, 4>(&ctx);
+		void* scene_view = utils::get_context_argument<void*, 5>(&ctx);
+		void* scene_layer = utils::get_context_argument<void*, 6>(&ctx);
+		void* a7 = utils::get_context_argument<void*, 7>(&ctx);
+		IMaterial* material = utils::get_context_argument<IMaterial*, 8>(&ctx);
 		
 		//Bug: chams rendering on local team
 		chams(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
-
-		original_fn(rcx, rdx, scene_data, a4, scene_view, scene_layer, a7, material);
 	}
 }
 
