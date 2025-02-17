@@ -14,7 +14,7 @@
 #pragma comment(lib, "Shlwapi.lib")
 #include "../helpers/importer.h"
 #include "../../sdk/helpers/console.h"
-#include "../../sdk/helpers/fnv.h"
+#include "../../sdk/helpers/xxhash.h"
 
 #pragma warning(disable:26495)
 
@@ -197,12 +197,12 @@ class SigAddrCacher
 public:
 	SigAddrCacher() = default;
 
-	void cache_sig(const fnv::hash& hash, PatternScanner& sig)
+	void cache_sig(const XXH64_hash_t& hash, PatternScanner& sig)
 	{
 		sigmap[hash] = sig;
 	}
 
-	PatternScanner& get_addr(const fnv::hash& hash, const char* func_name = "")
+	PatternScanner& get_addr(const XXH64_hash_t& hash, const char* func_name = "")
 	{
 		auto it = sigmap.find(hash);
 		if (it != sigmap.end())
@@ -211,7 +211,7 @@ public:
 	}
 
 private:
-	std::unordered_map<fnv::hash, PatternScanner> sigmap;
+	std::unordered_map<XXH64_hash_t, PatternScanner> sigmap;
 };
 
 class DynamicModule
@@ -240,7 +240,7 @@ public:
 	Exporter& get_export(const std::string_view& func_name);
 	PatternScanner& scan(const std::string_view& signature, const std::string_view& msg);
 	void scan_and_cache_sig(const std::string_view& sig, const std::string_view& sig_name, const uintptr_t& offset, bool abs = true);
-	PatternScanner& get_sig_addr(const fnv::hash& hash, const char* func_name = "");
+	PatternScanner& get_sig_addr(const XXH64_hash_t& hash, const char* func_name = "");
 
 	uintptr_t base;
 private:

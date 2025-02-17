@@ -17,7 +17,7 @@ public:
     }
 
     template <int class_hierarchy_level = 1>
-    fnv::hash GetClassNameHash()
+    XXH64_hash_t GetClassNameHash()
     {
         const auto& class_info = GetSchemaClassInfo();
         if (!class_info)
@@ -30,7 +30,7 @@ public:
                 return 0;
 
             if (current_level == class_hierarchy_level)
-                return fnv::hash_runtime(current_info->m_pszName);
+                return XXH3_64bits(current_info->m_pszName, strlen(current_info->m_pszName));
 
             current_info = current_info->m_pBaseClasses ? current_info->m_pBaseClasses->m_pPrevByClass : nullptr;
         }
@@ -40,64 +40,84 @@ public:
 
     bool IsController()
     {
+        static auto class_hash = XXH3_64bits("CBasePlayerController", strlen("CBasePlayerController"));
+        
         //CCSPlayerController : CBasePlayerController : C_BaseEntity
         const auto& class_two_hash = GetClassNameHash<2>();
-        return class_two_hash == FNV("CBasePlayerController");
+        return class_two_hash == class_hash;
     }
 
     bool IsPawn()
     {
+        static auto class_hash = XXH3_64bits("C_BasePlayerPawn", strlen("C_BasePlayerPawn"));
+        
         //C_CSPlayerPawn : C_CSPlayerPawnBase : C_BasePlayerPawn  
         const auto& class_three_hash = GetClassNameHash<3>();
-        return class_three_hash == FNV("C_BasePlayerPawn");
+        return class_three_hash == class_hash;
     }
 
     bool IsPlantedC4()
     {
+        static auto class_hash = XXH3_64bits("C_PlantedC4", strlen("C_PlantedC4"));
+        
         const auto& class_one_hash = GetClassNameHash();
-        return class_one_hash == FNV("C_PlantedC4");
+        return class_one_hash == class_hash;
     }
 
     bool IsGrenadeProjectile()
     {
+        static auto class_hash = XXH3_64bits("C_BaseCSGrenadeProjectile", strlen("C_BaseCSGrenadeProjectile"));
+        
         //C_SmokeGrenadeProjectile : C_BaseCSGrenadeProjectile
         const auto& class_two_hash = GetClassNameHash<2>();
-        return class_two_hash == FNV("C_BaseCSGrenadeProjectile");
+        return class_two_hash == class_hash;
     }
 
     bool IsSmokeProjectile()
     {
+        static auto class_hash = XXH3_64bits("C_SmokeGrenadeProjectile", strlen("C_SmokeGrenadeProjectile"));
+        
         const auto& class_one_hash = GetClassNameHash<>();
-        return class_one_hash == FNV("C_SmokeGrenadeProjectile");
+        return class_one_hash == class_hash;
     }
 
     bool IsMolotovProjectile()
     {
+        static auto class_hash = XXH3_64bits("C_MolotovProjectile", strlen("C_MolotovProjectile"));
+        
         const auto& class_one_hash = GetClassNameHash<>();
-        return class_one_hash == FNV("C_MolotovProjectile");
+        return class_one_hash == class_hash;
     }
     
     bool IsFlashProjectile()
     {
+        static auto class_hash = XXH3_64bits("C_FlashbangProjectile", strlen("C_FlashbangProjectile"));
+        
         const auto& class_one_hash = GetClassNameHash<>();
-        return class_one_hash == FNV("C_FlashbangProjectile");
+        return class_one_hash == class_hash;
     }
 
     bool IsHEProjectile()
     {
+        static auto class_hash = XXH3_64bits("C_HEGrenadeProjectile", strlen("C_HEGrenadeProjectile"));
+        
         const auto& class_one_hash = GetClassNameHash<>();
-        return class_one_hash == FNV("C_HEGrenadeProjectile");
+        return class_one_hash == class_hash;
     }
 
     bool IsDecoyProjectile()
     {
+        static auto class_hash = XXH3_64bits("C_DecoyProjectile", strlen("C_DecoyProjectile"));
+        
         const auto& class_one_hash = GetClassNameHash<>();
-        return class_one_hash == FNV("C_DecoyProjectile");
+        return class_one_hash == class_hash;
     }
     
     //returns dropped weapon or grenade entities in the world
     bool IsDroppedWorldEntity() //replace with more precise version?
     {
+        static auto hash = XXH3_64bits("C_CSWeaponBase", strlen("C_CSWeaponBase"));
+        
         //C_AK47 : C_CSWeaponBaseGun : C_CSWeaponBase
         //C_C4 : C_CSWeaponBase
         //C_IncendiaryGrenade : C_MolotovGrenade : C_BaseCSGrenade : C_CSWeaponBase
@@ -105,6 +125,6 @@ public:
         const auto& class_four_hash = GetClassNameHash<4>(); //inheritance level for Incendiary grenade
         const auto& class_three_hash = GetClassNameHash<3>(); //the inheritance level for guns and grenades
         const auto& class_two_hash = GetClassNameHash<2>(); //inheritance level for C4 on the ground
-        return class_four_hash == FNV("C_CSWeaponBase") || class_three_hash == FNV("C_CSWeaponBase") || class_two_hash == FNV("C_CSWeaponBase");
+        return class_four_hash == hash || class_three_hash == hash || class_two_hash == hash;
     }
 };

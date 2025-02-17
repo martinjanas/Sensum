@@ -33,9 +33,9 @@ namespace netvars
                     strcpy_s(name_hashed, class_binding->m_pszName);
                     strcat_s(name_hashed, "->");
                     strcat_s(name_hashed, field->m_pszName);
-
-                    const auto hash = fnv::hash_runtime(name_hashed);
-
+                    
+                    const auto hash = XXH3_64bits(name_hashed, strlen(name_hashed));
+                    
                     netvars_data[hash] = field->m_nSingleInheritanceOffset;
 
                     //if (!strstr(class_binding->m_name, "CEntityInstance"));
@@ -45,7 +45,7 @@ namespace netvars
         }
     }
 
-    uintptr_t get_offset_by_hash_cached(const fnv::hash hash)
+    uintptr_t get_offset_by_hash_cached(const XXH64_hash_t hash)
     {
         uintptr_t offset(0);
 

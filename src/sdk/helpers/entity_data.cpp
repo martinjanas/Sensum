@@ -122,7 +122,8 @@ namespace entity_data
 	bool is_in_smoke(const Vector& start, const Vector& end, const float& max_density)
 	{
 		using fn = float(__fastcall*)(const Vector&, const Vector&, void*);
-		static auto addr = modules::client.get_sig_addr(FNV("IsInSmoke"), __FUNCTION__).as();
+		static auto hash = XXH3_64bits("IsInSmoke", strlen("IsInSmoke"));
+		static auto addr = modules::client.get_sig_addr(hash, __FUNCTION__).as();
 		if (!addr)
 			return false;
 

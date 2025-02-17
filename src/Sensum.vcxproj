@@ -237,6 +237,7 @@
     <ClInclude Include="sdk\helpers\Hitbox_t.h" />
     <ClInclude Include="sdk\helpers\matrix.h" />
     <ClInclude Include="sdk\helpers\ScopedTimer.h" />
+    <ClInclude Include="sdk\helpers\xxhash.h" />
     <ClInclude Include="sdk\hooking\safetyhook\safetyhook.hpp" />
     <ClInclude Include="sdk\hooking\safetyhook\Zydis.h" />
     <ClInclude Include="sdk\interfaces\CGameRules.h" />
@@ -267,7 +268,6 @@
     <ClInclude Include="sdk\classes\CPlayerWeaponServices.h" />
     <ClInclude Include="sdk\helpers\console.h" />
     <ClInclude Include="sdk\helpers\CUtlSymbolLarge.hpp" />
-    <ClInclude Include="sdk\helpers\fnv.h" />
     <ClInclude Include="sdk\helpers\importer.h" />
     <ClInclude Include="sdk\helpers\netvars.h" />
     <ClInclude Include="sdk\helpers\vfunc.h" />
@@ -327,6 +327,7 @@
     <ClCompile Include="sdk\classes\CBasePlayerWeapon.cpp" />
     <ClCompile Include="sdk\helpers\console.cpp" />
     <ClCompile Include="sdk\helpers\netvars.cpp" />
+    <ClCompile Include="sdk\helpers\xxhash.c" />
     <ClCompile Include="sdk\hooking\safetyhook\safetyhook.cpp" />
     <ClCompile Include="sdk\hooking\safetyhook\Zydis.c" />
     <ClCompile Include="sdk\interfaces\CGameTrace.cpp" />

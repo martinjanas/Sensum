@@ -3,7 +3,6 @@
 #include "../helpers/CUtlLinkedList.h"
 #include "../math/Vector.h"
 #include "../math/QAngle.h"
-#include "../helpers/fnv.h"
 
 #define FCVAR_NONE 0
 #define FCVAR_UNREGISTERED (1 << 0)	// if this is set, don't add to linked list, etc
@@ -97,14 +96,14 @@ public:
 	std::byte pad01[0x40];
 	CUtlLinkedList<Convar*> convars;
 
-	Convar* find(const fnv::hash& hash)
+	Convar* find(const XXH64_hash_t& hash)
 	{
 		for (auto& convar : convars)
 		{
 			if (!convar)
 				continue;
 
-			auto name_hashed = fnv::hash_runtime(convar->szName);
+			auto name_hashed = XXH3_64bits(convar->szName, strlen(convar->szName));
 			if (hash == name_hashed)
 				return convar;
 		}

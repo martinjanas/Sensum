@@ -45,7 +45,8 @@ namespace globals
 	void* find_hud_element(const char* hud)
 	{
 		using fn = void* (__fastcall*)(const char*);
-		static auto addr = modules::client.get_sig_addr(FNV("globals::FindHudElement"), __FUNCTION__).as();
+		static auto hash = XXH3_64bits("globals::FindHudElement", strlen("globals::FindHudElement"));
+		static auto addr = modules::client.get_sig_addr(hash, __FUNCTION__).as();
 		if (!addr)
 			return nullptr;
 

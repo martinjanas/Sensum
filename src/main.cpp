@@ -20,7 +20,7 @@ DWORD __stdcall on_attach(void* base)
     
     netvars::init();
     hooks::init();
-
+    
     while (!globals::can_unhook)
         Sleep(50);
 

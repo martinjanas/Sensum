@@ -95,8 +95,8 @@ namespace sdk
 
 	void validate_interfaces_on_map_load()
 	{
-		g::global_vars = *modules::client.get_sig_addr(FNV("g::global_vars")).as<CGlobalVarsBase**>();
-		g::game_rules = *modules::client.get_sig_addr(FNV("g::game_rules")).as<CGameRules**>();
+		g::global_vars = *modules::client.get_sig_addr(XXH3_64bits("g::global_vars", strlen("g::global_vars"))).as<CGlobalVarsBase**>();
+		g::game_rules = *modules::client.get_sig_addr(XXH3_64bits("g::game_rules", strlen("g::game_rules"))).as<CGameRules**>();
 	}
 
 	void invalidate_interfaces_on_map_unload()
@@ -116,12 +116,12 @@ namespace sdk
 		g::game_type = modules::matchmaking.get_interface_from_list<CGameType*>("GameTypes001");
 		g::cvar = modules::tier0.get_interface_from_list<IVEngineCVar*>("VEngineCvar007");
 
-		g::csgo_input = modules::client.get_sig_addr(FNV("g::csgo_input")).as<CSGOInput*>();
-		g::render_system = **modules::directx11.get_sig_addr(FNV("g::render_system")).as<CRenderSystem***>();
-		g::global_vars = *modules::client.get_sig_addr(FNV("g::global_vars")).as<CGlobalVarsBase**>();
-		g::engine_trace = *modules::client.get_sig_addr(FNV("g::engine_trace")).as<CGameTrace**>();
-		g::client_mode_csnormal = modules::client.get_sig_addr(FNV("g::clientmode_csnormal")).as<CClientModeCSNormal*>();
-		g::game_rules = *modules::client.get_sig_addr(FNV("g::game_rules")).as<CGameRules**>();
+		g::csgo_input = modules::client.get_sig_addr(XXH3_64bits("g::csgo_input", strlen("g::csgo_input"))).as<CSGOInput*>();
+		g::render_system = **modules::directx11.get_sig_addr(XXH3_64bits("g::render_system", strlen("g::render_system"))).as<CRenderSystem***>();
+		g::global_vars = *modules::client.get_sig_addr(XXH3_64bits("g::global_vars", strlen("g::global_vars"))).as<CGlobalVarsBase**>();
+		g::engine_trace = *modules::client.get_sig_addr(XXH3_64bits("g::engine_trace", strlen("g::engine_trace"))).as<CGameTrace**>();
+		g::client_mode_csnormal = modules::client.get_sig_addr(XXH3_64bits("g::clientmode_csnormal", strlen("g::clientmode_csnormal"))).as<CClientModeCSNormal*>();
+		g::game_rules = *modules::client.get_sig_addr(XXH3_64bits("g::game_rules", strlen("g::game_rules"))).as<CGameRules**>();
 		g::mat_system = modules::materialsys.get_interface_from_list<CMaterialSystem*>("VMaterialSystem2_001");
 
 		g::entity_system = g::game_resource_service->GetEntitySystem();

@@ -252,8 +252,8 @@ namespace hooks
 		
 		auto vtable = *reinterpret_cast<void***>(swapchain);
 		directx::present::safetyhook = safetyhook::create_inline((void*)vtable[8], reinterpret_cast<void*>(directx::present::hooked));	
-		get_matrices_for_view::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::GetMatricesForView"), __FUNCTION__).as(), reinterpret_cast<void*>(get_matrices_for_view::hooked));
-		draw_array_ex::safetyhook = safetyhook::create_inline(modules::scenesys.get_sig_addr(FNV("hooks::DrawArrayEx"), __FUNCTION__).as(), reinterpret_cast<void*>(draw_array_ex::hooked));
+		get_matrices_for_view::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(XXH3_64bits("hooks::GetMatricesForView", strlen("hooks::GetMatricesForView")), __FUNCTION__).as(), reinterpret_cast<void*>(get_matrices_for_view::hooked));
+		draw_array_ex::safetyhook = safetyhook::create_inline(modules::scenesys.get_sig_addr(XXH3_64bits("hooks::DrawArrayEx", strlen("hooks::DrawArrayEx")), __FUNCTION__).as(), reinterpret_cast<void*>(draw_array_ex::hooked));
 		//calcviewmodel::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::CalcViewModel"), __FUNCTION__).as(), reinterpret_cast<void*>(calcviewmodel::hooked));
 		//onrenderstart::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::OnRenderStart"), __FUNCTION__).as(), reinterpret_cast<void*>(onrenderstart::hooked));
 		
@@ -286,7 +286,8 @@ namespace hooks
 
 		ret(rcx, pos, fov, a3);
 
-		static Convar* viewmodel_fov = g::cvar->find(FNV("viewmodel_fov"));
+		static auto hash = XXH3_64bits("viewmodel_fov", strlen("viewmodel_fov"));
+		static Convar* viewmodel_fov = g::cvar->find(hash);
 		*fov = settings::misc::fov_changer ? settings::misc::fov : (viewmodel_fov ? viewmodel_fov->value.as_float : 68.f);
 		
 		if (g::engine_client->IsInGame() && settings::misc::bhop)

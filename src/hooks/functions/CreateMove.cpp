@@ -2,7 +2,6 @@
 #include "../../sdk/sdk.h"
 #include "../../features/features.h"
 #include "../../sdk/helpers/CUtlBuffer.h"
-
 /*
     MJ: Hooking two createmoves now, because aimbot & rcs is behaving weirdly in createmove_csgoinput21
 
@@ -46,7 +45,8 @@ void save_cmd(CUserCmd* cmd)
 bool SerializePartialToArray(CBaseUserCmdPB* base_cmd, const CUtlBuffer& buffer, int crc_size)
 {
     using fn = bool(__thiscall*)(void*, const CUtlBuffer&, int);
-    static const auto& addr = modules::client.get_sig_addr(FNV("SerializePartialToArray"), __FUNCTION__).as();
+    static auto hash = XXH3_64bits("SerializePartialToArray", strlen("SerializePartialToArray"));
+    static const auto& addr = modules::client.get_sig_addr(hash, __FUNCTION__).as();
     if (!addr)
         return false;
 
@@ -60,7 +60,8 @@ bool SerializePartialToArray(CBaseUserCmdPB* base_cmd, const CUtlBuffer& buffer,
 void WriteMessage(void* msg, const CUtlBuffer& buffer, int crc_size)
 {
     using fn = void(__fastcall*)(void*, const CUtlBuffer&, int);
-    static const auto& addr = modules::client.get_sig_addr(FNV("WriteMessage"), __FUNCTION__).as();
+    static auto hash = XXH3_64bits("WriteMessage", strlen("WriteMessage"));
+    static const auto& addr = modules::client.get_sig_addr(hash, __FUNCTION__).as();
     if (!addr)
         return;
 
@@ -72,7 +73,8 @@ void WriteMessage(void* msg, const CUtlBuffer& buffer, int crc_size)
 std::string* SetMessageData(void* move_crc, void* msg, void* nHasBits)
 {
     using fn = std::string* (__fastcall*)(void*, void*, void*);
-    static const auto& addr = modules::client.get_sig_addr(FNV("SetMessageData"), __FUNCTION__).as();
+    static auto hash = XXH3_64bits("SetMessageData", strlen("SetMessageData"));
+    static const auto& addr = modules::client.get_sig_addr(hash, __FUNCTION__).as();
     if (!addr)
         return nullptr;
 
