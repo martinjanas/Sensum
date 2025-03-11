@@ -68,9 +68,9 @@ namespace entity_data
 		CCSPlayerPawn* m_PlayerPawn;
 		Transform_t hitbox_transform[HITBOX_MAX];
 		std::bitset<32> flags;
-
+		bool on_screen;
+		
 		float distance;
-		float sim_time;
 		
 		icon_t weapon_icon;
 		const char* weapon_text;

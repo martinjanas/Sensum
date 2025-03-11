@@ -10,6 +10,12 @@ public:
     NETVAR(CHandle, m_hObserverTarget, "CPlayer_ObserverServices", "m_hObserverTarget");
 };
 
+class CCSPlayer_ViewModelServices
+{
+public:
+    NETVAR(CHandle, m_hViewModel, "CCSPlayer_ViewModelServices", "m_hViewModel")
+};
+
 class CCSPlayerPawn : public CBaseEntity
 {
 public:
@@ -27,6 +33,7 @@ public:
     NETVAR(bool, m_bIsScoped, "C_CSPlayerPawn", "m_bIsScoped");
     NETVAR(bool, m_bGunGameImmunity, "C_CSPlayerPawnBase", "m_bGunGameImmunity");
     NETVAR(CPlayer_ObserverServices*, m_pObserverServices, "C_BasePlayerPawn", "m_pObserverServices")
+    NETVAR(CCSPlayer_ViewModelServices*, m_pViewModelServices, "C_CSPlayerPawnBase", "m_pViewModelServices")
 
     Vector GetEyePos();
     bool InAir();

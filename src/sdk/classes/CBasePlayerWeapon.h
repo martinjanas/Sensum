@@ -130,6 +130,7 @@ public:
 	NETVAR(GameTick_t, m_nNextPrimaryAttackTick, "C_BasePlayerWeapon", "m_nNextPrimaryAttackTick")
 	NETVAR(bool, m_bInReload, "C_CSWeaponBase", "m_bInReload")
 	NETVAR_OFFSET(CCSWeaponBaseVData*, m_pWpnData, "C_BaseEntity", "m_nSubclassID", 0x8)
+	NETVAR(uint32_t, m_OriginalOwnerXuidLow, "C_EconEntity", "m_OriginalOwnerXuidLow")
 
 	bool IsPistol()
 	{
