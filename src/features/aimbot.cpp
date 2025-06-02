@@ -163,7 +163,7 @@ namespace features::aimbot
                     best_angle = target_angle;
                 }
 
-                targets.emplace_back(player_data.m_PlayerPawn, &player_data, fov, player_data.m_vecOrigin.dist_to(eye_pos), player_data.sim_time, player_data.flags.test(PLAYER_IN_AIR), best_angle, player_data.m_szPlayerName);
+                targets.emplace_back(player_data.m_PlayerPawn, &player_data, fov, player_data.m_vecOrigin.dist_to(eye_pos), player_data.flags.test(PLAYER_IN_AIR), best_angle, player_data.m_szPlayerName);
             }
         }
         return targets;

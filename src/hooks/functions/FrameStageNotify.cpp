@@ -3,19 +3,6 @@
 #include "../../sdk/classes/CBaseEntity.h"
 #include "../../sdk/helpers/entity_data.h"
 
-//temp placement
-void SetMeshGroupMask(void* scene_node, uint64_t mask)
-{
-	using fn = void(__fastcall*)(void*, uint64_t);
-	static auto addr = modules::client.scan("48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8D 99 ? ? ? ? 48 8B 71", "SetMeshGroupMask").as<>();
-	if (!addr)
-		return;
-
-	auto set_mesh_group_mask = reinterpret_cast<fn>(addr);
-
-	set_mesh_group_mask(scene_node, mask);
-}
-
 void skinchanger()
 {
 	if (!g::engine_client->IsInGame())
@@ -65,9 +52,9 @@ void skinchanger()
 		auto scene_node = weapon->m_pGameSceneNode();
 		if (!scene_node)
 			return;
-		
-		SetMeshGroupMask(scene_node, 2);
-		SetMeshGroupMask(viewmodel_entity->m_pGameSceneNode(), 2);
+
+		scene_node->SetMeshGroupMask(2);
+		viewmodel_entity->m_pGameSceneNode()->SetMeshGroupMask(2);
 		
 	}
 }
@@ -91,8 +78,6 @@ void __fastcall hooks::frame_stage_notify::hooked(void* rcx, EClientFrameStage s
 	case FRAME_RENDER_END:
 		break;
 	case FRAME_NET_FULL_FRAME_UPDATE_ON_REMOVE:
-		break;
-	default:
 		break;
 	}
 	

@@ -192,8 +192,8 @@ namespace features::esp
 			for (auto& grenade_info : entry.grenade_info)
 				grenade_projectiles(grenade_info);
 
-			// for (auto& dropped_ents_info : entry.dropped_ent_info)
-			// 	dropped_entities(dropped_ents_info);
+			for (auto& dropped_ents_info : entry.dropped_ent_info)
+				dropped_entities(dropped_ents_info);
 		}
 	}
 

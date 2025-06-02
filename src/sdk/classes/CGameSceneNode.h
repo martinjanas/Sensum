@@ -18,5 +18,16 @@ public:
     {
         return VTable::GetThiscall<CSkeletonInstance*>(this, 8);
     }
+
+    void SetMeshGroupMask(uint64_t mask)
+    {
+        using fn = void(__fastcall*)(void*, uint64_t);
+        static auto addr = modules::client.get_sig_addr(XXH3_64bits("SetMeshGroupMask", strlen("SetMeshGroupMask"))).as<void*>();
+        if (!addr)
+            return;
+
+        auto set_mesh_group_mask = reinterpret_cast<fn>(addr);
+        set_mesh_group_mask(this, mask);
+    }
 };
 
