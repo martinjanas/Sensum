@@ -22,7 +22,7 @@ public:
     void SetMeshGroupMask(uint64_t mask)
     {
         using fn = void(__fastcall*)(void*, uint64_t);
-        static auto addr = modules::client.get_sig_addr(XXH3_64bits("SetMeshGroupMask", strlen("SetMeshGroupMask"))).as<void*>();
+        static auto addr = modules::client.get_sig(xxh::get_hash("SetMeshGroupMask")).as<void*>();
         if (!addr)
             return;
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "../../sdk/classes/CEntityIdentity.h"
 #include "../../sdk/interfaces/SchemaSystem.h"
+#include "../helpers/xxh.h"
 //#include "../../sdk/classes/CHandle.h"
 
 class CEntityInstance
@@ -30,7 +31,7 @@ public:
                 return 0;
 
             if (current_level == class_hierarchy_level)
-                return XXH3_64bits(current_info->m_pszName, strlen(current_info->m_pszName));
+                return xxh::get_hash(current_info->m_pszName);
 
             current_info = current_info->m_pBaseClasses ? current_info->m_pBaseClasses->m_pPrevByClass : nullptr;
         }
@@ -40,7 +41,7 @@ public:
 
     bool IsController()
     {
-        static auto class_hash = XXH3_64bits("CBasePlayerController", strlen("CBasePlayerController"));
+        static auto class_hash = xxh::get_hash("CBasePlayerController");
         
         //CCSPlayerController : CBasePlayerController : C_BaseEntity
         const auto& class_two_hash = GetClassNameHash<2>();
@@ -49,7 +50,7 @@ public:
 
     bool IsPawn()
     {
-        static auto class_hash = XXH3_64bits("C_BasePlayerPawn", strlen("C_BasePlayerPawn"));
+        static auto class_hash = xxh::get_hash("C_BasePlayerPawn");
         
         //C_CSPlayerPawn : C_CSPlayerPawnBase : C_BasePlayerPawn  
         const auto& class_three_hash = GetClassNameHash<3>();
@@ -58,7 +59,7 @@ public:
 
     bool IsPlantedC4()
     {
-        static auto class_hash = XXH3_64bits("C_PlantedC4", strlen("C_PlantedC4"));
+        static auto class_hash = xxh::get_hash("C_PlantedC4");
         
         const auto& class_one_hash = GetClassNameHash();
         return class_one_hash == class_hash;
@@ -66,7 +67,7 @@ public:
 
     bool IsGrenadeProjectile()
     {
-        static auto class_hash = XXH3_64bits("C_BaseCSGrenadeProjectile", strlen("C_BaseCSGrenadeProjectile"));
+        static auto class_hash = xxh::get_hash("C_BaseCSGrenadeProjectile");
         
         //C_SmokeGrenadeProjectile : C_BaseCSGrenadeProjectile
         const auto& class_two_hash = GetClassNameHash<2>();
@@ -75,7 +76,7 @@ public:
 
     bool IsSmokeProjectile()
     {
-        static auto class_hash = XXH3_64bits("C_SmokeGrenadeProjectile", strlen("C_SmokeGrenadeProjectile"));
+        static auto class_hash = xxh::get_hash("C_SmokeGrenadeProjectile");
         
         const auto& class_one_hash = GetClassNameHash<>();
         return class_one_hash == class_hash;
@@ -83,7 +84,7 @@ public:
 
     bool IsMolotovProjectile()
     {
-        static auto class_hash = XXH3_64bits("C_MolotovProjectile", strlen("C_MolotovProjectile"));
+        static auto class_hash = xxh::get_hash("C_MolotovProjectile");
         
         const auto& class_one_hash = GetClassNameHash<>();
         return class_one_hash == class_hash;
@@ -91,7 +92,7 @@ public:
     
     bool IsFlashProjectile()
     {
-        static auto class_hash = XXH3_64bits("C_FlashbangProjectile", strlen("C_FlashbangProjectile"));
+        static auto class_hash = xxh::get_hash("C_FlashbangProjectile");
         
         const auto& class_one_hash = GetClassNameHash<>();
         return class_one_hash == class_hash;
@@ -99,7 +100,7 @@ public:
 
     bool IsHEProjectile()
     {
-        static auto class_hash = XXH3_64bits("C_HEGrenadeProjectile", strlen("C_HEGrenadeProjectile"));
+        static auto class_hash = xxh::get_hash("C_HEGrenadeProjectile");
         
         const auto& class_one_hash = GetClassNameHash<>();
         return class_one_hash == class_hash;
@@ -107,7 +108,7 @@ public:
 
     bool IsDecoyProjectile()
     {
-        static auto class_hash = XXH3_64bits("C_DecoyProjectile", strlen("C_DecoyProjectile"));
+        static auto class_hash = xxh::get_hash("C_DecoyProjectile");
         
         const auto& class_one_hash = GetClassNameHash<>();
         return class_one_hash == class_hash;
@@ -116,7 +117,7 @@ public:
     //returns dropped weapon or grenade entities in the world
     bool IsDroppedWorldEntity() //replace with more precise version?
     {
-        static auto hash = XXH3_64bits("C_CSWeaponBase", strlen("C_CSWeaponBase"));
+        static auto hash = xxh::get_hash("C_CSWeaponBase");
         
         //C_AK47 : C_CSWeaponBaseGun : C_CSWeaponBase
         //C_C4 : C_CSWeaponBase

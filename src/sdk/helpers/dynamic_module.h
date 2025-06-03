@@ -14,7 +14,7 @@
 #pragma comment(lib, "Shlwapi.lib")
 #include "../helpers/importer.h"
 #include "../../sdk/helpers/console.h"
-#include "../../sdk/helpers/xxhash.h"
+#include "../../sdk/helpers/xxh.h"
 
 #pragma warning(disable:26495)
 
@@ -240,7 +240,7 @@ public:
 	Exporter& get_export(const std::string_view& func_name);
 	PatternScanner& scan(const std::string_view& signature, const std::string_view& msg);
 	void scan_and_cache_sig(const std::string_view& sig, const std::string_view& sig_name, const uintptr_t& offset, bool abs = true);
-	PatternScanner& get_sig_addr(const XXH64_hash_t& hash, const char* func_name = "");
+	PatternScanner& get_sig(const XXH64_hash_t& hash, const char* func_name = "");
 
 	uintptr_t base;
 private:

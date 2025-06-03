@@ -238,6 +238,7 @@
     <ClInclude Include="sdk\helpers\matrix.h" />
     <ClInclude Include="sdk\helpers\ScopedTimer.h" />
     <ClInclude Include="sdk\helpers\xxhash.h" />
+    <ClInclude Include="sdk\helpers\xxh.h" />
     <ClInclude Include="sdk\hooking\safetyhook\safetyhook.hpp" />
     <ClInclude Include="sdk\hooking\safetyhook\Zydis.h" />
     <ClInclude Include="sdk\interfaces\CGameRules.h" />

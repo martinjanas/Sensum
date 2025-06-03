@@ -103,7 +103,7 @@ public:
 			if (!convar)
 				continue;
 
-			auto name_hashed = XXH3_64bits(convar->szName, strlen(convar->szName));
+			auto name_hashed = xxh::get_hash(convar->szName);
 			if (hash == name_hashed)
 				return convar;
 		}

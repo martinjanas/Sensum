@@ -25,7 +25,7 @@ std::uint32_t CBaseEntity::GetOwnerHandle()
 
 CHandle CBaseEntity::m_hGroundEntity()
 {
-    static auto hash = XXH3_64bits("C_BaseEntity->m_hGroundEntity", strlen("C_BaseEntity->m_hGroundEntity"));
+    static auto hash = xxh::get_hash("C_BaseEntity->m_hGroundEntity");
     static auto offset = netvars::get_offset_by_hash_cached(hash);
     auto handle = *reinterpret_cast<CHandle*>(reinterpret_cast<uintptr_t>(this) + offset);
     
@@ -34,7 +34,7 @@ CHandle CBaseEntity::m_hGroundEntity()
 
 CHandle CBaseEntity::m_hOwnerEntity()
 {
-    static auto hash = XXH3_64bits("C_BaseEntity->m_hOwnerEntity", strlen("C_BaseEntity->m_hOwnerEntity"));
+    static auto hash = xxh::get_hash("C_BaseEntity->m_hOwnerEntity");
     static auto offset = netvars::get_offset_by_hash_cached(hash);
     auto handle = *reinterpret_cast<CHandle*>(reinterpret_cast<uintptr_t>(this) + offset);
 
@@ -44,8 +44,8 @@ CHandle CBaseEntity::m_hOwnerEntity()
 HitboxSet_t* CBaseEntity::GetHitboxSet(int i)
 {
     using fn = HitboxSet_t * (__thiscall*)(void*, int);
-    static auto hash = XXH3_64bits("CBaseEntity::GetHitboxSet", strlen("CBaseEntity::GetHitboxSet"));
-    static auto addr = modules::client.get_sig_addr(hash, __FUNCTION__).as();
+    static auto hash = xxh::get_hash("CBaseEntity::GetHitboxSet");
+    static auto addr = modules::client.get_sig(hash, __FUNCTION__).as();
     if (!addr)
         return nullptr;
 
@@ -57,8 +57,8 @@ HitboxSet_t* CBaseEntity::GetHitboxSet(int i)
 int CBaseEntity::HitboxToWorldTransform(HitboxSet_t* hitbox_set, Transform_t* out_transform)
 {
     using fn = int(__thiscall*)(void*, HitboxSet_t*, Transform_t*, int max_studio_bones);
-    static auto hash = XXH3_64bits("CBaseEntity::HitboxToWorldTransform", strlen("CBaseEntity::HitboxToWorldTransform"));
-    static auto addr = modules::client.get_sig_addr(hash, __FUNCTION__).as();
+    static auto hash = xxh::get_hash("CBaseEntity::HitboxToWorldTransform");
+    static auto addr = modules::client.get_sig(hash, __FUNCTION__).as();
     if (!addr)
         return -1;
 
@@ -70,8 +70,8 @@ int CBaseEntity::HitboxToWorldTransform(HitboxSet_t* hitbox_set, Transform_t* ou
 int CBaseEntity::EmitSound(EmitSound_t& params, const char* sound_name, float sound_time)
 {
     using fn = int(__thiscall*)(void*, EmitSound_t&, const char*, float);
-    static auto hash = XXH3_64bits("CBaseEntity::EmitSound", strlen("CBaseEntity::EmitSound"));
-    static auto addr = modules::client.get_sig_addr(hash, __FUNCTION__).as();
+    static auto hash = xxh::get_hash("CBaseEntity::EmitSound");
+    static auto addr = modules::client.get_sig(hash, __FUNCTION__).as();
     if (!addr)
         return 0;
 

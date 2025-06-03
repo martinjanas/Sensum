@@ -45,8 +45,8 @@ void save_cmd(CUserCmd* cmd)
 bool SerializePartialToArray(CBaseUserCmdPB* base_cmd, const CUtlBuffer& buffer, int crc_size)
 {
     using fn = bool(__thiscall*)(void*, const CUtlBuffer&, int);
-    static auto hash = XXH3_64bits("SerializePartialToArray", strlen("SerializePartialToArray"));
-    static const auto& addr = modules::client.get_sig_addr(hash, __FUNCTION__).as();
+    static auto hash = xxh::get_hash("SerializePartialToArray");
+    static const auto& addr = modules::client.get_sig(hash, __FUNCTION__).as();
     if (!addr)
         return false;
 
@@ -60,8 +60,8 @@ bool SerializePartialToArray(CBaseUserCmdPB* base_cmd, const CUtlBuffer& buffer,
 void WriteMessage(void* msg, const CUtlBuffer& buffer, int crc_size)
 {
     using fn = void(__fastcall*)(void*, const CUtlBuffer&, int);
-    static auto hash = XXH3_64bits("WriteMessage", strlen("WriteMessage"));
-    static const auto& addr = modules::client.get_sig_addr(hash, __FUNCTION__).as();
+    static auto hash = xxh::get_hash("WriteMessage");
+    static const auto& addr = modules::client.get_sig(hash, __FUNCTION__).as();
     if (!addr)
         return;
 
@@ -73,8 +73,8 @@ void WriteMessage(void* msg, const CUtlBuffer& buffer, int crc_size)
 std::string* SetMessageData(void* move_crc, void* msg, void* nHasBits)
 {
     using fn = std::string* (__fastcall*)(void*, void*, void*);
-    static auto hash = XXH3_64bits("SetMessageData", strlen("SetMessageData"));
-    static const auto& addr = modules::client.get_sig_addr(hash, __FUNCTION__).as();
+    static auto hash = xxh::get_hash("SetMessageData");
+    static const auto& addr = modules::client.get_sig(hash, __FUNCTION__).as();
     if (!addr)
         return nullptr;
 

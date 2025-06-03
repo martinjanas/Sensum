@@ -105,8 +105,8 @@ public:
     BitFlag GetBoneFlags(const int index) 
     {
         using fn = int(__thiscall*)(void*, int); //int -> BitFlag?
-        static auto hash = XXH3_64bits("CModel::GetBoneFlags", strlen("CModel::GetBoneFlags"));
-        static auto addr = modules::client.get_sig_addr(hash, __FUNCTION__).as();
+        static auto hash = xxh::get_hash("CModel::GetBoneFlags");
+        static auto addr = modules::client.get_sig(hash, __FUNCTION__).as();
         if (!addr)
             return {};
 
@@ -118,8 +118,8 @@ public:
     int GetBoneParent(const int index) 
     {
         using fn = int(__thiscall*)(void*, int);
-        static auto hash = XXH3_64bits("CModel::GetBoneParent", strlen("CModel::GetBoneParent"));
-        static auto addr = modules::client.get_sig_addr(hash, __FUNCTION__).as();
+        static auto hash = xxh::get_hash("CModel::GetBoneParent");
+        static auto addr = modules::client.get_sig(hash, __FUNCTION__).as();
         if (!addr)
             return -1;
 
@@ -131,8 +131,8 @@ public:
     const char* GetBoneName(const std::int32_t index) 
     {
         using fn = const char* (__thiscall*)(void*, int);
-        static auto hash = XXH3_64bits("CModel::GetBoneName", strlen("CModel::GetBoneName"));
-        static auto addr = modules::client.get_sig_addr(hash, __FUNCTION__).as();
+        static auto hash = xxh::get_hash("CModel::GetBoneName");
+        static auto addr = modules::client.get_sig(hash, __FUNCTION__).as();
         if (!addr)
             return nullptr;
 

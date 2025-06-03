@@ -412,8 +412,8 @@ struct TraceFilter_t
 	static TraceFilter_t* InitEntitiesOnly(TraceFilter_t* thisptr, CBaseEntity* skip, uint32_t mask, int layer)
 	{
 		using fn = TraceFilter_t*(__thiscall*)(void*, CBaseEntity*, uint32_t, int, int16_t);
-		static auto hash = XXH3_64bits("TraceFilter_t::InitEntitiesOnly", strlen("TraceFilter_t::InitEntitiesOnly"));
-		static auto addr = modules::client.get_sig_addr(hash, __FUNCTION__).as();
+		static auto hash = xxh::get_hash("TraceFilter_t::InitEntitiesOnly");
+		static auto addr = modules::client.get_sig(hash, __FUNCTION__).as();
 		if (!addr)
 			return nullptr;
 
@@ -429,8 +429,8 @@ public:
 	bool TraceShape(Ray_t* ray, const Vector& start, const Vector& end, TraceFilter_t* filter, Trace_t* trace)
 	{
 		using fn = bool(__fastcall*)(void*, Ray_t*, const Vector&, const Vector&, TraceFilter_t*, Trace_t*);
-		static auto hash = XXH3_64bits("CGameTrace::TraceShape", strlen("CGameTrace::TraceShape"));
-		static auto addr = modules::client.get_sig_addr(hash, __FUNCTION__).as();
+		static auto hash = xxh::get_hash("CGameTrace::TraceShape");
+		static auto addr = modules::client.get_sig(hash, __FUNCTION__).as();
 		if (!addr)
 			return false;
 
@@ -442,8 +442,8 @@ public:
 	bool ClipRayToEntity(Ray_t* ray, const Vector& start, const Vector& end, CCSPlayerPawn* skip, TraceFilter_t* filter, Trace_t* trace)
 	{
 		using fn = bool(__fastcall*)(void*, Ray_t*, const Vector&, const Vector&, CCSPlayerPawn*, TraceFilter_t*, Trace_t*);
-		static auto hash = XXH3_64bits("CGameTrace::ClipRayToEntity", strlen("CGameTrace::ClipRayToEntity"));
-		static auto addr = modules::client.get_sig_addr(hash, __FUNCTION__).as();
+		static auto hash = xxh::get_hash("CGameTrace::ClipRayToEntity");
+		static auto addr = modules::client.get_sig(hash, __FUNCTION__).as();
 		if (!addr)
 			return false;
 

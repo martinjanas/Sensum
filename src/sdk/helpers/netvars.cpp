@@ -34,7 +34,7 @@ namespace netvars
                     strcat_s(name_hashed, "->");
                     strcat_s(name_hashed, field->m_pszName);
                     
-                    const auto hash = XXH3_64bits(name_hashed, strlen(name_hashed));
+                    const auto hash = xxh::get_hash(name_hashed);
                     
                     netvars_data[hash] = field->m_nSingleInheritanceOffset;
 
