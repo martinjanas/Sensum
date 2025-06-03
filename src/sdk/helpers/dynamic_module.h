@@ -12,6 +12,8 @@
 #include <winternl.h>
 #include <Shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
+#include "ScopedTimer.h"
+#include "Timer.h"
 #include "../helpers/importer.h"
 #include "../../sdk/helpers/console.h"
 #include "../../sdk/helpers/xxh.h"
@@ -101,7 +103,7 @@ public:
 
 	PatternScanner& scan(const std::string_view& signature, const std::string_view& sig_name)
 	{
-		this->addr = pattern_scan(signature.data());
+		this->addr = pattern_scan(signature.data());		
 		if (!this->addr)
 			g_Console->println("PatternScanner: %s not found\n", sig_name.data());
 
@@ -138,56 +140,83 @@ public:
 	}
 
 private:
+	//BMH hybrid, not pure BMH
 	std::uint8_t* pattern_scan(const char* signature) const
 	{
 		static auto pattern_to_bytes = [](const char* pattern)
-		{
-			auto bytes = std::vector<int>{};
-			auto start = const_cast<char*>(pattern);
-			auto end = const_cast<char*>(pattern) + strlen(pattern);
-
-			for (auto current = start; current < end; ++current)
-			{
-				if (*current == '?')
-				{
+	 	{
+	 		auto bytes = std::vector<int>{};
+	 		auto start = const_cast<char*>(pattern);
+	 		auto end = const_cast<char*>(pattern) + strlen(pattern);
+	
+	 		for (auto current = start; current < end; ++current)
+	 		{
+	 			if (*current == '?')
+	 			{
 					++current;
-
+	
 					if (*current == '?')
-						++current;
-
-					bytes.emplace_back(-1);
-				}
-				else bytes.emplace_back(strtoul(current, &current, 16));
-			}
-			return bytes;
-		};
-
+	 					++current;
+	
+	 				bytes.emplace_back(-1);
+	 			}
+	 			else bytes.emplace_back(strtoul(current, &current, 16));
+	 		}
+	 		return bytes;
+	 	};
+	
 		auto dos_header = reinterpret_cast<PIMAGE_DOS_HEADER>(this->base);
 		auto nt_headers = reinterpret_cast<PIMAGE_NT_HEADERS>(reinterpret_cast<uint8_t*>(dos_header) + dos_header->e_lfanew);
-
 		auto size_of_image = nt_headers->OptionalHeader.SizeOfImage;
+	
 		auto pattern_bytes = pattern_to_bytes(signature);
 		auto scan_bytes = reinterpret_cast<uint8_t*>(this->base);
-
-		for (std::size_t i = 0; i < size_of_image - pattern_bytes.size(); ++i)
+		const size_t pattern_len = pattern_bytes.size();
+	
+		// Fallback to naive scan if there are wildcards
+		if (std::find(pattern_bytes.begin(), pattern_bytes.end(), -1) != pattern_bytes.end())
 		{
-			bool found = true;
-			for (std::size_t j = 0; j < pattern_bytes.size(); ++j)
+			for (size_t i = 0; i <= size_of_image - pattern_len; ++i)
 			{
-				if (scan_bytes[i + j] != pattern_bytes[j] && pattern_bytes[j] != -1)
+				bool found = true;
+				for (size_t j = 0; j < pattern_len; ++j)
 				{
-					found = false;
-					break;
+					if (pattern_bytes[j] != -1 && scan_bytes[i + j] != pattern_bytes[j])
+					{
+						found = false;
+						break;
+					}
 				}
+	
+				if (found)
+					return &scan_bytes[i];
 			}
-
-			if (found)
-				return &scan_bytes[i];
+	
+			return nullptr;
 		}
-
+	
+		// Boyer-Moore-Horspool
+		std::unordered_map<uint8_t, size_t> bad_char_shift;
+		for (size_t i = 0; i < pattern_len - 1; ++i)
+			bad_char_shift[static_cast<uint8_t>(pattern_bytes[i])] = pattern_len - 1 - i;
+	
+		size_t i = 0;
+		while (i <= size_of_image - pattern_len)
+		{
+			int j = static_cast<int>(pattern_len) - 1;
+			while (j >= 0 && scan_bytes[i + j] == pattern_bytes[j])
+				--j;
+	
+			if (j < 0)
+				return &scan_bytes[i];
+	
+			uint8_t next_byte = scan_bytes[i + pattern_len - 1];
+			i += bad_char_shift.count(next_byte) ? bad_char_shift[next_byte] : pattern_len;
+		}
+	
 		return nullptr;
 	}
-
+	
 	uintptr_t base;
 	uint8_t* addr;
 };
@@ -248,8 +277,3 @@ private:
 	Exporter exporter;
 	SigAddrCacher sig_addr_cacher;
 };
-
-
-
-
-

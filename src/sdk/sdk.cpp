@@ -32,6 +32,7 @@ namespace sdk
 	void scan_and_cache_sigs()
 	{
 		std::vector<std::future<void>> futures;
+		futures.reserve(20);
 
 		auto scan_and_cache_sig = [&](DynamicModule* module, const std::string_view& sig, const std::string_view& name, const uintptr_t& offset, bool abs)
 		{
@@ -45,24 +46,24 @@ namespace sdk
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 8B 0D ? ? ? ? 4C 8B C3 66 89 44 24", "g::engine_trace", 0x3, true));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 8D 3D ? ? ? ? 48 8D 35 ? ? ? ? 90", "g::clientmode_csnormal", 0x3, true));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 8B 0D ?? ?? ?? ?? 48 85 C9 74 16 48 8B 01 44 8B C2", "g::game_rules", 0x3, true));
-
+		
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 08 48 89 74 24 10 57 48 81 EC 40 01 00 00 8B DA 48 8B F9 E8 ?? ?? ?? ??", "CBaseEntity::GetHitboxSet", 0, false));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 ? 55 57 41 54 41 56 41 57 48 83 EC 20", "CBaseEntity::HitboxToWorldTransform", 0, false));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 8B C4 48 89 58 10 48 89 70 20 55 57 41 56 48 8D A8 08", "CBaseEntity::EmitSound", 0, false));
-
+		
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "85 D2 78 16 3B 91", "CModel::GetBoneFlags", 0, false));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "E8 ? ? ? ? 41 0F 10 14 3F", "CModel::GetBoneParent", 0x1, true));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "85 D2 78 25 3B 91", "CModel::GetBoneName", 0, false));
-
+		
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "40 55 48 83 EC 20 48 83 3D ? ? ? ? ?", "globals::FindHudElement", 0, false));
-
+		
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 20 48 89 4C 24 08 55 56 41", "CGameTrace::TraceShape", 0, false));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 48 89 7C 24 20 41 54 41 56 41 57 48 81 EC C0 00 00 00 48 8B 9C", "CGameTrace::ClipRayToEntity", 0, false));
 		
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "E8 ? ? ? ? 48 81 4B ? ? ? ? ? 48 8D 05 ? ? ? ?", "TraceFilter_t::InitEntitiesOnly", 0x1, true));
-
+		
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "E8 ? ? ? ? 0F 28 F8 44 0F 28 54 24 ?", "IsInSmoke", 0x1, true));
-
+		
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 18 55 56 57 48 81 EC 90", "SerializePartialToArray", 0, false));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 10 48 89 6C 24 18 48 89 7C 24 20 41 56 48 83 EC 20 48 BF", "WriteMessage", 0, false));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 20 55 56 57 48 83 EC 30 49", "SetMessageData", 0, false));
@@ -72,7 +73,7 @@ namespace sdk
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 10 48 89 74 24 18 55 57 41 54 41 56 41 57 48 8B EC 48 83 EC 20", "hooks::CalcViewModel", 0, false));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 ? 48 89 6C 24 ? 56 57 41 56 48 81 EC ? ? ? ? 4C 8B F1 48 8D 94 24", "hooks::OnRenderStart", 0, false));	
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::scenesys, "48 8B C4 48 89 50 10 53", "hooks::DrawArrayEx", 0, false));
-
+		
 		for (auto& future : futures)
 			future.get();
 	}

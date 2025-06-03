@@ -10,6 +10,8 @@ public:
 		start = std::chrono::high_resolution_clock::now();
 	}
 
+	ScopedTimer(ScopedTimer& timer) = delete;
+
 	~ScopedTimer()
 	{
 		end = std::chrono::high_resolution_clock::now();
@@ -17,7 +19,7 @@ public:
 		auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 		auto duration_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
 
-		printf("%s took %d ms, %d ns\n", func, duration_ms, duration_ns);
+		printf("%s took %lld ms, %lld ns\n", func, duration_ms, duration_ns);
 	}
 private:
 	std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
