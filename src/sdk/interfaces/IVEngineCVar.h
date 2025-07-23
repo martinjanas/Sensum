@@ -110,3 +110,15 @@ public:
 		}
 	}
 };
+
+class CVarInterface : public Interface
+{
+public:
+	CVarInterface(void* ptr, const char* name) : Interface(ptr, name) { }
+
+	Convar* find(const XXH64_hash_t& hash)
+	{
+		auto cvar_ptr = static_cast<IVEngineCVar*>(m_obj);
+		return cvar_ptr->find(hash);
+	}
+};

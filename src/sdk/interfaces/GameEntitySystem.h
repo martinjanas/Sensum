@@ -1,11 +1,11 @@
 #pragma once
-#include "../classes/CEntityInstance.h"
-#include "../helpers/modules.h"
 #include "../classes/CBaseEntity.h"
 
-class CEntitySystem
+class CEntitySystem : public Interface
 {
 public:
+	CEntitySystem(void* obj, const char* name) : Interface(obj, name) { }
+	
 	CBaseEntity* GetBaseEntity(uint32_t index)
 	{
 		uint64_t entity;
@@ -55,21 +55,21 @@ public:
 
 	CEntityInstance* FindEntityByName(const char* name)
 	{
-		return VTable::GetThiscall<CEntityInstance*>(this, 12, name); //probably outdated index? +1 ?
+		return VTable::GetThiscall<CEntityInstance*>(this->m_obj, 12, name); //probably outdated index? +1 ?
 	}
 
 	CEntityInstance* OnAddEntity(CEntityInstance* entity_instance, void* handle)
 	{
-		return VTable::GetThiscall<CEntityInstance*>(this, 15, entity_instance, handle);
+		return VTable::GetThiscall<CEntityInstance*>(this->m_obj, 15, entity_instance, handle);
 	}
 
 	CEntityInstance* OnRemoveEntity(CEntityInstance* entity_instance, void* handle)
 	{
-		return VTable::GetThiscall<CEntityInstance*>(this, 16, entity_instance, handle);
+		return VTable::GetThiscall<CEntityInstance*>(this->m_obj, 16, entity_instance, handle);
 	}
 
 	int GetHighestEntityIndex()
 	{
-		return *reinterpret_cast<int*>(this + 0x20F0);
+		return *reinterpret_cast<int*>(reinterpret_cast<uintptr_t>(this->m_obj) + 0x20F0);
 	}
 };

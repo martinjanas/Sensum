@@ -9,7 +9,7 @@ Vector CCSPlayerPawn::GetEyePos()
 
 bool CCSPlayerPawn::InAir()
 {	
-	return g::entity_system->GetEntityFromHandle(m_hGroundEntity()) == nullptr;
+	return cheat::interfaces().entity_system->GetEntityFromHandle(m_hGroundEntity()) == nullptr;
 }
 
 bool CCSPlayerPawn::IsAlive()

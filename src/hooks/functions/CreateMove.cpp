@@ -2,7 +2,11 @@
 #include "../../sdk/sdk.h"
 #include "../../features/features.h"
 #include "../../sdk/helpers/CUtlBuffer.h"
+<<<<<<< Updated upstream
 
+=======
+#include "../../sdk/cheat.h"
+>>>>>>> Stashed changes
 /*
     MJ: Hooking two createmoves now, because aimbot & rcs is behaving weirdly in createmove_csgoinput21
 
@@ -142,7 +146,7 @@ static inline CUserCmd* g_cmd = nullptr;
 
 void __fastcall hooks::createmove_csgoinput::hooked(void* rcx, int slot, bool active)
 {
-    if (!g::engine_client->IsInGame() || !g::engine_client->IsConnected())
+    if (!cheat::interfaces().engine->IsInGame() || !cheat::interfaces().engine->IsConnected())
         original_fn(rcx, slot, active);
     
     entity_data::fetch_player_data();
@@ -175,7 +179,7 @@ bool __fastcall hooks::createmove_csgoinput21::hooked(void* rcx, int slot, CUser
 
                 if (mat2)
                 {
-                    g_Console->println("name: %s, %s", mat2->GetName(), mat2->GetShareName());
+                    core::console().println("name: %s, %s", mat2->GetName(), mat2->GetShareName());
                 }
             }
         }*/

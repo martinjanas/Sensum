@@ -6,6 +6,7 @@
 
 #include "../sdk/helpers/utils.h"
 #include "../sdk/helpers/IconFetcher.h"
+#include "../sdk/cheat.h"
 
 namespace features::esp
 {
@@ -76,7 +77,7 @@ namespace features::esp
 	//bomb_timer, grenade_projectiles and dropped_entities functions are in wip/prototype stage, they will be redone properly later
 	void bomb_timer(const entity_data::bomb_info_t& bomb_info)
 	{
-		auto bomb_time = bomb_info.m_flC4Blow - g::global_vars->m_curtime;
+		auto bomb_time = bomb_info.m_flC4Blow - cheat::interfaces().global_vars->m_curtime;
 		bomb_time = std::clamp<float>(bomb_time, 0.f, 40.f);
 		if (bomb_time <= 0.0f)
 			return;
@@ -172,7 +173,7 @@ namespace features::esp
 
 	void render_entities()
 	{
-		if (!g::engine_client->IsInGame())
+		if (!cheat::interfaces().engine->IsInGame())
 			return;
 		
 		std::lock_guard<std::mutex> lock(entity_data::entity_locker);
@@ -199,7 +200,7 @@ namespace features::esp
 
 	void render()
 	{
-		if (!g::engine_client->IsInGame())
+		if (!cheat::interfaces().engine->IsInGame())
 			return;
 
 		std::lock_guard<std::mutex> lock(entity_data::player_locker);
@@ -259,11 +260,11 @@ namespace features::esp
 	
 	void draw_fov(entity_data::player_data_t& data)
 	{
-		CCSPlayerController* controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
+		CCSPlayerController* controller = cheat::interfaces().entity_system->GetLocalPlayerController<CCSPlayerController*>();
 		if (!controller)
 			return;
 
-		CCSPlayerPawn* pawn = reinterpret_cast<CCSPlayerPawn*>(g::entity_system->GetEntityFromHandle(controller->m_hPawn()));
+		CCSPlayerPawn* pawn = reinterpret_cast<CCSPlayerPawn*>(cheat::interfaces().entity_system->GetEntityFromHandle(controller->m_hPawn()));
 		if (!pawn)
 			return;
 		
@@ -275,7 +276,7 @@ namespace features::esp
 		if (!globals::world2screen(head_hitbox->hitbox_pos, head_w2s))
 			return;
 
-		auto wpn = reinterpret_cast<CBasePlayerWeapon*>(g::entity_system->GetEntityFromHandle(pawn->m_pWeaponServices()->m_hActiveWeapon()));
+		auto wpn = reinterpret_cast<CBasePlayerWeapon*>(cheat::interfaces().entity_system->GetEntityFromHandle(pawn->m_pWeaponServices()->m_hActiveWeapon()));
 		if (!wpn)
 			return;
 		
@@ -336,11 +337,11 @@ namespace features::esp
 	    const auto& icon = data.weapon_icon;
 	    if (icon.texture)
 	    {
-	        auto controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
+	        auto controller = cheat::interfaces().entity_system->GetLocalPlayerController<CCSPlayerController*>();
 	        if (!controller)
 	            return;
 
-	        auto pawn = reinterpret_cast<CCSPlayerPawn*>(g::entity_system->GetEntityFromHandle(controller->m_hPawn()));
+	        auto pawn = reinterpret_cast<CCSPlayerPawn*>(cheat::interfaces().entity_system->GetEntityFromHandle(controller->m_hPawn()));
 	        if (!pawn)
 	            return;
 
@@ -348,7 +349,7 @@ namespace features::esp
 	        float distance = data.m_vecOrigin.dist_to(pawn->m_pGameSceneNode()->m_vecOrigin());
 
 	        // Debug distance output
-	        //g_Console->println("distance: %.1f", distance);
+	        //core::console().println("distance: %.1f", distance);
 
 	        // Use a smooth falloff for scaling, using a more gradual approach
 	        float scale_factor = 1.0f;
@@ -361,7 +362,7 @@ namespace features::esp
 	        }
 
 	        // Debug output for scale_factor
-	        //g_Console->println("scale_factor: %.2f", scale_factor);
+	        //core::console().println("scale_factor: %.2f", scale_factor);
 
 	        // Apply the scale factor to width and height
 	        float scaled_w = icon.w * scale_factor;
@@ -372,7 +373,7 @@ namespace features::esp
 	        scaled_h = std::max(scaled_h, 10.0f);
 
 	        // Debug output for scaled width and height
-	        //g_Console->println("scaled_w: %.1f, scaled_h: %.1f", scaled_w, scaled_h);
+	        //core::console().println("scaled_w: %.1f, scaled_h: %.1f", scaled_w, scaled_h);
 
 	        // Position the icon based on bounding box center and scale
 	        ImVec2 image_start = ImVec2(bottom_mid.x - scaled_w / 2, bottom_mid.y - scaled_h / 2 + 6.f);

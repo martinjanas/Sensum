@@ -55,11 +55,11 @@ void ShowMultiSelectPopup(const char* label, int& current, const std::vector<std
 
 void get_def_index(int& index)
 {
-	CCSPlayerController* localplayer = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
+	CCSPlayerController* localplayer = cheat::interfaces().entity_system->GetLocalPlayerController<CCSPlayerController*>();
 	if (!localplayer)
 		return;
 
-	CCSPlayerPawn* localpawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(localplayer->m_hPlayerPawn());  //localplayer->m_hPlayerPawn().Get<CCSPlayerPawn*>();
+	CCSPlayerPawn* localpawn = cheat::interfaces().entity_system->GetEntityFromHandle<CCSPlayerPawn*>(localplayer->m_hPlayerPawn());  //localplayer->m_hPlayerPawn().Get<CCSPlayerPawn*>();
 	if (!localpawn)
 		return;
 
@@ -67,7 +67,7 @@ void get_def_index(int& index)
 	if (!active_wpn_handle.IsValid())
 		return;
 
-	auto active_wpn = reinterpret_cast<CBasePlayerWeapon*>(g::entity_system->GetEntityFromHandle(active_wpn_handle));
+	auto active_wpn = reinterpret_cast<CBasePlayerWeapon*>(cheat::interfaces().entity_system->GetEntityFromHandle(active_wpn_handle));
 	if (!active_wpn)
 		return;
 

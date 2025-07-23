@@ -190,6 +190,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="render\tabs\tabs.h" />
+    <ClInclude Include="sdk\cheat.h" />
     <ClInclude Include="sdk\helpers\config_system.h" />
     <ClInclude Include="features\features.h" />
     <ClInclude Include="render\fonts\droidsans.hpp" />
@@ -204,9 +205,9 @@
     <ClInclude Include="sdk\helpers\CViewRender.h" />
     <ClInclude Include="sdk\helpers\IconFetcher.h" />
     <ClInclude Include="sdk\helpers\Icons.h" />
-    <ClInclude Include="sdk\helpers\interfaces.h" />
     <ClInclude Include="sdk\helpers\json.hpp" />
     <ClInclude Include="sdk\helpers\json_fwd.hpp" />
+    <ClInclude Include="sdk\helpers\KeyValues.h" />
     <ClInclude Include="sdk\helpers\notify_system.h" />
     <ClInclude Include="sdk\helpers\render.h" />
     <ClInclude Include="sdk\helpers\BBox_t.h" />
@@ -245,10 +246,13 @@
     <ClInclude Include="sdk\interfaces\CGlobalVars.h" />
     <ClInclude Include="sdk\interfaces\CHudChat.h" />
     <ClInclude Include="sdk\interfaces\CInputSystem.h" />
+    <ClInclude Include="sdk\interfaces\CMaterialSystem.h" />
     <ClInclude Include="sdk\interfaces\CNetworkGameClient.h" />
     <ClInclude Include="sdk\interfaces\CNetworkGameService.h" />
     <ClInclude Include="sdk\interfaces\CRenderSystem.h" />
     <ClInclude Include="sdk\interfaces\CSource2Client.h" />
+    <ClInclude Include="sdk\interfaces\impl\Interface.h" />
+    <ClInclude Include="sdk\interfaces\impl\interfaces.h" />
     <ClInclude Include="sdk\interfaces\IVEngineCVar.h" />
     <ClInclude Include="sdk\math\math.h" />
     <ClInclude Include="sdk\math\QAngle.h" />
@@ -295,6 +299,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="render\tabs\aimbot_tab.cpp" />
+    <ClCompile Include="sdk\cheat.cpp" />
     <ClCompile Include="sdk\helpers\config_system.cpp" />
     <ClCompile Include="features\aimbot.cpp" />
     <ClCompile Include="features\bhop.cpp" />
@@ -306,7 +311,7 @@
     <ClCompile Include="render\menu.cpp" />
     <ClCompile Include="sdk\classes\CPlantedC4.h" />
     <ClCompile Include="sdk\helpers\IconFetcher.cpp" />
-    <ClCompile Include="sdk\helpers\interfaces.cpp" />
+    <ClCompile Include="sdk\helpers\KeyValues.cpp" />
     <ClCompile Include="sdk\helpers\notify_system.cpp" />
     <ClCompile Include="render\render.cpp" />
     <ClCompile Include="sdk\classes\CHandle.cpp" />
@@ -331,6 +336,9 @@
     <ClCompile Include="sdk\hooking\safetyhook\Zydis.c" />
     <ClCompile Include="sdk\interfaces\CGameTrace.cpp" />
     <ClCompile Include="sdk\interfaces\ClientModeCSNormal.h" />
+    <ClCompile Include="sdk\interfaces\CMaterialSystem.cpp" />
+    <ClCompile Include="sdk\interfaces\impl\Interface.cpp" />
+    <ClCompile Include="sdk\interfaces\impl\interfaces.cpp" />
     <ClCompile Include="sdk\math\math.cpp" />
     <ClCompile Include="sdk\math\QAngle.cpp" />
     <ClCompile Include="sdk\sdk.cpp" />

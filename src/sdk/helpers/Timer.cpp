@@ -1,12 +1,12 @@
 #include "Timer.h"
-#include "../sdk.h"
+#include "../cheat.h"
 
 bool Timer::has_finished()
 {
-	this->time_remaining = g::global_vars->m_curtime - last_time;
+	this->time_remaining = cheat::interfaces().global_vars->m_curtime - last_time;
 	if (this->time_remaining >= timer_duration)
 	{
-		last_time = g::global_vars->m_curtime;
+		last_time = cheat::interfaces().global_vars->m_curtime;
 
 		return true;
 	}
@@ -15,7 +15,7 @@ bool Timer::has_finished()
 
 void Timer::reset()
 {
-	last_time = g::global_vars->m_curtime;
+	last_time = cheat::interfaces().global_vars->m_curtime;
 }
 
 void Timer::set_duration(float duration)

@@ -1,8 +1,7 @@
 #pragma once
 
 #include <cassert>
-
-#include "../../sdk/helpers/interfaces.h"
+#include "../cheat.h"
 
 template <class T>
 class CUtlVector {
@@ -52,9 +51,9 @@ public:
     {
         m_Size += num;
         if (m_pElements)
-            m_pElements = (T*)mem_alloc_in::mem_alloc->ReAlloc(m_pElements, m_Size * sizeof(T));
+            m_pElements = (T*)cheat::interfaces().mem_alloc->ReAlloc(m_pElements, m_Size * sizeof(T));
         else
-            m_pElements = (T*)mem_alloc_in::mem_alloc->Alloc(m_Size * sizeof(T));
+            m_pElements = (T*)cheat::interfaces().mem_alloc->Alloc(m_Size * sizeof(T));
     }
 
     //-----------------------------------------------------------------------------

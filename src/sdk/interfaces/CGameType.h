@@ -1,9 +1,11 @@
 #pragma once
 #include "../../sdk/helpers/vfunc.h"
 
-class CGameType
+class CGameType : public Interface
 {
 public:
+	CGameType(void* obj, const char* name) : Interface(obj, name) { }
+	
 	bool IsDeathmatch()
 	{
 		return GetGameType() == 1 && GetGameMode() == 2;
@@ -36,11 +38,11 @@ public:
 private:
 	int GetGameType()
 	{
-		return VTable::GetThiscall<int>(this, 19);
+		return VTable::GetThiscall<int>(this->m_obj, 19);
 	}
 
 	int GetGameMode()
 	{
-		return VTable::GetThiscall<int>(this, 20);
+		return VTable::GetThiscall<int>(this->m_obj, 20);
 	}
 };

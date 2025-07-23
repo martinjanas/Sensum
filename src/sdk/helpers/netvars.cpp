@@ -11,7 +11,7 @@ namespace netvars
 
         for (const auto& module : netvar_modules)
         {
-            CSchemaSystemTypeScope* netvar_class = g::schema_system->FindTypeScopeForModule(module);
+            CSchemaSystemTypeScope* netvar_class = core::interfaces().schema_system->FindTypeScopeForModule(module);
             if (!netvar_class)
                 continue;
 
@@ -39,7 +39,7 @@ namespace netvars
                     netvars_data[hash] = field->m_nSingleInheritanceOffset;
 
                     //if (!strstr(class_binding->m_name, "CEntityInstance"));
-                        //g_Console->println("DEBUG: %s->%s: 0x%p", class_binding->m_pszName, field->m_pszName, (uintptr_t)field->m_nSingleInheritanceOffset);
+                        //core::console().println("DEBUG: %s->%s: 0x%p", class_binding->m_pszName, field->m_pszName, (uintptr_t)field->m_nSingleInheritanceOffset);
                 }
             }
         }

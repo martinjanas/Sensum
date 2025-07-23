@@ -1,7 +1,11 @@
 #include "hooks.h"
 #include "../settings/settings.h"
 #include "../sdk/helpers/entity_data.h"
+<<<<<<< Updated upstream
 #include "../sdk/helpers/utils.h"
+=======
+#include "../sdk/cheat.h"
+>>>>>>> Stashed changes
 
 #pragma comment(lib, "d3d11.lib")
 
@@ -10,7 +14,7 @@ static void get_dxgi(IDXGIFactory*& dxgi_factory)
 	dxgi_factory = nullptr;
 
 	ID3D11Device* d3d11_device = nullptr;
-	if (FAILED(g::render_system->swap_chain->GetDevice(IID_PPV_ARGS(&d3d11_device))))
+	if (FAILED(cheat::interfaces().render_system->swap_chain->GetDevice(IID_PPV_ARGS(&d3d11_device))))
 		return;
 
 	IDXGIDevice* dxgi_device = nullptr;
@@ -179,7 +183,7 @@ IMaterial* CreateMaterial(const char* material_vmat, const char* mat_name)
 	if (!KeyValues::LoadKV3(kv, material_vmat, mat_name))
 		return nullptr;
 
-	g::mat_system->CreateMaterial(&temp, mat_name, kv, 0, 1);
+	cheat::interfaces().material_system->CreateMaterial(&temp, mat_name, kv, 0, 1);
 
 	return *temp;
 }
@@ -239,10 +243,10 @@ namespace hooks
 		CreateDeviceD3D11(hwnd, device, swapchain);
 
 		//TODO: Add manual reset function to ShadowVMT ?
-		entity_system = ShadowVMT(g::entity_system);
-		csgo_input = ShadowVMT(g::csgo_input);
-		client = ShadowVMT(g::client);
-		client_mode = ShadowVMT(g::client_mode_csnormal);
+		entity_system = ShadowVMT(cheat::interfaces().entity_system.get());
+		csgo_input = ShadowVMT(cheat::interfaces().csgo_input);
+		client = ShadowVMT(cheat::interfaces().client.get());
+		client_mode = ShadowVMT(cheat::interfaces().client_mode.get());
 
 		entity_system.apply(on_add_entity::index, reinterpret_cast<uintptr_t*>(&on_add_entity::hooked), reinterpret_cast<void**>(&on_add_entity::original_fn));
 		entity_system.apply(on_remove_entity::index, reinterpret_cast<uintptr_t*>(&on_remove_entity::hooked), reinterpret_cast<void**>(&on_remove_entity::original_fn));
@@ -315,22 +319,42 @@ namespace hooks
 	{
 		CViewRender* view_render = utils::get_context_argument<CViewRender*, 1>(&ctx);
 
+<<<<<<< Updated upstream
 		view_render->m_viewSetup.m_flAspectRatio = 1.2f;
 		view_render->m_viewSetup.nSomeFlags |= 2;
+=======
+		ret(rcx, pos, fov, a3);
+
+		static auto hash = xxh::get_hash("viewmodel_fov");
+		static Convar* viewmodel_fov = cheat::interfaces().cvar->find(hash);
+		*fov = settings::misc::fov_changer ? settings::misc::fov : (viewmodel_fov ? viewmodel_fov->value.as_float : 68.f);
+		
+		if (cheat::interfaces().engine->IsInGame() && settings::misc::bhop)
+		{
+			pos.x += settings::misc::rotation_x == 0 ? 0 : settings::misc::rotation_x;
+			pos.y += settings::misc::rotation_y == 0 ? 0 : settings::misc::rotation_y;
+			pos.z += settings::misc::rotation_z == 0 ? 0 : settings::misc::rotation_z;
+		}
+	}
+
+	void __fastcall onrenderstart::hooked(CViewRender* rcx)
+	{
+		safetyhook.fastcall<void>(rcx);
+>>>>>>> Stashed changes
 	}
 
 	void chams(void* rcx, void* rdx, CSceneData* scene_data, int a4, void* scene_view, void* scene_layer, void* a7, IMaterial* material)
 	{
-		if (!g::engine_client->IsInGame())
+		if (!cheat::interfaces().engine->IsInGame())
 			return;
 
 		static const auto& original_fn = hooks::draw_array_ex::original_fn;
 		
-		CCSPlayerController* local_controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
+		CCSPlayerController* local_controller = cheat::interfaces().entity_system->GetLocalPlayerController<CCSPlayerController*>();
 		if (!local_controller)
 			return;
 
-		CCSPlayerPawn* local_pawn = reinterpret_cast<CCSPlayerPawn*>(g::entity_system->GetEntityFromHandle(local_controller->m_hPawn()));
+		CCSPlayerPawn* local_pawn = reinterpret_cast<CCSPlayerPawn*>(cheat::interfaces().entity_system->GetEntityFromHandle(local_controller->m_hPawn()));
 		if (!local_pawn)
 			return;
 
@@ -338,11 +362,11 @@ namespace hooks
 			return;
 
 		//doesnt really return the material's owner, but C_World entity...
-		auto entity = reinterpret_cast<CCSPlayerController*>(g::entity_system->GetEntityFromHandle(scene_data->scene_object->owner_handle));
+		auto entity = reinterpret_cast<CCSPlayerController*>(cheat::interfaces().entity_system->GetEntityFromHandle(scene_data->scene_object->owner_handle));
 		if (!entity)
 			return;
 
-		auto pawn = reinterpret_cast<CCSPlayerPawn*>(g::entity_system->GetEntityFromHandle(entity->m_hPawn()));
+		auto pawn = reinterpret_cast<CCSPlayerPawn*>(cheat::interfaces().entity_system->GetEntityFromHandle(entity->m_hPawn()));
 		if (!pawn)
 			return;
 		

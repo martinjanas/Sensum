@@ -86,6 +86,5 @@ private:
 
     bool is_attached = false;
 };
-extern inline std::unique_ptr<Console> g_Console = nullptr;
 
 

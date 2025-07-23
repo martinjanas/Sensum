@@ -15,8 +15,8 @@ struct icon_t
         if (!texture)
             return;
         
-        w *= scale;
-        h *= scale;
+        *(float*)w *= scale; //TODO: MJ - if crashing remove casting
+        *(float*)h *= scale;
     }
 };
 

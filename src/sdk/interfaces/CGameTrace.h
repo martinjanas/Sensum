@@ -3,6 +3,7 @@
 #include "../../sdk/math/QAngle.h"
 #include "../../sdk/classes/CBaseEntity.h"
 #include "../../sdk/classes/CCSPlayerPawn.h"
+#include "../../sdk/helpers/modules.h"
 
 enum BuiltInInteractionLayer_t
 {
@@ -422,9 +423,11 @@ struct TraceFilter_t
 	}
 };
 
-class CGameTrace
+class CGameTrace : public Interface
 {
 public:
+	CGameTrace(void* obj, const char* name) : Interface(obj, name) { }
+	
 	bool TraceShape(Ray_t* ray, const Vector& start, const Vector& end, TraceFilter_t* filter, Trace_t* trace)
 	{
 		using fn = bool(__fastcall*)(void*, Ray_t*, const Vector&, const Vector&, TraceFilter_t*, Trace_t*);
@@ -434,7 +437,7 @@ public:
 
 		auto trace_shape = reinterpret_cast<fn>(addr);
 		if (trace_shape)
-			return trace_shape(this, ray, start, end, filter, trace);
+			return trace_shape(this->m_obj, ray, start, end, filter, trace);
 	}
 
 	bool ClipRayToEntity(Ray_t* ray, const Vector& start, const Vector& end, CCSPlayerPawn* skip, TraceFilter_t* filter, Trace_t* trace)
@@ -446,13 +449,13 @@ public:
 
 		auto clip_ray_to_entity = reinterpret_cast<fn>(addr);
 		if (clip_ray_to_entity)
-			return clip_ray_to_entity(this, ray, start, end, skip, filter, trace);
+			return clip_ray_to_entity(this->m_obj, ray, start, end, skip, filter, trace);
 	}
 
 	//TraceRay - index 56
 	/*void TraceRay(const Ray_t& ray, unsigned int fMask, TraceFilter_t* pTraceFilter, Trace_t* pTrace)
 	{
 		GetVirtual<void(__thiscall*)(void*, const Ray_t&, uint32_t mask, TraceFilter_t*, Trace_t*)>(this, 56)(this, ray, fMask, pTraceFilter, pTrace);
-		VTable::GetThiscall<void>(this, 56, ray, fMask, pTraceFilter, pTrace);
+		VTable::GetThiscall<void>(this->m_obj, 56, ray, fMask, pTraceFilter, pTrace);
 	}*/
 };

@@ -1,10 +1,9 @@
 #pragma once
 #include "../../sdk/helpers/netvars.h"
-#include "../../sdk/helpers/vfunc.h"
 #include "../../sdk/classes/CGameSceneNode.h"
-#include "../../sdk/classes/CEntityInstance.h"
 #include "../../sdk/classes/CPlayerGlowProperty.h"
 #include "../../sdk/classes/CHandle.h"
+#include "../../sdk/classes/CEntityInstance.h"
 
 enum LifeState_t : uint8_t
 {

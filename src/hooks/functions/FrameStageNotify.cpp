@@ -2,17 +2,22 @@
 #include "../../sdk/sdk.h"
 #include "../../sdk/classes/CBaseEntity.h"
 #include "../../sdk/helpers/entity_data.h"
+#include "../../sdk/cheat.h"
 
 void skinchanger() //doesnt work
 {
-	if (!g::engine_client->IsInGame())
+	if (!cheat::interfaces().engine->IsInGame())
 		return;
 
-	auto local_controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
+	auto local_controller = cheat::interfaces().entity_system->GetLocalPlayerController<CCSPlayerController*>();
 	if (!local_controller)
 		return;
 
+<<<<<<< Updated upstream
 	auto pawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(local_controller->m_hPlayerPawn()); //local_controller->m_hPlayerPawn().Get<CCSPlayerPawn*>();
+=======
+	auto pawn = cheat::interfaces().entity_system->GetEntityFromHandle<CCSPlayerPawn*>(local_controller->m_hPawn()); //local_controller->m_hPlayerPawn().Get<CCSPlayerPawn*>();
+>>>>>>> Stashed changes
 	if (!pawn)
 		return;
 
@@ -29,10 +34,20 @@ void skinchanger() //doesnt work
 		if (!handle.IsValid())
 			continue;
 			
-		auto weapon = g::entity_system->GetEntityFromHandle<CBasePlayerWeapon*>(handle);
+		auto weapon = cheat::interfaces().entity_system->GetEntityFromHandle<CBasePlayerWeapon*>(handle);
 		if (!weapon)
 			continue;
 
+<<<<<<< Updated upstream
+=======
+		if (weapon->m_iItemDefinitionIndex() != WEAPON_AK47)
+			continue;
+		
+		auto viewmodel_entity = cheat::interfaces().entity_system->GetEntityFromHandle<CBaseEntity*>(viewmodel_services->m_hViewModel());
+		if (!viewmodel_entity)
+			return;
+		
+>>>>>>> Stashed changes
 		weapon->m_AttributeManager().m_Item().m_iItemIDHigh() = -1;
 		weapon->m_AttributeManager().m_Item().m_iItemIDLow() = -1;
 		

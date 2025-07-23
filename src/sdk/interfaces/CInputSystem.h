@@ -369,16 +369,18 @@ enum class ButtonCode : int32_t {
     KeyXStick2Up
 };
 
-class CInputSystem
+class CInputSystem : public Interface
 {
 public:
+    CInputSystem(void* obj, const char* name) : Interface(obj, name) { }
+    
 	bool IsButtonDown(ButtonCode code)
 	{
-        return VTable::GetThiscall<bool>(this, 18, code);
+        return VTable::GetThiscall<bool>(this->m_obj, 18, code);
 	}
 
     ButtonCode VirtualKeyToButtonCode(int vkey)
     {
-        return VTable::GetThiscall<ButtonCode>(this, 44, vkey);
+        return VTable::GetThiscall<ButtonCode>(this->m_obj, 44, vkey);
     }
 };

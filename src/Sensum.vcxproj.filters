@@ -81,9 +81,6 @@
     <ClInclude Include="sdk\helpers\dynamic_module.h">
       <Filter>sdk\helpers</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\helpers\fnv.h">
-      <Filter>sdk\helpers</Filter>
-    </ClInclude>
     <ClInclude Include="sdk\helpers\importer.h">
       <Filter>sdk\helpers</Filter>
     </ClInclude>
@@ -206,7 +203,6 @@
     <ClInclude Include="sdk\helpers\CUtlString.h" />
     <ClInclude Include="sdk\helpers\CUtlTSHash.h" />
     <ClInclude Include="sdk\math\math.h" />
-    <ClInclude Include="sdk\helpers\interfaces.h" />
     <ClInclude Include="sdk\helpers\CUtlVector.h" />
     <ClInclude Include="sdk\interfaces\CInputSystem.h" />
     <ClInclude Include="sdk\hooking\safetyhook\safetyhook.hpp" />
@@ -238,6 +234,16 @@
     <ClInclude Include="sdk\helpers\CUtlBuffer.h" />
     <ClInclude Include="sdk\helpers\CViewRender.h" />
     <ClInclude Include="sdk\helpers\Timer.h" />
+    <ClInclude Include="render\tabs\tabs.h" />
+    <ClInclude Include="sdk\cheat.h" />
+    <ClInclude Include="sdk\helpers\IconFetcher.h" />
+    <ClInclude Include="sdk\helpers\Icons.h" />
+    <ClInclude Include="sdk\helpers\KeyValues.h" />
+    <ClInclude Include="sdk\helpers\xxhash.h" />
+    <ClInclude Include="sdk\helpers\xxh.h" />
+    <ClInclude Include="sdk\interfaces\CMaterialSystem.h" />
+    <ClInclude Include="sdk\interfaces\impl\Interface.h" />
+    <ClInclude Include="sdk\interfaces\impl\interfaces.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\classes\CBaseEntity.cpp">
@@ -324,7 +330,6 @@
     <ClCompile Include="render\render.cpp" />
     <ClCompile Include="sdk\hooking\shadow_vmt\ShadowVMT.cpp" />
     <ClCompile Include="sdk\math\QAngle.cpp" />
-    <ClCompile Include="sdk\helpers\interfaces.cpp" />
     <ClCompile Include="sdk\hooking\safetyhook\safetyhook.cpp" />
     <ClCompile Include="sdk\hooking\safetyhook\Zydis.c" />
     <ClCompile Include="hooks\functions\GetMatricesForView.cpp" />
@@ -344,6 +349,15 @@
     <ClCompile Include="sdk\helpers\config_system.cpp" />
     <ClCompile Include="sdk\helpers\utils.cpp" />
     <ClCompile Include="sdk\helpers\Timer.cpp" />
+    <ClCompile Include="render\tabs\aimbot_tab.cpp" />
+    <ClCompile Include="sdk\helpers\IconFetcher.cpp" />
+    <ClCompile Include="sdk\helpers\KeyValues.cpp" />
+    <ClCompile Include="sdk\helpers\xxhash.c" />
+    <ClCompile Include="sdk\interfaces\CMaterialSystem.cpp" />
+    <ClCompile Include="sdk\interfaces\impl\Interface.cpp" />
+    <ClCompile Include="sdk\interfaces\impl\interfaces.cpp" />
+    <ClCompile Include="sdk\math\math.cpp" />
+    <ClCompile Include="sdk\cheat.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\freetype.lib" />

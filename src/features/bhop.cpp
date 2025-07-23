@@ -1,15 +1,16 @@
 #include "../features/features.h"
+#include "../sdk/cheat.h"
 
 void features::bhop::handle(CUserCmd* cmd)
 {
-    if (!g::engine_client->IsInGame() || !settings::misc::bhop)
+    if (!cheat::interfaces().engine->IsInGame() || !settings::misc::bhop)
         return;
 
-    CCSPlayerController* localplayer = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
+    CCSPlayerController* localplayer = cheat::interfaces().entity_system->GetLocalPlayerController<CCSPlayerController*>();
     if (!localplayer)
         return;
 
-    CCSPlayerPawn* localpawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(localplayer->m_hPawn());
+    CCSPlayerPawn* localpawn = cheat::interfaces().entity_system->GetEntityFromHandle<CCSPlayerPawn*>(localplayer->m_hPawn());
     if (!localpawn)
         return;
 

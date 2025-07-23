@@ -6,15 +6,14 @@
 
 DWORD __stdcall on_attach(void* base)
 {
-    g_Console = std::make_unique<Console>();
-    
 #if defined(_DEBUG) || defined(RELEASE_CONSOLE)
-    g_Console->attach();
+    cheat::console().attach();
 #endif
 
     sdk::init_modules();
-    sdk::init_interfaces();
-
+    cheat::interfaces().init();
+    cheat::interfaces().print_status();
+    
     if (!modules::nav_system.base)
         Sleep(50);
     
@@ -27,7 +26,7 @@ DWORD __stdcall on_attach(void* base)
     hooks::detach();
 
 #if defined(_DEBUG) || defined(RELEASE_CONSOLE)
-    g_Console->detach();
+    cheat::console().detach();
 #endif
 
     FreeLibraryAndExitThread(static_cast<HMODULE>(base), EXIT_SUCCESS);

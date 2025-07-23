@@ -3,9 +3,11 @@
 #include "../../sdk/helpers/vfunc.h"
 
 //Actual type: C_CSGameRules
-class CGameRules
+class CGameRules : public Interface
 {
 public:
+	CGameRules(void* obj, const char* name) : Interface(obj, name) { }
+	
 	NETVAR(bool, m_bFreezePeriod, "C_CSGameRules", "m_bFreezePeriod");
 	NETVAR(bool, m_bWarmupPeriod, "C_CSGameRules", "m_bWarmupPeriod");
 	NETVAR(bool, m_bBombPlanted, "C_CSGameRules", "m_bBombPlanted");

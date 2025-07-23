@@ -318,3 +318,4 @@ public:
 	char pad_0624[0x4]; //0x0624
 	void* message;//c_cs_input_message* message; //0x0628
 };
+

@@ -103,7 +103,7 @@ public:
 	{
 		this->addr = pattern_scan(signature.data());
 		if (!this->addr)
-			g_Console->println("PatternScanner: %s not found\n", sig_name.data());
+			cheat::console().println("PatternScanner: %s not found\n", sig_name.data());
 
 		return *this;
 	}
@@ -207,7 +207,7 @@ public:
 		auto it = sigmap.find(hash);
 		if (it != sigmap.end())
 			return it->second;
-		else g_Console->println("hash not found in sigmap: %s", func_name);
+		else cheat::console().println("hash not found in sigmap: %s", func_name);
 	}
 
 private:

@@ -11,6 +11,7 @@
 #include "../helpers/CUtlVector.h"
 #include "../helpers/CUtlMap.h"
 #include "../helpers/vfunc.h"
+#include "../interfaces/impl/Interface.h"
 
 // Copyright (C) 2023 neverlosecc
 // See end of file for extended copyright information.
@@ -779,7 +780,7 @@ enum SchemaTypeScope_t : std::uint8_t
     SCHEMA_TYPESCOPE_DEFAULT,
 };
 
-class CSchemaSystem 
+class CSchemaSystem
 {
 public:
     [[nodiscard]] CSchemaSystemTypeScope* GlobalTypeScope(void) 
@@ -823,7 +824,7 @@ public:
 
     /*[[nodiscard]] std::string GetScopedNameForEnum(CSchemaEnumBinding* pBinding) {
         static CBufferStringGrowable<1024> szBuf;
-        GetVirtual<const char* (__thiscall*)(void*, CSchemaEnumBinding*, CBufferString*)>(this, 19)(this, pBinding, &szBuf);
+        GetVirtual<const char* (__thiscall*)(void*, CSchemaEnumBinding*, CBufferString*)>(this->m_obj, 19)(this, pBinding, &szBuf);
         return szBuf.Get();
     }*/
 
@@ -902,6 +903,91 @@ private:
     std::int32_t m_nRedundant = 0; // 0x02C8
     std::size_t m_nIgnoredBytes = 0; // 0x02CC
 };
+
+class SchemaSystemInterface : public Interface
+{
+public:
+	SchemaSystemInterface(void* ptr, const char* name) : Interface(ptr, name) { }
+
+	[[nodiscard]] CSchemaSystemTypeScope* GlobalTypeScope()
+	{
+		auto schema = static_cast<CSchemaSystem*>(m_obj);
+		return schema->GlobalTypeScope();
+	}
+
+	[[nodiscard]] CSchemaSystemTypeScope* FindTypeScopeForModule(std::string_view moduleName)
+	{
+		auto schema = static_cast<CSchemaSystem*>(m_obj);
+		return schema->FindTypeScopeForModule(moduleName);
+	}
+
+	[[nodiscard]] CSchemaSystemTypeScope* GetTypeScopeForBinding(SchemaTypeScope_t scope, std::string_view binding)
+	{
+		auto schema = static_cast<CSchemaSystem*>(m_obj);
+		return schema->GetTypeScopeForBinding(scope, binding);
+	}
+
+	[[nodiscard]] CSchemaClassBinding* FindClassByScopedName(std::string_view scopedName)
+	{
+		auto schema = static_cast<CSchemaSystem*>(m_obj);
+		return schema->FindClassByScopedName(scopedName);
+	}
+
+	[[nodiscard]] CSchemaEnumBinding* FindEnumByScopedName(std::string_view scopedName)
+	{
+		auto schema = static_cast<CSchemaSystem*>(m_obj);
+		return schema->FindEnumByScopedName(scopedName);
+	}
+
+	[[nodiscard]] const char* GetClassInfoBinaryName(CSchemaClassBinding* binding)
+	{
+		auto schema = static_cast<CSchemaSystem*>(m_obj);
+		return schema->GetClassInfoBinaryName(binding);
+	}
+
+	[[nodiscard]] const char* GetClassProjectName(CSchemaClassBinding* binding)
+	{
+		auto schema = static_cast<CSchemaSystem*>(m_obj);
+		return schema->GetClassProjectName(binding);
+	}
+
+	[[nodiscard]] const char* GetEnumBinaryName(CSchemaEnumBinding* binding)
+	{
+		auto schema = static_cast<CSchemaSystem*>(m_obj);
+		return schema->GetEnumBinaryName(binding);
+	}
+
+	[[nodiscard]] const char* GetEnumProjectName(CSchemaEnumBinding* binding)
+	{
+		auto schema = static_cast<CSchemaSystem*>(m_obj);
+		return schema->GetEnumProjectName(binding);
+	}
+
+	[[nodiscard]] CSchemaClassBinding* ValidateClasses(CSchemaClassBinding** ppBinding)
+	{
+		auto schema = static_cast<CSchemaSystem*>(m_obj);
+		return schema->ValidateClasses(ppBinding);
+	}
+
+	[[nodiscard]] bool IsSchemaSystemReady()
+	{
+		auto schema = static_cast<CSchemaSystem*>(m_obj);
+		return schema->IsSchemaSystemReady();
+	}
+
+	void PrintSchemaStats()
+	{
+		auto schema = static_cast<CSchemaSystem*>(m_obj);
+		schema->PrintSchemaStats();
+	}
+
+	void PrintSchemaMetaStats(const char* options)
+	{
+		auto schema = static_cast<CSchemaSystem*>(m_obj);
+		schema->PrintSchemaMetaStats(options);
+	}
+};
+
 
 // source2gen - Source2 games SDK generator
 // Copyright 2023 neverlosecc

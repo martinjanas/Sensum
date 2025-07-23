@@ -7,6 +7,7 @@
 #include "../classes/CGrenadeProjectile.h"
 #include <queue>
 #include "../../render/render.h"
+#include "../cheat.h"
 
 namespace entity_data
 {
@@ -187,7 +188,7 @@ namespace entity_data
 			if (hitbox.visible)
 				continue;
 
-			g::engine_trace->TraceShape(&ray, local_pawn->GetEyePos(), hitbox.hitbox_pos, &filter, &trace);
+			cheat::interfaces().engine_trace->TraceShape(&ray, local_pawn->GetEyePos(), hitbox.hitbox_pos, &filter, &trace);
 
 			if (!trace.m_pHitEntity || trace.m_pHitEntity == local_pawn || !trace.m_pHitEntity->IsPawn())
 				continue;
@@ -254,16 +255,16 @@ namespace entity_data
 
 	void fetch_player_data()
 	{
-		if (!g::engine_client->IsInGame())
+		if (!cheat::interfaces().engine->IsInGame())
 			return;
 	
 		std::lock_guard<std::mutex> lock(player_locker);
 
-		const auto& local_controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
+		const auto& local_controller = cheat::interfaces().entity_system->GetLocalPlayerController<CCSPlayerController*>();
 		if (!local_controller)
 			return;
 
-		CCSPlayerPawn* localpawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(local_controller->m_hPawn());
+		CCSPlayerPawn* localpawn =cheat::interfaces().entity_system->GetEntityFromHandle<CCSPlayerPawn*>(local_controller->m_hPawn());
 		if (!localpawn)
 		{
 			destroy();
@@ -273,7 +274,7 @@ namespace entity_data
 		bool is_localpawn_spectating = !localpawn->IsAlive() && localpawn->m_pObserverServices();
 		if (is_localpawn_spectating)
 		{
-			const auto& observer_controller = g::entity_system->GetEntityFromHandle<CCSPlayerController*>(localpawn->m_pObserverServices()->m_hObserverTarget());
+			const auto& observer_controller = cheat::interfaces().entity_system->GetEntityFromHandle<CCSPlayerController*>(localpawn->m_pObserverServices()->m_hObserverTarget());
 			if (!observer_controller)
 				return;
 
@@ -304,8 +305,8 @@ namespace entity_data
 			if (!controller->m_hPawn().IsValid())
 				continue;
 
-			const auto& pawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(controller->m_hPawn());
-			if (!pawn || !pawn->IsAlive() || pawn->m_bGunGameImmunity() || pawn == localpawn || (!g::game_type->IsDeathmatch() && pawn->m_iTeamNum() == local_team))
+			const auto& pawn = cheat::interfaces().entity_system->GetEntityFromHandle<CCSPlayerPawn*>(controller->m_hPawn());
+			if (!pawn || !pawn->IsAlive() || pawn->m_bGunGameImmunity() || pawn == localpawn || (!cheat::interfaces().game_type->IsDeathmatch() && pawn->m_iTeamNum() == local_team))
 				continue;
 
 			const auto& hitbox_set = pawn->GetHitboxSet(0);
@@ -321,7 +322,7 @@ namespace entity_data
 			if (!active_wpn_handle.IsValid())
 				continue;
 
-			const auto& active_wpn = g::entity_system->GetEntityFromHandle<CBasePlayerWeapon*>(active_wpn_handle); //weapon_services->m_hActiveWeapon().Get<CBasePlayerWeapon*>();
+			const auto& active_wpn = cheat::interfaces().entity_system->GetEntityFromHandle<CBasePlayerWeapon*>(active_wpn_handle); //weapon_services->m_hActiveWeapon().Get<CBasePlayerWeapon*>();
 			const auto& collision = pawn->m_pCollision();
 			const auto& skeleton_instance = scene_node->GetSkeletonInstance();
 			if (!active_wpn || !collision || !skeleton_instance)
@@ -393,7 +394,7 @@ namespace entity_data
 	{
 		static float expire_time = 21.f;
 		auto spawn_time = (float)TICKS_TO_TIME(data.m_nSmokeEffectTickBegin);
-		float total_time_alive = g::global_vars->m_curtime - spawn_time;
+		float total_time_alive =cheat::interfaces().global_vars->m_curtime - spawn_time;
 					
 		float time_remaining = expire_time - total_time_alive;
 		time_remaining = std::clamp(time_remaining, 0.f, 21.f);
@@ -403,7 +404,7 @@ namespace entity_data
 	
 	void fetch_entity_info()
 	{
-		if (!g::engine_client->IsInGame())
+		if (!cheat::interfaces().engine->IsInGame())
 			return;
 
 		std::lock_guard<std::mutex> lock(entity_locker);

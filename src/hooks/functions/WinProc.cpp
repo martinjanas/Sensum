@@ -10,7 +10,7 @@ namespace hooks
     {
         if (msg == WM_CLOSE)
         {
-            g_Console->save_log();
+            cheat::console().save_log();
             Sleep(500);
         }
 

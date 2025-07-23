@@ -9,6 +9,7 @@
 #include "../sdk/sdk.h"
 #include "../sdk/helpers/Timer.h"
 #include "../sdk/helpers/utils.h"
+#include "../sdk/cheat.h"
 
 #define TIME_TO_TICKS( dt )	( ( int )( 0.5f + ( float )( dt ) / 0.015625 ) )
 #define TICKS_TO_TIME(t) ( 0.015625 * (t) )
@@ -195,7 +196,7 @@ namespace features::aimbot
             QAngle output = viewangles.linear_smooth(compensated_angle, 1.1f);
             output.normalize_clamp();
 
-            g::client->SetViewAngles(output);
+            cheat::interfaces().client->SetViewAngles(output);
         }
         else
         {
@@ -211,7 +212,7 @@ namespace features::aimbot
         
     void handle(CUserCmd* cmd)
     {
-        if (!g::engine_client->IsInGame())
+        if (!cheat::interfaces().engine->IsInGame())
             return;
 
         std::lock_guard<std::mutex> lock(entity_data::player_locker);
@@ -220,16 +221,16 @@ namespace features::aimbot
         if (!entity_data::player_entry_data.empty())
             std::copy(entity_data::player_entry_data.front().player_data.begin(), entity_data::player_entry_data.front().player_data.end(), std::back_inserter(m_player_data));
         
-        CCSPlayerController* localplayer = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
+        CCSPlayerController* localplayer = cheat::interfaces().entity_system->GetLocalPlayerController<CCSPlayerController*>();
         if (!localplayer)
             return;
 
-        CCSPlayerPawn* localpawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(localplayer->m_hPlayerPawn());  //localplayer->m_hPlayerPawn().Get<CCSPlayerPawn*>();
+        CCSPlayerPawn* localpawn = cheat::interfaces().entity_system->GetEntityFromHandle<CCSPlayerPawn*>(localplayer->m_hPlayerPawn());  //localplayer->m_hPlayerPawn().Get<CCSPlayerPawn*>();
         if (!localpawn)
             return;
             
         QAngle viewangles;
-        g::client->GetViewAngles(&viewangles);
+        cheat::interfaces().client->GetViewAngles(&viewangles);
 
         const auto eye_pos = localpawn->GetEyePos();
             
@@ -241,7 +242,7 @@ namespace features::aimbot
         if (!active_wpn_handle.IsValid())
             return;
 
-        auto active_wpn = reinterpret_cast<CBasePlayerWeapon*>(g::entity_system->GetEntityFromHandle(active_wpn_handle));
+        auto active_wpn = reinterpret_cast<CBasePlayerWeapon*>(cheat::interfaces().entity_system->GetEntityFromHandle(active_wpn_handle));
         if (!active_wpn)
             return;
 
@@ -268,7 +269,7 @@ namespace features::aimbot
             if (next_attack_tick <= localplayer->m_nTickBase() && !active_wpn->IsSniper()) //temp fix
                 continue;
 
-            //g_Console->println("[ %s ]: fov: %.1f, dist: %.1f", target.name, target.fov, target.distance);
+            //core::console().println("[ %s ]: fov: %.1f, dist: %.1f", target.name, target.fov, target.distance);
             
             if (!(cmd->nButtons.nValue & IN_ATTACK))
                 continue;
@@ -288,7 +289,7 @@ namespace features::aimbot
             float t = elapsed_time / weapon_config.smooth_time;
             t = std::clamp(t, 0.0f, 1.0f);
 
-            //g_Console->println("t: %.2f, elapsed_time: %.2f", t, elapsed_time);
+            //core::console().println("t: %.2f, elapsed_time: %.2f", t, elapsed_time);
 
             QAngle rcs_delta = target.target_angle - viewangles;
             rcs_delta.normalize_clamp();
@@ -304,7 +305,7 @@ namespace features::aimbot
                 
             smoothed_angle.normalize_clamp();
                 
-            g::client->SetViewAngles(smoothed_angle);
+            cheat::interfaces().client->SetViewAngles(smoothed_angle);
             
             if (t >= 1.0f)
                 timer.reset();

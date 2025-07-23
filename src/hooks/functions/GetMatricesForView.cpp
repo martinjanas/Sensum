@@ -1,17 +1,18 @@
 #include "../hooks.h"
+#include "../../sdk/cheat.h"
 #include "../../sdk/helpers/entity_data.h"
 #include "../../sdk/helpers/utils.h"
 
 static void get_viewmatrix(VMatrix* viewmatrix)
 {
-	if (!g::engine_client->IsInGame())
+	if (!cheat::interfaces().engine->IsInGame())
 		return;
 	
-	CCSPlayerController* controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
+	CCSPlayerController* controller = cheat::interfaces().entity_system->GetLocalPlayerController<CCSPlayerController*>();
 	if (!controller)
 		return;
 
-	auto pawn = reinterpret_cast<CCSPlayerPawn*>(g::entity_system->GetEntityFromHandle(controller->m_hPawn()));
+	auto pawn = reinterpret_cast<CCSPlayerPawn*>(cheat::interfaces().entity_system->GetEntityFromHandle(controller->m_hPawn()));
 	if (!pawn)
 		return;
 

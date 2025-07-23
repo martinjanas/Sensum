@@ -5,27 +5,7 @@
 #include <d3d11.h>
 #include <future>
 
-#include "../sdk/helpers/interfaces.h"
-
-void print_status(const char* name, void* ptr)
-{
-	auto remove_leading_zeros = [](const std::string& input) -> std::string
-	{
-		size_t start = input.find_first_not_of("0x");
-		if (start != std::string::npos)
-			return "0x" + input.substr(start);
-
-		return "0x0";
-	};
-
-	std::string ptr_str = std::format("{:p}", ptr);
-
-	std::string str = std::format("{:s}: {:s}", name, remove_leading_zeros(ptr_str));
-
-	g_Console->println(str.c_str());
-}
-
-#define print_status(name) print_status(#name, name)
+#include "cheat.h"
 
 namespace sdk
 {
@@ -92,6 +72,7 @@ namespace sdk
 
 		scan_and_cache_sigs();
 	}
+<<<<<<< Updated upstream
 
 	void validate_interfaces_on_map_load()
 	{
@@ -171,5 +152,7 @@ namespace interfaces
 	CHudChat* hud_chat{};
 	CGameRules* game_rules{};
 	CMaterialSystem* mat_system{};
+=======
+>>>>>>> Stashed changes
 }
 
