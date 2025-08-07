@@ -10,13 +10,13 @@ class CSource2Client
 public:
 	void GetViewAngles(QAngle* vec)
 	{
-		VTable::GetThiscall<void>(this, 77, 0, vec);
+		VTable::GetThiscall<void>(this, 77, 0, vec); //Possibly outdated index? (unable to find anything in CSource2Client close to my xrefs)
 	}
 
 	void SetViewAngles(QAngle& vec)
 	{
 		vec.normalize_clamp();
-		VTable::GetThiscall<void>(this, 78, 0, vec);
+		VTable::GetThiscall<void>(this, 78, 0, vec); //Possibly outdated index? (unable to find anything in CSource2Client close to my xrefs)
 	}
 
 	//bool TraceRay(const Vector& vecAbsStart, const Vector& vecAbsEnd, CTraceFilter* filter, Trace_t* trace)

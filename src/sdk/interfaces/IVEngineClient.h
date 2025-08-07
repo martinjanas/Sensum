@@ -36,39 +36,39 @@ public:
 
     bool IsInGame()
     {
-        return VTable::GetThiscall<bool>(this, 35);
+        return VTable::GetThiscall<bool>(this, 37); //was 35
     }
 
     bool IsConnected()
     {
-        return VTable::GetThiscall<bool>(this, 36);
+        return VTable::GetThiscall<bool>(this, 38); //was 36
     }
 
     void ExecuteClientCmd(const char* cmd)
     {
-        VTable::GetThiscall<void>(this, 45, 0, cmd, 0x7FFEF001);
+        VTable::GetThiscall<void>(this, 47, 0, cmd, 0x7FFEF001); //was 45
     }
 
     int GetLocalPlayer()
     {
         int index = -1;
-        VTable::GetThiscall<void>(this, 49, std::ref(index), 0);
+        VTable::GetThiscall<void>(this, 51, std::ref(index), 0); //was 49
 
         return index + 1;
     }
 
     void GetScreenSize(int& width, int& height)
     {
-        VTable::GetThiscall<void>(this, 53, std::ref(width), std::ref(height)); //55 if returning nonsense values
+        VTable::GetThiscall<void>(this, 53, std::ref(width), std::ref(height)); //55 if returning nonsense values; Edit 2024-08-07: 57?
     }
 
     const char* GetLevelName()
     {
-        return VTable::GetThiscall<const char*>(this, 58);
+        return VTable::GetThiscall<const char*>(this, 60); //was 58
     }
 
     const char* GetLevelNameShort()
     {
-        return VTable::GetThiscall<const char*>(this, 59);
+        return VTable::GetThiscall<const char*>(this, 61); //was 59
     }
 };

@@ -80,8 +80,8 @@ void __fastcall hooks::frame_stage_notify::hooked(void* rcx, EClientFrameStage s
 	case FRAME_NET_FULL_FRAME_UPDATE_ON_REMOVE:
 		break;
 	}
-	
-	skinchanger();
+
+	//skinchanger();
 	
 	original_fn(rcx, stage);
 }

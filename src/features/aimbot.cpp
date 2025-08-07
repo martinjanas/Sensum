@@ -250,7 +250,7 @@ namespace features::aimbot
             return;
         
         weapon_config = settings::aimbot::weapon_configs[active_wpn->m_iItemDefinitionIndex()];
-        
+
         bool in_fov = false;
         for (auto& target : targets)
         {

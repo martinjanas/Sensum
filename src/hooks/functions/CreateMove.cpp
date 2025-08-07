@@ -149,7 +149,12 @@ void __fastcall hooks::createmove_csgoinput::hooked(void* rcx, int slot, bool ac
     
     entity_data::fetch_player_data();
     entity_data::fetch_entity_info();
-    
+
+    /*if (g::global_vars)
+    {
+        g_Console->println("frametime: %.4f, frametime2: %.4f", g::global_vars->m_frametime, g::global_vars->m_frametime2);
+    }*/
+
     if (g_cmd && g_cmd->csgoUserCmd.pBaseCmd && g_cmd->csgoUserCmd.pBaseCmd->nWeaponSelect == 0)
     {
         features::aimbot::handle(g_cmd);
@@ -162,7 +167,7 @@ bool __fastcall hooks::createmove_csgoinput21::hooked(void* rcx, int slot, CUser
 {
     g_cmd = cmd;
 
-    features::bhop::handle(cmd);
+    //features::bhop::handle(cmd);
 
     if (cmd && cmd->csgoUserCmd.pBaseCmd)
     {
