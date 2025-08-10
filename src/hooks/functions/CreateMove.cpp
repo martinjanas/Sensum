@@ -148,7 +148,7 @@ void __fastcall hooks::createmove_csgoinput::hooked(void* rcx, int slot, bool ac
         original_fn(rcx, slot, active);
     
     entity_data::fetch_player_data();
-    entity_data::fetch_entity_info();
+    //entity_data::fetch_entity_info();
 
     /*if (g::global_vars)
     {

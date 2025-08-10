@@ -68,7 +68,7 @@ namespace hooks
 
 	struct on_add_entity
 	{
-		static const int index = 15;
+		static const int index = 16;
 		using fn = CEntityInstance*(__thiscall*)(void*, CEntityInstance*, CHandle);
 		static CEntityInstance* __fastcall hooked(void* rcx, CEntityInstance* instance, CHandle handle);
 
@@ -77,7 +77,7 @@ namespace hooks
 
 	struct on_remove_entity
 	{
-		static const int index = 16;
+		static const int index = 17;
 		using fn = CEntityInstance * (__thiscall*)(void*, CEntityInstance*, CHandle);
 		static CEntityInstance* __fastcall hooked(void* rcx, CEntityInstance* instance, CHandle  handle);
 

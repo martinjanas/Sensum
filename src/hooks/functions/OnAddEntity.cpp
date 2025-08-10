@@ -9,6 +9,13 @@ CEntityInstance* __fastcall hooks::on_add_entity::hooked(void* rcx, CEntityInsta
     {
         if (instance->IsController())
         {
+            auto info = instance->GetSchemaClassInfo();
+            if (info)
+            {
+                auto name = info->m_pszName;
+                g_Console->println("name: %s", name);
+            }
+
             bool exists = std::any_of(entity_data::player_instances.begin(), entity_data::player_instances.end(), [&](const entity_data::EntityInstance_t& e) { return e.handle.GetEntryIndex() == handle.GetEntryIndex(); });
 
             if (!exists)

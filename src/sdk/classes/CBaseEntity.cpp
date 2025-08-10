@@ -67,9 +67,9 @@ int CBaseEntity::HitboxToWorldTransform(HitboxSet_t* hitbox_set, Transform_t* ou
         return hitbox_to_world_transform(this, hitbox_set, out_transform, 1024);
 }
 
-int CBaseEntity::EmitSound(EmitSound_t& params, const char* sound_name, float sound_time)
+int CBaseEntity::EmitSound(EmitSound_t& params, const char* sound_name)
 {
-    using fn = int(__thiscall*)(void*, EmitSound_t&, const char*, float);
+    using fn = int(__thiscall*)(void*, EmitSound_t&, const char*);
     static auto hash = xxh::get_hash("CBaseEntity::EmitSound");
     static auto addr = modules::client.get_sig(hash, __FUNCTION__).as();
     if (!addr)
@@ -77,5 +77,5 @@ int CBaseEntity::EmitSound(EmitSound_t& params, const char* sound_name, float so
 
     auto emit_sound = reinterpret_cast<fn>(addr);
     if (emit_sound)
-        return emit_sound(this, params, sound_name, 0.0f);
+        return emit_sound(this, params, sound_name);
 }

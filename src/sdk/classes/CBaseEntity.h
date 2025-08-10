@@ -112,7 +112,7 @@ public:
     std::uint32_t GetOwnerHandle();
     HitboxSet_t* GetHitboxSet(int i);
     int HitboxToWorldTransform(HitboxSet_t* hitbox_set, Transform_t* out_transform);
-    int EmitSound(EmitSound_t& params, const char* sound_name, float sound_time);
+    int EmitSound(EmitSound_t& params, const char* sound_name);
 };
 
 

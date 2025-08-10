@@ -44,31 +44,32 @@ namespace sdk
 
 		//todo: fix render_system sig
 		//futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::directx11, "66 0F 7F 0D ? ? ? ? 48 8B F7 66 0F 7F 05", "g::render_system", 0x4, true));
+		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::directx11, "48 89 2D ? ? ? ? 48 89 2D ? ? ? ? 48 C7 05 ? ? ? ? ? ? ? ? C7 05 ? ? ? ? ? ? ? ? 89 2D", "g::render_system", 0x3, true));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 8B 05 ?? ?? ?? ?? 44 8B B7 ?? ?? ?? ?? 8B 70 04 B8 ?? ?? ?? ??", "g::global_vars", 0x3, true));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 8B 0D ? ? ? ? 48 8D 55 ? 66 89 44 24", "g::engine_trace", 0x3, true));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 8D 3D ? ? ? ? 48 8D 35 ? ? ? ? 90", "g::clientmode_csnormal", 0x3, true));
-		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 8B 0D ?? ?? ?? ?? 48 85 C9 74 16 48 8B 01 44 8B C2", "g::game_rules", 0x3, true));
+		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 8B 0D ?? ?? ?? ?? 48 85 C9 74 16 48 8B 01 45 8B C8", "g::game_rules", 0x3, true));
 		
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 08 48 89 74 24 10 57 48 81 EC 40 01 00 00 8B DA 48 8B F9 E8 ?? ?? ?? ??", "CBaseEntity::GetHitboxSet", 0, false));
 
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 18 55 56 57 41 56 41 57 48 83 EC 20 41", "CBaseEntity::HitboxToWorldTransform", 0, false));
-		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 8B C4 48 89 58 10 48 89 70 20 55 57 41 56 48 8D A8 08", "CBaseEntity::EmitSound", 0, false));
+		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 8B C4 48 89 58 10 48 89 70 20 55 57 41 56", "CBaseEntity::EmitSound", 0, false));
 		
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "85 D2 78 16 3B 91", "CModel::GetBoneFlags", 0, false));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "E8 ? ? ? ? 41 0F 10 14 3F", "CModel::GetBoneParent", 0x1, true));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "85 D2 78 25 3B 91", "CModel::GetBoneName", 0, false));
 		
-		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "40 55 48 83 EC 20 48 83 3D ? ? ? ? ?", "globals::FindHudElement", 0, false));
+		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "4C 8B DC 53 48 83 EC 50 48 8B 05", "globals::FindHudElement", 0, false));
 
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 20 48 89 4C 24 08 55 57", "CGameTrace::TraceShape", 0, false));
-		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 48 89 7C 24 20 41 54 41 56 41 57 48 81 EC C0 00 00 00 48 8B 9C", "CGameTrace::ClipRayToEntity", 0, false));
+		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 8B C4 48 89 58 20 48 89 48 08 55 56 57 41 54", "CGameTrace::ClipRayToEntity", 0, false));
 		
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "E8 ? ? ? ? 48 81 4B ? ? ? ? ? 48 8D 05 ? ? ? ?", "TraceFilter_t::InitEntitiesOnly", 0x1, true));
 		
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "E8 ? ? ? ? 0F 28 F8 44 0F 28 54 24 ?", "IsInSmoke", 0x1, true));
 		
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 18 55 56 57 48 81 EC 90", "SerializePartialToArray", 0, false));
-		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 10 48 89 6C 24 18 48 89 7C 24 20 41 56 48 83 EC 20 48 BF", "WriteMessage", 0, false));
+		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "E8 ? ? ? ? 0F 10 4D 18", "WriteMessage", 0x1, true));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 20 55 56 57 48 83 EC 30 49", "SetMessageData", 0, false));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8D 99 ? ? ? ? 48 8B 71", "SetMeshGroupMask", 0, false));
 		
@@ -101,7 +102,7 @@ namespace sdk
 	void validate_interfaces_on_map_load()
 	{
 		g::global_vars = *modules::client.get_sig(xxh::get_hash("g::global_vars")).as<CGlobalVarsBase**>();
-		//g::game_rules = *modules::client.get_sig(xxh::get_hash("g::game_rules")).as<CGameRules**>();
+		g::game_rules = *modules::client.get_sig(xxh::get_hash("g::game_rules")).as<CGameRules**>();
 	}
 
 	void invalidate_interfaces_on_map_unload()
@@ -122,11 +123,11 @@ namespace sdk
 		g::cvar = modules::tier0.get_interface_from_list<IVEngineCVar*>("VEngineCvar007");
 
 		g::csgo_input = modules::client.get_sig(xxh::get_hash("g::csgo_input")).as<CSGOInput*>();
-		//g::render_system = **modules::directx11.get_sig(xxh::get_hash("g::render_system")).as<CRenderSystem***>();
+		g::render_system = **modules::directx11.get_sig(xxh::get_hash("g::render_system")).add(0x8).as<CRenderSystem***>();
 		g::global_vars = *modules::client.get_sig(xxh::get_hash("g::global_vars")).as<CGlobalVarsBase**>();
 		g::engine_trace = *modules::client.get_sig(xxh::get_hash("g::engine_trace")).as<CGameTrace**>();
 		g::client_mode_csnormal = modules::client.get_sig(xxh::get_hash("g::clientmode_csnormal")).as<CClientModeCSNormal*>();
-		//g::game_rules = *modules::client.get_sig(xxh::get_hash("g::game_rules")).as<CGameRules**>();
+		g::game_rules = *modules::client.get_sig(xxh::get_hash("g::game_rules")).as<CGameRules**>();
 		g::mat_system = modules::materialsys.get_interface_from_list<CMaterialSystem*>("VMaterialSystem2_001");
 
 		g::entity_system = g::game_resource_service->GetEntitySystem();
@@ -134,7 +135,7 @@ namespace sdk
 		g::mem_alloc = modules::tier0.get_export("g_pMemAlloc").as<IMemAlloc*>();
 		mem_alloc_in::mem_alloc = modules::tier0.get_export("g_pMemAlloc").as<IMemAlloc*>();
 
-		//g::hud_chat = *reinterpret_cast<CHudChat**>(globals::find_hud_element("HudChatDelegate"));
+		g::hud_chat = *reinterpret_cast<CHudChat**>(globals::find_hud_element("HudChatDelegate"));
 
 		print_status(g::engine_client);
 		print_status(g::client);

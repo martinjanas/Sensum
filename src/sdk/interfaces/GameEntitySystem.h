@@ -55,17 +55,17 @@ public:
 
 	CEntityInstance* FindEntityByName(const char* name)
 	{
-		return VTable::GetThiscall<CEntityInstance*>(this, 12, name); //probably outdated index? +1 ?
+		return VTable::GetThiscall<CEntityInstance*>(this, 13, name);
 	}
 
 	CEntityInstance* OnAddEntity(CEntityInstance* entity_instance, void* handle)
 	{
-		return VTable::GetThiscall<CEntityInstance*>(this, 15, entity_instance, handle);
+		return VTable::GetThiscall<CEntityInstance*>(this, 16, entity_instance, handle);
 	}
 
 	CEntityInstance* OnRemoveEntity(CEntityInstance* entity_instance, void* handle)
 	{
-		return VTable::GetThiscall<CEntityInstance*>(this, 16, entity_instance, handle);
+		return VTable::GetThiscall<CEntityInstance*>(this, 17, entity_instance, handle);
 	}
 
 	int GetHighestEntityIndex()

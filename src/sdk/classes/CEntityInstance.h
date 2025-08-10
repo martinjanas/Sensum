@@ -3,16 +3,27 @@
 #include "../../sdk/interfaces/SchemaSystem.h"
 #include "../helpers/xxh.h"
 //#include "../../sdk/classes/CHandle.h"
+#include "../helpers/console.h"
 
 class CEntityInstance
 {
 public:
     NETVAR(CEntityIdentity*, m_pEntity, "CEntityInstance", "m_pEntity");
 
-    SchemaClassInfoData_t* GetSchemaClassInfo()
+    // @ida xref
+    /*__int64 __fastcall GetSchemaClassInfo(__int64 a1, __int64 a2)
+    {
+        __int64 v2; // rbx
+
+        v2 = a2;
+        nullsub_423();
+        unknown_libname_916(v2, &unk_181B290A0);
+        return v2;
+    }*/
+    SchemaClassInfoData_t* GetSchemaClassInfo() //GetSchemaClassInfo is the last function in the CEntityInstance vtable.
     {
         SchemaClassInfoData_t* pClassInfo = nullptr;
-        VTable::GetThiscall<void>(this, 38, &pClassInfo);
+        VTable::GetThiscall<void>(this, 42, &pClassInfo);
 
         return pClassInfo;
     }
@@ -39,10 +50,11 @@ public:
         return 0;
     }
 
-    bool IsController()
+    //TODO: Update Schema related classes, looks like m_baseClasses no longer work properly?
+    bool IsController() //Looks like schema classes are outdated or smth, cant reliably determine entity type;
     {
         static auto class_hash = xxh::get_hash("CBasePlayerController");
-        
+
         //CCSPlayerController : CBasePlayerController : C_BaseEntity
         const auto& class_two_hash = GetClassNameHash<2>();
         return class_two_hash == class_hash;
