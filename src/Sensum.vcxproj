@@ -297,9 +297,6 @@
   <ItemGroup>
     <ClCompile Include="render\tabs\aimbot_tab.cpp" />
     <ClCompile Include="sdk\helpers\config_system.cpp" />
-    <ClCompile Include="features\aimbot.cpp" />
-    <ClCompile Include="features\bhop.cpp" />
-    <ClCompile Include="features\esp.cpp" />
     <ClCompile Include="hooks\functions\GetMatricesForView.cpp" />
     <ClCompile Include="hooks\functions\LevelInit.cpp" />
     <ClCompile Include="hooks\functions\LevelShutdown.cpp" />

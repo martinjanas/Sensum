@@ -111,9 +111,6 @@ namespace hooks
 			
 			menu::modulate_window_alpha();
 			menu::draw();
-			
-			features::esp::render();
-			features::esp::render_entities();
 		}
 		ImGui::EndFrame();
 		ImGui::Render();
