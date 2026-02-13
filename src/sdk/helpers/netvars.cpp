@@ -1,5 +1,4 @@
 #include <vector>
-
 #include "Netvars.h"
 #include "../sdk.h"
 
@@ -15,14 +14,10 @@ namespace netvars
             if (!netvar_class)
                 continue;
 
-            CUtlTSHash<SchemaClassInfoData_t*> classes = netvar_class->GetClassBindings();
+            auto classes = netvar_class->GetClassBindings();
             for (const auto& class_binding : classes.GetElements())
             {
-                const char* lookup_name = class_binding->m_pszName;
-                if (!lookup_name)
-                    continue;
-
-                SchemaClassInfoData_t* class_info = netvar_class->FindDeclaredClass(lookup_name);
+                SchemaClassInfoData_t* class_info = netvar_class->FindDeclaredClass(class_binding->m_pszName);
 
                 for (auto j = 0; j < class_info->m_nFieldSize; j++)
                 {
@@ -30,18 +25,13 @@ namespace netvars
                     if (!field)
                         continue;
 
-                    char name_hashed[256];
-
-                    strcpy_s(name_hashed, class_binding->m_pszName);
-                    strcat_s(name_hashed, "->");
-                    strcat_s(name_hashed, field->m_pszName);
-                    
+                    std::string name_hashed = std::format(":s->:s", class_binding->m_pszName, field->m_pszName);
                     const auto hash = xxh::get_hash(name_hashed);
                     
                     netvars_data[hash] = field->m_nSingleInheritanceOffset;
 
-                    //if (!strstr(class_binding->m_name, "CEntityInstance"));
-                        //g_Console->println("DEBUG: %s->%s: 0x%p", class_binding->m_pszName, field->m_pszName, (uintptr_t)field->m_nSingleInheritanceOffset);
+                    //if (!strcmp(class_binding->m_pszName, "C_BaseGrenade"))
+                    //g_Console->println("DEBUG: %s->%s: 0x%p", class_binding->m_pszName, field->m_pszName, field->m_nSingleInheritanceOffset);
                 }
             }
         }
@@ -49,8 +39,7 @@ namespace netvars
 
     uintptr_t get_offset_by_hash_cached(const XXH64_hash_t hash)
     {
-        uintptr_t offset(0);
-
+        uintptr_t offset = 0;
         if (!offset)
             offset = netvars_data[hash];
 

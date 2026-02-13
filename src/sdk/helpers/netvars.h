@@ -1,5 +1,5 @@
 #pragma once
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <type_traits>
 #include "../../sdk/helpers/xxhash.h"
@@ -43,7 +43,7 @@ __forceinline type function() \
 
 namespace netvars
 {
-    static std::map<XXH64_hash_t, uintptr_t> netvars_data;
+    static std::unordered_map<XXH64_hash_t, uintptr_t> netvars_data;
 
     void init();
     uintptr_t get_offset_by_hash_cached(const XXH64_hash_t hash);

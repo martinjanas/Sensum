@@ -21,7 +21,8 @@ public:
         return v2;
     }*/
 
-    SchemaClassInfoData_t* GetSchemaClassInfo() //GetSchemaClassInfo is the last function in the CEntityInstance vtable.
+    //GetSchemaClassInfo is the last function in the CEntityInstance vtable.
+    SchemaClassInfoData_t* GetSchemaClassInfo()
     {
         SchemaClassInfoData_t* pClassInfo = nullptr;
         VTable::GetThiscall<void>(this, 44, &pClassInfo);
@@ -51,8 +52,7 @@ public:
         return 0;
     }
 
-    //TODO: Update Schema related classes, looks like m_baseClasses no longer work properly?
-    bool IsController() //Looks like schema classes are outdated or smth, cant reliably determine entity type;
+    bool IsController()
     {
         static auto class_hash = xxh::get_hash("CBasePlayerController");
 

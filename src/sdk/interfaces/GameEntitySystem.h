@@ -8,25 +8,24 @@ class CEntitySystem
 public:
 	CBaseEntity* GetBaseEntity(uint32_t index)
 	{
-		uint64_t entity;
-
-		uint64_t temp_entity_ptr = *(uint64_t*)(this + 0x8 * (index >> 9) + 0x10);
-
-		if (!temp_entity_ptr)
+		if (index < 0 || index > 0x7FFE)
 			return nullptr;
 
-		int64_t temp_entity = 0x78 * (index & 0x1FF) + temp_entity_ptr;
-
-		if (!temp_entity)
+		const int chunk_idx = index >> 9;
+		if (chunk_idx > 0x3F)
 			return nullptr;
 
-		uint32_t entity_index = (*(uint32_t*)(temp_entity + 0x10) & 0x7FFF);
+		const uintptr_t chunk_base = *reinterpret_cast<uintptr_t*>(reinterpret_cast<uintptr_t>(this) + 0x10 + chunk_idx * 8);
+		if (!chunk_base)
+			return nullptr;
 
-		if (index <= 0x7FFE && (index >> 9) <= 0x3F && temp_entity_ptr && temp_entity && entity_index == index)
-			entity = *(uint64_t*)temp_entity;
-		else entity = 0;
+		const uintptr_t entry = chunk_base + (index & 0x1FF) * 0x70;
 
-		return reinterpret_cast<CBaseEntity*>(entity);
+		const uint32_t entry_identity = *reinterpret_cast<uint32_t*>(entry + 0x10);
+		if ((entry_identity & 0x7FFF) != index)
+			return nullptr;
+
+		return *reinterpret_cast<CBaseEntity**>(entry);
 	}
 
 	template <typename T = CBaseEntity*>

@@ -10,7 +10,6 @@
 
 namespace entity_data
 {
-	std::list<EntityInstance_t> player_instances;
 	std::list<EntityInstance_t> entity_instances;
 	std::list<player_entry_data_t> player_entry_data;
 	std::list<entity_entry_data_t> entity_entry_data;
@@ -257,22 +256,19 @@ namespace entity_data
 	{
 		if (!g::engine_client->IsInGame())
 			return;
-	
-		std::lock_guard<std::mutex> lock(player_locker);
 
-		const auto& local_controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
+		std::lock_guard lock(player_locker);
+
+		CCSPlayerController* local_controller = g::entity_system->GetLocalPlayerController<CCSPlayerController*>();
 		if (!local_controller)
 			return;
 
+		//TODO: localpawn is nullptr somehow - MJ - GetEntityFromHandle is fucking up somehow...
 		CCSPlayerPawn* localpawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(local_controller->m_hPawn());
 		if (!localpawn)
-		{
-			destroy();
 			return;
-		}
 
-		bool is_localpawn_spectating = !localpawn->IsAlive() && localpawn->m_pObserverServices();
-		if (is_localpawn_spectating)
+		if (!localpawn->IsAlive() && localpawn->m_pObserverServices())
 		{
 			const auto& observer_controller = g::entity_system->GetEntityFromHandle<CCSPlayerController*>(localpawn->m_pObserverServices()->m_hObserverTarget());
 			if (!observer_controller)
@@ -287,19 +283,12 @@ namespace entity_data
 
 		const auto& local_team = localpawn->m_iTeamNum();
 		const auto& eye_pos = localpawn->GetEyePos();
-		
+
 		player_entry_data_t entry_data;
-		for (const auto& instance : player_instances)
+		for (int i = 1; i < 65; ++i)
 		{
-			if (!instance.entity || !instance.handle.IsValid())
-				continue;
-
-			const auto& controller = reinterpret_cast<CCSPlayerController*>(instance.entity);
+			const auto& controller = reinterpret_cast<CCSPlayerController*>(g::entity_system->GetBaseEntity(i));
 			if (!controller)
-				continue;
-
-			const uint32_t& index = instance.handle.GetEntryIndex();
-			if (index <= 0 || index > 0x7FFF)
 				continue;
 
 			if (!controller->m_hPawn().IsValid())
@@ -338,7 +327,7 @@ namespace entity_data
 
 			player_data_t player_data;
 			player_data.m_szPlayerName = controller->m_sSanitizedPlayerName();
-			player_data.m_iPlayerIndex = index;
+			player_data.m_iPlayerIndex = i;
 			player_data.m_vecOrigin = scene_node->m_vecOrigin();
 			player_data.m_vecAbsOrigin = scene_node->m_vecAbsOrigin();
 			player_data.m_vecEyePos = (scene_node->m_vecOrigin() + pawn->m_vecViewOffset());

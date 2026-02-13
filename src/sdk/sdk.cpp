@@ -122,8 +122,8 @@ namespace sdk
 		g::game_type = modules::matchmaking.get_interface_from_list<CGameType*>("GameTypes001");
 		g::cvar = modules::tier0.get_interface_from_list<IVEngineCVar*>("VEngineCvar007");
 
-		/*g::csgo_input = modules::client.get_sig(xxh::get_hash("g::csgo_input")).as<CSGOInput*>();
-		g::render_system = **modules::directx11.get_sig(xxh::get_hash("g::render_system")).add(0x8).as<CRenderSystem***>();
+		g::csgo_input = modules::client.get_sig(xxh::get_hash("g::csgo_input")).as<CSGOInput*>();
+		/*g::render_system = **modules::directx11.get_sig(xxh::get_hash("g::render_system")).add(0x8).as<CRenderSystem***>();
 		g::global_vars = *modules::client.get_sig(xxh::get_hash("g::global_vars")).as<CGlobalVarsBase**>();
 		g::engine_trace = *modules::client.get_sig(xxh::get_hash("g::engine_trace")).as<CGameTrace**>();
 		g::client_mode_csnormal = modules::client.get_sig(xxh::get_hash("g::clientmode_csnormal")).as<CClientModeCSNormal*>();
