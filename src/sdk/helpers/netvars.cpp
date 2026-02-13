@@ -15,15 +15,18 @@ namespace netvars
             if (!netvar_class)
                 continue;
 
-            CUtlTSHash<CSchemaClassBinding*> classes = netvar_class->GetClassBindings();
+            CUtlTSHash<SchemaClassInfoData_t*> classes = netvar_class->GetClassBindings();
             for (const auto& class_binding : classes.GetElements())
             {
-                CSchemaClassInfo* class_info = netvar_class->FindDeclaredClass(class_binding->GetName());
+                const char* lookup_name = class_binding->m_pszName;
+                if (!lookup_name)
+                    continue;
+
+                SchemaClassInfoData_t* class_info = netvar_class->FindDeclaredClass(lookup_name);
 
                 for (auto j = 0; j < class_info->m_nFieldSize; j++)
                 {
-                    SchemaClassFieldData_t* field = &class_info->m_pFields[j];//&class_info->GetFields()[j];
-
+                    SchemaClassFieldData_t* field = &class_info->m_pFields[j];
                     if (!field)
                         continue;
 
@@ -38,7 +41,7 @@ namespace netvars
                     netvars_data[hash] = field->m_nSingleInheritanceOffset;
 
                     //if (!strstr(class_binding->m_name, "CEntityInstance"));
-                        g_Console->println("DEBUG: %s->%s: 0x%p", class_binding->m_pszName, field->m_pszName, (uintptr_t)field->m_nSingleInheritanceOffset);
+                        //g_Console->println("DEBUG: %s->%s: 0x%p", class_binding->m_pszName, field->m_pszName, (uintptr_t)field->m_nSingleInheritanceOffset);
                 }
             }
         }

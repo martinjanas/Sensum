@@ -7,16 +7,14 @@ CEntityInstance* __fastcall hooks::on_remove_entity::hooked(void* rcx, CEntityIn
 {
     if (instance)
     {
-        /*if (instance->IsController())
+        if (instance->IsController())
         {
             auto it = std::remove_if(entity_data::player_instances.begin(), entity_data::player_instances.end(), [&](const entity_data::EntityInstance_t& e) { return e.handle.GetEntryIndex() == handle.GetEntryIndex(); });
-
             entity_data::player_instances.erase(it, entity_data::player_instances.end());
         }
 
         auto entity_it = std::remove_if(entity_data::entity_instances.begin(), entity_data::entity_instances.end(), [&](const entity_data::EntityInstance_t& e) { return e.handle.GetEntryIndex() == handle.GetEntryIndex(); });
-
-        entity_data::entity_instances.erase(entity_it, entity_data::entity_instances.end());*/
+        entity_data::entity_instances.erase(entity_it, entity_data::entity_instances.end());
     }
 
     return original_fn(rcx, instance, handle);

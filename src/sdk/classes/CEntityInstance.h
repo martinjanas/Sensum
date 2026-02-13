@@ -20,10 +20,11 @@ public:
         unknown_libname_916(v2, &unk_181B290A0);
         return v2;
     }*/
+
     SchemaClassInfoData_t* GetSchemaClassInfo() //GetSchemaClassInfo is the last function in the CEntityInstance vtable.
     {
         SchemaClassInfoData_t* pClassInfo = nullptr;
-        VTable::GetThiscall<void>(this, 42, &pClassInfo);
+        VTable::GetThiscall<void>(this, 44, &pClassInfo);
 
         return pClassInfo;
     }
