@@ -2,6 +2,7 @@
 // See end of file for extended copyright information.
 #pragma once
 #include "CUtlMemory.h"
+#include <cassert>
 
 //-----------------------------------------------------------------------------
 // A red-black binary search tree
@@ -169,7 +170,7 @@ public:
 
     I NextInorder(I i) const {
         // Don't go into an infinite loop if it's a bad index
-        Assert(IsValidIndex(i));
+        assert(IsValidIndex(i));
         if (!IsValidIndex(i))
             return InvalidIndex();
 
@@ -192,7 +193,7 @@ public:
 
     I PrevInorder(I i) const {
         // Don't go into an infinite loop if it's a bad index
-        Assert(IsValidIndex(i));
+        assert(IsValidIndex(i));
         if (!IsValidIndex(i))
             return InvalidIndex();
 

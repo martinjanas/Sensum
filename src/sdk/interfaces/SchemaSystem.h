@@ -10,13 +10,14 @@
 #include "../helpers/CUtlTSHash.h"
 #include "../helpers/CUtlVector.h"
 #include "../helpers/CUtlMap.h"
+#include "../helpers/modules.h"
 #include "../helpers/vfunc.h"
 
 // Copyright (C) 2023 neverlosecc
 // See end of file for extended copyright information.
 constexpr auto kSchemaSystemVersion = 2;
-constexpr auto kSchemaSystem_PAD0 = 0x188;
-constexpr auto kSchemaSystem_PAD1 = 0x120;
+constexpr auto kSchemaSystem_PAD0 = 0x190;
+constexpr auto kSchemaSystem_PAD1 = 0xE0;
 constexpr auto kSchemaSystemTypeScope_PAD0 = 0x7;
 
 enum 
@@ -24,8 +25,8 @@ enum
     kSchemaType_GetSizeWithAlignOf = 3,
     kSchemaSystem_ValidateClasses = 35,
     kSchemaSystem_GetClassInfoBinaryName = 22,
-    kSchemaSystem_GetClassProjectName = kSchemaSystem_GetClassInfoBinaryName + 1,
-    kSchemaSystem_GetEnumBinaryName = kSchemaSystem_GetClassProjectName + 1,
+    kSchemaSystem_GetClassModuleName = kSchemaSystem_GetClassInfoBinaryName + 1,
+    kSchemaSystem_GetEnumBinaryName = kSchemaSystem_GetClassModuleName + 1,
     kSchemaSystem_GetEnumProjectName = kSchemaSystem_GetEnumBinaryName + 1,
     kSchemaSystemTypeScope_DeclaredClass = 14,
     kSchemaSystemTypeScope_DeclaredEnum = kSchemaSystemTypeScope_DeclaredClass + 1,
@@ -455,11 +456,9 @@ class typedescription_t;
 using SchemaFieldMetadataOverrideSetData_t = datamap_t;
 using SchemaFieldMetadataOverrideData_t = typedescription_t;
 
-struct SchemaClassInfoData_t 
-{
+struct SchemaClassInfoData_t {
 public:
-    enum class SchemaClassInfoFunctionIndex : std::int32_t 
-    {
+    enum class SchemaClassInfoFunctionIndex : std::int32_t {
         kRegisterClassSchema = 0,
         kPreRegisterClassSchema = 1,
         kCopyInstance = 2,
@@ -474,30 +473,37 @@ public:
     SchemaClassInfoData_t* m_pSelf; // 0x0000
     const char* m_pszName; // 0x0008
     const char* m_pszModule; // 0x0010
-    int m_nSize; // 0x0018
+
+    int m_nSizeOf; // 0x0018
+
     std::int16_t m_nFieldSize; // 0x001C
-    std::int16_t m_nStaticFieldsSize; // 0x001E
+
     std::int16_t m_nStaticMetadataSize; // 0x0020
     std::uint8_t m_unAlignOf; // 0x0022
-    std::uint8_t m_bHasBaseClass; // 0x0023
-    std::int16_t m_nTotalClassSize; // 0x0024 // @note: @og: if there is no derived or base class, then it will be 1 otherwise derived class size + 1.
-    std::int16_t m_nDerivedClassSize; // 0x0026
+
+    std::int8_t m_nBaseClassSize; // 0x0023
+
+    // @note: @og: if there is no derived or base class, then it will be 1 otherwise derived class size + 1.
+    std::int16_t m_nMultipleInheritanceDepth; // 0x0024
+    std::int16_t m_nSingleInheritanceDepth; // 0x0026
+
     SchemaClassFieldData_t* m_pFields; // 0x0028
-    SchemaStaticFieldData_t* m_pStaticFields; // 0x0030
+
     SchemaBaseClassInfoData_t* m_pBaseClasses; // 0x0038
     SchemaFieldMetadataOverrideSetData_t* m_pFieldMetadataOverrides; // 0x0040
     SchemaMetadataEntryData_t* m_pStaticMetadata; // 0x0048
     CSchemaSystemTypeScope* m_pTypeScope; // 0x0050
+
     CSchemaType* m_pSchemaType; // 0x0058
-    SchemaClassFlags_t m_nClassFlags : 8; // 0x0060
+    SchemaClassFlags_t m_nClassFlags:32; // 0x0060
+
     std::uint32_t m_unSequence; // 0x0064 // @note: @og: idk
     void* m_pFn; // 0x0068
 
 public:
     template <typename RetTy = void*, typename... Ty>
-    RetTy CallFunction(SchemaClassInfoFunctionIndex index, Ty... args) const 
-    {
-        return reinterpret_cast<RetTy(*)(SchemaClassInfoFunctionIndex, Ty...)>(m_pFn)(index, std::forward<Ty>(args)...);
+    [[nodiscard]] RetTy CallFunction(SchemaClassInfoFunctionIndex index, Ty... args) const {
+        return reinterpret_cast<RetTy (*)(SchemaClassInfoFunctionIndex, Ty...)>(m_pFn)(index, std::forward<Ty>(args)...);
     }
 };
 
@@ -520,7 +526,7 @@ public:
 
     [[nodiscard]] std::optional<CSchemaClassInfo*> GetBaseClass() const 
     {
-        if (m_bHasBaseClass && m_pBaseClasses)
+        if (m_nBaseClassSize && m_pBaseClasses)
             return m_pBaseClasses->m_pPrevByClass;
         return std::nullopt;
     }
@@ -528,11 +534,6 @@ public:
     [[nodiscard]] std::vector<SchemaClassFieldData_t> GetFields() 
     {
         return { m_pFields, m_pFields + m_nFieldSize };
-    }
-
-    [[nodiscard]] std::vector<SchemaStaticFieldData_t> GetStaticFields() 
-    {
-        return { m_pStaticFields, m_pStaticFields + m_nStaticFieldsSize };
     }
 
     [[nodiscard]] std::vector<SchemaMetadataEntryData_t> GetStaticMetadata() 
@@ -568,7 +569,7 @@ public:
 
     [[nodiscard]] bool IsInherits(const std::string_view from) const 
     {
-        if (!m_bHasBaseClass || !m_pBaseClasses || !m_pBaseClasses->m_pPrevByClass)
+        if (!m_nBaseClassSize || !m_pBaseClasses || !m_pBaseClasses->m_pPrevByClass)
             return false;
         if (m_pBaseClasses->m_pPrevByClass->GetName() == from)
             return true;
@@ -584,7 +585,7 @@ public:
 
     [[nodiscard]] int GetSize() const 
     {
-        return m_nSize;
+        return m_nSizeOf;
     }
 
     [[nodiscard]] std::uint8_t GetAligment() const 
@@ -643,6 +644,7 @@ public:
     CUtlMap<K, V> m_Map;
 };
 
+// MJ: Needed
 class CSchemaSystemTypeScope 
 {
 public:
@@ -768,6 +770,8 @@ private:
     CSchemaPtrMap<TypeAndCountInfo_t, CSchemaType_FixedArray*> m_FixedArrays; // 0x0558
     CSchemaPtrMap<int, CSchemaType_Bitfield*> m_Bitfields; // 0x0588
 
+    char _pad_before_bindings[0x60]{};
+
     CUtlTSHash<CSchemaClassBinding*> m_ClassBindings = {}; // 0x05C0
     CUtlTSHash<CSchemaEnumBinding*> m_EnumBindings = {}; // 0x2E50
 };
@@ -779,6 +783,7 @@ enum SchemaTypeScope_t : std::uint8_t
     SCHEMA_TYPESCOPE_DEFAULT,
 };
 
+// MJ: Needed
 class CSchemaSystem 
 {
 public:
@@ -789,7 +794,11 @@ public:
 
     [[nodiscard]] CSchemaSystemTypeScope* FindTypeScopeForModule(const std::string_view pszModuleName) 
     {
-        return VTable::GetThiscall<CSchemaSystemTypeScope*>(this, 13, pszModuleName.data(), nullptr);
+        //return VTable::GetThiscall<CSchemaSystemTypeScope*>(this, 13, pszModuleName.data(), nullptr);
+
+        typedef CSchemaSystemTypeScope* (__thiscall* FnFindTypeScopeForModule)(void*, const char*, void*);
+        static auto addr = modules::schema.scan("48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 48 8B DA", "FindTypeScopeForModule").as<FnFindTypeScopeForModule>();
+        return addr(this, pszModuleName.data(), nullptr);
     }
 
     [[nodiscard]] CSchemaSystemTypeScope* GetTypeScopeForBinding(const SchemaTypeScope_t nType, const std::string_view pszBinding) 
@@ -834,7 +843,7 @@ public:
 
     [[nodiscard]] const char* GetClassProjectName(CSchemaClassBinding* pBinding)
     {
-        return VTable::GetThiscall<const char*>(this, kSchemaSystem_GetClassProjectName, pBinding);
+        return VTable::GetThiscall<const char*>(this, 22/* or 23 - kSchemaSystem_GetClassProjectName*/, pBinding);
     }
 
     [[nodiscard]] const char* GetEnumBinaryName(CSchemaEnumBinding* pBinding)

@@ -1,13 +1,19 @@
-// Copyright (C) 2023 neverlosecc
+// Copyright (C) 2024 neverlosecc
 // See end of file for extended copyright information.
 #pragma once
+#include "../helpers/CThreadSpinMutex.h"
+#include "../helpers/CUtlMemory.h"
+#include <climits>
+#include <cstdint>
 #include <type_traits>
+#include <vector>
 
-#include "CThreadSpinMutex.h"
 #include "CInterlockedInt.h"
+#include "CThreadSpinRWLock.h"
 #include "CUtlMemoryPoolBase.h"
 
 constexpr auto kUtlTsHashVersion = 2;
+
 //=============================================================================
 //
 // Threadsafe Hash
@@ -21,21 +27,21 @@ constexpr auto kUtlTsHashVersion = 2;
 // the insertions are moved into a lock-free list
 //
 // Elements are never individually removed; clears must occur at a time
-// where we and guaranteed no queries are occurring
+// when we and guaranteed no queries are occurring
 //
 using UtlTsHashHandleT = std::uint64_t;
 
 template <class T>
 class ITSHashConstructor {
 public:
-    virtual void Construct(T* pElement) = 0;
+    virtual void func(T* pElement) = 0;
 };
 
 template <class T>
 class CDefaultTSHashConstructor : public ITSHashConstructor<T> {
 public:
-    virtual void Construct(T* pElement) {
-        ::Construct(pElement);
+    virtual void func(T* pElement) {
+        //::func(pElement); //huh?
     }
 };
 
@@ -86,7 +92,7 @@ class CUtlTSHashUseKeyHashMethod {
 public:
     static int Hash(const KEYTYPE& key, int nBucketMask) {
         std::uint32_t nHash = key.HashValue();
-        return (nHash & nBucketMask);
+        return static_cast<int>(nHash & nBucketMask);
     }
 
     static bool Compare(const KEYTYPE& lhs, const KEYTYPE& rhs) {
@@ -98,7 +104,7 @@ template <class T, class Keytype = std::uint64_t, int BucketCount = 256, class H
 class CUtlTSHashV1 {
 public:
     // Invalid handle.
-    static UtlTsHashHandleT InvalidHandle(void) {
+    static UtlTsHashHandleT InvalidHandle() {
         return static_cast<UtlTsHashHandleT>(0);
     }
 
@@ -112,7 +118,7 @@ public:
     }
 
     // Returns elements in the table
-    std::vector<T> GetElements(void);
+    std::vector<T> GetElements();
 
 public:
     // Templatized for memory tracking purposes
@@ -160,11 +166,16 @@ public:
 
     CUtlMemoryPoolBase m_EntryMemory;
     std::array<HashBucket_t, BucketCount> m_aBuckets;
+
+#if defined(DOTA2) || defined(DEADLOCK)
+    bool m_bNeedsCommit;
+    CInterlockedInt m_ContentionCheck;
+#endif
 };
 
 // @note: @og: notice this is hacky-way to obtain elements from CUtlTSHash but its works, so why not
 template <class T, class Keytype, int BucketCount, class HashFuncs>
-std::vector<T> CUtlTSHashV1<T, Keytype, BucketCount, HashFuncs>::GetElements(void) {
+std::vector<T> CUtlTSHashV1<T, Keytype, BucketCount, HashFuncs>::GetElements() {
     std::vector<T> list;
 
     const int n_count = PeakAlloc();
@@ -190,7 +201,7 @@ template <class T, class Keytype = std::uint64_t, int BucketCount = 256, class H
 class CUtlTSHashV2 {
 public:
     // Invalid handle.
-    static UtlTsHashHandleT InvalidHandle(void) {
+    static UtlTsHashHandleT InvalidHandle() {
         return static_cast<UtlTsHashHandleT>(0);
     }
 
@@ -236,16 +247,20 @@ public:
 
     class HashBucket_t {
     public:
-        CThreadSpinRWLock m_AddLock; // 0x0000
-        HashFixedData_t* m_pFirst; // 0x0020
-        HashFixedData_t* m_pFirstUncommitted; // 0x0020
-    }; // Size: 0x0028
-    static_assert(sizeof(HashBucket_t) == 0x28);
+        CThreadSpinRWLock* m_AddLock; // 0x0000
+        HashFixedData_t* m_pFirst; // 0x008
+        HashFixedData_t* m_pFirstUncommitted; // 0x0010
+    }; // Size: 0x0018
+    // clang-19 requires an explicit template type for platform_specific
+    static_assert(sizeof(HashBucket_t) == 0x18);
 
     CUtlMemoryPoolBase m_EntryMemory;
+
     std::array<HashBucket_t, BucketCount> m_aBuckets;
-    bool m_bNeedsCommit;
+    bool m_bNeedsCommit{};
+    char _pad_0x1861[0x03]{};
     CInterlockedInt m_ContentionCheck;
+    char _pad_0x1868[0x08]{};
 };
 
 template <typename T>
@@ -256,11 +271,11 @@ bool ptr_compare(const T& item1, const T& item2) {
 template <class T, class Keytype, int BucketCount, class HashFuncs>
 template <typename Predicate>
 inline std::vector<T> CUtlTSHashV2<T, Keytype, BucketCount, HashFuncs>::merge_without_duplicates(const std::vector<T>& allocated_list,
-    const std::vector<T>& un_allocated_list, Predicate pred) {
+                                                                                                 const std::vector<T>& un_allocated_list, Predicate pred) {
     std::vector<T> merged_list = allocated_list;
 
     for (const auto& item : un_allocated_list) {
-        if (std::find_if(allocated_list.begin(), allocated_list.end(), [&](const T& elem) { return pred(elem, item); }) == allocated_list.end()) {
+        if (std::ranges::find_if(allocated_list, [&](const T& elem) { return pred(elem, item); }) == allocated_list.end()) {
             merged_list.push_back(item);
         }
     }
@@ -294,7 +309,6 @@ std::vector<T> CUtlTSHashV2<T, Keytype, BucketCount, HashFuncs>::GetElements(int
 
     /// @note: @og: basically, its hacky-way to obtain first-time commited information to memory
     n_count = PeakAlloc() - BlocksAllocated();
-
     std::vector<T> unAllocatedList;
     if (n_count > 0) {
         int nIndex = 0;
@@ -317,3 +331,18 @@ std::vector<T> CUtlTSHashV2<T, Keytype, BucketCount, HashFuncs>::GetElements(int
 template <class Ty>
 using CUtlTSHash = std::conditional_t<kUtlTsHashVersion == 1, CUtlTSHashV1<Ty>, CUtlTSHashV2<Ty>>;
 
+// source2gen - Source2 games SDK generator
+// Copyright 2024 neverlosecc
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//

@@ -122,12 +122,12 @@ namespace sdk
 		g::game_type = modules::matchmaking.get_interface_from_list<CGameType*>("GameTypes001");
 		g::cvar = modules::tier0.get_interface_from_list<IVEngineCVar*>("VEngineCvar007");
 
-		g::csgo_input = modules::client.get_sig(xxh::get_hash("g::csgo_input")).as<CSGOInput*>();
+		/*g::csgo_input = modules::client.get_sig(xxh::get_hash("g::csgo_input")).as<CSGOInput*>();
 		g::render_system = **modules::directx11.get_sig(xxh::get_hash("g::render_system")).add(0x8).as<CRenderSystem***>();
 		g::global_vars = *modules::client.get_sig(xxh::get_hash("g::global_vars")).as<CGlobalVarsBase**>();
 		g::engine_trace = *modules::client.get_sig(xxh::get_hash("g::engine_trace")).as<CGameTrace**>();
 		g::client_mode_csnormal = modules::client.get_sig(xxh::get_hash("g::clientmode_csnormal")).as<CClientModeCSNormal*>();
-		g::game_rules = *modules::client.get_sig(xxh::get_hash("g::game_rules")).as<CGameRules**>();
+		g::game_rules = *modules::client.get_sig(xxh::get_hash("g::game_rules")).as<CGameRules**>();*/
 		g::mat_system = modules::materialsys.get_interface_from_list<CMaterialSystem*>("VMaterialSystem2_001");
 
 		g::entity_system = g::game_resource_service->GetEntitySystem();
@@ -135,7 +135,7 @@ namespace sdk
 		g::mem_alloc = modules::tier0.get_export("g_pMemAlloc").as<IMemAlloc*>();
 		mem_alloc_in::mem_alloc = modules::tier0.get_export("g_pMemAlloc").as<IMemAlloc*>();
 
-		g::hud_chat = *reinterpret_cast<CHudChat**>(globals::find_hud_element("HudChatDelegate"));
+		//g::hud_chat = *reinterpret_cast<CHudChat**>(globals::find_hud_element("HudChatDelegate"));
 
 		print_status(g::engine_client);
 		print_status(g::client);

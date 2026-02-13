@@ -355,6 +355,9 @@
   <ItemGroup>
     <Content Include="todo.md" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="sdk\vendor\" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
 </Project>

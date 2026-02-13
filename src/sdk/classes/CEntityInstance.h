@@ -38,7 +38,7 @@ public:
         const auto* current_info = class_info;
         for (int current_level = 1; current_level <= class_hierarchy_level; ++current_level)
         {
-            if (!current_info || !current_info->m_bHasBaseClass)
+            if (!current_info || !current_info->m_nBaseClassSize)
                 return 0;
 
             if (current_level == class_hierarchy_level)

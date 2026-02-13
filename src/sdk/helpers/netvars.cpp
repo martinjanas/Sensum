@@ -16,7 +16,6 @@ namespace netvars
                 continue;
 
             CUtlTSHash<CSchemaClassBinding*> classes = netvar_class->GetClassBindings();
-
             for (const auto& class_binding : classes.GetElements())
             {
                 CSchemaClassInfo* class_info = netvar_class->FindDeclaredClass(class_binding->GetName());
@@ -39,7 +38,7 @@ namespace netvars
                     netvars_data[hash] = field->m_nSingleInheritanceOffset;
 
                     //if (!strstr(class_binding->m_name, "CEntityInstance"));
-                        //g_Console->println("DEBUG: %s->%s: 0x%p", class_binding->m_pszName, field->m_pszName, (uintptr_t)field->m_nSingleInheritanceOffset);
+                        g_Console->println("DEBUG: %s->%s: 0x%p", class_binding->m_pszName, field->m_pszName, (uintptr_t)field->m_nSingleInheritanceOffset);
                 }
             }
         }

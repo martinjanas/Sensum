@@ -216,10 +216,10 @@ namespace hooks
 	
 	bool init()
 	{
-		IDXGIFactory* dxgi_factory = nullptr;
-		get_dxgi(dxgi_factory);
+		//IDXGIFactory* dxgi_factory = nullptr;
+		//get_dxgi(dxgi_factory);
 
-		if (dxgi_factory)
+		/*if (dxgi_factory)
 		{
 			dxgi = ShadowVMT(dxgi_factory);
 			dxgi_factory->Release();
@@ -229,18 +229,18 @@ namespace hooks
 		IDXGISwapChain* swapchain = nullptr;
 		
 		HWND hwnd = FindWindow(nullptr, L"Counter-Strike 2");
-		CreateDeviceD3D11(hwnd, device, swapchain);
+		CreateDeviceD3D11(hwnd, device, swapchain);*/
 
 		//TODO: Add manual reset function to ShadowVMT ?
 		entity_system = ShadowVMT(g::entity_system);
-		csgo_input = ShadowVMT(g::csgo_input);
+		/*csgo_input = ShadowVMT(g::csgo_input);
 		client = ShadowVMT(g::client);
-		client_mode = ShadowVMT(g::client_mode_csnormal);
+		client_mode = ShadowVMT(g::client_mode_csnormal);*/
 
 		entity_system.apply(on_add_entity::index, reinterpret_cast<uintptr_t*>(&on_add_entity::hooked), reinterpret_cast<void**>(&on_add_entity::original_fn));
 		entity_system.apply(on_remove_entity::index, reinterpret_cast<uintptr_t*>(&on_remove_entity::hooked), reinterpret_cast<void**>(&on_remove_entity::original_fn));
 
-		csgo_input.apply(createmove_csgoinput::index, reinterpret_cast<uintptr_t*>(&createmove_csgoinput::hooked), reinterpret_cast<void**>(&createmove_csgoinput::original_fn));
+		/*csgo_input.apply(createmove_csgoinput::index, reinterpret_cast<uintptr_t*>(&createmove_csgoinput::hooked), reinterpret_cast<void**>(&createmove_csgoinput::original_fn));
 		csgo_input.apply(createmove_csgoinput21::index, reinterpret_cast<uintptr_t*>(&createmove_csgoinput21::hooked), reinterpret_cast<void**>(&createmove_csgoinput21::original_fn));
 
 		client.apply(frame_stage_notify::index, reinterpret_cast<uintptr_t*>(&frame_stage_notify::hooked), reinterpret_cast<void**>(&frame_stage_notify::original_fn));
@@ -248,11 +248,11 @@ namespace hooks
 		client_mode.apply(level_init::index, reinterpret_cast<uintptr_t*>(&level_init::hooked), reinterpret_cast<void**>(&level_init::original_fn));
 		client_mode.apply(level_shutdown::index, reinterpret_cast<uintptr_t*>(&level_shutdown::hooked), reinterpret_cast<void**>(&level_shutdown::original_fn));
 		
-		dxgi.apply(directx::create_swapchain::index, reinterpret_cast<uintptr_t*>(&directx::create_swapchain::hooked), reinterpret_cast<void**>(&directx::create_swapchain::original_fn));
+		dxgi.apply(directx::create_swapchain::index, reinterpret_cast<uintptr_t*>(&directx::create_swapchain::hooked), reinterpret_cast<void**>(&directx::create_swapchain::original_fn));*/
 		
-		auto vtable = *reinterpret_cast<void***>(swapchain);
+		/*auto vtable = *reinterpret_cast<void***>(swapchain);
 		directx::present::safetyhook = safetyhook::create_inline((void*)vtable[8], reinterpret_cast<void*>(directx::present::hooked));
-		get_matrices_for_view::safetyhook = safetyhook::create_inline(modules::client.get_sig(xxh::get_hash("hooks::GetMatricesForView"), __FUNCTION__).as(), reinterpret_cast<void*>(get_matrices_for_view::hooked));
+		get_matrices_for_view::safetyhook = safetyhook::create_inline(modules::client.get_sig(xxh::get_hash("hooks::GetMatricesForView"), __FUNCTION__).as(), reinterpret_cast<void*>(get_matrices_for_view::hooked));*/
 		//draw_array_ex::safetyhook = safetyhook::create_inline(modules::scenesys.get_sig(xxh::get_hash("hooks::DrawArrayEx"), __FUNCTION__).as(), reinterpret_cast<void*>(draw_array_ex::hooked));
 		//calcviewmodel::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::CalcViewModel"), __FUNCTION__).as(), reinterpret_cast<void*>(calcviewmodel::hooked));
 		//onrenderstart::safetyhook = safetyhook::create_inline(modules::client.get_sig_addr(FNV("hooks::OnRenderStart"), __FUNCTION__).as(), reinterpret_cast<void*>(onrenderstart::hooked));

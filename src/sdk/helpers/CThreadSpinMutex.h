@@ -1,24 +1,38 @@
-// Copyright (C) 2023 neverlosecc
+// Copyright (C) 2024 neverlosecc
 // See end of file for extended copyright information.
 #pragma once
-#include <cstdint>
 
-class CThreadSpinRWLock {
-public:
-    struct LockInfo_t {
-        std::uint32_t m_writerId;
-        std::int32_t m_nReaders;
-    };
+#include "CThreadMutex.h"
+#include <type_traits>
 
+constexpr auto kThreadSpinMutex = 2;
+
+class CThreadSpinMutexV1 {
 public:
-    void* m_pThreadSpin;
-    LockInfo_t m_lockInfo;
+    CThreadSpinMutexV1(const char* pDebugName = NULL): m_ownerID(0), m_depth(0), m_pszDebugName(pDebugName) { }
+
+private:
+    volatile ThreadId_t m_ownerID;
+    int m_depth;
     const char* m_pszDebugName;
 };
-static_assert(sizeof(CThreadSpinRWLock) == 0x18);
+static_assert(sizeof(CThreadSpinMutexV1) == 0x10);
+
+class CThreadSpinMutexV2 {
+public:
+    CThreadSpinMutexV2([[maybe_unused]] const char* pDebugName = NULL): m_ownerID(0), m_depth(0) { }
+
+private:
+    volatile ThreadId_t m_ownerID;
+    int m_depth;
+};
+static_assert(sizeof(CThreadSpinMutexV2) == 0x8);
+
+using CThreadSpinMutex = std::conditional_t<kThreadSpinMutex == 1, CThreadSpinMutexV1, CThreadSpinMutexV2>;
+using CThreadFastMutex = CThreadSpinMutex;
 
 // source2gen - Source2 games SDK generator
-// Copyright 2023 neverlosecc
+// Copyright 2024 neverlosecc
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
