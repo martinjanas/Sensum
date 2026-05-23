@@ -9,7 +9,7 @@ CEntityInstance* __fastcall hooks::on_add_entity::hooked(void* rcx, CEntityInsta
     {
         if (!instance->IsController())
         {
-            bool entity_exists = std::any_of(entity_data::entity_instances.begin(), entity_data::entity_instances.end(), [&](const entity_data::EntityInstance_t& e) { return e.handle.GetEntryIndex() == handle.GetEntryIndex(); });
+            bool entity_exists = std::any_of(entity_data::entity_instances.begin(), entity_data::entity_instances.end(), [&](const entity_data::EntityInstance_t& e) { return e.handle.GetEntityIndex() == handle.GetEntityIndex(); });
             if (!entity_exists)
                 entity_data::entity_instances.emplace_back(instance, handle);
         }

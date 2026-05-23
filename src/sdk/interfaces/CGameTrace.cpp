@@ -17,7 +17,7 @@ TraceFilter_t::TraceFilter_t(std::uint32_t uMask, CBaseEntity* localplayer, CBas
 
 	if (localplayer)
 	{
-		m_arrSkipHandles[0] = localplayer->GetHandle().GetEntryIndex();
+		m_arrSkipHandles[0] = localplayer->GetHandle().GetEntityIndex();
 		m_arrSkipHandles[2] = localplayer->GetOwnerHandle();
 		m_arrCollisions[0] = localplayer->m_pCollision()->CollisionMask();
 	}
@@ -30,7 +30,7 @@ TraceFilter_t::TraceFilter_t(std::uint32_t uMask, CBaseEntity* localplayer, CBas
 
 	if (player)
 	{
-		m_arrSkipHandles[1] = player->GetHandle().GetEntryIndex();
+		m_arrSkipHandles[1] = player->GetHandle().GetEntityIndex();
 		m_arrSkipHandles[3] = player->GetOwnerHandle();
 		m_arrCollisions[1] = player->m_pCollision()->CollisionMask();
 

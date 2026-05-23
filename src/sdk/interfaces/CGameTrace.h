@@ -332,24 +332,6 @@ struct SurfaceData_t
 
 struct Trace_t
 {
-	Trace_t() = default;
-
-	SurfaceData_t* GetSurfaceData();
-
-	int GetHitboxID()
-	{
-		if (m_pHitboxData)
-			return m_pHitboxData->m_nHitboxId;
-		return -1;
-	}
-
-	int GetHitgroup()
-	{
-		if (m_pHitboxData)
-			return m_pHitboxData->m_nHitGroup;
-		return -1;
-	}
-
 	//void* m_pSurface;					// 0x0
 	//CBaseEntity* m_pHitEntity;			// 0x8
 	//TraceHitboxData_t* m_pHitboxData;	// 0x10
@@ -408,19 +390,6 @@ struct TraceFilter_t
 
 	TraceFilter_t() = default;
 	TraceFilter_t(std::uint32_t uMask, CBaseEntity* localplayer, CBaseEntity* player, int nLayer);
-
-	static TraceFilter_t* InitEntitiesOnly(TraceFilter_t* thisptr, CBaseEntity* skip, uint32_t mask, int layer)
-	{
-		using fn = TraceFilter_t*(__thiscall*)(void*, CBaseEntity*, uint32_t, int, int16_t);
-		static auto hash = xxh::get_hash("TraceFilter_t::InitEntitiesOnly");
-		static auto addr = modules::client.get_sig(hash, __FUNCTION__).as();
-		if (!addr)
-			return nullptr;
-
-		auto init_entities_only = reinterpret_cast<fn>(addr);
-		if (init_entities_only)
-			return init_entities_only(thisptr, skip, mask, layer, 15);
-	}
 };
 
 class CGameTrace

@@ -37,6 +37,7 @@ DWORD __stdcall on_attach(void* base)
 
 BOOL APIENTRY DllMain(HMODULE module, DWORD reason, void* reserved)
 {
+    
     if (reason == DLL_PROCESS_ATTACH)
     {
         DisableThreadLibraryCalls(module);

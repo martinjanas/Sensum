@@ -3,15 +3,15 @@
 
 bool CHandle::IsValid() const
 {
-    return entity_index != 0xFFFFFFFF;
+    return entry_index != 0xFFFFFFFF;
 }
 
-int CHandle::GetEntryIndex() const
+int CHandle::GetEntityIndex() const
 {
-    return static_cast<int>(entity_index & 0x7FFF);
+    return static_cast<int>(entry_index & 0x7FFF);
 }
 
 int CHandle::GetSerialNumber() const
 { 
-    return static_cast<int>(entity_index >> 15);
+    return static_cast<int>(entry_index >> 15);
 }

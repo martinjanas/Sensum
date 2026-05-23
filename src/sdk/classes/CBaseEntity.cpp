@@ -18,7 +18,7 @@ std::uint32_t CBaseEntity::GetOwnerHandle()
     std::uint32_t entry_index = -1;
 
     if (this && m_pCollision() && !(m_pCollision()->m_usSolidFlags() & FSOLID_NOT_SOLID))
-        entry_index = this->m_hOwnerEntity().GetEntryIndex();
+        entry_index = this->m_hOwnerEntity().GetEntityIndex();
 
     return entry_index;
 }

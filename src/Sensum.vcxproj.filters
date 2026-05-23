@@ -81,9 +81,6 @@
     <ClInclude Include="sdk\helpers\dynamic_module.h">
       <Filter>sdk\helpers</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\helpers\fnv.h">
-      <Filter>sdk\helpers</Filter>
-    </ClInclude>
     <ClInclude Include="sdk\helpers\importer.h">
       <Filter>sdk\helpers</Filter>
     </ClInclude>
@@ -238,6 +235,11 @@
     <ClInclude Include="sdk\helpers\CUtlBuffer.h" />
     <ClInclude Include="sdk\helpers\CViewRender.h" />
     <ClInclude Include="sdk\helpers\Timer.h" />
+    <ClInclude Include="render\tabs\tabs.h" />
+    <ClInclude Include="sdk\helpers\IconFetcher.h" />
+    <ClInclude Include="sdk\helpers\Icons.h" />
+    <ClInclude Include="sdk\helpers\xxhash.h" />
+    <ClInclude Include="sdk\helpers\xxh.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\classes\CBaseEntity.cpp">
@@ -316,9 +318,6 @@
     <ClCompile Include="sdk\classes\CCSPlayerController.cpp">
       <Filter>sdk\classes</Filter>
     </ClCompile>
-    <ClCompile Include="features\esp.cpp">
-      <Filter>features</Filter>
-    </ClCompile>
     <ClCompile Include="sdk\helpers\globals.cpp" />
     <ClCompile Include="sdk\classes\CCSPlayerPawn.cpp" />
     <ClCompile Include="render\render.cpp" />
@@ -328,7 +327,6 @@
     <ClCompile Include="sdk\hooking\safetyhook\safetyhook.cpp" />
     <ClCompile Include="sdk\hooking\safetyhook\Zydis.c" />
     <ClCompile Include="hooks\functions\GetMatricesForView.cpp" />
-    <ClCompile Include="features\aimbot.cpp" />
     <ClCompile Include="sdk\classes\CHandle.cpp" />
     <ClCompile Include="sdk\interfaces\CGameTrace.cpp" />
     <ClCompile Include="sdk\helpers\notify_system.cpp" />
@@ -339,11 +337,14 @@
     <ClCompile Include="hooks\functions\LevelInit.cpp" />
     <ClCompile Include="hooks\functions\LevelShutdown.cpp" />
     <ClCompile Include="sdk\interfaces\ClientModeCSNormal.h" />
-    <ClCompile Include="features\bhop.cpp" />
     <ClCompile Include="sdk\classes\CPlantedC4.h" />
     <ClCompile Include="sdk\helpers\config_system.cpp" />
     <ClCompile Include="sdk\helpers\utils.cpp" />
     <ClCompile Include="sdk\helpers\Timer.cpp" />
+    <ClCompile Include="render\tabs\aimbot_tab.cpp" />
+    <ClCompile Include="sdk\helpers\IconFetcher.cpp" />
+    <ClCompile Include="sdk\helpers\xxhash.c" />
+    <ClCompile Include="sdk\math\math.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\freetype.lib" />
