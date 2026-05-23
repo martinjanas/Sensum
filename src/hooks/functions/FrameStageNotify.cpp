@@ -20,7 +20,7 @@ void skinchanger()
 	if (!weapon_services)
 		return;
 
-	const auto& viewmodel_services = pawn->m_pViewModelServices();
+	const auto& viewmodel_services = pawn->m_pViewModelServices_REMOVED();
 	if (!viewmodel_services)
 		return;
 	

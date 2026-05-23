@@ -16,7 +16,7 @@ public:
 
     CSkeletonInstance* GetSkeletonInstance()
     {
-        return VTable::GetThiscall<CSkeletonInstance*>(this, 8);
+        return reinterpret_cast<CSkeletonInstance*>(this);
     }
 
     void SetMeshGroupMask(uint64_t mask)

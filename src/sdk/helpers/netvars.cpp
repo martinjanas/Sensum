@@ -18,14 +18,16 @@ namespace netvars
             for (const auto& class_binding : classes.GetElements())
             {
                 SchemaClassInfoData_t* class_info = netvar_class->FindDeclaredClass(class_binding->m_pszName);
-
                 for (auto j = 0; j < class_info->m_nFieldSize; j++)
                 {
                     SchemaClassFieldData_t* field = &class_info->m_pFields[j];
                     if (!field)
                         continue;
 
-                    std::string name_hashed = std::format(":s->:s", class_binding->m_pszName, field->m_pszName);
+                    if (!class_binding->m_pszName || !field->m_pszName)
+						continue;
+
+                    std::string name_hashed = std::format("{}->{}", class_binding->m_pszName, field->m_pszName);
                     const auto hash = xxh::get_hash(name_hashed);
                     
                     netvars_data[hash] = field->m_nSingleInheritanceOffset;

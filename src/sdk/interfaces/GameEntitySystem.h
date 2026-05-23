@@ -8,18 +8,14 @@ class CEntitySystem
 public:
 	CBaseEntity* GetBaseEntity(uint32_t index)
 	{
-		using fn = CBaseEntity*(__thiscall*)(void*, uint32_t);
-		static auto addr = modules::client.scan("4C 8D 49 10 81", "GetBaseEntity").as<fn>();
-
-		return addr(this, index);
-		/*uint64_t entity;
+		uint64_t entity;
 
 		uint64_t temp_entity_ptr = *(uint64_t*)(this + 0x8 * (index >> 9) + 0x10);
 
 		if (!temp_entity_ptr)
 			return nullptr;
 
-		int64_t temp_entity = 0x70 * (index & 0x1FF) + temp_entity_ptr;
+		int64_t temp_entity = static_cast<unsigned long long>(0x70) * (index & 0x1FF) + temp_entity_ptr;
 
 		if (!temp_entity)
 			return nullptr;
@@ -30,7 +26,7 @@ public:
 			entity = *(uint64_t*)temp_entity;
 		else entity = 0;
 
-		return reinterpret_cast<CBaseEntity*>(entity);*/
+		return reinterpret_cast<CBaseEntity*>(entity);
 	}
 
 	template <typename T = CBaseEntity*>
@@ -40,7 +36,7 @@ public:
 		{
 			T player = reinterpret_cast<T>(GetBaseEntity(i));
 
-			if (!player || !player->IsController())
+			if (!player)
 				continue;
 
 			if (player->m_bIsLocalPlayerController())
@@ -52,9 +48,7 @@ public:
 	template <typename T = CBaseEntity*>
 	T GetEntityFromHandle(CHandle handle)
 	{
-		auto base_entity = GetBaseEntity(handle.GetEntityIndex());
-
-		return reinterpret_cast<T>(base_entity);
+		return reinterpret_cast<T>(GetBaseEntity(handle.GetEntityIndex()));
 	}
 
 	CEntityInstance* FindEntityByName(const char* name)

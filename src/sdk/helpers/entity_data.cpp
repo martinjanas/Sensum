@@ -263,12 +263,11 @@ namespace entity_data
 		if (!local_controller)
 			return;
 
-		//TODO: localpawn is nullptr somehow - MJ - GetEntityFromHandle is fucking up somehow...
 		CCSPlayerPawn* localpawn = g::entity_system->GetEntityFromHandle<CCSPlayerPawn*>(local_controller->m_hPawn());
 		if (!localpawn)
 			return;
 
-		if (!localpawn->IsAlive() && localpawn->m_pObserverServices())
+		/*if (!localpawn->IsAlive() && localpawn->m_pObserverServices())
 		{
 			const auto& observer_controller = g::entity_system->GetEntityFromHandle<CCSPlayerController*>(localpawn->m_pObserverServices()->m_hObserverTarget());
 			if (!observer_controller)
@@ -279,7 +278,7 @@ namespace entity_data
 				return;
 
 			localpawn = observer_pawn;
-		}
+		}*/
 
 		const auto& local_team = localpawn->m_iTeamNum();
 		const auto& eye_pos = localpawn->GetEyePos();
@@ -383,7 +382,7 @@ namespace entity_data
 	{
 		static float expire_time = 21.f;
 		auto spawn_time = (float)TICKS_TO_TIME(data.m_nSmokeEffectTickBegin);
-		float total_time_alive = g::global_vars->m_curtime - spawn_time;
+		float total_time_alive = g::global_vars->GetCurtime() - spawn_time;
 					
 		float time_remaining = expire_time - total_time_alive;
 		time_remaining = std::clamp(time_remaining, 0.f, 21.f);
@@ -408,7 +407,7 @@ namespace entity_data
 			if (!entity)
 				continue;
 
-			const uint32_t& index = instance.handle.GetEntryIndex();
+			const uint32_t& index = instance.handle.GetEntityIndex();
 			if (index <= 0 || index > 0x7FFF)
 				continue;
 

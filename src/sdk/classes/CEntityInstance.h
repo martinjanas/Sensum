@@ -25,7 +25,7 @@ public:
     SchemaClassInfoData_t* GetSchemaClassInfo()
     {
         SchemaClassInfoData_t* pClassInfo = nullptr;
-        VTable::GetThiscall<void>(this, 44, &pClassInfo);
+        VTable::GetThiscall<void>(this, 47, &pClassInfo);
 
         return pClassInfo;
     }

@@ -51,7 +51,7 @@ struct SchemaBaseClassInfoData_t
     SchemaClassInfoData_t* m_pPrevByClass; // 0x0008
 };
 
-struct SchemaClassInfoData_t
+/*struct SchemaClassInfoData_t
 {
 public:
     PAD(pad01, 0x8);
@@ -64,6 +64,7 @@ public:
     SchemaClassFieldData_t* m_pFields; // 0x0028
     SchemaBaseClassInfoData_t* m_pBaseClasses; // 0x0038
 };
+static_assert(sizeof(SchemaClassFieldData_t) == 0x20);*/
 
 class CSchemaSystemTypeScope
 {
@@ -86,6 +87,43 @@ private:
     //Update 13.02.2026: m_ClassBindings is now at 0x560 or 1376 in decimal
     CUtlTSHash<SchemaClassInfoData_t*> m_ClassBindings = {}; // 0x560 or 1376
 };
+
+struct SchemaClassInfoData_t
+{
+public:
+    SchemaClassInfoData_t* m_pSelf; // 0x0000
+    const char* m_pszName; // 0x0008
+    const char* m_pszModule; // 0x0010
+    const char* m_pszName2; // 0x0018
+
+    int m_nSizeOf; // 0x0018
+
+    std::int16_t m_nFieldSize; // 0x001C
+
+    std::int16_t m_nStaticMetadataSize; // 0x0020
+    std::uint8_t m_unAlignOf; // 0x0022
+
+    std::int8_t m_nBaseClassSize; // 0x0023
+
+    // @note: @og: if there is no derived or base class, then it will be 1 otherwise derived class size + 1.
+    std::int16_t m_nMultipleInheritanceDepth; // 0x0024
+    std::int16_t m_nSingleInheritanceDepth; // 0x0026
+
+    SchemaClassFieldData_t* m_pFields; // 0x0028
+
+    SchemaBaseClassInfoData_t* m_pBaseClasses; // 0x0038
+    void* m_pFieldMetadataOverrides; // 0x0040
+    SchemaMetadataEntryData_t* m_pStaticMetadata; // 0x0048
+    CSchemaSystemTypeScope* m_pTypeScope; // 0x0050
+
+    void* m_pSchemaType; // 0x0058
+    enum SchemaClassFlags_t m_nClassFlags : 32; // 0x0060
+
+    std::uint32_t m_unSequence; // 0x0064 // @note: @og: idk
+    void* m_pFn; // 0x0068
+};
+static_assert(offsetof(SchemaClassInfoData_t, m_pFn) == 0x68, "Offset of m_pFn should be 0x68");
+
 
 class CSchemaSystem 
 {

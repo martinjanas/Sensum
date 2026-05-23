@@ -55,7 +55,7 @@ namespace sdk
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 89 5C 24 18 55 56 57 41 56 41 57 48 83 EC 20 41", "CBaseEntity::HitboxToWorldTransform", 0, false));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "48 8B C4 48 89 58 10 48 89 70 20 55 57 41 56", "CBaseEntity::EmitSound", 0, false));
 		
-		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "85 D2 78 16 3B 91", "CModel::GetBoneFlags", 0, false));
+		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "85 D2 78 16 3B 91 68", "CModel::GetBoneFlags", 0, false));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "E8 ? ? ? ? 41 0F 10 14 3F", "CModel::GetBoneParent", 0x1, true));
 		futures.push_back(std::async(std::launch::async, scan_and_cache_sig, &modules::client, "85 D2 78 25 3B 91", "CModel::GetBoneName", 0, false));
 		

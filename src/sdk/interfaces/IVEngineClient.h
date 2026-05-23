@@ -31,22 +31,22 @@ public:
 
     int GetMaxClients()
     {
-        return VTable::GetThiscall<int>(this, 36);
+        return VTable::GetThiscall<int>(this, 38);
     }
 
     bool IsInGame()
     {
-        return VTable::GetThiscall<bool>(this, 37); //was 35
+        return VTable::GetThiscall<bool>(this, 39); //was 35
     }
 
     bool IsConnected()
     {
-        return VTable::GetThiscall<bool>(this, 38); //was 36
+        return VTable::GetThiscall<bool>(this, 40); //was 36
     }
 
     void ExecuteClientCmd(const char* cmd)
     {
-        VTable::GetThiscall<void>(this, 47, 0, cmd, 0x7FFEF001); //Edit: 27-09-25 - 49?
+        VTable::GetThiscall<void>(this, 49, 0, cmd, 0x7FFEF001); //Edit: 27-09-25 - 49?
     }
 
     int GetLocalPlayer()
@@ -59,7 +59,7 @@ public:
 
     void GetScreenSize(int& width, int& height)
     {
-        VTable::GetThiscall<void>(this, 55, std::ref(width), std::ref(height));
+        VTable::GetThiscall<void>(this, 60, std::ref(width), std::ref(height)); //was 55
     }
 
     const char* GetLevelName()
