@@ -1,6 +1,7 @@
 #include "sdk.h"
 #include "../sdk/helpers/modules.h"
 #include "../hooks/hooks.h"
+#include "../core/core.h"
 
 #include <d3d11.h>
 #include <future>
@@ -108,6 +109,9 @@ namespace sdk
 
 	void init_interfaces()
 	{
+		core::ConstructContexts();
+		core::ConstructSystems();
+
 		g::engine_client = modules::engine.get_interface_from_list<IVEngineClient*>("Source2EngineToClient001");
 		g::client = modules::client.get_interface_from_list<CSource2Client*>("Source2Client002");
 		g::schema_system = modules::schema.get_interface_from_list<CSchemaSystem*>("SchemaSystem_001");

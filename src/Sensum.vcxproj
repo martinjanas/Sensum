@@ -189,6 +189,14 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="core\registries\ContextRegistry.h" />
+    <ClInclude Include="core\contexts\EngineContext.h" />
+    <ClInclude Include="core\core.h" />
+    <ClInclude Include="core\interfaces\IBaseContext.h" />
+    <ClInclude Include="core\interfaces\IFeature.h" />
+    <ClInclude Include="core\managers\FeatureManager.h" />
+    <ClInclude Include="core\registries\registries.h" />
+    <ClInclude Include="core\systems\EntityCacheSystem.h" />
     <ClInclude Include="render\tabs\tabs.h" />
     <ClInclude Include="sdk\helpers\config_system.h" />
     <ClInclude Include="features\features.h" />
@@ -282,6 +290,7 @@
     <ClInclude Include="sdk\interfaces\SchemaSystem.h" />
     <ClInclude Include="sdk\math\Vector.h" />
     <ClInclude Include="sdk\hooking\shadow_vmt\ShadowVMT.h" />
+    <ClInclude Include="core\registries\SystemsRegistry.h" />
     <ClInclude Include="thirdparty\ImGui\backends\imgui_impl_dx11.h" />
     <ClInclude Include="thirdparty\ImGui\backends\imgui_impl_win32.h" />
     <ClInclude Include="thirdparty\ImGui\imconfig.h" />
@@ -295,6 +304,12 @@
     <ClInclude Include="sdk\helpers\Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="core\registries\ContextRegistry.cpp" />
+    <ClCompile Include="core\contexts\EngineContext.cpp" />
+    <ClCompile Include="core\core.cpp" />
+    <ClCompile Include="core\interfaces\ISystem.h" />
+    <ClCompile Include="core\managers\FeatureManager.cpp" />
+    <ClCompile Include="core\systems\EntityCacheSystem.cpp" />
     <ClCompile Include="render\tabs\aimbot_tab.cpp" />
     <ClCompile Include="sdk\helpers\config_system.cpp" />
     <ClCompile Include="hooks\functions\GetMatricesForView.cpp" />
@@ -338,6 +353,7 @@
     <ClCompile Include="sdk\math\Vector.cpp" />
     <ClCompile Include="settings\settings.cpp" />
     <ClCompile Include="sdk\hooking\shadow_vmt\ShadowVMT.cpp" />
+    <ClCompile Include="core\registries\SystemsRegistry.cpp" />
     <ClCompile Include="thirdparty\ImGui\backends\imgui_impl_dx11.cpp" />
     <ClCompile Include="thirdparty\ImGui\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="thirdparty\ImGui\imgui.cpp" />

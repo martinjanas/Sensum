@@ -240,6 +240,15 @@
     <ClInclude Include="sdk\helpers\Icons.h" />
     <ClInclude Include="sdk\helpers\xxhash.h" />
     <ClInclude Include="sdk\helpers\xxh.h" />
+    <ClInclude Include="core\core.h" />
+    <ClInclude Include="core\contexts\EngineContext.h" />
+    <ClInclude Include="core\managers\FeatureManager.h" />
+    <ClInclude Include="core\interfaces\IFeature.h" />
+    <ClInclude Include="core\interfaces\IBaseContext.h" />
+    <ClInclude Include="core\systems\EntityCacheSystem.h" />
+    <ClInclude Include="core\registries\ContextRegistry.h" />
+    <ClInclude Include="core\registries\SystemsRegistry.h" />
+    <ClInclude Include="core\registries\registries.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\classes\CBaseEntity.cpp">
@@ -345,6 +354,13 @@
     <ClCompile Include="sdk\helpers\IconFetcher.cpp" />
     <ClCompile Include="sdk\helpers\xxhash.c" />
     <ClCompile Include="sdk\math\math.cpp" />
+    <ClCompile Include="core\core.cpp" />
+    <ClCompile Include="core\contexts\EngineContext.cpp" />
+    <ClCompile Include="core\managers\FeatureManager.cpp" />
+    <ClCompile Include="core\interfaces\ISystem.h" />
+    <ClCompile Include="core\systems\EntityCacheSystem.cpp" />
+    <ClCompile Include="core\registries\ContextRegistry.cpp" />
+    <ClCompile Include="core\registries\SystemsRegistry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\freetype.lib" />
