@@ -189,14 +189,16 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="core\helpers\Module.h" />
     <ClInclude Include="core\registries\ContextRegistry.h" />
     <ClInclude Include="core\contexts\EngineContext.h" />
     <ClInclude Include="core\core.h" />
-    <ClInclude Include="core\interfaces\IBaseContext.h" />
-    <ClInclude Include="core\interfaces\IFeature.h" />
+    <ClInclude Include="core\contexts\BaseContext.h" />
+    <ClInclude Include="core\base\BaseFeature.h" />
     <ClInclude Include="core\managers\FeatureManager.h" />
-    <ClInclude Include="core\registries\registries.h" />
     <ClInclude Include="core\systems\EntityCacheSystem.h" />
+    <ClInclude Include="core\helpers\Exporter.h" />
+    <ClInclude Include="core\helpers\Modules2.h" />
     <ClInclude Include="render\tabs\tabs.h" />
     <ClInclude Include="sdk\helpers\config_system.h" />
     <ClInclude Include="features\features.h" />
@@ -212,9 +214,9 @@
     <ClInclude Include="sdk\helpers\CViewRender.h" />
     <ClInclude Include="sdk\helpers\IconFetcher.h" />
     <ClInclude Include="sdk\helpers\Icons.h" />
-    <ClInclude Include="sdk\helpers\interfaces.h" />
     <ClInclude Include="sdk\helpers\json.hpp" />
     <ClInclude Include="sdk\helpers\json_fwd.hpp" />
+    <ClInclude Include="sdk\helpers\KeyValues.h" />
     <ClInclude Include="sdk\helpers\notify_system.h" />
     <ClInclude Include="sdk\helpers\render.h" />
     <ClInclude Include="sdk\helpers\BBox_t.h" />
@@ -255,6 +257,7 @@
     <ClInclude Include="sdk\interfaces\CGlobalVars.h" />
     <ClInclude Include="sdk\interfaces\CHudChat.h" />
     <ClInclude Include="sdk\interfaces\CInputSystem.h" />
+    <ClInclude Include="sdk\interfaces\CMaterialSystem.h" />
     <ClInclude Include="sdk\interfaces\CNetworkGameClient.h" />
     <ClInclude Include="sdk\interfaces\CNetworkGameService.h" />
     <ClInclude Include="sdk\interfaces\CRenderSystem.h" />
@@ -304,12 +307,18 @@
     <ClInclude Include="sdk\helpers\Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="core\helpers\Module.cpp" />
+    <ClCompile Include="core\contexts\BaseContext.cpp" />
+    <ClCompile Include="core\base\BaseFeature.cpp" />
+    <ClCompile Include="core\systems\BaseSystem.cpp" />
     <ClCompile Include="core\registries\ContextRegistry.cpp" />
     <ClCompile Include="core\contexts\EngineContext.cpp" />
     <ClCompile Include="core\core.cpp" />
-    <ClCompile Include="core\interfaces\ISystem.h" />
+    <ClCompile Include="core\systems\BaseSystem.h" />
     <ClCompile Include="core\managers\FeatureManager.cpp" />
     <ClCompile Include="core\systems\EntityCacheSystem.cpp" />
+    <ClCompile Include="core\helpers\Exporter.cpp" />
+    <ClCompile Include="core\helpers\Modules2.cpp" />
     <ClCompile Include="render\tabs\aimbot_tab.cpp" />
     <ClCompile Include="sdk\helpers\config_system.cpp" />
     <ClCompile Include="hooks\functions\GetMatricesForView.cpp" />
@@ -318,8 +327,10 @@
     <ClCompile Include="render\imgui_custom.cpp" />
     <ClCompile Include="render\menu.cpp" />
     <ClCompile Include="sdk\classes\CPlantedC4.h" />
+    <ClCompile Include="sdk\helpers\CUtlMemory.cpp" />
+    <ClCompile Include="sdk\helpers\CUtlVector.cpp" />
     <ClCompile Include="sdk\helpers\IconFetcher.cpp" />
-    <ClCompile Include="sdk\helpers\interfaces.cpp" />
+    <ClCompile Include="sdk\helpers\KeyValues.cpp" />
     <ClCompile Include="sdk\helpers\notify_system.cpp" />
     <ClCompile Include="render\render.cpp" />
     <ClCompile Include="sdk\classes\CHandle.cpp" />

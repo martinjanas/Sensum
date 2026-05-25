@@ -1,22 +1,42 @@
 #include "core.h"
 #include "../core/contexts/EngineContext.h"
 #include "../core/systems/EntityCacheSystem.h"
-#include "../core/registries/registries.h"
+#include "../core/helpers/Modules2.h"
 
 namespace core
 {
+	ContextRegistry& contexts()
+	{
+		static ContextRegistry instance;
+
+		return instance;
+	}
+
+	SystemsRegistry& systems()
+	{
+		static SystemsRegistry instance;
+
+		return instance;
+	}
+
+	FeatureManager& features()
+	{
+		static FeatureManager instance;
+
+		return instance;
+	}
+
 	void ConstructContexts()
 	{
-		namespace reg = registries;
+		modules2::InitModules();
 
-		reg::g_ContextRegistry.Register<EngineContext>();
-		reg::g_ContextRegistry.ConstructContexts();
+		contexts().Register<EngineContext>();
+		contexts().ConstructContexts();
 	}
 
 	void ConstructSystems()
 	{
-		//namespace sys = systems;
-
-		g_EntityCacheSystem.run();
+		g_EntityCacheSystem.OnCreate();
+		g_EntityCacheSystem.OnUpdate();
 	}
 }

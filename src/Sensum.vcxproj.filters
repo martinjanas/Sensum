@@ -203,7 +203,6 @@
     <ClInclude Include="sdk\helpers\CUtlString.h" />
     <ClInclude Include="sdk\helpers\CUtlTSHash.h" />
     <ClInclude Include="sdk\math\math.h" />
-    <ClInclude Include="sdk\helpers\interfaces.h" />
     <ClInclude Include="sdk\helpers\CUtlVector.h" />
     <ClInclude Include="sdk\interfaces\CInputSystem.h" />
     <ClInclude Include="sdk\hooking\safetyhook\safetyhook.hpp" />
@@ -243,12 +242,16 @@
     <ClInclude Include="core\core.h" />
     <ClInclude Include="core\contexts\EngineContext.h" />
     <ClInclude Include="core\managers\FeatureManager.h" />
-    <ClInclude Include="core\interfaces\IFeature.h" />
-    <ClInclude Include="core\interfaces\IBaseContext.h" />
+    <ClInclude Include="core\base\BaseFeature.h" />
+    <ClInclude Include="core\contexts\BaseContext.h" />
     <ClInclude Include="core\systems\EntityCacheSystem.h" />
     <ClInclude Include="core\registries\ContextRegistry.h" />
     <ClInclude Include="core\registries\SystemsRegistry.h" />
-    <ClInclude Include="core\registries\registries.h" />
+    <ClInclude Include="core\helpers\Module.h" />
+    <ClInclude Include="core\helpers\Exporter.h" />
+    <ClInclude Include="core\helpers\Modules2.h" />
+    <ClInclude Include="sdk\interfaces\CMaterialSystem.h" />
+    <ClInclude Include="sdk\helpers\KeyValues.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\classes\CBaseEntity.cpp">
@@ -332,7 +335,6 @@
     <ClCompile Include="render\render.cpp" />
     <ClCompile Include="sdk\hooking\shadow_vmt\ShadowVMT.cpp" />
     <ClCompile Include="sdk\math\QAngle.cpp" />
-    <ClCompile Include="sdk\helpers\interfaces.cpp" />
     <ClCompile Include="sdk\hooking\safetyhook\safetyhook.cpp" />
     <ClCompile Include="sdk\hooking\safetyhook\Zydis.c" />
     <ClCompile Include="hooks\functions\GetMatricesForView.cpp" />
@@ -357,10 +359,19 @@
     <ClCompile Include="core\core.cpp" />
     <ClCompile Include="core\contexts\EngineContext.cpp" />
     <ClCompile Include="core\managers\FeatureManager.cpp" />
-    <ClCompile Include="core\interfaces\ISystem.h" />
+    <ClCompile Include="core\systems\BaseSystem.h" />
     <ClCompile Include="core\systems\EntityCacheSystem.cpp" />
     <ClCompile Include="core\registries\ContextRegistry.cpp" />
     <ClCompile Include="core\registries\SystemsRegistry.cpp" />
+    <ClCompile Include="core\contexts\BaseContext.cpp" />
+    <ClCompile Include="core\base\BaseFeature.cpp" />
+    <ClCompile Include="core\systems\BaseSystem.cpp" />
+    <ClCompile Include="core\helpers\Module.cpp" />
+    <ClCompile Include="core\helpers\Exporter.cpp" />
+    <ClCompile Include="core\helpers\Modules2.cpp" />
+    <ClCompile Include="sdk\helpers\KeyValues.cpp" />
+    <ClCompile Include="sdk\helpers\CUtlVector.cpp" />
+    <ClCompile Include="sdk\helpers\CUtlMemory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\freetype.lib" />

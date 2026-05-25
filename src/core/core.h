@@ -1,4 +1,7 @@
 #pragma once
+#include "../core/registries/ContextRegistry.h"
+#include "../core/registries/SystemsRegistry.h"
+#include "../core/managers/FeatureManager.h"
 
 /*
 	Contexts - sets of data - eg: Source Engine 2 interfaces such as IVEngineClient, IEngineTrace, etc... or any other usefull data.
@@ -11,6 +14,10 @@
 
 namespace core
 {
+	ContextRegistry& contexts();
+	SystemsRegistry& systems();
+	FeatureManager& features();
+
 	void ConstructContexts();
 	void ConstructSystems();
 }

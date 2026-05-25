@@ -1,6 +1,5 @@
 #pragma once
 #include <memory>
-#include "../registries/registries.h"
 
 /*
 	Will features use systems or contexts?
@@ -11,20 +10,17 @@
 	So features should have both contexts and systems.
 */
 
-class IFeature
+class BaseFeature
 {
 public:
 	
-	virtual ~IFeature() = default;
+	virtual ~BaseFeature() = default;
 
 	bool IsEnabled() const { return m_Enabled; }
 	void SetEnabled(bool enabled) { m_Enabled = enabled; }
 
 	template <typename T>
-	T& GetContext()
-	{
-		return core::registries::g_ContextRegistry.GetContext<T>();
-	}
+	T& GetContext();
 
 public:
 	virtual void OnCreateMove() { }

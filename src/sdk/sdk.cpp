@@ -6,8 +6,6 @@
 #include <d3d11.h>
 #include <future>
 
-#include "../sdk/helpers/interfaces.h"
-
 void print_status(const char* name, void* ptr)
 {
 	auto remove_leading_zeros = [](const std::string& input) -> std::string
@@ -112,6 +110,8 @@ namespace sdk
 		core::ConstructContexts();
 		core::ConstructSystems();
 
+
+		//MJ: these interfaces will be soon obsolete: - They are replaced by EngineContext
 		g::engine_client = modules::engine.get_interface_from_list<IVEngineClient*>("Source2EngineToClient001");
 		g::client = modules::client.get_interface_from_list<CSource2Client*>("Source2Client002");
 		g::schema_system = modules::schema.get_interface_from_list<CSchemaSystem*>("SchemaSystem_001");
@@ -132,7 +132,6 @@ namespace sdk
 		g::entity_system = g::game_resource_service->GetEntitySystem();
 
 		g::mem_alloc = modules::tier0.get_export("g_pMemAlloc").as<IMemAlloc*>();
-		mem_alloc_in::mem_alloc = modules::tier0.get_export("g_pMemAlloc").as<IMemAlloc*>();
 
 		g::hud_chat = *reinterpret_cast<CHudChat**>(globals::find_hud_element("HudChatDelegate"));
 

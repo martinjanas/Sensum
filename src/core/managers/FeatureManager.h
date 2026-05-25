@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <memory>
-#include "../interfaces/IFeature.h"
+#include "../base/BaseFeature.h"
 
 namespace core
 {
@@ -12,16 +12,11 @@ namespace core
 		~FeatureManager();
 
 	public:
-		template<typename T, typename... Args>
-		T& Register(Args&&... args)
+		template<typename T>
+		void Register() requires std::derived_from<T, BaseFeature>
 		{
-			static_assert(std::derived_from<T, IFeature>);
-
-			std::unique_ptr<T> feature = std::make_unique<T>(std::forward<Args>(args)...);
-			T* ptr = feature.get();
+			auto feature = std::make_unique<T>();
 			m_Features.emplace_back(std::move(feature));
-
-			return *ptr;
 		}
 
 		void OnCreateMove();
@@ -29,7 +24,7 @@ namespace core
 		void OnRender();
 
 	private:
-		std::vector<std::unique_ptr<IFeature>> m_Features;
+		std::vector<std::unique_ptr<BaseFeature>> m_Features;
 	};
 }
 

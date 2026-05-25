@@ -3,12 +3,12 @@
 #include <memory>
 #include <unordered_map>
 #include <cassert>
-#include "../interfaces/IBaseContext.h"
+#include "../contexts/BaseContext.h"
 
 class ContextRegistry
 {
 public:
-    template<typename T> requires std::derived_from<T, IBaseContext>
+    template<typename T> requires std::derived_from<T, BaseContext>
     void Register()
     {
         auto ptr = std::make_unique<T>();
@@ -32,7 +32,7 @@ public:
     }
 
 private:
-    std::unordered_map<std::type_index, std::unique_ptr<IBaseContext>> m_Contexts;
+    std::unordered_map<std::type_index, std::unique_ptr<BaseContext>> m_Contexts;
 };
 
 

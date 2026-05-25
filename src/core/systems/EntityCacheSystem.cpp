@@ -1,12 +1,15 @@
 #include "EntityCacheSystem.h"
+#include "../../sdk/helpers/console.h"
 
-void EntityCacheSystem::run()
+void EntityCacheSystem::OnCreate()
 {
-	auto& m_EngineCtx = GetContext<EngineContext>();
+	m_EngineCtx = &GetContext<EngineContext>();
+}
 
-	if (m_EngineCtx.GetEngineClient())
+void EntityCacheSystem::OnUpdate()
+{
+	if (m_EngineCtx->EngineClient())
 	{
-		m_EngineCtx.GetEngineClient()->ExecuteClientCmd("echo EntityCacheSystem::run() - EngineClient is valid!");
-		g_Console->println("EntityCacheSystem::run() - EngineClient is valid!");
+		g_Console->println("EntityCacheSystem::run() - EngineClient is valid!, 0x%p", m_EngineCtx->EngineClient());
 	}
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <cstddef>
 #include "../helpers/CUtlLinkedList.h"
+#include "../helpers/xxh.h"
 #include "../math/Vector.h"
 #include "../math/QAngle.h"
 

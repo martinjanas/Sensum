@@ -1,9 +1,8 @@
 // Copyright (C) 2023 neverlosecc
 // See end of file for extended copyright information.
 #pragma once
-
 #include "../helpers/vfunc.h"
-#include "../../sdk/helpers/interfaces.h"
+#include <cassert>
 
 template <class T>
 inline T* Construct(T* pMemory) {
@@ -148,14 +147,15 @@ public:
 // constructor, destructor
 //-----------------------------------------------------------------------------
 
-template <class T, class I>
+/*template <class T, class I>
 CUtlMemory<T, I>::CUtlMemory(int nGrowSize, int nInitAllocationCount): m_pMemory(0), m_nAllocationCount(nInitAllocationCount), m_nGrowSize(nGrowSize) {
     ValidateGrowSize();
     assert(nGrowSize >= 0);
     if (m_nAllocationCount) {
-        m_pMemory = (T*)mem_alloc_in::mem_alloc->Alloc(m_nAllocationCount * sizeof(T));
+        auto& ctx = core::contexts().GetContext<EngineContext>();
+        m_pMemory = (T*)ctx.MemAlloc()->Alloc(m_nAllocationCount * sizeof(T));
     }
-}
+}*/
 
 template <class T, class I>
 CUtlMemory<T, I>::CUtlMemory(T* pMemory, int numElements): m_pMemory(pMemory), m_nAllocationCount(numElements) {
@@ -174,24 +174,26 @@ CUtlMemory<T, I>::~CUtlMemory() {
     Purge();
 }
 
-template <class T, class I>
-void CUtlMemory<T, I>::Init(int nGrowSize /*= 0*/, int nInitSize /*= 0*/) {
-    Purge();
-
-    m_nGrowSize = nGrowSize;
-    m_nAllocationCount = nInitSize;
-    ValidateGrowSize();
-    assert(nGrowSize >= 0);
-    if (m_nAllocationCount) {
-        m_pMemory = (T*)mem_alloc_in::mem_alloc->Alloc(m_nAllocationCount * sizeof(T));
-    }
-}
+//template <class T, class I>
+//void CUtlMemory<T, I>::Init(int nGrowSize /*= 0*/, int nInitSize /*= 0*/) {
+//    Purge();
+//
+//    m_nGrowSize = nGrowSize;
+//    m_nAllocationCount = nInitSize;
+//    ValidateGrowSize();
+//    assert(nGrowSize >= 0);
+//    if (m_nAllocationCount) {
+//		auto& ctx = core::contexts().GetContext<EngineContext>();
+//
+//        m_pMemory = (T*)ctx.MemAlloc()->Alloc(m_nAllocationCount * sizeof(T));
+//    }
+//}
 
 //-----------------------------------------------------------------------------
 // Fast swap
 //-----------------------------------------------------------------------------
 template <class T>
-FORCEINLINE void V_swap(T& x, T& y) {
+inline void V_swap(T& x, T& y) {
     T temp = x;
     x = y;
     y = temp;
@@ -207,7 +209,7 @@ void CUtlMemory<T, I>::Swap(CUtlMemory<T, I>& mem) {
 //-----------------------------------------------------------------------------
 // Switches the buffer from an external memory buffer to a reallocatable buffer
 //-----------------------------------------------------------------------------
-template <class T, class I>
+/*template <class T, class I>
 void CUtlMemory<T, I>::ConvertToGrowableMemory(int nGrowSize) {
     if (!IsExternallyAllocated())
         return;
@@ -215,13 +217,14 @@ void CUtlMemory<T, I>::ConvertToGrowableMemory(int nGrowSize) {
     m_nGrowSize = nGrowSize;
     if (m_nAllocationCount) {
         int nNumBytes = m_nAllocationCount * sizeof(T);
-        T* pMemory = (T*)mem_alloc_in::mem_alloc->Alloc(nNumBytes);
+        auto& ctx = core::contexts().GetContext<EngineContext>();
+        T* pMemory = (T*)ctx.MemAlloc()->Alloc(nNumBytes);
         memcpy(pMemory, m_pMemory, nNumBytes);
         m_pMemory = pMemory;
     } else {
         m_pMemory = NULL;
     }
-}
+}*/
 
 //-----------------------------------------------------------------------------
 // Attaches the buffer to external memory....
@@ -395,7 +398,7 @@ inline int UtlMemory_CalcNewAllocationCount(int nAllocationCount, int nGrowSize,
     return nAllocationCount;
 }
 
-template <class T, class I>
+/*template <class T, class I>
 void CUtlMemory<T, I>::Grow(int num) {
     assert(num > 0);
 
@@ -430,20 +433,21 @@ void CUtlMemory<T, I>::Grow(int num) {
 
     m_nAllocationCount = nNewAllocationCount;
 
+    auto& ctx = core::contexts().GetContext<EngineContext>();
     if (m_pMemory) {
-        auto ptr = mem_alloc_in::mem_alloc->Alloc(m_nAllocationCount * sizeof(T));
+        auto ptr = ctx.MemAlloc()->Alloc(m_nAllocationCount * sizeof(T));
 
         memcpy(ptr, m_pMemory, oldAllocationCount * sizeof(T));
         m_pMemory = (T*)ptr;
     } else {
-        m_pMemory = (T*)mem_alloc_in::mem_alloc->Alloc(m_nAllocationCount * sizeof(T));
+        m_pMemory = (T*)ctx.MemAlloc()->Alloc(m_nAllocationCount * sizeof(T));
     }
-}
+}*/
 
 //-----------------------------------------------------------------------------
 // Makes sure we've got at least this much memory
 //-----------------------------------------------------------------------------
-template <class T, class I>
+/*template <class T, class I>
 inline void CUtlMemory<T, I>::EnsureCapacity(int num) {
     if (m_nAllocationCount >= num)
         return;
@@ -455,21 +459,24 @@ inline void CUtlMemory<T, I>::EnsureCapacity(int num) {
     }
     m_nAllocationCount = num;
 
+    auto& ctx = core::contexts().GetContext<EngineContext>();
+
     if (m_pMemory) {
-        m_pMemory = (T*)mem_alloc_in::mem_alloc->ReAlloc(m_pMemory, m_nAllocationCount * sizeof(T));
+        m_pMemory = (T*)ctx.MemAlloc()->ReAlloc(m_pMemory, m_nAllocationCount * sizeof(T));
     } else {
-        m_pMemory = (T*)mem_alloc_in::mem_alloc->Alloc(m_nAllocationCount * sizeof(T));
+        m_pMemory = (T*)ctx.MemAlloc()->Alloc(m_nAllocationCount * sizeof(T));
     }
-}
+}*/
 
 //-----------------------------------------------------------------------------
 // Memory deallocation
 //-----------------------------------------------------------------------------
-template <class T, class I>
+/*template <class T, class I>
 void CUtlMemory<T, I>::Purge() {
     if (!IsExternallyAllocated()) {
         if (m_pMemory) {
-            mem_alloc_in::mem_alloc->Free((void*)m_pMemory);
+            auto& ctx = core::contexts().GetContext<EngineContext>();
+            ctx.MemAlloc()->Free((void*)m_pMemory);
             m_pMemory = 0;
         }
         m_nAllocationCount = 0;
@@ -508,8 +515,9 @@ void CUtlMemory<T, I>::Purge(int numElements) {
         return;
     }
     m_nAllocationCount = numElements;
-    m_pMemory = (T*)mem_alloc_in::mem_alloc->ReAlloc(m_pMemory, m_nAllocationCount * sizeof(T));
-}
+    auto& ctx = core::contexts().GetContext<EngineContext>();
+    m_pMemory = (T*)ctx.MemAlloc()->ReAlloc(m_pMemory, m_nAllocationCount * sizeof(T));
+}*/
 
 // source2gen - Source2 games SDK generator
 // Copyright 2023 neverlosecc

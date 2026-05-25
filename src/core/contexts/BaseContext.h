@@ -1,9 +1,9 @@
 #pragma once
 
-class IBaseContext
+class BaseContext
 {
 public:
-	virtual ~IBaseContext() = default;
+	virtual ~BaseContext() = default;
 
 public:
 	virtual void ConstructContext() { }
