@@ -1,6 +1,7 @@
 #pragma once
 #include <stdio.h>
 #include "../contexts/BaseContext.h"
+#include "subcontexts/ModuleSubContext.h"
 #include "../../sdk/interfaces/IVEngineClient.h"
 #include "../../sdk/interfaces/IVEngineCVar.h"
 #include "../../sdk/interfaces/CSource2Client.h"
@@ -27,6 +28,7 @@
 class EngineContext : public BaseContext
 {
 public:
+	/* Source 2 interfaces: */
 	CSource2Client* GameClient() { return m_GameClient; }
 	IVEngineClient* EngineClient() { return m_EngineClient; }
 	IVEngineCVar* EngineCvar() { return m_EngineCvar; }
@@ -46,10 +48,14 @@ public:
 	CGameRules* GameRules() { return m_GameRules; }
 	CMaterialSystem* GameMaterials() { return m_GameMaterials; }
 
+	/* Submodules: */
+	ModuleSubContext* Modules() { return &m_ModuleSubContext; }
+
 public:
 	virtual void ConstructContext() override;
 
 private:
+	/* Source 2 interfaces: */
 	CSource2Client* m_GameClient;
 	IVEngineClient* m_EngineClient = nullptr;
 	IVEngineCVar* m_EngineCvar;
@@ -68,5 +74,8 @@ private:
 	CHudChat* m_HudChat;
 	CGameRules* m_GameRules;
 	CMaterialSystem* m_GameMaterials;
+
+	/* Submodules: */
+	ModuleSubContext m_ModuleSubContext;
 };
 

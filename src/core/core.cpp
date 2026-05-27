@@ -1,7 +1,6 @@
 #include "core.h"
 #include "../core/contexts/EngineContext.h"
 #include "../core/systems/EntityCacheSystem.h"
-#include "../core/helpers/Modules2.h"
 
 namespace core
 {
@@ -26,10 +25,13 @@ namespace core
 		return instance;
 	}
 
+	ModuleSubContext& modules()
+	{
+		return *contexts().GetContext<EngineContext>().Modules();
+	}
+
 	void ConstructContexts()
 	{
-		modules2::InitModules();
-
 		contexts().Register<EngineContext>();
 		contexts().ConstructContexts();
 	}

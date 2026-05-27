@@ -249,9 +249,12 @@
     <ClInclude Include="core\registries\SystemsRegistry.h" />
     <ClInclude Include="core\helpers\Module.h" />
     <ClInclude Include="core\helpers\Exporter.h" />
-    <ClInclude Include="core\helpers\Modules2.h" />
     <ClInclude Include="sdk\interfaces\CMaterialSystem.h" />
     <ClInclude Include="sdk\helpers\KeyValues.h" />
+    <ClInclude Include="core\systems\SigCachingSystem.h" />
+    <ClInclude Include="core\helpers\PatternScanner.h" />
+    <ClInclude Include="core\contexts\subcontexts\BaseSubContext.h" />
+    <ClInclude Include="core\contexts\subcontexts\ModuleSubContext.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sdk\classes\CBaseEntity.cpp">
@@ -368,10 +371,13 @@
     <ClCompile Include="core\systems\BaseSystem.cpp" />
     <ClCompile Include="core\helpers\Module.cpp" />
     <ClCompile Include="core\helpers\Exporter.cpp" />
-    <ClCompile Include="core\helpers\Modules2.cpp" />
     <ClCompile Include="sdk\helpers\KeyValues.cpp" />
     <ClCompile Include="sdk\helpers\CUtlVector.cpp" />
     <ClCompile Include="sdk\helpers\CUtlMemory.cpp" />
+    <ClCompile Include="core\systems\SigCachingSystem.cpp" />
+    <ClCompile Include="core\helpers\PatternScanner.cpp" />
+    <ClCompile Include="core\contexts\subcontexts\BaseSubContext.cpp" />
+    <ClCompile Include="core\contexts\subcontexts\ModuleSubContext.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\freetype.lib" />

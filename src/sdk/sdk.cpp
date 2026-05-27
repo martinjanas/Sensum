@@ -78,6 +78,7 @@ namespace sdk
 
 	void init_modules()
 	{
+		//Soon to be obsolete - replaced by core::modules()
 		modules::client = DynamicModule("client.dll");
 		modules::nav_system = DynamicModule("navsystem.dll");
 		modules::engine = DynamicModule("engine2.dll");
